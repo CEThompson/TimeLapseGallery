@@ -90,6 +90,18 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
+                <ImageView
+                    android:id="@+id/detail_next_image"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="invisible"
+                    android:background="@color/imagePlaceholder"
+                    app:layout_constraintDimensionRatio="1:1"
+                    android:contentDescription="@string/detail_current_image_content_description"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
                 <!-- gradient overlay for image -->
                 <View
                     android:id="@+id/details_gradient_overlay"

@@ -73,6 +73,7 @@ import butterknife.ButterKnife;
 public class DetailsActivity extends AppCompatActivity implements DetailsAdapter.DetailsAdapterOnClickHandler {
 
     @BindView(R.id.detail_current_image) ImageView mCurrentPhotoImageView;
+    @BindView(R.id.detail_next_image) ImageView mNextPhotoImageView;
     @BindView(R.id.details_recyclerview) RecyclerView mDetailsRecyclerView;
     @BindView(R.id.add_photo_fab) FloatingActionButton mAddPhotoFab;
     @BindView(R.id.fullscreen_fab) FloatingActionButton mFullscreenFab;
@@ -93,6 +94,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     private List<PhotoEntry> mPhotos;
     private PhotoEntry mCurrentPhoto;
+    private PhotoEntry mNextPhoto;
     private ProjectEntry mCurrentProject;
 
     private Dialog mFullscreenImageDialog;
@@ -328,12 +330,14 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         constraintSet.clone(constraintLayout);
         constraintSet.setDimensionRatio(R.id.detail_current_image, ratio);
+        constraintSet.setDimensionRatio(R.id.detail_next_image, ratio);
         constraintSet.applyTo(constraintLayout);
 
         // Set the transition name for the image
         String transitionName = mCurrentProject.getId() + mCurrentProject.getName();
         mCurrentPhotoImageView.setTransitionName(transitionName);
 
+        // TODO streamline image loading for clarity and smoothness
         // Load the image
         File f = new File(imagePath);
         Glide.with(this)
@@ -341,18 +345,34 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        schedulePostponedTransition();
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        schedulePostponedTransition();
+                        mNextPhotoImageView.setVisibility(View.VISIBLE);
+                        // TODO refactor second call
+                        Glide.with(DetailsActivity.this)
+                                .load(f)
+                                .listener(new RequestListener<Drawable>() {
+                                    @Override
+                                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                        schedulePostponedTransition();
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                        schedulePostponedTransition();
+                                        mNextPhotoImageView.setVisibility(View.INVISIBLE);
+                                        return false;
+                                    }
+                                })
+                                .into(mCurrentPhotoImageView);
                         return false;
                     }
                 })
-                .into(mCurrentPhotoImageView);
-
+                .into(mNextPhotoImageView);
     }
 
     private void setupViewModel(){
@@ -676,6 +696,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             int currentIndex = mPhotos.indexOf(mCurrentPhoto);
             if (currentIndex == 0) return;
             mCurrentPhoto = mPhotos.get(currentIndex-1);
+            mNextPhoto = mPhotos.get(currentIndex);
             loadUi();
         }
 
@@ -683,6 +704,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             int currentIndex = mPhotos.indexOf(mCurrentPhoto);
             if (currentIndex == mPhotos.size()) return;
             mCurrentPhoto = mPhotos.get(currentIndex+1);
+            mNextPhoto = mPhotos.get(currentIndex);
             loadUi();
         }
 
