@@ -209,6 +209,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         prepareSharedElementTransition();
         setEnterSharedElementCallback(mCallback);
+
+        /* If the user manually adds photos sync here*/
+        syncFiles();
     }
 
     @Override
@@ -476,9 +479,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.import_files:
-                importFiles();
-                return true;
             case R.id.delete_photo:
                 if (mPhotos.size()==1){
                     verifyLastPhotoDeletion();
@@ -737,21 +737,35 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     /*
     * Finds all photos in the project directory and adds any missing photos to the database
      */
-    public void importFiles(){
-
-        List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(this, mCurrentProject);
-        List<PhotoEntry> photosInDb = mPhotos;
-        List<PhotoEntry> photosMissingInDb = new ArrayList<>();
-
-        // Generate a list of photos missing from the database
-        if (allPhotosInFolder != null) {
-            for (PhotoEntry photo : allPhotosInFolder) {
-                if (!photosInDb.contains(photo)) photosMissingInDb.add(photo);
-            }
-        }
-
-        // Add the missing photos to the database
+    public void syncFiles(){
         AppExecutors.getInstance().diskIO().execute(()->{
+            Log.d(TAG, "syncing files");
+            // Create a list of all photos in the project directory
+            List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(this, mCurrentProject);
+
+            // Create empty list of photos to add
+            List<PhotoEntry> photosMissingInDb = new ArrayList<>();
+
+            // Generate a list of photos missing from the database
+            if (allPhotosInFolder != null) {
+                Log.d(TAG, "checking photos in folder");
+                // Loop through all photos in folder
+                for (PhotoEntry photo : allPhotosInFolder) {
+
+                    long currentTimestamp = photo.getTimestamp();
+                    Log.d(TAG, "checking timestamp " + currentTimestamp);
+                    PhotoEntry dbPhoto = mTimeLapseDatabase.photoDao().loadPhotoByTimestamp(currentTimestamp, mCurrentProject.getId());
+
+                    Log.d(TAG, "dbPhoto is null = " + (dbPhoto == null));
+                    if (dbPhoto == null) photosMissingInDb.add(photo);
+                }
+            }
+
+            if (photosMissingInDb.size() == 0) return;
+
+            Log.d(TAG, "photos missing from dabatase is " + photosMissingInDb.toString());
+            Log.d(TAG, "adding the missing photos");
+            // Add the missing photos to the database
             for (PhotoEntry photo: photosMissingInDb){
                 mTimeLapseDatabase.photoDao().insertPhoto(photo);
             }

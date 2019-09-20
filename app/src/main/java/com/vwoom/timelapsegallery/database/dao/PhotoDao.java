@@ -15,13 +15,14 @@ import java.util.List;
 public interface PhotoDao {
 
     @Query("SELECT * FROM photo WHERE project_id = :project_id ORDER BY timestamp")
-    //@Query("SELECT * FROM photo WHERE project_id = :project_id")
     LiveData<List<PhotoEntry>> loadAllPhotosByProjectId(long project_id);
 
 
     @Query("SELECT * FROM photo WHERE project_id = :project_id ORDER BY timestamp")
-        //@Query("SELECT * FROM photo WHERE project_id = :project_id")
     List<PhotoEntry> loadAllPhotosByProjectId_NonLiveData(long project_id);
+
+    @Query("SELECT * FROM photo WHERE project_id = :project_id AND timestamp = :timestamp")
+    PhotoEntry loadPhotoByTimestamp(long timestamp, long project_id);
 
     @Insert
     void insertPhoto(PhotoEntry photoEntry);
