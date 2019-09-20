@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.format.DateUtils;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
@@ -174,7 +175,30 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             startActivityForResult(addPhotoIntent, REQUEST_ADD_PHOTO);
         });
 
+        // TODO hack together a play function
         mPlayAsVideoFab.setOnClickListener((View v) -> {
+            mProgressBar.setVisibility(View.VISIBLE);
+            mPlayAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp);
+
+            Handler handler = new Handler();
+            for (int i = 0; i < mPhotos.size(); i++){
+                mCurrentPhoto = mPhotos.get(i);
+                final String path = mCurrentPhoto.getUrl();
+                Runnable runnable = () -> {
+                    loadImage(path);
+                };
+
+                if (i == mPhotos.size()-1){
+                    runnable = () -> {
+                        loadImage(path);
+                        mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                        mProgressBar.setVisibility(View.INVISIBLE);
+                        loadUi();
+                    };
+                }
+
+                handler.postDelayed(runnable, 200*i);
+            }
         });
 
 
