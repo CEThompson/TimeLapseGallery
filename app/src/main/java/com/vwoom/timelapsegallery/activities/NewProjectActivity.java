@@ -250,15 +250,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             if (!mInterstitialAd.isLoaded()){
                 mInterstitialAd.loadAd(new AdRequest.Builder().build());
             }
-        } else {
-            loadError();
         }
-    }
-
-    private void loadError() {
-        Glide.with(this)
-                .load(R.drawable.ic_error_outline_white_24dp)
-                .into(mProjectFirstImage);
     }
 
     /* Loads an image into the main photo view */
