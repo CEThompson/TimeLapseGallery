@@ -433,6 +433,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mPhotoNumberTv.setText(photoNumberString);
         mPhotoDateTv.setText(date);
         mPhotoTimeTv.setText(time);
+
+        int position = mPhotos.indexOf(mCurrentPhoto);
+        mDetailsRecyclerView.scrollToPosition(position);
     }
 
     @Override
