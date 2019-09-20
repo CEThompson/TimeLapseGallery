@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Cardview resources -->
+    <dimen name="cardview_padding">4dp</dimen>
+    <dimen name="cardview_margin">8dp</dimen>
+    <dimen name="cardview_margin_with_FAB">28dp</dimen>
+
+    <!-- Detail resources -->
+    <dimen name="detail_margin">8dp</dimen>
+    <dimen name="detail_small_margin">4dp</dimen>
+    <dimen name="detail_recyclerview_height">80dp</dimen>
+    <dimen name="detail_recyclerview_item_height">65dp</dimen>
+    <dimen name="detail_recyclerview_item_width">40dp</dimen>
+
+    <dimen name="detail_project_info_width">200dp</dimen>
+
+    <dimen name="detail_image_height">400dp</dimen>
+    <dimen name="detail_image_width">300dp</dimen>
+
+    <dimen name="gradient_overlay_detail_height">100dp</dimen>
+
+    <dimen name="fab_detail_margin_bottom">52dp</dimen>
+
+    <dimen name="fab_size_plus_padding">68dp</dimen>
+
+    <!-- FAB resources -->
+    <dimen name="fab_margin">8dp</dimen>
+
+    <!-- Text resources -->
+    <dimen name="textview_margin">8dp</dimen>
+
+    <!-- Input resources -->
+    <dimen name="selector_margin">12dp</dimen>
+    <dimen name="project_name_edit_text_width">300dp</dimen>
+
+    <!-- New Project layout resources -->
+    <dimen name="new_project_image_width">240dp</dimen>
+    <dimen name="new_project_image_height">320dp</dimen>
+
+    <dimen name="padding_tiny">2dp</dimen>
+
+    <dimen name="widget_size">40dp</dimen>
+
+
+</resources>

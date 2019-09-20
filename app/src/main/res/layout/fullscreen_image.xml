@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/fullscreen_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/fullscreen_image_content_description"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fullscreen_back_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabSize="mini"
+        android:layout_margin="@dimen/detail_small_margin"
+        app:backgroundTint="@color/colorSubtleRedAccent"
+        android:src="@drawable/ic_arrow_back_white_24dp"
+        android:layout_gravity="top|start"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fullscreen_exit_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabSize="mini"
+        android:layout_margin="@dimen/detail_small_margin"
+        app:backgroundTint="@color/darkImagePlaceHolder"
+        android:src="@drawable/ic_fullscreen_exit_white_24dp"
+        android:layout_gravity="top|end"/>
+
+</FrameLayout>

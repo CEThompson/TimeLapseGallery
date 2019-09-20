@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+
+    <!-- todo: height and width will need to be set dynamically depending upon orientation of the photo -->
+    <ImageView
+            android:id="@+id/detail_thumbnail"
+            android:contentDescription="@string/detail_photo_content_description"
+            android:layout_width="@dimen/detail_recyclerview_item_width"
+            android:layout_height="@dimen/detail_recyclerview_item_height"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="@dimen/detail_margin"
+            android:background="@color/darkImagePlaceHolder"
+            />
+
+</FrameLayout>

@@ -1,0 +1,94 @@
+<resources>
+    <!-- Project strings -->
+    <string name="app_name">Time Lapse Collection</string>
+    <string name="project_details">Project Details</string>
+
+    <!-- Activities -->
+    <string name="main_activity">Main Activity</string>
+    <string name="details_activity">Details Activity</string>
+    <string name="new_project_activity">New Project Activity</string>
+    <string name="add_photo_activity">Add Photo Activity</string>
+
+    <!-- Tracking -->
+    <string name="submit_project">Submit Project</string>
+    <string name="submitted">Submitted</string>
+    <string name="submit_photo">Submit Photo</string>
+    <string name="submitting">Submitting</string>
+
+    <!-- Admob -->
+    <string name="admob_test_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
+
+    <!-- Content descriptions -->
+    <string name="project_image_content_description">Thumbnail image for the time lapse project.</string>
+    <string name="detail_photo_content_description">Thumbnail image of a detail for the time lapse project.</string>
+    <string name="detail_current_image_content_description">The currently selected image belonging to the time lapse project.</string>
+    <string name="first_image_content_description">The first image for the project.</string>
+    <string name="widget_grid_item_content_description">Project thumbnail image for a grid item in the widget.</string>
+    <string name="schedule_indicator_content_description">Indicator showing is a project has been scheduled for notifications.</string>
+    <string name="previous_photo_content_description">Image of the previous photo in the set.</string>
+    <string name="new_photo_content_description">Image of the new photo in the set.</string>
+    <string name="fullscreen_image_content_description">Fullscreen image of the currently selected photo.</string>
+
+    <!-- Options -->
+    <string name="disable_notifications">Disable notifications</string>
+    <string name="enable_notifications">Enable notifications</string>
+    <string name="delete_photo">Delete photo</string>
+    <string name="delete_project">Delete project</string>
+    <string name="edit_project">Edit project</string>
+
+    <!-- Feedback -->
+    <string name="enabling_notifications">Enabling notifications</string>
+    <string name="disabling_notifications">Disabling notifications</string>
+
+    <!-- Verification strings -->
+    <string name="verify_delete_project">Are you sure you wish to delete the project?</string>
+    <string name="verify_delete_photo">Are you sure you wish to delete this photo?</string>
+    <string name="verify_delete_last_photo">This is the last photo in the project. Would you like to delete the project instead?</string>
+    <string name="double_verify_project_deletion">Please verify to confirm.</string>
+
+    <!-- New project strings -->
+    <string name="project_name">Project Name</string>
+    <string name="project_description">Project Description</string>
+    <string name="orientation">Orientation</string>
+    <string name="notification_schedule">Notification Schedule</string>
+    <string-array name="schedule_options">
+        <item>none</item>
+        <item>daily</item>
+        <item>weekly</item>
+    </string-array>
+    <string name="none">none</string>
+    <string name="daily">daily</string>
+    <string name="weekly">weekly</string>
+
+    <string name="no_projects_for_today">No projects scheduled today.</string>
+
+    <!-- Notifications -->
+    <string name="projects_scheduled_today">Project(s) scheduled today.</string>
+
+    <!-- New project strings -->
+    <string name="previous_photo">previous photo</string>
+    <string name="new_photo">new photo</string>
+
+    <!-- Photo / Project information -->
+    <string name="details_photo_number_out_of">%1$d / %2$d</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="number_of_days">In %1$d Days</string>
+    <string name="one_day">In 1 Day</string>
+    <string name="started_on">Started on %1$s %2$s</string>
+    <string name="next">Next photo: %1$s at %2$s</string>
+    <string name="transition_tag">transition tag</string>
+    <string name="default_aspect_ratio">1:1</string>
+
+    <!-- Validation -->
+    <string name="invalid_name">Invalid Name</string>
+    <string name="no_name_message">Please enter a name to submit the project.</string>
+    <string name="invalid_characters_message">Please enter a name containing alpha numeric characters only.</string>
+    <string name="no_picture">No Picture</string>
+    <string name="no_picture_message">Please add an initial picture to submit the project.</string>
+    <string name="error">Error</string>
+    <string name="edit_failed">Edit failed to submit.</string>
+
+    <!-- Welcome -->
+    <string name="no_projects">Welcome to Time Lapse Collection.</string>
+</resources>

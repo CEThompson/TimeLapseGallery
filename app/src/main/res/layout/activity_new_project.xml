@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Scrollview containing project information fields -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="?attr/actionBarSize">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/new_project_main_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context=".activities.NewProjectActivity">
+
+            <!-- Project Name edit text -->
+            <EditText
+                android:id="@+id/project_name_edit_text"
+                android:autofillHints="@string/project_name"
+                android:hint="@string/project_name"
+                android:gravity="center"
+                android:layout_width="@dimen/project_name_edit_text_width"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/textview_margin"
+                android:inputType="textCapWords"
+                android:singleLine="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Project XYZ" />
+
+            <!-- Container for initial image and add initial image FAB -->
+            <FrameLayout
+                android:id="@+id/image_container"
+                android:layout_width="@dimen/new_project_image_width"
+                android:layout_height="@dimen/new_project_image_height"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/project_name_edit_text">
+
+                <!-- Cardview containing the project image -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/new_project_card_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/cardview_margin_with_FAB">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/new_project_image_constraint_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/project_first_image"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="@color/imagePlaceholder"
+                            android:contentDescription="@string/first_image_content_description"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- FAB to add the first image -->
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/add_first_photo_fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|top"
+                    android:layout_margin="@dimen/fab_margin"
+                    android:src="@drawable/ic_add_a_photo_white_24dp"
+                    app:fabSize="normal" />
+
+            </FrameLayout>
+
+            <!-- Label for spinner -->
+            <TextView
+                android:id="@+id/notification_schedule_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/selector_margin"
+                android:layout_marginStart="@dimen/detail_margin"
+                android:text="@string/notification_schedule"
+                app:layout_constraintStart_toStartOf="@+id/image_container"
+                app:layout_constraintTop_toBottomOf="@+id/image_container"
+                tools:text="Notification Schedule" />
+
+            <!-- Selector for notification schedule -->
+            <Spinner
+                android:id="@+id/notification_schedule_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/selector_margin"
+                android:layout_marginStart="@dimen/detail_margin"
+                app:layout_constraintStart_toEndOf="@+id/notification_schedule_textview"
+                app:layout_constraintTop_toBottomOf="@+id/image_container" />
+
+            <!-- Selector for schedule start time -->
+            <TimePicker
+                android:id="@+id/notification_schedule_picker"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/selector_margin"
+                android:paddingBottom="@dimen/selector_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/notification_schedule_spinner"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Toolbar layout -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/new_project_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppToolbar"
+            android:minHeight="?attr/actionBarSize"/>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Submit project FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/submit_new_project_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_check_white_24dp"
+        android:backgroundTint="@color/colorRedAccent"
+        app:fabSize="normal"
+        android:layout_gravity="bottom|end"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

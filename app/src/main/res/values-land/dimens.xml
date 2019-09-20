@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Detail resources -->
+    <dimen name="detail_recyclerview_height">60dp</dimen>
+    <dimen name="detail_recyclerview_item_height">40dp</dimen>
+    <dimen name="fab_detail_margin_bottom">32dp</dimen>
+
+    <!-- New Project layout resources -->
+    <dimen name="new_project_image_width">240dp</dimen>
+    <dimen name="new_project_image_height">160dp</dimen>
+
+    <dimen name="project_name_edit_text_width">450dp</dimen>
+
+</resources>
