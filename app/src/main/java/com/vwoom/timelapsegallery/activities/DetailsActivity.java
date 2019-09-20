@@ -169,11 +169,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             startActivityForResult(addPhotoIntent, REQUEST_ADD_PHOTO);
         });
 
-        // TODO: Implement playing a timelapse video with this listener
-        /*
         mPlayAsVideoFab.setOnClickListener((View v) -> {
         });
-        */
+
 
         // Set a listener to display the image fullscreen
         mFullscreenFab.setOnClickListener( (View v) -> {
