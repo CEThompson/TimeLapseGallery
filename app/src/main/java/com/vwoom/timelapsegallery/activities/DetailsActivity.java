@@ -33,6 +33,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -74,6 +75,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     @BindView(R.id.detail_current_image) ImageView mCurrentPhotoImageView;
     @BindView(R.id.detail_next_image) ImageView mNextPhotoImageView;
+    @BindView(R.id.image_loading_progress) ProgressBar mProgressBar;
+
     @BindView(R.id.details_recyclerview) RecyclerView mDetailsRecyclerView;
     @BindView(R.id.add_photo_fab) FloatingActionButton mAddPhotoFab;
     @BindView(R.id.fullscreen_fab) FloatingActionButton mFullscreenFab;
@@ -345,6 +348,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        // TODO handle load error
                         return false;
                     }
 

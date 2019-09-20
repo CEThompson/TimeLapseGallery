@@ -25,6 +25,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             />
 
+        <!-- For image loading -->
+        <ProgressBar
+            android:id="@+id/image_loading_progress"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@xml/progress"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/play_as_video_fab"/>
+
         <!-- Layout containing project information -->
         <LinearLayout
             android:id="@+id/project_information_layout"
