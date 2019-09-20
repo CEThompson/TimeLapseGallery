@@ -89,6 +89,4 @@
     <string name="error">Error</string>
     <string name="edit_failed">Edit failed to submit.</string>
 
-    <!-- Welcome -->
-    <string name="no_projects">Welcome to Time Lapse Collection.</string>
 </resources>

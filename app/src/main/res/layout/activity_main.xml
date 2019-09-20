@@ -15,17 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <!-- Welcome placeholder -->
-    <TextView
-        android:id="@+id/welcome_textview"
-        android:visibility="invisible"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:layout_margin="@dimen/textview_margin"
-        android:text="@string/no_projects"/>
-
+    <!-- App bar and tool bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -38,8 +28,6 @@
             android:minHeight="?attr/actionBarSize"/>
 
     </com.google.android.material.appbar.AppBarLayout>
-
-
 
     <!-- FAB to create a new project -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton

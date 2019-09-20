@@ -55,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
     @BindView(R.id.projects_recycler_view)
     RecyclerView mProjectsRecyclerView;
-    @BindView(R.id.welcome_textview)
-    TextView mWelcomeTextView;
 
     private ProjectsAdapter mProjectsAdapter;
 
@@ -252,12 +250,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
                     mProjectsAdapter.setProjectData(mProjects);
                 }
 
-                // Display welcome view if there are no projects
-                if (mProjects.isEmpty()){
-                    mWelcomeTextView.setVisibility(View.VISIBLE);
-                } else {
-                    mWelcomeTextView.setVisibility(View.INVISIBLE);
-                }
         });
     }
 
