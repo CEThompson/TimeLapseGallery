@@ -150,18 +150,6 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Displays time for the next scheduled submission -->
-        <TextView
-            android:id="@+id/details_project_time_textview"
-            android:visibility="invisible"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/detail_margin"
-            app:layout_constraintBottom_toTopOf="@+id/details_recyclerview"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="Next Photo: Tuesday 4:30 PM" />
-
-
         <!-- Recycler view showing the photos in the project -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/details_recyclerview"

@@ -71,7 +71,7 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintVertical_bias="0.5"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/details_project_time_textview"
+            app:layout_constraintBottom_toTopOf="@+id/details_recyclerview"
             app:layout_constraintStart_toEndOf="@+id/project_information_layout"
             app:layout_constraintEnd_toStartOf="@+id/play_as_video_fab">
 
@@ -148,16 +148,6 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
-
-        <!-- Displays time for the next scheduled submission -->
-        <TextView
-            android:id="@+id/details_project_time_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/detail_margin"
-            app:layout_constraintBottom_toTopOf="@+id/details_recyclerview"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="Next: Tuesday Aug, 1 2019 4:30 PM" />
 
 
         <!-- Recycler view showing the photos in the project -->

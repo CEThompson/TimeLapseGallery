@@ -87,7 +87,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     @BindView(R.id.details_project_day_time_textview) TextView mProjectDayTimeTv;
     @BindView(R.id.details_project_name_text_view) TextView mProjectNameTextView;
     @BindView(R.id.details_project_date_textview) TextView mProjectDateTextView;
-    @BindView(R.id.details_project_time_textview) TextView mNextPhotoTimeTv;
 
     private TimeLapseDatabase mTimeLapseDatabase;
     private DetailsAdapter mDetailsAdapter;
@@ -396,39 +395,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 mProjectNameTextView.setText(mCurrentProject.getName());
                 mProjectDayTimeTv.setText(getString(R.string.started_on, day, time));
                 mProjectDateTextView.setText(projectDate);
-
-                // If no schedule hide next photo info
-                if (mCurrentProject.getSchedule() == 0) mNextPhotoTimeTv.setVisibility(View.INVISIBLE);
-                // Otherwise set and display next photo info
-                else {
-                    long nextTimestamp = mCurrentProject.getSchedule_next_submission();
-
-                    String nextSubmissionDay;
-
-                    // Calculate days until the next submission
-                    Calendar c = Calendar.getInstance();
-                    c.setTimeInMillis(System.currentTimeMillis());
-                    int currentDay = c.get(Calendar.DAY_OF_YEAR);
-                    c.setTimeInMillis(nextTimestamp);
-                    int nextDay = c.get(Calendar.DAY_OF_YEAR);
-                    int daysUntilNext = nextDay - currentDay;
-
-                    // Set the next submission day string to either today, tomorrow, or the name of the day if longer
-                    if (daysUntilNext <= 0) {
-                        nextSubmissionDay = getString(R.string.today);
-                    }
-                    else if (daysUntilNext == 1){
-                        nextSubmissionDay = getString(R.string.tomorrow);
-                    }
-                    else {
-                        nextSubmissionDay = TimeUtils.getDayFromTimestamp(nextTimestamp);
-                    }
-
-                    // Set the info
-                    String nextSubmissionTime = TimeUtils.getTimeFromTimestamp(nextTimestamp);
-                    mNextPhotoTimeTv.setText(getString(R.string.next, nextSubmissionDay, nextSubmissionTime));
-                    mNextPhotoTimeTv.setVisibility(View.VISIBLE);
-                }
             }
         });
     }
