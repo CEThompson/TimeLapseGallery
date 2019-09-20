@@ -79,6 +79,7 @@
                 android:id="@+id/details_current_image_constraint_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+                <!-- Dual image views for smooth loading -->
                 <ImageView
                     android:id="@+id/detail_current_image"
                     android:layout_width="0dp"
