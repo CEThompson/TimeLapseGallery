@@ -525,6 +525,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                         mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                         mProgressBar.setVisibility(View.INVISIBLE);
                         loadUi(photoEntry);
+                        mCurrentPhoto = photoEntry;
                     };
                 }
 
