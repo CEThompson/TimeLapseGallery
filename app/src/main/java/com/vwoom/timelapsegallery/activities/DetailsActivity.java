@@ -113,6 +113,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     private FloatingActionButton mFullscreenExitFab;
     private FloatingActionButton mFullscreenBackFab;
 
+    // For playing timelapse
+    private boolean mPlaying = false;
+    private Handler mPlayHandler;
+
     // Swipe listener for image navigation
     private OnSwipeTouchListener mOnSwipeTouchListener;
 
@@ -187,32 +191,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             startActivityForResult(addPhotoIntent, REQUEST_ADD_PHOTO);
         });
 
-        // TODO hack together a play function
+        // Show the set of images in succession
         mPlayAsVideoFab.setOnClickListener((View v) -> {
-            mProgressBar.setVisibility(View.VISIBLE);
-            mPlayAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp);
-
-            Handler handler = new Handler();
-            for (int i = 0; i < mPhotos.size(); i++){
-                mCurrentPhoto = mPhotos.get(i);
-                final String path = mCurrentPhoto.getUrl();
-                Runnable runnable = () -> {
-                    loadImage(path);
-                };
-
-                if (i == mPhotos.size()-1){
-                    runnable = () -> {
-                        loadImage(path);
-                        mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                        mProgressBar.setVisibility(View.INVISIBLE);
-                        loadUi();
-                    };
-                }
-
-                handler.postDelayed(runnable, 200*i);
-            }
+            playSetOfImages();
         });
-
 
         // Set a listener to display the image fullscreen
         mFullscreenFab.setOnClickListener( (View v) -> {
@@ -259,6 +241,14 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         // Track activity launch
         mTracker.setScreenName(getString(R.string.details_activity));
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // If the activity stops while playing make sure to cancel runnables
+        if (mPlaying) mPlayHandler.removeCallbacksAndMessages(null);
     }
 
     @Override
@@ -382,16 +372,16 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
      */
 
     /* Update the UI */
-    public void loadUi(){
+    public void loadUi(PhotoEntry photoEntry){
         // Set the fullscreen image dialogue to the current photo
         preloadFullscreenImage();
 
         // Load the current image
-        loadImage(mCurrentPhoto.getUrl());
+        loadImage(photoEntry.getUrl());
 
         // Get info for the current photo
-        long timestamp = mCurrentPhoto.getTimestamp();
-        int photoNumber = mPhotos.indexOf(mCurrentPhoto)+1;
+        long timestamp = photoEntry.getTimestamp();
+        int photoNumber = mPhotos.indexOf(photoEntry)+1;
         int photosInProject = mPhotos.size();
 
         // Get formatted strings
@@ -404,7 +394,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mPhotoDateTv.setText(date);
         mPhotoTimeTv.setText(time);
 
-        int position = mPhotos.indexOf(mCurrentPhoto);
+        int position = mPhotos.indexOf(photoEntry);
         mDetailsRecyclerView.scrollToPosition(position);
     }
 
@@ -496,11 +486,61 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .into(mNextPhotoImageView);
     }
 
+    private void playSetOfImages(){
+        // Lazy Initialize handler
+        if (mPlayHandler == null) mPlayHandler = new Handler();
+
+        // If already playing cancel
+        if (mPlaying){
+            // Set playing false and cancel runnable
+            mPlaying = false;
+            mPlayHandler.removeCallbacksAndMessages(null);
+            mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+            mProgressBar.setVisibility(View.INVISIBLE);
+
+            // Handle UI
+            loadUi(mCurrentPhoto);
+        }
+        // Otherwise play the set of images
+        else {
+            // Set paying true
+            mPlaying = true;
+
+            // Handle UI
+            mProgressBar.setVisibility(View.VISIBLE);
+            mPlayAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp);
+
+            // Create a runnable for each image
+            for (int i = 0; i < mPhotos.size(); i++) {
+                PhotoEntry photoEntry = mPhotos.get(i);
+
+                // Load the image for each
+                Runnable runnable = () -> {
+                    loadUi(photoEntry);
+                };
+
+                // If the position is last create a different runnable to clean up
+                int lastPosition = mPhotos.size() - 1;
+                if (i == lastPosition) {
+                    runnable = () -> {
+                        mPlaying = false;
+                        mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                        mProgressBar.setVisibility(View.INVISIBLE);
+                        loadUi(photoEntry);
+                    };
+                }
+
+                // Post the runnable
+                mPlayHandler.postDelayed(runnable, 200 * i);
+            }
+        }
+    }
+
     /* Sets the current entry to the clicked photo and loads the image from the entry */
     @Override
     public void onClick(PhotoEntry clickedPhoto) {
         mCurrentPhoto = clickedPhoto;
-        loadUi();
+        loadUi(mCurrentPhoto);
     }
 
     /* Sets up the full screen image dialog for later use*/
@@ -563,7 +603,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             if (mCurrentPhoto == null) mCurrentPhoto = getLastPhoto();
 
             // Load the ui based on the current photo
-            loadUi();
+            loadUi(mCurrentPhoto);
 
         });
 
@@ -646,14 +686,14 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             int currentIndex = mPhotos.indexOf(mCurrentPhoto);
             if (currentIndex == 0) return;
             mCurrentPhoto = mPhotos.get(currentIndex-1);
-            loadUi();
+            loadUi(mCurrentPhoto);
         }
 
         public void onSwipeLeft() {
             int currentIndex = mPhotos.indexOf(mCurrentPhoto);
             if (currentIndex == mPhotos.size()) return;
             mCurrentPhoto = mPhotos.get(currentIndex+1);
-            loadUi();
+            loadUi(mCurrentPhoto);
         }
 
         public void onSwipeTop() {
