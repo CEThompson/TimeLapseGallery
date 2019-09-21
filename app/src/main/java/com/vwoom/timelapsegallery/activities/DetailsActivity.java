@@ -73,11 +73,18 @@ import butterknife.ButterKnife;
 
 public class DetailsActivity extends AppCompatActivity implements DetailsAdapter.DetailsAdapterOnClickHandler {
 
+    // Photo Views
     @BindView(R.id.detail_current_image) ImageView mCurrentPhotoImageView;
     @BindView(R.id.detail_next_image) ImageView mNextPhotoImageView;
+
+    // Progress Indication
     @BindView(R.id.image_loading_progress) ProgressBar mProgressBar;
 
+    // Recycler View
     @BindView(R.id.details_recyclerview) RecyclerView mDetailsRecyclerView;
+    private DetailsAdapter mDetailsAdapter;
+
+    // Fabs
     @BindView(R.id.add_photo_fab) FloatingActionButton mAddPhotoFab;
     @BindView(R.id.fullscreen_fab) FloatingActionButton mFullscreenFab;
     @BindView(R.id.play_as_video_fab) FloatingActionButton mPlayAsVideoFab;
@@ -92,19 +99,21 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     @BindView(R.id.details_project_name_text_view) TextView mProjectNameTextView;
     @BindView(R.id.details_project_date_textview) TextView mProjectDateTextView;
 
+    // Database
     private TimeLapseDatabase mTimeLapseDatabase;
-    private DetailsAdapter mDetailsAdapter;
 
+    // Photo and project Information
     private List<PhotoEntry> mPhotos;
     private PhotoEntry mCurrentPhoto;
-    private PhotoEntry mNextPhoto;
     private ProjectEntry mCurrentProject;
 
+    // Views for fullscreen dialog
     private Dialog mFullscreenImageDialog;
     private ImageView mFullscreenImage;
     private FloatingActionButton mFullscreenExitFab;
     private FloatingActionButton mFullscreenBackFab;
 
+    // Swipe listener for image navigation
     private OnSwipeTouchListener mOnSwipeTouchListener;
 
     private final static String TAG = DetailsActivity.class.getSimpleName();
@@ -133,6 +142,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             }
         }
     };
+
+    /*
+     *   Lifecycle
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -286,6 +299,56 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(Keys.PHOTO_ENTRY, mCurrentPhoto);
+        outState.putInt(Keys.TRANSITION_POSITION, mPosition);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // Prevents shared element transition from lingering on screen
+        supportFinishAfterTransition();
+    }
+
+    /*
+    *   Options
+     */
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.details_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.delete_photo:
+                if (mPhotos.size()==1){
+                    verifyLastPhotoDeletion();
+                } else {
+                    verifyPhotoDeletion();
+                }
+                return true;
+            case R.id.delete_project:
+                verifyProjectDeletion();
+                return true;
+            case R.id.edit_project:
+                editProject();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /*
+    *   Shared elements methods
+     */
+
+    @Override
     public void finishAfterTransition() {
         mIsReturning = true;
         Intent data = new Intent();
@@ -312,6 +375,37 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 return true;
             }
         });
+    }
+
+    /*
+    *   UI methods
+     */
+
+    /* Update the UI */
+    public void loadUi(){
+        // Set the fullscreen image dialogue to the current photo
+        preloadFullscreenImage();
+
+        // Load the current image
+        loadImage(mCurrentPhoto.getUrl());
+
+        // Get info for the current photo
+        long timestamp = mCurrentPhoto.getTimestamp();
+        int photoNumber = mPhotos.indexOf(mCurrentPhoto)+1;
+        int photosInProject = mPhotos.size();
+
+        // Get formatted strings
+        String photoNumberString = getString(R.string.details_photo_number_out_of, photoNumber, photosInProject);
+        String date = TimeUtils.getDateFromTimestamp(timestamp);
+        String time = TimeUtils.getTimeFromTimestamp(timestamp);
+
+        // Set the info
+        mPhotoNumberTv.setText(photoNumberString);
+        mPhotoDateTv.setText(date);
+        mPhotoTimeTv.setText(time);
+
+        int position = mPhotos.indexOf(mCurrentPhoto);
+        mDetailsRecyclerView.scrollToPosition(position);
     }
 
     /* Loads an image into the main photo view */
@@ -402,150 +496,11 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .into(mNextPhotoImageView);
     }
 
-    private void setupViewModel(){
-        DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getId());
-        final DetailsActivityViewModel viewModel = ViewModelProviders.of(this, factory)
-                .get(DetailsActivityViewModel.class);
-
-        /* Observe the list of photos */
-        viewModel.getPhotos().observe(this, photoEntries -> {
-            // Save the list of photos
-            mPhotos = photoEntries;
-
-            // Send the photos to the adapter
-            mDetailsAdapter.setPhotoData(mPhotos);
-
-            // Set current photo to last if none has been selected
-            if (mCurrentPhoto == null) mCurrentPhoto = getLastPhoto();
-
-            // Load the ui based on the current photo
-            loadUi();
-
-        });
-
-        /* Observe the current selected project */
-        // Note: this ensures that project data is updated correctly when editing
-        viewModel.getCurrentProject().observe(this, currentProject -> {
-            mCurrentProject = currentProject;
-
-            // mCurrentProject will be null upon deletion
-            // So when deleting a project the viewmodel attempted to updated a null project causing a crash
-            // This prevents crashes from occurring
-            if (mCurrentProject != null) {
-                // Set project info
-                long timestamp = mCurrentProject.getTimestamp();
-                String projectDate = TimeUtils.getDateFromTimestamp(timestamp);
-                String day = TimeUtils.getDayFromTimestamp(timestamp);
-                String time = TimeUtils.getTimeFromTimestamp(timestamp);
-                mProjectNameTextView.setText(mCurrentProject.getName());
-                mProjectDayTimeTv.setText(getString(R.string.started_on, day, time));
-                mProjectDateTextView.setText(projectDate);
-            }
-        });
-    }
-
-    /* Returns the last photo */
-    private PhotoEntry getLastPhoto(){
-        return mPhotos.get(mPhotos.size()-1);
-    }
-
     /* Sets the current entry to the clicked photo and loads the image from the entry */
     @Override
     public void onClick(PhotoEntry clickedPhoto) {
         mCurrentPhoto = clickedPhoto;
         loadUi();
-    }
-
-    /* Update the UI */
-    public void loadUi(){
-        // Set the fullscreen image dialogue to the current photo
-        preloadFullscreenImage();
-
-        // Load the current image
-        loadImage(mCurrentPhoto.getUrl());
-
-        // Get info for the current photo
-        long timestamp = mCurrentPhoto.getTimestamp();
-        int photoNumber = mPhotos.indexOf(mCurrentPhoto)+1;
-        int photosInProject = mPhotos.size();
-
-        // Get formatted strings
-        String photoNumberString = getString(R.string.details_photo_number_out_of, photoNumber, photosInProject);
-        String date = TimeUtils.getDateFromTimestamp(timestamp);
-        String time = TimeUtils.getTimeFromTimestamp(timestamp);
-
-        // Set the info
-        mPhotoNumberTv.setText(photoNumberString);
-        mPhotoDateTv.setText(date);
-        mPhotoTimeTv.setText(time);
-
-        int position = mPhotos.indexOf(mCurrentPhoto);
-        mDetailsRecyclerView.scrollToPosition(position);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.details_activity_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.delete_photo:
-                if (mPhotos.size()==1){
-                    verifyLastPhotoDeletion();
-                } else {
-                    verifyPhotoDeletion();
-                }
-                return true;
-            case R.id.delete_project:
-                verifyProjectDeletion();
-                return true;
-            case R.id.edit_project:
-                editProject();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    /* Deletes the current photo */
-    private void deletePhoto(TimeLapseDatabase database, PhotoEntry photoEntry){
-        AppExecutors.getInstance().diskIO().execute(() -> {
-                // Delete the photo from the file structure
-                FileUtils.deletePhoto(this, photoEntry);
-
-                // Delete the photo metadata in the database
-                database.photoDao().deletePhoto(photoEntry);
-            });
-    }
-
-    /* Deletes the project and recursively deletes files from project folder */
-    private void deleteProject(TimeLapseDatabase database, ProjectEntry projectEntry){
-        /* Delete project from the database and photos from the file structure */
-        AppExecutors.getInstance().diskIO().execute(() -> {
-            // Delete the photos from the file structure
-            FileUtils.deleteProject(DetailsActivity.this, projectEntry);
-            // Delete the project from the database
-            database.projectDao().deleteProject(projectEntry);
-
-            /* If project had a schedule ensure widget and notification worker are updated */
-            if (projectEntry.getSchedule() != 0) {
-                NotificationUtils.scheduleNotificationWorker(this);
-                UpdateWidgetService.startActionUpdateWidgets(this);
-            }
-        });
-    }
-
-    /* Gets the last photo from the set and sets it as the project thumbnail */
-    private void updateProjectThumbnail(TimeLapseDatabase database, ProjectEntry project, PhotoEntry photo){
-        AppExecutors.getInstance().diskIO().execute(() -> {
-                    project.setThumbnail_url(photo.getUrl());
-                    database.projectDao().updateProject(project);
-                }
-        );
     }
 
     /* Sets up the full screen image dialog for later use*/
@@ -589,6 +544,222 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .load(current)
                 .into(mFullscreenImage);
     };
+
+    /* Binds project and photos to database */
+    private void setupViewModel(){
+        DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getId());
+        final DetailsActivityViewModel viewModel = ViewModelProviders.of(this, factory)
+                .get(DetailsActivityViewModel.class);
+
+        /* Observe the list of photos */
+        viewModel.getPhotos().observe(this, photoEntries -> {
+            // Save the list of photos
+            mPhotos = photoEntries;
+
+            // Send the photos to the adapter
+            mDetailsAdapter.setPhotoData(mPhotos);
+
+            // Set current photo to last if none has been selected
+            if (mCurrentPhoto == null) mCurrentPhoto = getLastPhoto();
+
+            // Load the ui based on the current photo
+            loadUi();
+
+        });
+
+        /* Observe the current selected project */
+        // Note: this ensures that project data is updated correctly when editing
+        viewModel.getCurrentProject().observe(this, currentProject -> {
+            mCurrentProject = currentProject;
+
+            // mCurrentProject will be null upon deletion
+            // So when deleting a project the viewmodel attempted to updated a null project causing a crash
+            // This prevents crashes from occurring
+            if (mCurrentProject != null) {
+                // Set project info
+                long timestamp = mCurrentProject.getTimestamp();
+                String projectDate = TimeUtils.getDateFromTimestamp(timestamp);
+                String day = TimeUtils.getDayFromTimestamp(timestamp);
+                String time = TimeUtils.getTimeFromTimestamp(timestamp);
+                mProjectNameTextView.setText(mCurrentProject.getName());
+                mProjectDayTimeTv.setText(getString(R.string.started_on, day, time));
+                mProjectDateTextView.setText(projectDate);
+            }
+        });
+    }
+
+    /* Changes photo on swipe */
+    public class OnSwipeTouchListener implements View.OnTouchListener {
+        private final GestureDetector gestureDetector;
+
+        public OnSwipeTouchListener (Context ctx){
+            gestureDetector = new GestureDetector(ctx, new GestureListener());
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            return gestureDetector.onTouchEvent(event);
+        }
+
+        private final class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+            private static final int SWIPE_THRESHOLD = 100;
+            private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true;
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                boolean result = false;
+                try {
+                    float diffY = e2.getY() - e1.getY();
+                    float diffX = e2.getX() - e1.getX();
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                            if (diffX > 0) {
+                                onSwipeRight();
+                            } else {
+                                onSwipeLeft();
+                            }
+                            result = true;
+                        }
+                    }
+                    else if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffY > 0) {
+                            onSwipeBottom();
+                        } else {
+                            onSwipeTop();
+                        }
+                        result = true;
+                    }
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+                return result;
+            }
+        }
+
+        public void onSwipeRight() {
+            int currentIndex = mPhotos.indexOf(mCurrentPhoto);
+            if (currentIndex == 0) return;
+            mCurrentPhoto = mPhotos.get(currentIndex-1);
+            loadUi();
+        }
+
+        public void onSwipeLeft() {
+            int currentIndex = mPhotos.indexOf(mCurrentPhoto);
+            if (currentIndex == mPhotos.size()) return;
+            mCurrentPhoto = mPhotos.get(currentIndex+1);
+            loadUi();
+        }
+
+        public void onSwipeTop() {
+        }
+
+        public void onSwipeBottom() {
+        }
+
+    }
+
+    /*
+    *   Photo management
+     */
+
+    /* Returns the last photo */
+    private PhotoEntry getLastPhoto(){
+        return mPhotos.get(mPhotos.size()-1);
+    }
+
+    /* Deletes the current photo */
+    private void deletePhoto(TimeLapseDatabase database, PhotoEntry photoEntry){
+        AppExecutors.getInstance().diskIO().execute(() -> {
+                // Delete the photo from the file structure
+                FileUtils.deletePhoto(this, photoEntry);
+
+                // Delete the photo metadata in the database
+                database.photoDao().deletePhoto(photoEntry);
+            });
+    }
+
+    /* Finds all photos in the project directory and adds any missing photos to the database */
+    public void syncFiles(){
+        AppExecutors.getInstance().diskIO().execute(()->{
+            Log.d(TAG, "syncing files");
+            // Create a list of all photos in the project directory
+            List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(this, mCurrentProject);
+
+            // Create empty list of photos to add
+            List<PhotoEntry> photosMissingInDb = new ArrayList<>();
+
+            // Generate a list of photos missing from the database
+            if (allPhotosInFolder != null) {
+                Log.d(TAG, "checking photos in folder");
+                // Loop through all photos in folder
+                for (PhotoEntry photo : allPhotosInFolder) {
+
+                    long currentTimestamp = photo.getTimestamp();
+                    Log.d(TAG, "checking timestamp " + currentTimestamp);
+                    PhotoEntry dbPhoto = mTimeLapseDatabase.photoDao().loadPhotoByTimestamp(currentTimestamp, mCurrentProject.getId());
+
+                    Log.d(TAG, "dbPhoto is null = " + (dbPhoto == null));
+                    if (dbPhoto == null) photosMissingInDb.add(photo);
+                }
+            }
+
+            if (photosMissingInDb.size() == 0) return;
+
+            Log.d(TAG, "photos missing from dabatase is " + photosMissingInDb.toString());
+            Log.d(TAG, "adding the missing photos");
+            // Add the missing photos to the database
+            for (PhotoEntry photo: photosMissingInDb){
+                mTimeLapseDatabase.photoDao().insertPhoto(photo);
+            }
+        });
+    }
+
+    /*
+    *   Project management
+     */
+
+    /* Deletes the project and recursively deletes files from project folder */
+    private void deleteProject(TimeLapseDatabase database, ProjectEntry projectEntry){
+        /* Delete project from the database and photos from the file structure */
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            // Delete the photos from the file structure
+            FileUtils.deleteProject(DetailsActivity.this, projectEntry);
+            // Delete the project from the database
+            database.projectDao().deleteProject(projectEntry);
+
+            /* If project had a schedule ensure widget and notification worker are updated */
+            if (projectEntry.getSchedule() != 0) {
+                NotificationUtils.scheduleNotificationWorker(this);
+                UpdateWidgetService.startActionUpdateWidgets(this);
+            }
+        });
+    }
+
+    /* Gets the last photo from the set and sets it as the project thumbnail */
+    private void updateProjectThumbnail(TimeLapseDatabase database, ProjectEntry project, PhotoEntry photo){
+        AppExecutors.getInstance().diskIO().execute(() -> {
+                    project.setThumbnail_url(photo.getUrl());
+                    database.projectDao().updateProject(project);
+                }
+        );
+    }
+
+    /* Edits the current project */
+    private void editProject(){
+        Intent intent = new Intent(this, NewProjectActivity.class);
+        intent.putExtra(Keys.PROJECT_ENTRY, mCurrentProject);
+        startActivity(intent);
+    }
+
+    /*
+    *   Verification
+     */
 
     /* Deletes the current photo after user verification */
     private void verifyPhotoDeletion(){
@@ -650,141 +821,5 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                     finish();
                 })
                 .setNegativeButton(android.R.string.no, null).show();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(Keys.PHOTO_ENTRY, mCurrentPhoto);
-        outState.putInt(Keys.TRANSITION_POSITION, mPosition);
-    }
-
-    /* Edits the current project */
-    private void editProject(){
-        Intent intent = new Intent(this, NewProjectActivity.class);
-        intent.putExtra(Keys.PROJECT_ENTRY, mCurrentProject);
-        startActivity(intent);
-    }
-
-    public class OnSwipeTouchListener implements View.OnTouchListener {
-        private final GestureDetector gestureDetector;
-
-        public OnSwipeTouchListener (Context ctx){
-            gestureDetector = new GestureDetector(ctx, new GestureListener());
-        }
-
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            return gestureDetector.onTouchEvent(event);
-        }
-
-        private final class GestureListener extends GestureDetector.SimpleOnGestureListener {
-
-            private static final int SWIPE_THRESHOLD = 100;
-            private static final int SWIPE_VELOCITY_THRESHOLD = 100;
-
-            @Override
-            public boolean onDown(MotionEvent e) {
-                return true;
-            }
-
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                boolean result = false;
-                try {
-                    float diffY = e2.getY() - e1.getY();
-                    float diffX = e2.getX() - e1.getX();
-                    if (Math.abs(diffX) > Math.abs(diffY)) {
-                        if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                            if (diffX > 0) {
-                                onSwipeRight();
-                            } else {
-                                onSwipeLeft();
-                            }
-                            result = true;
-                        }
-                    }
-                    else if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffY > 0) {
-                            onSwipeBottom();
-                        } else {
-                            onSwipeTop();
-                        }
-                        result = true;
-                    }
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
-                return result;
-            }
-        }
-
-        public void onSwipeRight() {
-            int currentIndex = mPhotos.indexOf(mCurrentPhoto);
-            if (currentIndex == 0) return;
-            mCurrentPhoto = mPhotos.get(currentIndex-1);
-            mNextPhoto = mPhotos.get(currentIndex);
-            loadUi();
-        }
-
-        public void onSwipeLeft() {
-            int currentIndex = mPhotos.indexOf(mCurrentPhoto);
-            if (currentIndex == mPhotos.size()) return;
-            mCurrentPhoto = mPhotos.get(currentIndex+1);
-            mNextPhoto = mPhotos.get(currentIndex);
-            loadUi();
-        }
-
-        public void onSwipeTop() {
-        }
-
-        public void onSwipeBottom() {
-        }
-
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        // Prevents shared element transition from lingering on screen
-        supportFinishAfterTransition();
-    }
-
-    /*
-    * Finds all photos in the project directory and adds any missing photos to the database
-     */
-    public void syncFiles(){
-        AppExecutors.getInstance().diskIO().execute(()->{
-            Log.d(TAG, "syncing files");
-            // Create a list of all photos in the project directory
-            List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(this, mCurrentProject);
-
-            // Create empty list of photos to add
-            List<PhotoEntry> photosMissingInDb = new ArrayList<>();
-
-            // Generate a list of photos missing from the database
-            if (allPhotosInFolder != null) {
-                Log.d(TAG, "checking photos in folder");
-                // Loop through all photos in folder
-                for (PhotoEntry photo : allPhotosInFolder) {
-
-                    long currentTimestamp = photo.getTimestamp();
-                    Log.d(TAG, "checking timestamp " + currentTimestamp);
-                    PhotoEntry dbPhoto = mTimeLapseDatabase.photoDao().loadPhotoByTimestamp(currentTimestamp, mCurrentProject.getId());
-
-                    Log.d(TAG, "dbPhoto is null = " + (dbPhoto == null));
-                    if (dbPhoto == null) photosMissingInDb.add(photo);
-                }
-            }
-
-            if (photosMissingInDb.size() == 0) return;
-
-            Log.d(TAG, "photos missing from dabatase is " + photosMissingInDb.toString());
-            Log.d(TAG, "adding the missing photos");
-            // Add the missing photos to the database
-            for (PhotoEntry photo: photosMissingInDb){
-                mTimeLapseDatabase.photoDao().insertPhoto(photo);
-            }
-        });
     }
 }
