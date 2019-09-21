@@ -63,7 +63,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -164,7 +163,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         // Set the listener to add a photo to the project
         mAddPhotoFab.setOnClickListener((View v) -> {
             Intent addPhotoIntent = new Intent(DetailsActivity.this, AddPhotoActivity.class);
-            PhotoEntry lastPhoto = lastPhoto();
+            PhotoEntry lastPhoto = getLastPhoto();
             String lastPhotoPath = lastPhoto.getUrl();
 
             // Send the path of the last photo and the project id
@@ -417,7 +416,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mDetailsAdapter.setPhotoData(mPhotos);
 
             // Set current photo to last if none has been selected
-            if (mCurrentPhoto == null) mCurrentPhoto = lastPhoto();
+            if (mCurrentPhoto == null) mCurrentPhoto = getLastPhoto();
 
             // Load the ui based on the current photo
             loadUi();
@@ -446,7 +445,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     }
 
     /* Returns the last photo */
-    private PhotoEntry lastPhoto(){
+    private PhotoEntry getLastPhoto(){
         return mPhotos.get(mPhotos.size()-1);
     }
 
@@ -599,7 +598,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, (DialogInterface dialogInterface, int i) -> {
                     // If this photo is the last photo then set the new thumbnail to its previous
-                    if (mCurrentPhoto.equals(lastPhoto())){
+                    if (mCurrentPhoto.equals(getLastPhoto())){
                         PhotoEntry newLast = mPhotos.get(mPhotos.size()-2);
                         updateProjectThumbnail(mTimeLapseDatabase, mCurrentProject, newLast);
                     }
