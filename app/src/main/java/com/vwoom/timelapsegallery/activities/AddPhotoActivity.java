@@ -90,10 +90,8 @@ public class AddPhotoActivity extends AppCompatActivity {
         mTimeLapseDatabase = TimeLapseDatabase.getInstance(this);
 
         mPreviousPhotoPath = getIntent().getStringExtra(Keys.PHOTO_PATH);
-        Log.d(TAG, "checking previous photo path " + mPreviousPhotoPath);
 
         mCurrentProject = getIntent().getParcelableExtra(Keys.PROJECT_ENTRY);
-        Log.d(TAG, "checking project " + mCurrentProject.getName());
 
         setFabClickListeners();
 
