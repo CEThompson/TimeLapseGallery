@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Environment;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.util.Log;
@@ -26,11 +27,15 @@ import android.widget.TextView;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.adapters.ProjectsAdapter;
 import com.vwoom.timelapsegallery.analytics.AnalyticsApplication;
+import com.vwoom.timelapsegallery.database.AppExecutors;
+import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
+import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.notification.NotificationUtils;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.ProjectUtils;
+import com.vwoom.timelapsegallery.utils.TimeUtils;
 import com.vwoom.timelapsegallery.viewmodels.MainActivityViewModel;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -40,6 +45,8 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -136,6 +143,9 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         prepareSharedElementTransition();
 
         mFilterByToday = getIntent().getBooleanExtra(Keys.PROJECT_FILTER_BY_SCHEDULED_TODAY, false);
+
+        /* TODO: ENABLE FOR MANUAL PROJECT SYNC */
+        //importProjects();
 
         // Set up the view model
         setupViewModel();
@@ -249,7 +259,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
                 } else {
                     mProjectsAdapter.setProjectData(mProjects);
                 }
-
         });
     }
 
@@ -300,5 +309,63 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
                 .inflateTransition(R.transition.image_shared_element_transition);
         getWindow().setSharedElementExitTransition(transition);
         setExitSharedElementCallback(mCallback);
+    }
+
+    /* Helper to scan through folders and import projects */
+    private void importProjects(){
+        Log.d(TAG, "Importing projects");
+        AppExecutors.getInstance().diskIO().execute(()->{
+            TimeLapseDatabase db = TimeLapseDatabase.getInstance(this);
+
+            File storageDir = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            if (storageDir != null) {
+                File[] files = storageDir.listFiles();
+
+                if (files != null) {
+                    for (File child : files) {
+                        String url = child.getAbsolutePath();
+                        Log.d(TAG, "importing url " + url);
+
+                        String filename = url.substring(url.lastIndexOf("/")+1);
+                        Log.d(TAG, "stripping to filename = " + filename);
+
+                        if (!filename.equals(FileUtils.TEMP_FILE_SUBDIRECTORY)) {
+                            String id = filename.substring(0, filename.lastIndexOf("_"));
+                            Log.d(TAG, "stripping to project id = " + id);
+                            String projectName = filename.substring(filename.lastIndexOf("_") + 1);
+                            Log.d(TAG, "stripping to project name = " + projectName);
+                            File projectDir = new File(storageDir, filename);
+                            File[] projectFiles = projectDir.listFiles();
+
+                            if (projectFiles != null) {
+                                String firstPhotoPath = projectFiles[0].getAbsolutePath();
+                                String lastPhotoPath = projectFiles[projectFiles.length-1].getAbsolutePath();
+
+                                String lastPhotoRelPath = lastPhotoPath.substring(lastPhotoPath.lastIndexOf("/")+1);
+                                long lastPhotoTimeStamp = Long.valueOf(lastPhotoRelPath.replaceFirst("[.][^.]+$",""));
+                                String firstPhotoRelPath = firstPhotoPath.substring(firstPhotoPath.lastIndexOf("/")+1);
+                                long firstPhotoTimestamp = Long.valueOf(firstPhotoRelPath.replaceFirst("[.][^.]+$",""));
+
+                                Log.d(TAG, "first photo path = " + firstPhotoPath);
+                                Log.d(TAG, "last photo path = " + lastPhotoPath);
+
+                                Log.d(TAG, "inserting project = " + projectName);
+                                ProjectEntry currentProject
+                                        = new ProjectEntry(
+                                                Long.valueOf(id),
+                                        projectName,
+                                        firstPhotoPath,
+                                        TimeUtils.SCHEDULE_NONE,
+                                        lastPhotoTimeStamp,
+                                        firstPhotoTimestamp);
+
+                                db.projectDao().insertProject(currentProject);
+                            }
+                        }
+                    }
+                }
+            }
+
+        });
     }
 }

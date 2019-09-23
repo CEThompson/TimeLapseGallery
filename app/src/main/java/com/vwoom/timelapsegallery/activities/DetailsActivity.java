@@ -219,6 +219,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         initializeFullscreenImageDialog();
 
+        /* TODO: ENABLE FOR MANUAL PHOTO SYNC */
+        // syncFiles();
+
         setupViewModel();
 
         // Prepare analytics
@@ -227,9 +230,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         prepareSharedElementTransition();
         setEnterSharedElementCallback(mCallback);
-
-        /* If the user manually adds photos sync here*/
-        syncFiles();
     }
 
     @Override
