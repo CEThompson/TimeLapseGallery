@@ -211,6 +211,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                 mTemporaryPhotoPath = tempFile.getAbsolutePath();
             } catch (IOException e) {
                 Log.e(TAG, "failure creating file", e);
+                // TODO display toast
+                // TODO log with crashylitics
             }
             // Continue only if the File was successfully created
             if (tempFile != null) {

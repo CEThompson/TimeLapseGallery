@@ -141,7 +141,8 @@ public class AddPhotoActivity extends AppCompatActivity {
                 tempFile = FileUtils.createTemporaryImageFile(this);
                 mTemporaryPhotoPath = tempFile.getAbsolutePath();
             } catch (IOException e) {
-                Log.e(TAG, "failure creating file", e);
+                // TODO display toast
+                // TODO log with crashlytics
             }
             // Continue only if the File was successfully created
             if (tempFile != null) {

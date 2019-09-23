@@ -678,7 +678,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                         result = true;
                     }
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    // TODO display toast error
+                    // Todo retrieve error with crashylitics
                 }
                 return result;
             }

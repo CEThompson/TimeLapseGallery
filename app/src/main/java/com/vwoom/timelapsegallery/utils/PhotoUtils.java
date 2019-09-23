@@ -45,7 +45,10 @@ public final class PhotoUtils {
         try {
             ExifInterface exif = new ExifInterface(path);
             orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        } catch (IOException e) { Log.d(TAG, e.getMessage());}
+        } catch (IOException e) {
+            // TODO display error with toast
+            // TODO Log with crashlytics
+        }
 
        return orientation;
     }
@@ -92,7 +95,8 @@ public final class PhotoUtils {
             return bmRotated;
         }
         catch (OutOfMemoryError e) {
-            e.printStackTrace();
+            // TODO display error with toast
+            // TODO Log with crashlytics
             return null;
         }
     }

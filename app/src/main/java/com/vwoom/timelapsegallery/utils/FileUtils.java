@@ -89,7 +89,8 @@ public final class FileUtils {
             tempFile.delete();
         }
         catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            // TODO display error with toast
+            // TODO Log with crashlytics
         }
         return finalFile;
     }
