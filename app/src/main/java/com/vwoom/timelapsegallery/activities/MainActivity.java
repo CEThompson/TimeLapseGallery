@@ -360,6 +360,9 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
                                         firstPhotoTimestamp);
 
                                 db.projectDao().insertProject(currentProject);
+
+                                /* import the photos for the project */
+                                importProjectPhotos(db, currentProject);
                             }
                         }
                     }
@@ -367,5 +370,40 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
             }
 
         });
+    }
+
+    /* Finds all photos in the project directory and adds any missing photos to the database */
+    public void importProjectPhotos(TimeLapseDatabase db, ProjectEntry currentProject){
+
+            Log.d(TAG, "syncing files");
+            // Create a list of all photos in the project directory
+            List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(this, currentProject);
+
+            // Create empty list of photos to add
+            List<PhotoEntry> photosMissingInDb = new ArrayList<>();
+
+            // Generate a list of photos missing from the database
+            if (allPhotosInFolder != null) {
+                Log.d(TAG, "checking photos in folder");
+                // Loop through all photos in folder
+                for (PhotoEntry photo : allPhotosInFolder) {
+
+                    long currentTimestamp = photo.getTimestamp();
+                    Log.d(TAG, "checking timestamp " + currentTimestamp);
+                    PhotoEntry dbPhoto = db.photoDao().loadPhotoByTimestamp(currentTimestamp, currentProject.getId());
+
+                    Log.d(TAG, "dbPhoto is null = " + (dbPhoto == null));
+                    if (dbPhoto == null) photosMissingInDb.add(photo);
+                }
+            }
+
+            if (photosMissingInDb.size() == 0) return;
+
+            Log.d(TAG, "photos missing from dabatase is " + photosMissingInDb.toString());
+            Log.d(TAG, "adding the missing photos");
+            // Add the missing photos to the database
+            for (PhotoEntry photo: photosMissingInDb){
+                db.photoDao().insertPhoto(photo);
+            }
     }
 }
