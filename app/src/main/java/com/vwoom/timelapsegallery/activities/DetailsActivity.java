@@ -604,6 +604,15 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             // Load the ui based on the current photo
             loadUi(mCurrentPhoto);
 
+            // Set the date of the project based on the first photo entry
+            PhotoEntry firstPhoto = mPhotos.get(0);
+            long timestamp = firstPhoto.getTimestamp();
+            String projectDate = TimeUtils.getDateFromTimestamp(timestamp);
+            String day = TimeUtils.getDayFromTimestamp(timestamp);
+            String time = TimeUtils.getTimeFromTimestamp(timestamp);
+            mProjectDayTimeTv.setText(getString(R.string.started_on, day, time));
+            mProjectDateTextView.setText(projectDate);
+
         });
 
         /* Observe the current selected project */
@@ -616,13 +625,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             // This prevents crashes from occurring
             if (mCurrentProject != null) {
                 // Set project info
-                long timestamp = mCurrentProject.getTimestamp();
-                String projectDate = TimeUtils.getDateFromTimestamp(timestamp);
-                String day = TimeUtils.getDayFromTimestamp(timestamp);
-                String time = TimeUtils.getTimeFromTimestamp(timestamp);
                 mProjectNameTextView.setText(mCurrentProject.getName());
-                mProjectDayTimeTv.setText(getString(R.string.started_on, day, time));
-                mProjectDateTextView.setText(projectDate);
             }
         });
     }
