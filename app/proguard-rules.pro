@@ -19,3 +19,21 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# This will strip 'Log.v', 'Log.i', 'Log.w', 'Log.d' & 'Log.e'
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}
+
+
+# This block would strip timber log statements
+#-assumenosideeffects class timber.log.Timber* {
+#    public static *** v(...);
+#    public static *** d(...);
+#    public static *** i(...);
+#}
