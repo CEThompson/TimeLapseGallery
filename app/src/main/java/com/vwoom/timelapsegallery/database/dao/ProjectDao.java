@@ -15,7 +15,7 @@ import java.util.List;
 @Dao
 public interface ProjectDao {
 
-    @Query("SELECT * FROM project ORDER BY timestamp")
+    @Query("SELECT * FROM project ORDER BY id")
     LiveData<List<ProjectEntry>> loadAllProjects();
 
     @Query("SELECT * FROM project WHERE schedule != 0 ORDER BY schedule_next_submission")
