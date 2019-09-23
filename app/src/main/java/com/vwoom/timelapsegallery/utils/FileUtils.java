@@ -21,7 +21,7 @@ import java.util.List;
 public final class FileUtils {
 
     private static final String ReservedChars = "|\\?*<\":>+[]/'";
-    private static final String TEMP_FILE_SUBDIRECTORY = "temporary_images";
+    public static final String TEMP_FILE_SUBDIRECTORY = "temporary_images";
     private static final String TAG = FileUtils.class.getSimpleName();
 
     /* Used to create a photo file in its final location */
