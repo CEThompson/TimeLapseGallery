@@ -79,9 +79,11 @@
             android:visibility="invisible"
             tools:text="6"/>
 
+        <!-- TODO: decide on removing or keeping project name view -->
         <!-- name of project -->
         <TextView
             android:id="@+id/project_name"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
