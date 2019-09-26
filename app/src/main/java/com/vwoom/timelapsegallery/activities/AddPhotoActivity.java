@@ -60,7 +60,6 @@ public class AddPhotoActivity extends AppCompatActivity {
 
     /* Photo data */
     private String mTemporaryPhotoPath;
-    private String mCurrentPhotoPath;
     private String mPreviousPhotoPath;
 
     private TimeLapseDatabase mTimeLapseDatabase;
