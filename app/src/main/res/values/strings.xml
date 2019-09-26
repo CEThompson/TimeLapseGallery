@@ -74,7 +74,6 @@
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="number_of_days">In %1$d Days</string>
-    <string name="one_day">In 1 Day</string>
     <string name="started_on">Started on %1$s %2$s</string>
     <string name="next">Next photo: %1$s at %2$s</string>
     <string name="transition_tag">transition tag</string>

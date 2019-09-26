@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -46,11 +45,9 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
     public class ProjectsAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         @BindView(R.id.project_image) ImageView mProjectImageView;
-        @BindView(R.id.project_name) TextView mProjectNameTextView;
         @BindView(R.id.project_recyclerview_constraint_layout) ConstraintLayout mConstraintLayout;
         @BindView(R.id.schedule_indicator) ImageView mScheduleIndicator;
-        @BindView(R.id.next_submission_time_textview) TextView mNextTimeIndicator;
-        @BindView(R.id.next_submission_day_countdown_textview) TextView mDayCountdownIndicator;
+        @BindView(R.id.next_submission_day_countdown_textview) TextView mNextScheduleString;
         @BindView(R.id.project_card_view) CardView mCardView;
         @BindView(R.id.project_image_gradient_overlay) View mGradientOverlay;
 
@@ -87,9 +84,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         String thumbnail_path = currentProject.getThumbnail_url();
         String projectName = currentProject.getName();
 
-        // Set the name
-        holder.mProjectNameTextView.setText(projectName);
-
         // Set the constraint ratio
         String ratio = PhotoUtils.getAspectRatioFromImagePath(thumbnail_path);
         if (ratio==null) ratio = holder.itemView.getContext().getString(R.string.default_aspect_ratio);
@@ -98,58 +92,46 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         constraintSet.applyTo(holder.mConstraintLayout);
 
         // Set to original color so that views recycle appropriately
-        holder.mConstraintLayout.setBackgroundColor(ContextCompat
-                .getColor(holder.itemView.getContext(), R.color.colorLightPrimary));
+        //holder.mConstraintLayout.setBackgroundColor(ContextCompat
+        //        .getColor(holder.itemView.getContext(), R.color.colorLightPrimary));
+        holder.mConstraintLayout.setPadding(0,0,0,0);
 
         // Display schedule information
         if (currentProject.getSchedule() !=0) {
             // Get the next submisison
             long next = currentProject.getSchedule_next_submission();
 
-            String dayCountdown;
+            String nextSchedule;
+
+            // Calculate day countdown
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(System.currentTimeMillis());
+            int currentDay = cal.get(Calendar.DAY_OF_YEAR);
+            cal.setTimeInMillis(next);
+            int scheduledDay = cal.get(Calendar.DAY_OF_YEAR);
+            int daysUntilPhoto = scheduledDay - currentDay;
 
             // Handle projects scheduled for today
-            // OR projects that are past submission
-            if (DateUtils.isToday(next) || System.currentTimeMillis() > next){
-                dayCountdown = holder.itemView.getContext().getString(R.string.today);
-
-                // Set color to red for todays projects
-                holder.mConstraintLayout.setBackgroundColor(ContextCompat
-                        .getColor(holder.itemView.getContext(), R.color.colorSubtlePinkAccent));
-            }
-            // Otherwise handle projects scheduled for later
-            else {
-                // Calculate day countdown
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(System.currentTimeMillis());
-                int currentDay = cal.get(Calendar.DAY_OF_YEAR);
-                cal.setTimeInMillis(next);
-                int scheduledDay = cal.get(Calendar.DAY_OF_YEAR);
-                int daysUntilPhoto = scheduledDay - currentDay;
-                if (daysUntilPhoto == 1)
-                    dayCountdown = holder.itemView.getContext().getString(R.string.one_day);
-                else
-                    dayCountdown = holder.itemView.getContext().getString(R.string.number_of_days, daysUntilPhoto);
-            }
-
-            // Get time of submission
-            String time = TimeUtils.getTimeFromTimestamp(next);
+            if (DateUtils.isToday(next) || System.currentTimeMillis() > next)
+                nextSchedule = TimeUtils.getTimeFromTimestamp(next);
+            // Handle project scheduled for tomorrow
+            else if (daysUntilPhoto == 1)
+                nextSchedule = holder.itemView.getContext().getString(R.string.tomorrow);
+            // Handle projects scheduled for later
+            else nextSchedule = holder.itemView.getContext().getString(R.string.number_of_days, daysUntilPhoto);
 
             // Set fields
-            holder.mNextTimeIndicator.setText(time);
-            holder.mDayCountdownIndicator.setText(dayCountdown);
+            holder.mNextScheduleString.setText(nextSchedule);
 
             // Set visibility
             holder.mScheduleIndicator.setVisibility(View.VISIBLE);
-            holder.mDayCountdownIndicator.setVisibility(View.VISIBLE);
-            holder.mNextTimeIndicator.setVisibility(View.VISIBLE);
+            holder.mNextScheduleString.setVisibility(View.VISIBLE);
             holder.mGradientOverlay.setVisibility(View.VISIBLE);
         }
         // If there is no schedule hide schedule information
         else {
             holder.mScheduleIndicator.setVisibility(View.INVISIBLE);
-            holder.mNextTimeIndicator.setVisibility(View.INVISIBLE);
-            holder.mDayCountdownIndicator.setVisibility(View.INVISIBLE);
+            holder.mNextScheduleString.setVisibility(View.INVISIBLE);
             holder.mGradientOverlay.setVisibility(View.INVISIBLE);
         }
 

@@ -10,7 +10,6 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/project_recyclerview_constraint_layout"
-        android:padding="@dimen/padding_tiny"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorLightPrimary">
@@ -53,18 +52,6 @@
             app:layout_constraintTop_toTopOf="parent"
             android:visibility="invisible"/>
 
-        <!-- textview to display time for scheduled photo -->
-        <TextView
-            android:id="@+id/next_submission_time_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/detail_small_margin"
-            style="@style/WhiteText"
-            app:layout_constraintEnd_toEndOf="@+id/schedule_indicator"
-            app:layout_constraintTop_toBottomOf="@id/schedule_indicator"
-            android:visibility="invisible"
-            tools:text="9:30pm"/>
-
         <!-- textview to display days until photo -->
         <TextView
             android:id="@+id/next_submission_day_countdown_textview"
@@ -78,22 +65,6 @@
             app:layout_constraintBottom_toBottomOf="@+id/schedule_indicator"
             android:visibility="invisible"
             tools:text="6"/>
-
-        <!-- TODO: decide on removing or keeping project name view -->
-        <!-- name of project -->
-        <TextView
-            android:id="@+id/project_name"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:textSize="16sp"
-            android:gravity="center"
-            app:layout_constraintTop_toBottomOf="@id/project_image"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            tools:text="Project Name"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
