@@ -6,8 +6,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.ViewPropertyAnimatorListener;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -65,7 +63,6 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -638,7 +635,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mDetailsAdapter.setPhotoData(mPhotos);
 
             // Set current photo to last if none has been selected
-            if (mCurrentPhoto == null) mCurrentPhoto = getLastPhoto();
+            mCurrentPhoto = getLastPhoto();
 
             // Load the ui based on the current photo
             loadUi(mCurrentPhoto);
