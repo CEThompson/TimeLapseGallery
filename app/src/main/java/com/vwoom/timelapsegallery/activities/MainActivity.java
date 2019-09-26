@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -99,8 +100,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
                     sharedElements.clear();
                     sharedElements.put(transitionName, photoView);
-
-                    // TODO set add fab as shared element
                 }
                 mReenterState = null;
             }
@@ -270,10 +269,16 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         intent.putExtra(Keys.PROJECT_ENTRY, clickedProject);
         intent.putExtra(Keys.TRANSITION_POSITION, position);
 
+        Pair<View, String> p1 = Pair.create((sharedElement), transitionName);
+        Pair<View, String> p2 = Pair.create((mNewProjectFab), Keys.ADD_FAB_TRANSITION_NAME);
+
         // Start the activity with a shared element if lollipop or higher
         Bundle bundle = ActivityOptions
-                .makeSceneTransitionAnimation(MainActivity.this, sharedElement, transitionName)
+                .makeSceneTransitionAnimation(MainActivity.this,
+                        p1,
+                        p2)
                 .toBundle();
+
         startActivity(intent, bundle);
     }
 

@@ -32,6 +32,7 @@
     <!-- FAB to create a new project -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_project_FAB"
+        android:transitionName="add_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"

@@ -202,6 +202,7 @@
     <!-- FAB to add a new photo -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_photo_fab"
+        android:transitionName="add_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/fab_detail_margin_bottom"

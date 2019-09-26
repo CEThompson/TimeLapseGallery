@@ -142,7 +142,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 String transitionName = mCurrentPhotoImageView.getTransitionName();
 
                 names.add(transitionName);
+
                 sharedElements.put(transitionName, mCurrentPhotoImageView);
+                sharedElements.put(Keys.ADD_FAB_TRANSITION_NAME, mAddPhotoFab);
                 Log.d("SharedElements", "shared elements: transition name is " + transitionName);
             }
         }

@@ -20,7 +20,7 @@ public final class Keys {
     /* Shared element transition */
     public static final String TRANSITION_NAME = "transition_name";
     public static final String TRANSITION_POSITION = "transition_position";
-
+    public static final String ADD_FAB_TRANSITION_NAME = "add_fab";
 
     /* Authorities */
     public static final String FILEPROVIDER_AUTHORITY = "com.vwoom.timelapsegallery.fileprovider";
