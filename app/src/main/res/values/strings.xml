@@ -88,4 +88,8 @@
     <string name="error">Error</string>
     <string name="edit_failed">Edit failed to submit.</string>
 
+
+    <!-- Error handling -->
+    <string name="error_creating_temporary_image_file">Error creating temporary image file.</string>
+
 </resources>

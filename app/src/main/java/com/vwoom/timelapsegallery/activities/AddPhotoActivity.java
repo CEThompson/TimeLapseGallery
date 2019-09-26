@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.vwoom.timelapsegallery.R;
@@ -38,8 +39,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-// TODO refactor CameraX
 
 public class AddPhotoActivity extends AppCompatActivity {
 
@@ -141,8 +140,15 @@ public class AddPhotoActivity extends AppCompatActivity {
                 tempFile = FileUtils.createTemporaryImageFile(this);
                 mTemporaryPhotoPath = tempFile.getAbsolutePath();
             } catch (IOException e) {
-                // TODO display toast
-                // TODO log with crashlytics
+                // Notify user of error
+                Toast toast = Toast.makeText(this, getString(R.string.error_creating_temporary_image_file), Toast.LENGTH_SHORT);
+                toast.show();
+
+                // Track error
+                mTracker.send(new HitBuilders.EventBuilder()
+                        .setCategory(getString(R.string.error))
+                        .setAction(getString(R.string.error_creating_temporary_image_file))
+                        .build());
             }
             // Continue only if the File was successfully created
             if (tempFile != null) {
@@ -322,7 +328,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                 });
                 interstitialAd.show();
             } else {
-                // TODO: implement local ad here
+                // TODO: implement local ad
                 activity.finish();
             }
         }
