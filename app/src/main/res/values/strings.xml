@@ -91,5 +91,6 @@
 
     <!-- Error handling -->
     <string name="error_creating_temporary_image_file">Error creating temporary image file.</string>
+    <string name="error_loading_image">Error loading image.</string>
 
 </resources>

@@ -481,7 +481,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         constraintSet.setDimensionRatio(R.id.detail_next_image, ratio);
         constraintSet.applyTo(constraintLayout);
 
-        // TODO streamline image loading for clarity and smoothness
+        // TODO streamline code for image loading
         // Load the image
         File f = new File(imagePath);
         Glide.with(this)
@@ -489,7 +489,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        // TODO handle load error
+                        Toast toast = Toast.makeText(DetailsActivity.this, getString(R.string.error_loading_image), Toast.LENGTH_SHORT);
+                        toast.show();
                         return false;
                     }
 
@@ -503,6 +504,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                                     @Override
                                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                                         schedulePostponedTransition();
+                                        Toast toast = Toast.makeText(DetailsActivity.this, getString(R.string.error_loading_image), Toast.LENGTH_SHORT);
+                                        toast.show();
                                         return false;
                                     }
 
