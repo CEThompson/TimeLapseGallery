@@ -790,6 +790,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         );
     }
 
+    // TODO recall position after editing project
     /* Edits the current project */
     private void editProject(){
         Intent intent = new Intent(this, NewProjectActivity.class);
