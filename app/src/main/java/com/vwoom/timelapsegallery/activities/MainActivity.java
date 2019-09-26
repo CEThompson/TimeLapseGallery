@@ -264,6 +264,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
     @Override
     public void onClick(ProjectEntry clickedProject, View sharedElement, String transitionName, int position) {
+        // TODO fade out gradient and schedule text if visible
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra(Keys.PROJECT_ENTRY, clickedProject);
         intent.putExtra(Keys.TRANSITION_POSITION, position);
