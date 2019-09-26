@@ -77,7 +77,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     private String mTemporaryPhotoPath = null;
 
     private static final int REQUEST_TAKE_PHOTO = 1;
-    
+
     /* Analytics */
     private Tracker mTracker;
 
