@@ -60,7 +60,7 @@
     <string name="daily">daily</string>
     <string name="weekly">weekly</string>
 
-    <string name="no_projects_for_today">No projects scheduled today.</string>
+    <string name="no_projects_for_today">No projects scheduled for today.</string>
 
     <!-- Notifications -->
     <string name="projects_scheduled_today">Project(s) scheduled today.</string>
