@@ -6,6 +6,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.ViewPropertyAnimatorListener;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -131,6 +133,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
         public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+            Log.d("SharedElements", "shared element callback firing");
             if (mIsReturning){
                 Log.d("SharedElements", "shared elements: detail activity callback firing");
                 names.clear();
@@ -225,8 +228,38 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         AnalyticsApplication application = (AnalyticsApplication) getApplication();
         mTracker = application.getDefaultTracker();
 
+        // Set up shared element transition
         prepareSharedElementTransition();
         setEnterSharedElementCallback(mCallback);
+
+        // Listen for end of shared transition
+        Transition sharedElementEnterTransition = getWindow().getSharedElementEnterTransition();
+        sharedElementEnterTransition.addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                mFullscreenFab.show();
+            }
+
+            @Override
+            public void onTransitionCancel(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionPause(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionResume(Transition transition) {
+
+            }
+        });
     }
 
     @Override
@@ -357,7 +390,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 mCurrentPhotoImageView.getViewTreeObserver().removeOnPreDrawListener(this);
                 mCurrentPhotoImageView.requestLayout();
                 startPostponedEnterTransition();
-                // TODO animate / show fullescreen fab
                 return true;
             }
         });
