@@ -77,10 +77,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     private String mTemporaryPhotoPath = null;
 
     private static final int REQUEST_TAKE_PHOTO = 1;
-
-    /* Admob */
-    private InterstitialAd mInterstitialAd;
-
+    
     /* Analytics */
     private Tracker mTracker;
 
@@ -99,11 +96,6 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
-
-        // Set up interstitial ad
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
         /* Set up the database */
         mTimeLapseDatabase = TimeLapseDatabase.getInstance(this);
@@ -247,11 +239,6 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             loadImage(mTemporaryPhotoPath);
 
             mFirstPhotoFab.setImageResource(R.drawable.ic_repeat_white_24dp);
-
-            // Load ad if it isn't loaded
-            if (!mInterstitialAd.isLoaded()){
-                mInterstitialAd.loadAd(new AdRequest.Builder().build());
-            }
         }
     }
 
@@ -371,19 +358,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                 .setLabel(newProject.getName())
                 .build());
 
-            /* Finish the activity */
-            if (mInterstitialAd.isLoaded()) {
-                mInterstitialAd.setAdListener(new AdListener() {
-                    @Override
-                    public void onAdClosed() {
-                        finish();
-                    }
-                });
-                mInterstitialAd.show();
-            } else {
-                // TODO: implement local ad here
-                finish();
-            }
+            finish();
+
         }
     }
 
@@ -439,10 +415,6 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     @Override
     protected void onResume() {
         super.onResume();
-        if (!mInterstitialAd.isLoaded()){
-            mInterstitialAd.loadAd(new AdRequest.Builder().build());
-        }
-
         // Track activity launch
         mTracker.setScreenName(getString(R.string.new_project_activity));
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
