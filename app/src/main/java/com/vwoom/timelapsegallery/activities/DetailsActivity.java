@@ -219,6 +219,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mPosition = savedInstanceState.getInt(Keys.TRANSITION_POSITION);
         }
 
+        // Set the transition name for the image
+        String transitionName = mCurrentProject.getId() + mCurrentProject.getName();
+        mCurrentPhotoImageView.setTransitionName(transitionName);
+
         if (savedInstanceState == null){
             postponeEnterTransition();
         }
@@ -476,10 +480,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         constraintSet.setDimensionRatio(R.id.detail_current_image, ratio);
         constraintSet.setDimensionRatio(R.id.detail_next_image, ratio);
         constraintSet.applyTo(constraintLayout);
-
-        // Set the transition name for the image
-        String transitionName = mCurrentProject.getId() + mCurrentProject.getName();
-        mCurrentPhotoImageView.setTransitionName(transitionName);
 
         // TODO streamline image loading for clarity and smoothness
         // Load the image
