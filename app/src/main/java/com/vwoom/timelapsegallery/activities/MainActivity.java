@@ -88,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
             // If reenter state contains bundle the activity is returning
             if (mReenterState != null){
                 Log.d(TAG, "shared elements: main activity callback firing");
-                //int position = mReenterState.getInt(Keys.TRANSITION_POSITION);
 
                 String transitionName = mReenterState.getString(Keys.TRANSITION_NAME);
 
@@ -100,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
                     sharedElements.clear();
                     sharedElements.put(transitionName, photoView);
+
+                    // TODO set add fab as shared element
                 }
                 mReenterState = null;
             }
