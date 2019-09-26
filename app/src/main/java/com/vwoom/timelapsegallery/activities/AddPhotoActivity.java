@@ -245,13 +245,12 @@ public class AddPhotoActivity extends AppCompatActivity {
 
     /* Submits the photo to the database and saves photo to permanent file structure */
     private void submitPhoto(){
-        TaskParameters taskParameters = new TaskParameters(this, mTemporaryPhotoPath, mCurrentProject, mTimeLapseDatabase, mInterstitialAd);
-
-        // Track added photo
-        mTracker.send(new HitBuilders.EventBuilder()
-                .setCategory(getString(R.string.submit_photo))
-                .setAction(getString(R.string.submitting))
-                .build());
+        TaskParameters taskParameters = new TaskParameters(this,
+                mTemporaryPhotoPath,
+                mCurrentProject,
+                mTimeLapseDatabase,
+                mInterstitialAd,
+                mTracker);
 
         new SubmitPhotoAsyncTask().execute(taskParameters);
     }
@@ -277,31 +276,54 @@ public class AddPhotoActivity extends AppCompatActivity {
             ProjectEntry currentProject = taskParameters.getCurrentProject();
             TimeLapseDatabase timeLapseDatabase = taskParameters.getTimeLapseDatabase();
             InterstitialAd interstitialAd = taskParameters.getInterstitialAd();
+            Tracker tracker = taskParameters.getTracker();
 
             // Initialize the path for the final photo file
-            String currentPhotoPath = null;
+            String currentPhotoPath;
             long timestamp = System.currentTimeMillis();
 
-            // Create the final file
-            File finalFile = FileUtils.createFinalFileFromTemp(context,
-                    temporaryPhotoPath,
-                    currentProject,
-                    timestamp);
+            try {
+                // Create the final file
+                File finalFile = FileUtils.createFinalFileFromTemp(context,
+                        temporaryPhotoPath,
+                        currentProject,
+                        timestamp);
 
-            // Get the created path
-            currentPhotoPath = finalFile.getAbsolutePath();
+                // Get the created path
+                currentPhotoPath = finalFile.getAbsolutePath();
 
-            // Create the photo entry
+                // Create the photo entry
 
-            PhotoEntry photoToSubmit = new PhotoEntry(currentProject.getId(),
-                    currentPhotoPath,
-                    timestamp);
+                PhotoEntry photoToSubmit = new PhotoEntry(currentProject.getId(),
+                        currentPhotoPath,
+                        timestamp);
 
-            // Insert the photo to the database
-            timeLapseDatabase.photoDao().insertPhoto(photoToSubmit);
+                // Insert the photo to the database
+                timeLapseDatabase.photoDao().insertPhoto(photoToSubmit);
 
-            // Return the parameters to run in post execute
-            return new ResultParameters(context, photoToSubmit, interstitialAd);
+                // Track added photo
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory(context.getString(R.string.submit_photo))
+                        .setAction(context.getString(R.string.submitting))
+                        .build());
+
+                // Return the parameters to run in post execute
+                return new ResultParameters(context, photoToSubmit, interstitialAd);
+            }
+            catch (IOException e) {
+                // Notify user of error
+                Toast toast = Toast.makeText(context, context.getString(R.string.error_submitting_photo), Toast.LENGTH_LONG);
+                toast.show();
+
+                // Track error
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory(context.getString(R.string.error))
+                        .setAction(context.getString(R.string.error_submitting_photo))
+                        .setLabel(currentProject.getName())
+                        .build());
+
+                return new ResultParameters(context, null, null);
+            }
         }
 
         /* Sets the result intent, launches the ad and finishes the activity */
@@ -313,23 +335,25 @@ public class AddPhotoActivity extends AppCompatActivity {
             PhotoEntry insertedPhoto = resultParameters.getPhotoEntry();
             InterstitialAd interstitialAd = resultParameters.getInterstitialAd();
 
-            // Set the result to return to the details activity
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra(Keys.PHOTO_ENTRY, insertedPhoto);
-            activity.setResult(RESULT_OK, resultIntent);
+            if (insertedPhoto != null) {
+                // Set the result to return to the details activity
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra(Keys.PHOTO_ENTRY, insertedPhoto);
+                activity.setResult(RESULT_OK, resultIntent);
 
-            // Finish the activity returning to the details after showing the ad if it is loaded
-            if (interstitialAd.isLoaded()) {
-                interstitialAd.setAdListener(new AdListener() {
-                    @Override
-                    public void onAdClosed() {
-                        activity.finish();
-                    }
-                });
-                interstitialAd.show();
-            } else {
-                // TODO: implement local ad
-                activity.finish();
+                // Finish the activity returning to the details after showing the ad if it is loaded
+                if (interstitialAd.isLoaded()) {
+                    interstitialAd.setAdListener(new AdListener() {
+                        @Override
+                        public void onAdClosed() {
+                            activity.finish();
+                        }
+                    });
+                    interstitialAd.show();
+                } else {
+                    // TODO: implement local ad
+                    activity.finish();
+                }
             }
         }
     }
@@ -341,13 +365,20 @@ public class AddPhotoActivity extends AppCompatActivity {
         private ProjectEntry currentProject;
         private TimeLapseDatabase timeLapseDatabase;
         private InterstitialAd interstitialAd;
+        private Tracker tracker;
 
-        public TaskParameters(Context context, String tempPhotoPath, ProjectEntry currentProject, TimeLapseDatabase timeLapseDatabase, InterstitialAd interstitialAd){
+        public TaskParameters(Context context,
+                              String tempPhotoPath,
+                              ProjectEntry currentProject,
+                              TimeLapseDatabase timeLapseDatabase,
+                              InterstitialAd interstitialAd,
+                              Tracker tracker){
             this.context = context;
             this.tempPhotoPath = tempPhotoPath;
             this.currentProject = currentProject;
             this.timeLapseDatabase = timeLapseDatabase;
             this.interstitialAd = interstitialAd;
+            this.tracker = tracker;
         }
         // Getters
         public Context getContext() { return context; }
@@ -355,6 +386,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         public ProjectEntry getCurrentProject() { return currentProject; }
         public TimeLapseDatabase getTimeLapseDatabase() { return timeLapseDatabase; }
         public InterstitialAd getInterstitialAd() { return interstitialAd; }
+        public Tracker getTracker() { return tracker; }
     }
 
     /* Class to pass result references for async task */

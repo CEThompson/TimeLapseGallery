@@ -15,6 +15,7 @@ import com.vwoom.timelapsegallery.utils.PhotoUtils;
 import com.vwoom.timelapsegallery.utils.ProjectUtils;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
 
+import java.io.IOException;
 import java.util.List;
 
 public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
@@ -69,8 +70,12 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
         Bitmap bitmap = PhotoUtils.decodeSampledBitmapFromPath(currentProject.getThumbnail_url(), 100, 100);
 
         // Rotate the bitmap
-        Integer bitmapOrientation = PhotoUtils.getOrientationFromImagePath(currentProject.getThumbnail_url());
-        bitmap = PhotoUtils.rotateBitmap(bitmap, bitmapOrientation);
+        try {
+            Integer bitmapOrientation = PhotoUtils.getOrientationFromImagePath(currentProject.getThumbnail_url());
+            bitmap = PhotoUtils.rotateBitmap(bitmap, bitmapOrientation);
+        } catch (IOException e){
+            // TODO log orientation error
+        }
 
         // Set the view strings
         views.setTextViewText(R.id.widget_list_item_name_text_view, currentProject.getName());

@@ -14,7 +14,7 @@ public final class PhotoUtils {
     private static final String TAG = PhotoUtils.class.getSimpleName();
 
     /* Returns the aspect ratio from the photo path */
-    public static String getAspectRatioFromImagePath(String path){
+    public static String getAspectRatioFromImagePath(String path) {
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, bmOptions);
@@ -25,8 +25,12 @@ public final class PhotoUtils {
         String aspectRatio = imageWidth + ":" + imageHeight;
 
         // If the image is rotated modify the aspect ratio
-        Integer orientation = getOrientationFromImagePath(path);
-        if (orientation == null) return null;
+        Integer orientation;
+        try {
+            orientation = getOrientationFromImagePath(path);
+        } catch (IOException e) {
+            return aspectRatio;
+        }
 
         // Modify aspect ratio in case of landscape orientation
         switch (orientation) {
@@ -40,21 +44,13 @@ public final class PhotoUtils {
     }
 
     /* Gets exif orientation from bitmap */
-    public static Integer getOrientationFromImagePath(String path){
-        Integer orientation = null;
-        try {
-            ExifInterface exif = new ExifInterface(path);
-            orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        } catch (IOException e) {
-            // TODO display error with toast
-            // TODO Log with crashlytics
-        }
-
-       return orientation;
+    public static Integer getOrientationFromImagePath(String path) throws IOException{
+        ExifInterface exif = new ExifInterface(path);
+        return exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
     }
 
     /* Rotates a bitmap by its exif orientation */
-    public static Bitmap rotateBitmap(Bitmap bitmap, Integer orientation){
+    public static Bitmap rotateBitmap(Bitmap bitmap, Integer orientation) throws OutOfMemoryError {
         if (orientation == null) return null;
         Matrix matrix = new Matrix();
         // Determine the rotation matrix
@@ -101,7 +97,7 @@ public final class PhotoUtils {
         }
     }
 
-    public static boolean isLandscape(String imagePath){
+    public static boolean isLandscape(String imagePath) {
         String aspectRatio = getAspectRatioFromImagePath(imagePath);
         String[] res = aspectRatio.split(":");
         int width = Integer.parseInt(res[0]);

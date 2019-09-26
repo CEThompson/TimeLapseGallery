@@ -730,7 +730,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         public void onSwipeLeft() {
             int currentIndex = mPhotos.indexOf(mCurrentPhoto);
-            if (currentIndex == mPhotos.size()) return;
+            if (currentIndex == mPhotos.size()-1) return;
             mCurrentPhoto = mPhotos.get(currentIndex+1);
             loadUi(mCurrentPhoto);
         }

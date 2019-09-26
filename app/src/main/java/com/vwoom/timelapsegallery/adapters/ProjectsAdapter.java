@@ -86,7 +86,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
 
         // Set the constraint ratio
         String ratio = PhotoUtils.getAspectRatioFromImagePath(thumbnail_path);
-        if (ratio==null) ratio = holder.itemView.getContext().getString(R.string.default_aspect_ratio);
         constraintSet.clone(holder.mConstraintLayout);
         constraintSet.setDimensionRatio(holder.mProjectImageView.getId(), ratio);
         constraintSet.applyTo(holder.mConstraintLayout);

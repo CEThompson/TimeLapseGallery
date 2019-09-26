@@ -76,22 +76,17 @@ public final class FileUtils {
     }
 
     /* Used to create a photo file from its temporary location */
-    public static File createFinalFileFromTemp(Context context, String tempPath, ProjectEntry currentProject, long timestamp) {
-        File finalFile = null;
-        try {
-            // Create the permanent file for the photo
-            finalFile = createImageFile(context, currentProject, timestamp);
-            // Create tempfile from previous path
-            File tempFile = new File(tempPath);
-            // Copy file to new destination
-            copy(tempFile, finalFile);
-            // Remove temporary file
-            tempFile.delete();
-        }
-        catch (IOException e) {
-            // TODO display error with toast
-            // TODO Log with crashlytics
-        }
+    public static File createFinalFileFromTemp(Context context, String tempPath, ProjectEntry currentProject, long timestamp)
+    throws IOException {
+        // Create the permanent file for the photo
+        File finalFile = createImageFile(context, currentProject, timestamp);
+        // Create tempfile from previous path
+        File tempFile = new File(tempPath);
+        // Copy file to new destination
+        copy(tempFile, finalFile);
+        // Remove temporary file
+        tempFile.delete();
+
         return finalFile;
     }
 

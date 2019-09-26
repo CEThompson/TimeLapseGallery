@@ -341,24 +341,39 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
                 ProjectEntry result = mTimeLapseDatabase.projectDao().loadProjectById(projectId);
 
-                // Create the file for the photo
-                File finalFile = FileUtils.createFinalFileFromTemp(this, mTemporaryPhotoPath, result, result.getTimestamp());
+                try {
+                    // Create the file for the photo
+                    File finalFile = FileUtils.createFinalFileFromTemp(this, mTemporaryPhotoPath, result, result.getTimestamp());
 
-                // Submit the photo entry for the project
-                String photo_path = finalFile.getAbsolutePath();
-                PhotoEntry currentPhoto = new PhotoEntry(result.getId(), photo_path, result.getTimestamp());
-                mTimeLapseDatabase.photoDao().insertPhoto(currentPhoto);
+                    // Submit the photo entry for the project
+                    String photo_path = finalFile.getAbsolutePath();
+                    PhotoEntry currentPhoto = new PhotoEntry(result.getId(), photo_path, result.getTimestamp());
+                    mTimeLapseDatabase.photoDao().insertPhoto(currentPhoto);
 
-                // Set the cover photo for the project
-                result.setThumbnail_url(photo_path);
-                mTimeLapseDatabase.projectDao().updateProject(result);
+                    // Set the cover photo for the project
+                    result.setThumbnail_url(photo_path);
+                    mTimeLapseDatabase.projectDao().updateProject(result);
+
+                    // If the new project has a schedule trigger the notification worker to restart
+                    if (newProject.getSchedule() > 0) {
+                        NotificationUtils.scheduleNotificationWorker(this);
+                        UpdateWidgetService.startActionUpdateWidgets(this);
+                    }
+                } catch (IOException e){
+                    // Notify project creation error
+                    Toast toast = Toast.makeText(this, getString(R.string.error_creating_final_file), Toast.LENGTH_LONG);
+                    toast.show();
+
+                    // Track error
+                    mTracker.send(new HitBuilders.EventBuilder()
+                            .setCategory(getString(R.string.error))
+                            .setAction(getString(R.string.submitted))
+                            .setLabel(newProject.getName())
+                            .build());
+                }
             });
 
-            // If the new project has a schedule trigger the notification worker to restart
-            if (newProject.getSchedule() > 0) {
-                NotificationUtils.scheduleNotificationWorker(this);
-                UpdateWidgetService.startActionUpdateWidgets(this);
-            }
+
 
             // Track added project
             mTracker.send(new HitBuilders.EventBuilder()
