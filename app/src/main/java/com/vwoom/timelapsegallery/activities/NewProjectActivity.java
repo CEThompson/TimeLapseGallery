@@ -24,6 +24,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -203,8 +204,16 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                 mTemporaryPhotoPath = tempFile.getAbsolutePath();
             } catch (IOException e) {
                 Log.e(TAG, "failure creating file", e);
-                // TODO display toast
-                // TODO log with crashylitics
+
+                // Display error
+                Toast toast = Toast.makeText(this, getString(R.string.error_creating_temporary_image_file), Toast.LENGTH_SHORT);
+                toast.show();
+
+                // Log to analytics
+                mTracker.send(new HitBuilders.EventBuilder()
+                        .setCategory(getString(R.string.error))
+                        .setAction(getString(R.string.error_creating_temporary_image_file))
+                        .build());
             }
             // Continue only if the File was successfully created
             if (tempFile != null) {

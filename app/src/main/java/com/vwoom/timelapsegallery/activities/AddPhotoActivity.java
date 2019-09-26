@@ -147,6 +147,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                 mTracker.send(new HitBuilders.EventBuilder()
                         .setCategory(getString(R.string.error))
                         .setAction(getString(R.string.error_creating_temporary_image_file))
+                        .setLabel(mCurrentProject.getName())
                         .build());
             }
             // Continue only if the File was successfully created
