@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
-            android:backgroundTint="@color/colorRedAccent"
+            android:backgroundTint="@color/colorGreen"
             android:src="@drawable/ic_play_arrow_white_24dp"
             app:fabSize="normal"
             app:layout_constraintTop_toTopOf="parent"
@@ -28,17 +28,19 @@
         <!-- For image loading -->
         <ProgressBar
             android:id="@+id/image_loading_progress"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@xml/progress"
-            android:visibility="gone"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/play_as_video_fab"/>
+            app:layout_constraintBottom_toTopOf="@id/details_card_container"
+            app:layout_constraintStart_toEndOf="@id/project_information_layout"
+            app:layout_constraintEnd_toStartOf="@id/play_as_video_fab"
+            app:layout_constraintVertical_bias="0.5"/>
 
         <!-- Layout containing project information -->
         <LinearLayout
             android:id="@+id/project_information_layout"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_margin="@dimen/detail_margin"

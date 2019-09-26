@@ -542,15 +542,18 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
             // Handle UI
             mProgressBar.setVisibility(View.VISIBLE);
+            mProgressBar.setMax(mPhotos.size()-1);
             mPlayAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp);
 
             // Create a runnable for each image
             for (int i = 0; i < mPhotos.size(); i++) {
                 PhotoEntry photoEntry = mPhotos.get(i);
 
+                final int position = i;
                 // Load the image for each
                 Runnable runnable = () -> {
                     loadUi(photoEntry);
+                    mProgressBar.setProgress(position);
                 };
 
                 // If the position is last create a different runnable to clean up

@@ -68,6 +68,7 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsA
         File f = new File(photo_path);
 
         // TODO dynamically resize detail view
+        // TODO add red outline indicator for currently selected photo
         Glide.with(holder.itemView.getContext())
                 .load(f)
                 .into(holder.mDetailThumbnail);
