@@ -326,6 +326,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        // First hide fullscreen fab
+        // TODO animate fullscreen fab hide
+        mFullscreenFab.hide();
         // Prevents shared element transition from lingering on screen
         supportFinishAfterTransition();
     }
