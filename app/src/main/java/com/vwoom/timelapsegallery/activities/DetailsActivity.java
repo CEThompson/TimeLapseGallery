@@ -357,6 +357,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 mCurrentPhotoImageView.getViewTreeObserver().removeOnPreDrawListener(this);
                 mCurrentPhotoImageView.requestLayout();
                 startPostponedEnterTransition();
+                // TODO animate / show fullescreen fab
                 return true;
             }
         });
