@@ -106,6 +106,7 @@
                 <!-- gradient overlay for image -->
                 <View
                     android:id="@+id/details_gradient_overlay"
+                    android:visibility="invisible"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/gradient_overlay_detail_height"
                     android:background="@drawable/gradient_overlay_bottom_up"
@@ -116,6 +117,7 @@
                 <!-- Layout displaying the photo information -->
                 <LinearLayout
                     android:id="@+id/photo_information_layout"
+                    android:visibility="invisible"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/detail_margin"
@@ -150,6 +152,7 @@
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/fullscreen_fab"
+                    android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:fabSize="mini"

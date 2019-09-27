@@ -223,6 +223,15 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorGreen)));
         mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorGreen));
 
+        // Show fab and photo info on create
+        // TODO animate this block on transition completion
+        LinearLayout photoInformationLayout = findViewById(R.id.photo_information_layout);
+        View gradientOverlay = findViewById(R.id.details_gradient_overlay);
+        photoInformationLayout.setVisibility(View.VISIBLE);
+        gradientOverlay.setVisibility(View.VISIBLE);
+        mFullscreenFab.show();
+
+
         // Set the transition name for the image
         String transitionName = mCurrentProject.getId() + mCurrentProject.getName();
         mCardView.setTransitionName(transitionName);
