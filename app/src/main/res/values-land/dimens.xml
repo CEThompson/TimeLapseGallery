@@ -4,6 +4,9 @@
     <!-- Detail resources -->
     <dimen name="detail_recyclerview_height">60dp</dimen>
     <dimen name="detail_recyclerview_item_height">40dp</dimen>
+    <dimen name="detail_recyclerview_selection_height">62dp</dimen>
+    <dimen name="detail_recyclerview_selection_width">42dp</dimen>
+
     <dimen name="fab_detail_margin_bottom">32dp</dimen>
 
     <!-- New Project layout resources -->

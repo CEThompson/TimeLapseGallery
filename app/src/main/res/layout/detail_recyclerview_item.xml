@@ -5,8 +5,8 @@
 
     <View
         android:id="@+id/selection_indicator"
-        android:layout_width="42dp"
-        android:layout_height="67dp"
+        android:layout_width="@dimen/detail_recyclerview_selection_width"
+        android:layout_height="@dimen/detail_recyclerview_selection_height"
         android:layout_gravity="center"
         android:layout_margin="@dimen/detail_margin"
         android:background="@color/colorSubtleRedAccent"

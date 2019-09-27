@@ -12,6 +12,8 @@
     <dimen name="detail_recyclerview_height">80dp</dimen>
     <dimen name="detail_recyclerview_item_height">65dp</dimen>
     <dimen name="detail_recyclerview_item_width">40dp</dimen>
+    <dimen name="detail_recyclerview_selection_height">67dp</dimen>
+    <dimen name="detail_recyclerview_selection_width">42dp</dimen>
 
     <dimen name="detail_project_info_width">200dp</dimen>
 
