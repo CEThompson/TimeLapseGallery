@@ -20,6 +20,7 @@
             android:layout_margin="@dimen/fab_margin"
             android:backgroundTint="@color/colorGreen"
             android:src="@drawable/ic_play_arrow_white_24dp"
+            app:borderWidth="0dp"
             app:fabSize="normal"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -178,6 +179,7 @@
         <!-- Recycler view showing the photos in the project -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/details_recyclerview"
+            android:paddingEnd="@dimen/fab_size_plus_padding"
             android:layout_width="match_parent"
             android:layout_height="@dimen/detail_recyclerview_height"
             android:background="@color/colorPrimaryDark"
