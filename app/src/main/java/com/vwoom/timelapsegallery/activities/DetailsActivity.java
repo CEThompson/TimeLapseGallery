@@ -33,8 +33,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -76,6 +74,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     // Photo Views
     @BindView(R.id.detail_current_image) ImageView mCurrentPhotoImageView;
     @BindView(R.id.detail_next_image) ImageView mNextPhotoImageView;
+    @BindView(R.id.details_card_container) CardView mCardView;
 
     // Progress Indication
     @BindView(R.id.image_loading_progress) ProgressBar mProgressBar;
@@ -139,11 +138,11 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 names.clear();
                 sharedElements.clear();
 
-                String transitionName = mCurrentPhotoImageView.getTransitionName();
+                String transitionName = mCardView.getTransitionName();
 
                 names.add(transitionName);
 
-                sharedElements.put(transitionName, mCurrentPhotoImageView);
+                sharedElements.put(transitionName, mCardView);
                 sharedElements.put(Keys.ADD_FAB_TRANSITION_NAME, mAddPhotoFab);
                 Log.d("SharedElements", "shared elements: transition name is " + transitionName);
             }
@@ -221,7 +220,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         // Set the transition name for the image
         String transitionName = mCurrentProject.getId() + mCurrentProject.getName();
-        mCurrentPhotoImageView.setTransitionName(transitionName);
+        mCardView.setTransitionName(transitionName);
 
         if (savedInstanceState == null){
             postponeEnterTransition();
@@ -239,9 +238,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         prepareSharedElementTransition();
         setEnterSharedElementCallback(mCallback);
 
-        // Listen for end of shared transition
-        Transition sharedElementEnterTransition = getWindow().getSharedElementEnterTransition();
-        sharedElementEnterTransition.addListener(new Transition.TransitionListener() {
+        Transition sharedElementEnter = getWindow().getSharedElementEnterTransition();
+        sharedElementEnter.addListener(new Transition.TransitionListener(){
             @Override
             public void onTransitionStart(Transition transition) {
 
@@ -332,7 +330,18 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     @Override
     public void onBackPressed() {
-        supportFinishAfterTransition();
+        // Hide the fab then finish the activity
+        mFullscreenFab.hide(new FloatingActionButton.OnVisibilityChangedListener() {
+            @Override
+            public void onShown(FloatingActionButton fab) {
+                supportFinishAfterTransition();
+            }
+
+            @Override
+            public void onHidden(FloatingActionButton fab) {
+                supportFinishAfterTransition();
+            }
+        });
     }
 
     /*
@@ -382,10 +391,15 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     }
 
     private void prepareSharedElementTransition(){
+        Transition layoutTransition = TransitionInflater.from(this)
+                .inflateTransition(R.transition.details_transition);
+        getWindow().setEnterTransition(layoutTransition);
+
         Transition transition =
                 TransitionInflater.from(this)
                         .inflateTransition(R.transition.image_shared_element_transition);
         getWindow().setSharedElementEnterTransition(transition);
+
     }
 
     private void schedulePostponedTransition(){

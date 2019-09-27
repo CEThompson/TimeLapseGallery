@@ -61,8 +61,8 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
             ProjectEntry clickedProject = mProjectData.get(adapterPosition);
-            String transitionName = mProjectImageView.getTransitionName();
-            mClickHandler.onClick(clickedProject, mProjectImageView, transitionName, adapterPosition);
+            String transitionName = mCardView.getTransitionName();
+            mClickHandler.onClick(clickedProject, mCardView, transitionName, adapterPosition);
         }
     }
 
@@ -136,8 +136,8 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
 
         // Set the transition name
         String transitionName = currentProject.getId() + currentProject.getName();
-        holder.mProjectImageView.setTransitionName(transitionName);
-        holder.mProjectImageView.setTag(R.string.transition_tag, currentProject.getThumbnail_url());
+        holder.mCardView.setTransitionName(transitionName);
+        holder.mCardView.setTag(R.string.transition_tag, currentProject.getThumbnail_url());
 
         // Load the image
         File f = new File(thumbnail_path);
