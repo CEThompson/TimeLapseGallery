@@ -233,6 +233,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             postponeEnterTransition();
         }
 
+        // TODO implement pinch zoom on fullscreen image
         initializeFullscreenImageDialog();
 
         setupViewModel();
