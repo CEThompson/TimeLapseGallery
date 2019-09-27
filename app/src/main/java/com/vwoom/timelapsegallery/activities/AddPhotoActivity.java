@@ -146,8 +146,8 @@ public class AddPhotoActivity extends AppCompatActivity {
                 // Track error
                 mTracker.send(new HitBuilders.EventBuilder()
                         .setCategory(getString(R.string.error))
-                        .setAction(getString(R.string.error_creating_temporary_image_file))
-                        .setLabel(mCurrentProject.getName())
+                        .setAction(getString(R.string.action_take_photo))
+                        .setLabel(e.getMessage())
                         .build());
             }
             // Continue only if the File was successfully created
@@ -283,28 +283,24 @@ public class AddPhotoActivity extends AppCompatActivity {
             long timestamp = System.currentTimeMillis();
 
             try {
-                // Create the final file
+                // Create the final file & get path
                 File finalFile = FileUtils.createFinalFileFromTemp(context,
                         temporaryPhotoPath,
                         currentProject,
                         timestamp);
-
-                // Get the created path
                 currentPhotoPath = finalFile.getAbsolutePath();
 
-                // Create the photo entry
-
+                // Create and insert the photo entry
                 PhotoEntry photoToSubmit = new PhotoEntry(currentProject.getId(),
                         currentPhotoPath,
                         timestamp);
-
-                // Insert the photo to the database
                 timeLapseDatabase.photoDao().insertPhoto(photoToSubmit);
 
                 // Track added photo
                 tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(context.getString(R.string.submit_photo))
-                        .setAction(context.getString(R.string.submitting))
+                        .setCategory(context.getString(R.string.category_photo))
+                        .setAction(context.getString(R.string.action_submit))
+                        .setLabel(String.valueOf(photoToSubmit.getTimestamp()))
                         .build());
 
                 // Return the parameters to run in post execute
@@ -318,8 +314,8 @@ public class AddPhotoActivity extends AppCompatActivity {
                 // Track error
                 tracker.send(new HitBuilders.EventBuilder()
                         .setCategory(context.getString(R.string.error))
-                        .setAction(context.getString(R.string.error_submitting_photo))
-                        .setLabel(currentProject.getName())
+                        .setAction(context.getString(R.string.action_submit))
+                        .setLabel(e.getMessage())
                         .build());
 
                 return new ResultParameters(context, null, null);
@@ -335,6 +331,7 @@ public class AddPhotoActivity extends AppCompatActivity {
             PhotoEntry insertedPhoto = resultParameters.getPhotoEntry();
             InterstitialAd interstitialAd = resultParameters.getInterstitialAd();
 
+            // If photo insertion was succesful
             if (insertedPhoto != null) {
                 // Set the result to return to the details activity
                 Intent resultIntent = new Intent();
@@ -355,6 +352,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                     activity.finish();
                 }
             }
+            // If photo insertion unsuccesful do nothing
         }
     }
 

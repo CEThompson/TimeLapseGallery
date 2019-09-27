@@ -95,4 +95,10 @@
     <string name="error_creating_final_file">Error creating final file.</string>
     <string name="error_submitting_photo">Error submitting photo</string>
 
+    <!-- Analytics -->
+    <string name="category_photo">Photo</string>
+    <string name="category_project">Project</string>
+    <string name="action_submit">Submit</string>
+    <string name="action_take_photo">Take Photo</string>
+
 </resources>
