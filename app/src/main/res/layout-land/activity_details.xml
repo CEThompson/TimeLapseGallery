@@ -67,6 +67,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_margin="@dimen/detail_margin"
+            android:layout_marginEnd="@dimen/fab_size_plus_padding"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintVertical_bias="0.5"
             app:layout_constraintTop_toTopOf="parent"
@@ -111,7 +112,7 @@
                     android:background="@drawable/gradient_overlay_bottom_up"
                     app:layout_constraintBottom_toBottomOf="@+id/detail_current_image"
                     app:layout_constraintStart_toStartOf="@id/detail_current_image"
-                    app:layout_constraintTop_toTopOf="@id/detail_current_image"
+                    app:layout_constraintEnd_toEndOf="@id/detail_current_image"
                     />
                 <!-- Layout displaying the photo information -->
                 <LinearLayout
@@ -152,8 +153,8 @@
                     android:id="@+id/fullscreen_fab"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/detail_small_margin"
                     app:fabSize="mini"
+                    android:layout_margin="@dimen/detail_small_margin"
                     app:backgroundTint="@color/darkImagePlaceHolder"
                     android:src="@drawable/ic_fullscreen_white_24dp"
                     app:layout_constraintTop_toTopOf="parent"

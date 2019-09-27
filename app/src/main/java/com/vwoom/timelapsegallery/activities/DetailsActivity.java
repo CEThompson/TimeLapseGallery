@@ -430,30 +430,20 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         boolean isImageLandscape = PhotoUtils.isLandscape(imagePath);
 
         // Set cardview constraints depending upon if photo is landscape or portrait
-        CardView cardView = findViewById(R.id.details_card_container);
-        ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
+        ViewGroup.LayoutParams layoutParams = mCardView.getLayoutParams();
         Log.d(TAG, "is landscape = " + isImageLandscape);
 
-        int deviceOrientation = getResources().getConfiguration().orientation;
-
-        // Device is in portrait mode
-        if (deviceOrientation == Configuration.ORIENTATION_PORTRAIT)
-            // If landscape set height to wrap content
-            // Set width to be measured
-            if (isImageLandscape){
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                layoutParams.width = 0;
-            }
-            // Otherwise image is portrait set height to be measured
-            // And wrap content for width
-            else {
-                layoutParams.height = 0;
-                layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-            }
-        // Device is in landscape mode
+        // If landscape set height to wrap content
+        // Set width to be measured
+        if (isImageLandscape){
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            layoutParams.width = 0;
+        }
+        // Otherwise image is portrait set height to be measured
+        // And wrap content for width
         else {
             layoutParams.height = 0;
-            layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;;
+            layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         }
 
         // Resize the constraint layout
