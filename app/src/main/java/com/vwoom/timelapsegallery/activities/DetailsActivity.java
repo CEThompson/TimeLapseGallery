@@ -16,7 +16,6 @@ import android.app.SharedElementCallback;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -394,7 +393,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     /* Update the UI */
     public void loadUi(PhotoEntry photoEntry){
         // Set the fullscreen image dialogue to the current photo
-        preloadFullscreenImage();
+        if (!mPlaying) preloadFullscreenImage();
+
+        // Notify the adapter
+        mDetailsAdapter.setCurrentPhoto(photoEntry);
 
         // Load the current image
         loadImage(photoEntry.getUrl());
@@ -592,8 +594,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     /* Pre loads the selected image into the hidden dialogue so that display appears immediate */
     private void preloadFullscreenImage(){
         // TODO lock down fullscreen image loading
-        if (mPlaying) return; // Only preload fullscreen image when not playing
-
         File current = new File(mCurrentPhoto.getUrl());
         Glide.with(this)
                 .load(current)
