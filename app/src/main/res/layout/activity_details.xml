@@ -19,7 +19,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
             app:borderWidth="0dp"
-            android:backgroundTint="@color/colorGreen"
             android:src="@drawable/ic_play_arrow_white_24dp"
             app:fabSize="normal"
             app:layout_constraintTop_toTopOf="parent"

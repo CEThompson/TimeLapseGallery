@@ -2,10 +2,12 @@ package com.vwoom.timelapsegallery.activities;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +18,8 @@ import android.app.SharedElementCallback;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -216,6 +220,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mCurrentPhoto = savedInstanceState.getParcelable(Keys.PHOTO_ENTRY);
             mPosition = savedInstanceState.getInt(Keys.TRANSITION_POSITION);
         }
+
+        // Initialize fab color
+        mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorGreen)));
+        mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorGreen));
 
         // Set the transition name for the image
         String transitionName = mCurrentProject.getId() + mCurrentProject.getName();
@@ -501,6 +509,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         // If already playing cancel
         if (mPlaying){
+            // Set color of play fab
+            mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorGreen)));
+            mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorGreen));
+
             // Set playing false and cancel runnable
             mPlaying = false;
             mPlayHandler.removeCallbacksAndMessages(null);
@@ -511,6 +523,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         }
         // Otherwise play the set of images
         else {
+            // Set color of play fab
+            mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorRedAccent)));
+            mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorRedAccent));
+
             // Set paying true
             mPlaying = true;
 
