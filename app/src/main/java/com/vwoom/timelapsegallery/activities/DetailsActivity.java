@@ -33,6 +33,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -300,19 +301,12 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     @Override
     public void onBackPressed() {
-        // Hide the fab then finish the activity
-        /*
-        mFullscreenFab.hide(new FloatingActionButton.OnVisibilityChangedListener() {
-            @Override
-            public void onShown(FloatingActionButton fab) {
-                supportFinishAfterTransition();
-            }
-
-            @Override
-            public void onHidden(FloatingActionButton fab) {
-                supportFinishAfterTransition();
-            }
-        });*/
+        // Use this block for hide animation
+        LinearLayout photoInformationLayout = findViewById(R.id.photo_information_layout);
+        View gradientOverlay = findViewById(R.id.details_gradient_overlay);
+        photoInformationLayout.setVisibility(View.INVISIBLE);
+        gradientOverlay.setVisibility(View.INVISIBLE);
+        mFullscreenFab.hide();
         supportFinishAfterTransition();
     }
 
