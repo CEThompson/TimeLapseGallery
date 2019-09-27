@@ -216,6 +216,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         if (savedInstanceState != null) {
             mCurrentPhoto = savedInstanceState.getParcelable(Keys.PHOTO_ENTRY);
             mPosition = savedInstanceState.getInt(Keys.TRANSITION_POSITION);
+            mFullscreenFab.show();
         }
 
         // Set the transition name for the image
@@ -331,15 +332,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     @Override
     public void onBackPressed() {
-        //super.onBackPressed();
-        // Hide fullscreen fab and finish afterwards
-        mFullscreenFab.hide(new FloatingActionButton.OnVisibilityChangedListener(){
-            @Override
-            public void onHidden(FloatingActionButton fab) {
-                super.onHidden(fab);
-                supportFinishAfterTransition();
-            }
-        });
+        supportFinishAfterTransition();
     }
 
     /*
