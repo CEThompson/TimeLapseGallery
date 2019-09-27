@@ -39,9 +39,6 @@ import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.PhotoUtils;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -212,7 +209,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                 // Log to analytics
                 mTracker.send(new HitBuilders.EventBuilder()
                         .setCategory(getString(R.string.error))
-                        .setAction(getString(R.string.error_creating_temporary_image_file))
+                        .setAction(getString(R.string.action_take_photo))
                         .build());
             }
             // Continue only if the File was successfully created
@@ -359,6 +356,14 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                         NotificationUtils.scheduleNotificationWorker(this);
                         UpdateWidgetService.startActionUpdateWidgets(this);
                     }
+
+                    // Track added project
+                    mTracker.send(new HitBuilders.EventBuilder()
+                            .setCategory(getString(R.string.category_project))
+                            .setAction(getString(R.string.action_submit))
+                            .setLabel(newProject.getName())
+                            .build());
+
                 } catch (IOException e){
                     // Notify project creation error
                     Toast toast = Toast.makeText(this, getString(R.string.error_creating_final_file), Toast.LENGTH_LONG);
@@ -367,20 +372,11 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                     // Track error
                     mTracker.send(new HitBuilders.EventBuilder()
                             .setCategory(getString(R.string.error))
-                            .setAction(getString(R.string.submitted))
-                            .setLabel(newProject.getName())
+                            .setAction(getString(R.string.action_submit))
+                            .setLabel(e.getMessage())
                             .build());
                 }
             });
-
-
-
-            // Track added project
-            mTracker.send(new HitBuilders.EventBuilder()
-                .setCategory(getString(R.string.submit_project))
-                .setAction(getString(R.string.submitted))
-                .setLabel(newProject.getName())
-                .build());
 
             finish();
 
