@@ -33,6 +33,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -329,12 +331,15 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        // First hide fullscreen fab
-        // TODO animate fullscreen fab hide
-        mFullscreenFab.hide();
-        // Prevents shared element transition from lingering on screen
-        supportFinishAfterTransition();
+        //super.onBackPressed();
+        // Hide fullscreen fab and finish afterwards
+        mFullscreenFab.hide(new FloatingActionButton.OnVisibilityChangedListener(){
+            @Override
+            public void onHidden(FloatingActionButton fab) {
+                super.onHidden(fab);
+                supportFinishAfterTransition();
+            }
+        });
     }
 
     /*
