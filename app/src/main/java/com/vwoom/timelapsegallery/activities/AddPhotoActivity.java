@@ -12,7 +12,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -82,6 +81,7 @@ public class AddPhotoActivity extends AppCompatActivity {
 
         // Set up interstitial ad
         mInterstitialAd = new InterstitialAd(this);
+        // TODO replace with my own ad unit id
         mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
