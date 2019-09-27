@@ -591,6 +591,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     /* Pre loads the selected image into the hidden dialogue so that display appears immediate */
     private void preloadFullscreenImage(){
+        // TODO lock down fullscreen image loading
+        if (mPlaying) return; // Only preload fullscreen image when not playing
+
         File current = new File(mCurrentPhoto.getUrl());
         Glide.with(this)
                 .load(current)
