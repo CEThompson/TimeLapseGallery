@@ -493,6 +493,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .into(mNextPhotoImageView);
     }
 
+    // TODO debug, occasionally does not load
+    /* Loads the set of images concurrently */
     private void playSetOfImages(){
         // Lazy Initialize handler
         if (mPlayHandler == null) mPlayHandler = new Handler();
