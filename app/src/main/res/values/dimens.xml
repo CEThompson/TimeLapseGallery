@@ -22,7 +22,7 @@
 
     <dimen name="fab_detail_margin_bottom">52dp</dimen>
 
-    <dimen name="fab_size_plus_padding">68dp</dimen>
+    <dimen name="fab_size_plus_padding">72dp</dimen>
 
     <!-- FAB resources -->
     <dimen name="fab_margin">8dp</dimen>

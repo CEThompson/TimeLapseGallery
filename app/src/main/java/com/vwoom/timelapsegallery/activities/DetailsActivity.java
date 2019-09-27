@@ -215,7 +215,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         if (savedInstanceState != null) {
             mCurrentPhoto = savedInstanceState.getParcelable(Keys.PHOTO_ENTRY);
             mPosition = savedInstanceState.getInt(Keys.TRANSITION_POSITION);
-            mFullscreenFab.show();
         }
 
         // Set the transition name for the image
@@ -237,34 +236,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         // Set up shared element transition
         prepareSharedElementTransition();
         setEnterSharedElementCallback(mCallback);
-
-        Transition sharedElementEnter = getWindow().getSharedElementEnterTransition();
-        sharedElementEnter.addListener(new Transition.TransitionListener(){
-            @Override
-            public void onTransitionStart(Transition transition) {
-
-            }
-
-            @Override
-            public void onTransitionEnd(Transition transition) {
-                mFullscreenFab.show();
-            }
-
-            @Override
-            public void onTransitionCancel(Transition transition) {
-
-            }
-
-            @Override
-            public void onTransitionPause(Transition transition) {
-
-            }
-
-            @Override
-            public void onTransitionResume(Transition transition) {
-
-            }
-        });
     }
 
     @Override
@@ -331,6 +302,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     @Override
     public void onBackPressed() {
         // Hide the fab then finish the activity
+        /*
         mFullscreenFab.hide(new FloatingActionButton.OnVisibilityChangedListener() {
             @Override
             public void onShown(FloatingActionButton fab) {
@@ -341,7 +313,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             public void onHidden(FloatingActionButton fab) {
                 supportFinishAfterTransition();
             }
-        });
+        });*/
+        supportFinishAfterTransition();
     }
 
     /*
@@ -443,6 +416,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         int position = mPhotos.indexOf(photoEntry);
         mDetailsRecyclerView.scrollToPosition(position);
+
+        mProgressBar.setProgress(photoNumber-1);
     }
 
     /* Loads an image into the main photo view */
@@ -542,7 +517,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mPlaying = false;
             mPlayHandler.removeCallbacksAndMessages(null);
             mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-            mProgressBar.setVisibility(View.INVISIBLE);
 
             // Handle UI
             loadUi(mCurrentPhoto);
@@ -553,8 +527,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mPlaying = true;
 
             // Handle UI
-            mProgressBar.setVisibility(View.VISIBLE);
-            mProgressBar.setMax(mPhotos.size()-1);
             mPlayAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp);
 
             // Create a runnable for each image
@@ -574,9 +546,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                     runnable = () -> {
                         mPlaying = false;
                         mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                        mProgressBar.setVisibility(View.INVISIBLE);
                         loadUi(photoEntry);
                         mCurrentPhoto = photoEntry;
+                        mProgressBar.setProgress(position);
                     };
                 }
 
@@ -663,6 +635,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             String time = TimeUtils.getTimeFromTimestamp(timestamp);
             mProjectDayTimeTv.setText(getString(R.string.started_on, day, time));
             mProjectDateTextView.setText(projectDate);
+
+            // Set max for progress bar
+            mProgressBar.setMax(mPhotos.size()-1);
 
         });
 

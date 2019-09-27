@@ -7,23 +7,22 @@
             <target android:targetId="@id/play_as_video_fab"/>
         </targets>
     </slide>
-    <slide
-        android:slideEdge="end">
-        <targets>
-            <target android:targetId="@id/fullscreen_fab"/>
-        </targets>
-    </slide>
+
     <slide
         android:slideEdge="bottom">
         <targets>
             <target android:targetId="@id/details_recyclerview"/>
+            <target android:targetId="@id/image_loading_progress"/>
         </targets>
     </slide>
-    <!-- TODO debug project info animation -->
+
     <slide
-        android:slideEdge="top">
+        android:slideEdge="start">
         <targets>
-            <target android:targetId="@id/project_information_layout"/>
+            <target android:targetId="@id/details_project_name_text_view"/>
+            <target android:targetId="@id/details_project_day_time_textview"/>
+            <target android:targetId="@id/details_project_date_textview"/>
         </targets>
     </slide>
+
 </transitionSet>

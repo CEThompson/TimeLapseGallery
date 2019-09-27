@@ -25,16 +25,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             />
 
-        <!-- For image loading -->
-        <ProgressBar
-            android:id="@+id/image_loading_progress"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@xml/progress"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/play_as_video_fab"/>
-
         <!-- Layout containing project information -->
         <LinearLayout
             android:id="@+id/project_information_layout"
@@ -80,7 +70,7 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintVertical_bias="0.5"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/details_recyclerview"
+            app:layout_constraintBottom_toTopOf="@+id/image_loading_progress"
             app:layout_constraintStart_toEndOf="@+id/project_information_layout"
             app:layout_constraintEnd_toStartOf="@+id/play_as_video_fab">
 
@@ -95,6 +85,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:background="@color/imagePlaceholder"
+                    app:layout_constraintDimensionRatio="1:1"
                     android:contentDescription="@string/detail_current_image_content_description"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -115,9 +106,9 @@
                 <!-- gradient overlay for image -->
                 <View
                     android:id="@+id/details_gradient_overlay"
-                    android:layout_height="0dp"
-                    android:layout_width="@dimen/gradient_overlay_detail_height"
-                    android:background="@drawable/gradient_overlay_left_to_right"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/gradient_overlay_detail_height"
+                    android:background="@drawable/gradient_overlay_bottom_up"
                     app:layout_constraintBottom_toBottomOf="@+id/detail_current_image"
                     app:layout_constraintStart_toStartOf="@id/detail_current_image"
                     app:layout_constraintTop_toTopOf="@id/detail_current_image"
@@ -159,7 +150,6 @@
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/fullscreen_fab"
-                    android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/detail_small_margin"
@@ -172,6 +162,17 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- For image loading -->
+        <ProgressBar
+            android:id="@+id/image_loading_progress"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_marginEnd="@dimen/fab_size_plus_padding"
+            android:layout_marginStart="@dimen/detail_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/details_recyclerview"
+            app:layout_constraintStart_toStartOf="@+id/details_recyclerview"
+            app:layout_constraintEnd_toStartOf="@+id/details_recyclerview"/>
 
         <!-- Recycler view showing the photos in the project -->
         <androidx.recyclerview.widget.RecyclerView

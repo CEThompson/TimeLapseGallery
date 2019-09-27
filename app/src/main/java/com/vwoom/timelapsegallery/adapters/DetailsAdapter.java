@@ -71,6 +71,7 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsA
         // TODO add red outline indicator for currently selected photo
         Glide.with(holder.itemView.getContext())
                 .load(f)
+                .centerCrop()
                 .into(holder.mDetailThumbnail);
     }
 
