@@ -30,14 +30,14 @@ public class WidgetProvider extends AppWidgetProvider {
             views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
             views.setTextViewText(R.id.widget_text_view, context.getString(R.string.no_projects_for_today));
             views.setViewVisibility(R.id.widget_text_view, View.VISIBLE);
-            views.setViewVisibility(R.id.widget_grid_item_layout, View.INVISIBLE);
+            views.setViewVisibility(R.id.widget_list_view, View.INVISIBLE);
         }
 
         // Otherwise set the list of upcoming project submissions
         else {
             views = getGridRemoteViews(context);
             views.setViewVisibility(R.id.widget_text_view, View.INVISIBLE);
-            views.setViewVisibility(R.id.widget_grid_item_layout, View.VISIBLE);
+            views.setViewVisibility(R.id.widget_list_view, View.VISIBLE);
         }
 
         // Update the widget
