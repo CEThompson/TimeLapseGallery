@@ -131,6 +131,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     /*Shared Element variables */
     private boolean mIsReturning;
     private int mPosition;
+    private boolean mTransitioned = false;
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
         public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
@@ -238,6 +239,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         if (savedInstanceState == null){
             postponeEnterTransition();
+        } else {
+            mTransitioned = true;
         }
 
         // TODO implement pinch zoom on fullscreen image
@@ -385,12 +388,14 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     }
 
     private void schedulePostponedTransition(){
+        if (mTransitioned) return;
         mCurrentPhotoImageView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
                 mCurrentPhotoImageView.getViewTreeObserver().removeOnPreDrawListener(this);
                 mCurrentPhotoImageView.requestLayout();
                 startPostponedEnterTransition();
+                mTransitioned = true;
                 return true;
             }
         });
