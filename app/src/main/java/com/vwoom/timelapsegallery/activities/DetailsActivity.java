@@ -585,8 +585,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             }
         };
 
-        // Schedule the runnable for 200 ms from now
-        mPlayHandler.postDelayed(runnable, 100);
+        // Schedule the runnable for a certain number of ms from now
+        // TODO allow for setting delay
+        mPlayHandler.postDelayed(runnable, 50);
     }
 
     /* Sets the current entry to the clicked photo and loads the image from the entry */
