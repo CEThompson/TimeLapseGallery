@@ -117,6 +117,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     // For playing timelapse
     private boolean mPlaying = false;
     private Handler mPlayHandler;
+    private boolean mImageIsLoaded;
 
     // Swipe listener for image navigation
     private OnSwipeTouchListener mOnSwipeTouchListener;
@@ -439,6 +440,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     /* Loads an image into the main photo view */
     private void loadImage(String imagePath){
+        mImageIsLoaded = false;
 
         // Get photo info
         String ratio = PhotoUtils.getAspectRatioFromImagePath(imagePath);
@@ -504,6 +506,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                                         schedulePostponedTransition();
                                         mNextPhotoImageView.setVisibility(View.INVISIBLE);
+                                        mImageIsLoaded = true;
                                         return false;
                                     }
                                 })
@@ -546,33 +549,44 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             // Handle UI
             mPlayAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp);
 
-            // Create a runnable for each image
-            for (int i = 0; i < mPhotos.size(); i++) {
-                PhotoEntry photoEntry = mPhotos.get(i);
+            // Load first photo
+            loadUi(mPhotos.get(0));
+            mProgressBar.setProgress(0);
 
-                final int position = i;
-                // Load the image for each
-                Runnable runnable = () -> {
-                    loadUi(photoEntry);
-                    mProgressBar.setProgress(position);
-                };
-
-                // If the position is last create a different runnable to clean up
-                int lastPosition = mPhotos.size() - 1;
-                if (i == lastPosition) {
-                    runnable = () -> {
-                        mPlaying = false;
-                        mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                        loadUi(photoEntry);
-                        mCurrentPhoto = photoEntry;
-                        mProgressBar.setProgress(position);
-                    };
-                }
-
-                // Post the runnable
-                mPlayHandler.postDelayed(runnable, 200 * i);
-            }
+            // Recursively load the rest of set
+            int firstPhotoPosition = 0;
+            scheduleLoadPhoto(firstPhotoPosition);
         }
+    }
+
+    private void scheduleLoadPhoto(int position){
+        Runnable runnable = () -> {
+            // If the position is final position clean up
+            if (position == mPhotos.size()-1){
+                mPlaying = false;
+                mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                mCurrentPhoto = mPhotos.get(position);
+                mProgressBar.setProgress(position);
+
+                mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorGreen)));
+                mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorGreen));
+                return;
+            }
+
+            // If image is loaded load the next photo
+            if (mImageIsLoaded){
+                loadUi(mPhotos.get(position+1));
+                mProgressBar.setProgress(position+1);
+                scheduleLoadPhoto(position+1);
+            }
+            // If the image isn't loaded recheck in 200 ms
+            else {
+                scheduleLoadPhoto(position);
+            }
+        };
+
+        // Schedule the runnable for 200 ms from now
+        mPlayHandler.postDelayed(runnable, 100);
     }
 
     /* Sets the current entry to the clicked photo and loads the image from the entry */
