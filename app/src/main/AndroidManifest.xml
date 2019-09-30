@@ -50,7 +50,7 @@
         </activity> <!-- Providers -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.vwoom.timelapsegallery.fileprovider"
+            android:authorities="com.vwoom.timelapsegallery.fileprovider${applicationId}"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
