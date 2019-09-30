@@ -6,7 +6,9 @@
 
     <uses-feature
         android:name="android.hardware.camera2"
-        android:required="true" /> <!-- Permissions -->
+        android:required="true" />
+
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -21,24 +23,43 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.CameraActivity"></activity>
+
+        <!-- Settings -->
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".activities.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vwoom.timelapsegallery.activities.MainActivity" />
+        </activity>
+        <activity android:name=".activities.CameraActivity" />
+
         <!-- AdMob -->
         <!-- TODO replace admob test id -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/admob_test_id" /> <!-- Add Photo Activity -->
+            android:value="@string/admob_test_id" />
+
+        <!-- Add Photo Activity -->
         <activity
             android:name=".activities.AddPhotoActivity"
             android:parentActivityName=".activities.DetailsActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" /> <!-- New Project Activity -->
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
+
+        <!-- New Project Activity -->
         <activity
             android:name=".activities.NewProjectActivity"
             android:parentActivityName=".activities.MainActivity"
-            android:windowSoftInputMode="stateHidden" /> <!-- Details Activity -->
+            android:windowSoftInputMode="stateHidden" />
+
+        <!-- Details Activity -->
         <activity
             android:name=".activities.DetailsActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".activities.MainActivity" /> <!-- Main Activity -->
+            android:parentActivityName=".activities.MainActivity" />
+
+        <!-- Main Activity -->
         <activity
             android:name=".activities.MainActivity"
             android:launchMode="singleTop">
@@ -47,7 +68,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Providers -->
+        </activity>
+
+        <!-- Providers -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.vwoom.timelapsegallery.fileprovider${applicationId}"
@@ -56,7 +79,9 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-        </provider> <!-- Receivers -->
+        </provider>
+
+        <!-- Receivers -->
         <!-- This receiver used to create alarms to send out notification -->
         <receiver
             android:name=".notification.NotificationAlarm"
@@ -65,7 +90,9 @@
             <intent-filter>
                 <action android:name="com.vwoom.timelapsegallery.CREATE_NOTIFICATION" />
             </intent-filter>
-        </receiver> <!-- This receiver used to update any active widgets -->
+        </receiver>
+
+        <!-- This receiver used to update any active widgets -->
         <receiver android:name=".widget.WidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -74,8 +101,12 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info" />
-        </receiver> <!-- This service updates the widgets -->
-        <service android:name=".widget.UpdateWidgetService" /> <!-- This service provides the views for the widgets -->
+        </receiver>
+
+        <!-- This service updates the widgets -->
+        <service android:name=".widget.UpdateWidgetService" />
+
+        <!-- This service provides the views for the widgets -->
         <service
             android:name=".widget.WidgetGridRemoteViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />

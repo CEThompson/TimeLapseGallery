@@ -184,19 +184,22 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         mMenu = menu;
 
         // Set the text for enabling / disabling notifications
+        /*
         if (mNotificationsEnabled) {
             mMenu.findItem(R.id.notification_toggle).setTitle(R.string.disable_notifications);
         } else {
             mMenu.findItem(R.id.notification_toggle).setTitle(R.string.enable_notifications);
         }
+        */
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.notification_toggle:
-                toggleNotifications();
+            case R.id.settings:
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -206,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
     /**
      * Disables or enables notification reminders for scheduled projects
      */
+    /*
     private void toggleNotifications(){
         // Get the current shared preference
         SharedPreferences sharedPreferences = getSharedPreferences(Keys.PREFERENCES_KEY, Context.MODE_PRIVATE);
@@ -246,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         View view = findViewById(R.id.main_layout);
         Snackbar.make(view, feedback, Snackbar.LENGTH_SHORT).show();
     }
+    */
 
     /* Observes all time lapse projects */
     private void setupViewModel(){

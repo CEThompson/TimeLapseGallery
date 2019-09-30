@@ -101,4 +101,30 @@
     <string name="action_submit">Submit</string>
     <string name="action_take_photo">Take Photo</string>
 
+    <!-- Settings -->
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="notifications_header">Notifications</string>
+    <string name="sync_header">Sync</string>
+    <string name="playback_header">Playback</string>
+
+    <!-- Notifications Preferences -->
+    <string name="enable_notifications_title">Enable notifications</string>
+    <string name="notifications_summary_on">Notifications enabled
+    </string>
+    <string name="notifications_summary_off">Notifications disabled</string>
+
+    <string name="notification_time_title">Notification time</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync files to database</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+
+    <string name="set">Set</string>
+    <string name="cancel">Cancel</string>
 </resources>
