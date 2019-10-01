@@ -1,5 +1,7 @@
 package com.vwoom.timelapsegallery.utils;
 
+import com.vwoom.timelapsegallery.BuildConfig;
+
 public final class Keys {
     /* Project Keys */
     public static final String PROJECT_NAME = "project_name";
@@ -23,7 +25,9 @@ public final class Keys {
     public static final String ADD_FAB_TRANSITION_NAME = "add_fab";
 
     /* Authorities */
-    public static final String FILEPROVIDER_AUTHORITY = "com.vwoom.timelapsegallery.fileprovider";
-    public static final String PREFERENCES_KEY = "com.vwoom.timelapsegallery.preferences";
-    public static final String CREATE_NOTIFICATION_AUTHORITY = "com.vwoom.timelapsegallery.CREATE_NOTIFICATION";
+    private static final String applicationId = BuildConfig.APPLICATION_ID;
+
+    public static final String FILEPROVIDER_AUTHORITY = "com.vwoom.timelapsegallery.fileprovider" + applicationId;
+    public static final String PREFERENCES_KEY = "com.vwoom.timelapsegallery.preferences" + applicationId;
+    public static final String CREATE_NOTIFICATION_AUTHORITY = "com.vwoom.timelapsegallery.CREATE_NOTIFICATION" + applicationId;
 }
