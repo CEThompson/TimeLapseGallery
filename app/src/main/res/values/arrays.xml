@@ -1,12 +1,22 @@
 <resources>
     <!-- Reply Preference -->
-    <string-array name="reply_entries">
-        <item>Reply</item>
-        <item>Reply to all</item>
+    <string-array name="notification_time_entries">
+        <item>6 AM</item>
+        <item>9 AM</item>
     </string-array>
 
-    <string-array name="reply_values">
-        <item>reply</item>
-        <item>reply_all</item>
+    <string-array name="notification_time_values">
+        <item>6</item>
+        <item>9</item>
+    </string-array>
+
+    <string-array name="playback_interval_entries">
+        <item>50ms</item>
+        <item>100ms</item>
+    </string-array>
+
+    <string-array name="playback_interval_values">
+        <item>50</item>
+        <item>100</item>
     </string-array>
 </resources>

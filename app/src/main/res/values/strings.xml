@@ -116,6 +116,7 @@
     <string name="notifications_summary_off">Notifications disabled</string>
 
     <string name="notification_time_title">Notification time</string>
+    <string name="notifications_enabled_default">true</string>
 
     <!-- Sync Preferences -->
     <string name="sync_title">Sync files to database</string>
@@ -124,7 +125,14 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
+    <!-- Notifications Preferences -->
+    <string name="playback_interval_title">Playback interval</string>
+    <string name="playback_default">50ms</string>
 
-    <string name="set">Set</string>
-    <string name="cancel">Cancel</string>
+    <!-- Keys -->
+    <string name="key_sync">sync</string>
+    <string name="key_notifications_enabled">notifications_enabled</string>
+    <string name="key_notification_time">notification_time</string>
+    <string name="key_playback_interval">playback_interval</string>
+
 </resources>

@@ -16,33 +16,45 @@
 
 <androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Notifications -->
     <PreferenceCategory app:title="@string/notifications_header">
 
+        <!-- Notifications enabled -->
         <SwitchPreferenceCompat
-            app:key="notifications_enabled"
+            app:key="@string/key_notifications_enabled"
             app:title="@string/enable_notifications_title"
             app:summaryOff="@string/notifications_summary_off"
-            app:summaryOn="@string/notifications_summary_on" />
+            app:summaryOn="@string/notifications_summary_on"/>
 
+        <!-- Notification time -->
         <ListPreference
-            app:defaultValue="notification_time"
-            app:key="notification_time"
-            app:title="@string/notification_time_title" />
+            app:key="@string/key_notification_time"
+            app:title="@string/notification_time_title"
+            app:entries="@array/notification_time_entries"
+            app:entryValues="@array/notification_time_values"
+            app:dependency="@string/key_notifications_enabled"/>
 
     </PreferenceCategory>
 
+    <!-- Playback settings -->
     <PreferenceCategory app:title="@string/playback_header">
+
+        <!-- Playback interval -->
         <ListPreference
-            app:defaultValue="notification_time"
-            app:key="notification_time"
-            app:title="@string/notification_time_title" />
+            app:defaultValue="@string/playback_default"
+            app:key="@string/key_playback_interval"
+            app:title="@string/playback_interval_title"
+            app:entries="@array/playback_interval_entries"
+            app:entryValues="@array/playback_interval_values"/>
     </PreferenceCategory>
 
+    <!-- File sync -->
     <PreferenceCategory app:title="@string/sync_header">
 
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
+        <Preference
+            app:key="@string/key_sync"
+            app:title="@string/sync_title"
+            app:summary=""/>
 
         <!--
         <SwitchPreferenceCompat

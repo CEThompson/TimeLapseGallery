@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.vwoom.timelapsegallery.R
 
@@ -20,6 +21,8 @@ class SettingsActivity : AppCompatActivity() {
     class SettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
+
+            val button: Preference? =  findPreference(getString(R.string.key_sync))
         }
     }
 }
