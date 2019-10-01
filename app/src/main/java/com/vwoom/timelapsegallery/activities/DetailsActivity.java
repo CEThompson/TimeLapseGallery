@@ -589,7 +589,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         // Schedule the runnable for a certain number of ms from now
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        int playbackInterval = pref.getInt(getString(R.string.key_playback_interval), 50);
+        String playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), "50");
+        int playbackInterval = Integer.parseInt(playbackIntervalSharedPref);
         mPlayHandler.postDelayed(runnable, playbackInterval);
     }
 

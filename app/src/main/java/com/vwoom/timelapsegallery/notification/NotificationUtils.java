@@ -84,7 +84,8 @@ public final class NotificationUtils {
     /* Returns a timestamp for a notification by day of the year*/
     public static long convertDayOfYearToNotificationTime(int dayOfYear, Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int notificationTime = prefs.getInt(context.getString(R.string.key_notification_time), 7);
+        String notificationTimeString = prefs.getString(context.getString(R.string.key_notification_time), "7");
+        int notificationTime = Integer.parseInt(notificationTimeString);
 
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_YEAR, dayOfYear);
