@@ -62,7 +62,7 @@ public class NotificationAlarm extends BroadcastReceiver {
                 .getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Convert tomorrow into a timestamp at a set notification time
-        long timestampForTomorrow = NotificationUtils.convertDayOfYearToNotificationTime(requestCode);
+        long timestampForTomorrow = NotificationUtils.convertDayOfYearToNotificationTime(requestCode, context);
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, timestampForTomorrow, pendingIntent);
     }

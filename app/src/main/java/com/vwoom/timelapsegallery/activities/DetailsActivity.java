@@ -8,6 +8,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +18,7 @@ import android.app.SharedElementCallback;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -586,8 +588,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         };
 
         // Schedule the runnable for a certain number of ms from now
-        // TODO allow for setting delay
-        mPlayHandler.postDelayed(runnable, 50);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        int playbackInterval = pref.getInt(getString(R.string.key_playback_interval), 50);
+        mPlayHandler.postDelayed(runnable, playbackInterval);
     }
 
     /* Sets the current entry to the clicked photo and loads the image from the entry */

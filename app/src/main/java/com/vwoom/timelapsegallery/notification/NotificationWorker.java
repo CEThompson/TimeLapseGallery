@@ -10,6 +10,7 @@ import androidx.preference.PreferenceManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.utils.Keys;
@@ -36,7 +37,7 @@ public class NotificationWorker extends Worker {
         TimeLapseDatabase timeLapseDatabase = TimeLapseDatabase.getInstance(getApplicationContext());
         List<ProjectEntry> scheduledProjects = timeLapseDatabase.projectDao().loadAllScheduledProjects();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        Boolean notificationsEnabled = prefs.getBoolean(Keys.PREFERENCES_KEY, true);
+        boolean notificationsEnabled = prefs.getBoolean(getApplicationContext().getString(R.string.key_notifications_enabled), true);
 
         // If there are no scheduled projects cancel the worker
         if (scheduledProjects.size()==0){

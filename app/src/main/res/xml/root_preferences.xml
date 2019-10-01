@@ -24,7 +24,8 @@
             app:key="@string/key_notifications_enabled"
             app:title="@string/enable_notifications_title"
             app:summaryOff="@string/notifications_summary_off"
-            app:summaryOn="@string/notifications_summary_on"/>
+            app:summaryOn="@string/notifications_summary_on"
+            app:defaultValue="true"/>
 
         <!-- Notification time -->
         <ListPreference
@@ -32,7 +33,9 @@
             app:title="@string/notification_time_title"
             app:entries="@array/notification_time_entries"
             app:entryValues="@array/notification_time_values"
-            app:dependency="@string/key_notifications_enabled"/>
+            app:dependency="@string/key_notifications_enabled"
+            app:defaultValue="0"
+            app:summary="%s"/>
 
     </PreferenceCategory>
 
@@ -41,13 +44,17 @@
 
         <!-- Playback interval -->
         <ListPreference
-            app:key="50ms"
+            app:key="@string/key_playback_interval"
             app:title="@string/playback_interval_title"
             app:entries="@array/playback_interval_entries"
-            app:entryValues="@array/playback_interval_values"/>
+            app:entryValues="@array/playback_interval_values"
+            app:defaultValue="0"
+            app:summary="%s"/>
+
     </PreferenceCategory>
 
     <!-- File sync -->
+    <!--
     <PreferenceCategory app:title="@string/sync_header">
 
         <Preference
@@ -55,15 +62,7 @@
             app:title="@string/sync_title"
             app:summary=""/>
 
-        <!--
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
-        -->
-
     </PreferenceCategory>
+    -->
 
 </androidx.preference.PreferenceScreen>

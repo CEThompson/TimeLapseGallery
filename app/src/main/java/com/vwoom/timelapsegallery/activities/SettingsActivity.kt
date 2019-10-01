@@ -22,7 +22,8 @@ class SettingsActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-            val button: Preference? =  findPreference(getString(R.string.key_sync))
+            // TODO implement synchronization button?
+            val syncButton: Preference? =  findPreference(getString(R.string.key_sync))
         }
     }
 }
