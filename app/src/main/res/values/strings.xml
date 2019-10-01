@@ -126,8 +126,7 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
     <!-- Notifications Preferences -->
-    <string name="playback_interval_title">Playback interval</string>
-    <string name="playback_default">50ms</string>
+    <string name="playback_interval_title">Playback interval (ms)</string>
 
     <!-- Keys -->
     <string name="key_sync">sync</string>

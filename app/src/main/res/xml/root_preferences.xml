@@ -41,8 +41,7 @@
 
         <!-- Playback interval -->
         <ListPreference
-            app:defaultValue="@string/playback_default"
-            app:key="@string/key_playback_interval"
+            app:key="50ms"
             app:title="@string/playback_interval_title"
             app:entries="@array/playback_interval_entries"
             app:entryValues="@array/playback_interval_values"/>
