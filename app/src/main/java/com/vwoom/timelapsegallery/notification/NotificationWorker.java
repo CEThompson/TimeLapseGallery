@@ -1,15 +1,18 @@
 package com.vwoom.timelapsegallery.notification;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.format.DateUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
+import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
 
 import java.util.Calendar;
@@ -32,10 +35,17 @@ public class NotificationWorker extends Worker {
         // Get all the scheduled projects from the database
         TimeLapseDatabase timeLapseDatabase = TimeLapseDatabase.getInstance(getApplicationContext());
         List<ProjectEntry> scheduledProjects = timeLapseDatabase.projectDao().loadAllScheduledProjects();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Boolean notificationsEnabled = prefs.getBoolean(Keys.PREFERENCES_KEY, true);
 
         // If there are no scheduled projects cancel the worker
         if (scheduledProjects.size()==0){
             Log.d(TAG, "Notification Tracker: No projects scheduled");
+            NotificationUtils.cancelNotificationWorker(getApplicationContext());
+        }
+        // If notifications are disabled do the same
+        else if(!notificationsEnabled){
+            Log.d(TAG, "Notification Tracker: Notifications are disabled");
             NotificationUtils.cancelNotificationWorker(getApplicationContext());
         }
         // Otherwise schedule the notifications
