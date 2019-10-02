@@ -660,9 +660,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mFullscreenImage.setOnTouchListener(mOnSwipeTouchListener);
     };
 
+    // TODO implement dual loading solution for smooth transition between fullscreen images
     /* Pre loads the selected image into the hidden dialogue so that display appears immediate */
     private void preloadFullscreenImage(){
-        // TODO lock down fullscreen image loading
         File current = new File(mCurrentPhoto.getUrl());
         Glide.with(this)
                 .load(current)
