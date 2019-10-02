@@ -1,3 +1,3 @@
 package com.vwoom.timelapsegallery
 
-// TODO test scheduling a project
+// TODO (update) test scheduling a project

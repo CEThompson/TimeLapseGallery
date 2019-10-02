@@ -91,8 +91,8 @@ public final class PhotoUtils {
             return bmRotated;
         }
         catch (OutOfMemoryError e) {
-            // TODO display error with toast
-            // TODO Log with crashlytics
+            // TODO (update) display error with toast
+            // TODO (update) Log with crashlytics
             return null;
         }
     }

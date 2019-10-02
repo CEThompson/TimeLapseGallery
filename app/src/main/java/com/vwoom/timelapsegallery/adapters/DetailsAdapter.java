@@ -70,7 +70,7 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsA
         String photo_path = currentPhoto.getUrl();
         File f = new File(photo_path);
 
-        // TODO dynamically resize detail view
+        // TODO (update) dynamically resize detail view
         Glide.with(holder.itemView.getContext())
                 .load(f)
                 .centerCrop()

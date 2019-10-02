@@ -74,7 +74,7 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
             Integer bitmapOrientation = PhotoUtils.getOrientationFromImagePath(currentProject.getThumbnail_url());
             bitmap = PhotoUtils.rotateBitmap(bitmap, bitmapOrientation);
         } catch (IOException e){
-            // TODO log orientation error
+            // TODO (update) log orientation error
         }
 
         // Set the view strings

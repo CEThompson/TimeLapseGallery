@@ -1,3 +1,3 @@
 package com.vwoom.timelapsegallery
 
-// TODO test deleting a photo
+// TODO (update) test deleting a photo
