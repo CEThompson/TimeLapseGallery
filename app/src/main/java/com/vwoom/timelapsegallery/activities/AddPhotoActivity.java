@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -327,8 +328,12 @@ public class AddPhotoActivity extends AppCompatActivity {
                 resultIntent.putExtra(Keys.PHOTO_ENTRY, insertedPhoto);
                 activity.setResult(RESULT_OK, resultIntent);
 
-                // Finish the activity returning to the details after showing the ad if it is loaded
-                if (interstitialAd.isLoaded()) {
+                // Do not show ads to firebase lab test devices
+                if (isTestDevice(context)){
+                    activity.finish();
+                }
+                // Show ad if not test device and ad is loaded
+                else if (interstitialAd.isLoaded()) {
                     interstitialAd.setAdListener(new AdListener() {
                         @Override
                         public void onAdClosed() {
@@ -336,14 +341,21 @@ public class AddPhotoActivity extends AppCompatActivity {
                         }
                     });
                     interstitialAd.show();
-                } else {
-                    // TODO: (update) implement local ad
+                }
+                // Otherwise finish the activity
+                // TODO: (update) implement local ad
+                else {
                     activity.finish();
                 }
             }
             // If photo insertion unsuccesful do nothing
         }
+
+        boolean isTestDevice(Context context) {
+            return Boolean.valueOf(Settings.System.getString(context.getContentResolver(), "firebase.test.lab"));
+        }
     }
+
 
     /* Class to pass references to async task */
     public static class TaskParameters {
