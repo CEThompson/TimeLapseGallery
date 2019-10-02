@@ -36,11 +36,10 @@ public class NotificationWorker extends Worker {
         // Get all the scheduled projects from the database
         TimeLapseDatabase timeLapseDatabase = TimeLapseDatabase.getInstance(getApplicationContext());
         List<ProjectEntry> scheduledProjects = timeLapseDatabase.projectDao().loadAllScheduledProjects();
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String notificationsEnabledString = prefs.getString(getApplicationContext().getString(R.string.key_notifications_enabled), "true");
-        boolean notificationsEnabled = Boolean.parseBoolean(notificationsEnabledString);
-        Log.d(TAG, "Notification Tracker: notificationsEnabledString = " + notificationsEnabledString +
-                " and notificationsEnabled == " + notificationsEnabled);
+        boolean notificationsEnabled = prefs.getBoolean(getApplicationContext().getString(R.string.key_notifications_enabled), true);
+        Log.d(TAG, "Notification Tracker: notificationsEnabled == " + notificationsEnabled);
 
         // If there are no scheduled projects cancel the worker
         if (scheduledProjects.size()==0){
