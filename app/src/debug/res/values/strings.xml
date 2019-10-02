@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Id for test ads -->
+    <string name="admob_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
+
+    <!-- Test interstitial id -->
+    <string name="add_photo_activity_ad_unit_id" translatable="false">ca-app-pub-7456876949972231/7026327213</string>
+</resources>

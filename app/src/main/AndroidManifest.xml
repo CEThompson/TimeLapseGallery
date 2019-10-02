@@ -36,10 +36,9 @@
         <activity android:name=".activities.CameraActivity" />
 
         <!-- AdMob -->
-        <!-- TODO replace admob test id -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/admob_test_id" />
+            android:value="@string/admob_id" />
 
         <!-- Add Photo Activity -->
         <activity

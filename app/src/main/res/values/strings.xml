@@ -15,9 +15,6 @@
     <string name="submit_photo">Submit Photo</string>
     <string name="submitting">Submitting</string>
 
-    <!-- Admob -->
-    <string name="admob_test_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
-
     <!-- Content descriptions -->
     <string name="project_image_content_description">Thumbnail image for the time lapse project.</string>
     <string name="detail_photo_content_description">Thumbnail image of a detail for the time lapse project.</string>

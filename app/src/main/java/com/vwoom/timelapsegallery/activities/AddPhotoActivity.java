@@ -81,14 +81,15 @@ public class AddPhotoActivity extends AppCompatActivity {
 
         // Set up interstitial ad
         mInterstitialAd = new InterstitialAd(this);
-        // TODO replace with my own ad unit id
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        // This ad unit id points to test ads in debug and actual ads in release
+        mInterstitialAd.setAdUnitId(getString(R.string.add_photo_activity_ad_unit_id));
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
+        // Set up db
         mTimeLapseDatabase = TimeLapseDatabase.getInstance(this);
 
+        // Get information from intent
         mPreviousPhotoPath = getIntent().getStringExtra(Keys.PHOTO_PATH);
-
         mCurrentProject = getIntent().getParcelableExtra(Keys.PROJECT_ENTRY);
 
         setFabClickListeners();

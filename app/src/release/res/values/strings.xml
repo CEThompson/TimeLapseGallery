@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Admob id for time lapse gallery release -->
+    <string name="admob_id" translatable="false">ca-app-pub-7456876949972231~1412884369</string>
+
+    <!-- The ad unit id for the release version of the interstitial ad -->
+    <string name="add_photo_activity_ad_unit_id">ca-app-pub-7456876949972231/7026327213</string>
+</resources>
