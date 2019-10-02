@@ -492,7 +492,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                         mNextPhotoImageView.setVisibility(View.VISIBLE);
-                        // TODO refactor second call
                         Glide.with(DetailsActivity.this)
                                 .load(f)
                                 .listener(new RequestListener<Drawable>() {
