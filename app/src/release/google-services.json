@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1000412909752",
+    "firebase_url": "https://time-lapse-gallery-android.firebaseio.com",
+    "project_id": "time-lapse-gallery-android",
+    "storage_bucket": "time-lapse-gallery-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1000412909752:android:9ad3644b98f7d21315a44d",
+        "android_client_info": {
+          "package_name": "com.vwoom.timelapsegallery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1000412909752-7f4lj222scvcpaved28cv7n8363kdpun.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1A_wDeOd_NGB0bHYwYbtX_FwmgZyh7uA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1000412909752-7f4lj222scvcpaved28cv7n8363kdpun.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

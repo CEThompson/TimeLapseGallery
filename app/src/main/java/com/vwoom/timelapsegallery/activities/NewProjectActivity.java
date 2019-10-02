@@ -28,8 +28,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
-import com.vwoom.timelapsegallery.analytics.AnalyticsApplication;
 import com.vwoom.timelapsegallery.database.AppExecutors;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
@@ -39,8 +39,6 @@ import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.PhotoUtils;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService;
 
@@ -77,7 +75,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     private static final int REQUEST_TAKE_PHOTO = 1;
 
     /* Analytics */
-    private Tracker mTracker;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private static final String TAG = NewProjectActivity.class.getSimpleName();
 
@@ -150,8 +148,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         populateUi();
 
         // Prepare analytics
-        AnalyticsApplication application = (AnalyticsApplication) getApplication();
-        mTracker = application.getDefaultTracker();
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     /* Sets edit text, spinner, and picture to the values contained in member variables */
@@ -206,11 +203,10 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                 Toast toast = Toast.makeText(this, getString(R.string.error_creating_temporary_image_file), Toast.LENGTH_SHORT);
                 toast.show();
 
-                // Log to analytics
-                mTracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(getString(R.string.error))
-                        .setAction(getString(R.string.action_take_photo))
-                        .build());
+                // Log with analytics
+                Bundle params = new Bundle();
+                params.putString("error_text", e.getMessage());
+                mFirebaseAnalytics.logEvent("take_temporary_picture_error", params);
             }
             // Continue only if the File was successfully created
             if (tempFile != null) {
@@ -358,11 +354,9 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                     }
 
                     // Track added project
-                    mTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory(getString(R.string.category_project))
-                            .setAction(getString(R.string.action_submit))
-                            .setLabel(newProject.getName())
-                            .build());
+                    Bundle bundle = new Bundle();
+                    bundle.putString("project_name", newProject.getName());
+                    mFirebaseAnalytics.logEvent("new_project", bundle);
 
                 } catch (IOException e){
                     // Notify project creation error
@@ -370,11 +364,9 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                     toast.show();
 
                     // Track error
-                    mTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory(getString(R.string.error))
-                            .setAction(getString(R.string.action_submit))
-                            .setLabel(e.getMessage())
-                            .build());
+                    Bundle bundle = new Bundle();
+                    bundle.putString("error_text", e.getMessage());
+                    mFirebaseAnalytics.logEvent("submit_new_project_error", bundle);
                 }
             });
 
@@ -429,15 +421,6 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             /* Show an add then finish the activity */
             finish();
         }
-    }
-
-    /* Reload ad if consumed */
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Track activity launch
-        mTracker.setScreenName(getString(R.string.new_project_activity));
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     /* Validates new project */

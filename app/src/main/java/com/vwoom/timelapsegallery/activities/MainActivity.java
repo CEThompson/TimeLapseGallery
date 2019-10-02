@@ -23,16 +23,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.adapters.ProjectsAdapter;
-import com.vwoom.timelapsegallery.analytics.AnalyticsApplication;
 import com.vwoom.timelapsegallery.database.AppExecutors;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
-import com.vwoom.timelapsegallery.notification.NotificationUtils;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.ProjectUtils;
@@ -41,10 +39,7 @@ import com.vwoom.timelapsegallery.viewmodels.MainActivityViewModel;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -75,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
     private boolean mFilterByToday;
 
     /* Analytics */
-    private Tracker mTracker;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -153,17 +148,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         mNotificationsEnabled = sharedPreferences.getBoolean(Keys.NOTIFICATIONS_ENABLED, true);
 
         // Prepare analytics
-        AnalyticsApplication application = (AnalyticsApplication) getApplication();
-        mTracker = application.getDefaultTracker();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Track activity launch
-        mTracker.setScreenName(getString(R.string.main_activity));
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     /* Ensure deletion of temporary photo files */
@@ -180,15 +165,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_activity_menu, menu);
         mMenu = menu;
-
-        // Set the text for enabling / disabling notifications
-        /*
-        if (mNotificationsEnabled) {
-            mMenu.findItem(R.id.notification_toggle).setTitle(R.string.disable_notifications);
-        } else {
-            mMenu.findItem(R.id.notification_toggle).setTitle(R.string.enable_notifications);
-        }
-        */
         return true;
     }
 

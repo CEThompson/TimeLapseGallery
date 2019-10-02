@@ -74,7 +74,7 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
 
     /* analytics */
-    implementation 'com.google.android.gms:play-services-analytics:17.0.0'
+    implementation 'com.google.firebase:firebase-core:17.2.0'
 
     /* room */
     implementation 'androidx.room:room-runtime:2.1.0'
@@ -98,3 +98,5 @@ dependencies {
     implementation "androidx.work:work-runtime:2.2.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
+
+apply plugin: 'com.google.gms.google-services'

@@ -18,8 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
-import com.vwoom.timelapsegallery.analytics.AnalyticsApplication;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
@@ -28,8 +28,6 @@ import com.vwoom.timelapsegallery.utils.Keys;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -69,7 +67,7 @@ public class AddPhotoActivity extends AppCompatActivity {
     private InterstitialAd mInterstitialAd;
 
     /* Analytics */
-    private Tracker mTracker;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private static final int REQUEST_TAKE_PHOTO = 1;
 
@@ -111,8 +109,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         }
 
         // Prepare analytics
-        AnalyticsApplication application = (AnalyticsApplication) getApplication();
-        mTracker = application.getDefaultTracker();
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     /* Reload ad if consumed */
@@ -122,10 +119,6 @@ public class AddPhotoActivity extends AppCompatActivity {
         if (!mInterstitialAd.isLoaded()){
             mInterstitialAd.loadAd(new AdRequest.Builder().build());
         }
-
-        // Track activity launch
-        mTracker.setScreenName(getString(R.string.add_photo_activity));
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     /* Creates a temporary file and launches a camera intent to write a photo to that file */
@@ -145,11 +138,9 @@ public class AddPhotoActivity extends AppCompatActivity {
                 toast.show();
 
                 // Track error
-                mTracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(getString(R.string.error))
-                        .setAction(getString(R.string.action_take_photo))
-                        .setLabel(e.getMessage())
-                        .build());
+                Bundle params = new Bundle();
+                params.putString("error_text", e.getMessage());
+                mFirebaseAnalytics.logEvent("take_temporary_picture_error", params);
             }
             // Continue only if the File was successfully created
             if (tempFile != null) {
@@ -251,7 +242,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                 mCurrentProject,
                 mTimeLapseDatabase,
                 mInterstitialAd,
-                mTracker);
+                mFirebaseAnalytics);
 
         new SubmitPhotoAsyncTask().execute(taskParameters);
     }
@@ -277,7 +268,7 @@ public class AddPhotoActivity extends AppCompatActivity {
             ProjectEntry currentProject = taskParameters.getCurrentProject();
             TimeLapseDatabase timeLapseDatabase = taskParameters.getTimeLapseDatabase();
             InterstitialAd interstitialAd = taskParameters.getInterstitialAd();
-            Tracker tracker = taskParameters.getTracker();
+            FirebaseAnalytics firebaseAnalytics = taskParameters.getFirebaseAnalytics();
 
             // Initialize the path for the final photo file
             String currentPhotoPath;
@@ -298,11 +289,10 @@ public class AddPhotoActivity extends AppCompatActivity {
                 timeLapseDatabase.photoDao().insertPhoto(photoToSubmit);
 
                 // Track added photo
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(context.getString(R.string.category_photo))
-                        .setAction(context.getString(R.string.action_submit))
-                        .setLabel(String.valueOf(photoToSubmit.getTimestamp()))
-                        .build());
+                Bundle bundle = new Bundle();
+                bundle.putString("project_name", currentProject.getName());
+                bundle.putString("photo_number", String.valueOf(photoToSubmit.getId()));
+                firebaseAnalytics.logEvent("add_photo", bundle);
 
                 // Return the parameters to run in post execute
                 return new ResultParameters(context, photoToSubmit, interstitialAd);
@@ -313,11 +303,9 @@ public class AddPhotoActivity extends AppCompatActivity {
                 toast.show();
 
                 // Track error
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(context.getString(R.string.error))
-                        .setAction(context.getString(R.string.action_submit))
-                        .setLabel(e.getMessage())
-                        .build());
+                Bundle bundle = new Bundle();
+                bundle.putString("error_text", e.getMessage());
+                firebaseAnalytics.logEvent("add_photo_error", bundle);
 
                 return new ResultParameters(context, null, null);
             }
@@ -364,20 +352,20 @@ public class AddPhotoActivity extends AppCompatActivity {
         private ProjectEntry currentProject;
         private TimeLapseDatabase timeLapseDatabase;
         private InterstitialAd interstitialAd;
-        private Tracker tracker;
+        private FirebaseAnalytics firebaseAnalytics;
 
         public TaskParameters(Context context,
                               String tempPhotoPath,
                               ProjectEntry currentProject,
                               TimeLapseDatabase timeLapseDatabase,
                               InterstitialAd interstitialAd,
-                              Tracker tracker){
+                              FirebaseAnalytics firebaseAnalytics){
             this.context = context;
             this.tempPhotoPath = tempPhotoPath;
             this.currentProject = currentProject;
             this.timeLapseDatabase = timeLapseDatabase;
             this.interstitialAd = interstitialAd;
-            this.tracker = tracker;
+            this.firebaseAnalytics = firebaseAnalytics;
         }
         // Getters
         public Context getContext() { return context; }
@@ -385,7 +373,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         public ProjectEntry getCurrentProject() { return currentProject; }
         public TimeLapseDatabase getTimeLapseDatabase() { return timeLapseDatabase; }
         public InterstitialAd getInterstitialAd() { return interstitialAd; }
-        public Tracker getTracker() { return tracker; }
+        public FirebaseAnalytics getFirebaseAnalytics() { return firebaseAnalytics; }
     }
 
     /* Class to pass result references for async task */

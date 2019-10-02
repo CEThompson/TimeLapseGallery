@@ -12,7 +12,6 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.animation.Animator;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.SharedElementCallback;
@@ -48,9 +47,9 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.adapters.DetailsAdapter;
-import com.vwoom.timelapsegallery.analytics.AnalyticsApplication;
 import com.vwoom.timelapsegallery.database.AppExecutors;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
@@ -63,8 +62,6 @@ import com.vwoom.timelapsegallery.utils.TimeUtils;
 import com.vwoom.timelapsegallery.viewmodels.DetailsActivityViewModel;
 import com.vwoom.timelapsegallery.viewmodels.DetailsViewModelFactory;
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -130,7 +127,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     private static final int REQUEST_ADD_PHOTO = 1;
 
     /* Analytics */
-    private Tracker mTracker;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     /*Shared Element variables */
     private boolean mIsReturning;
@@ -244,8 +241,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         setupViewModel();
 
         // Prepare analytics
-        AnalyticsApplication application = (AnalyticsApplication) getApplication();
-        mTracker = application.getDefaultTracker();
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // Set up shared element transition
         prepareSharedElementTransition();
@@ -304,15 +300,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
             }
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Track activity launch
-        mTracker.setScreenName(getString(R.string.details_activity));
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     @Override
