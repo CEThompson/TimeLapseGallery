@@ -351,6 +351,7 @@ public class AddPhotoActivity extends AppCompatActivity {
             // If photo insertion unsuccesful do nothing
         }
 
+        // Used to filter out pre-launch reports bots clicking on ads
         boolean isTestDevice(Context context) {
             return Boolean.valueOf(Settings.System.getString(context.getContentResolver(), "firebase.test.lab"));
         }
