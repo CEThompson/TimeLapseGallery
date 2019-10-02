@@ -12,6 +12,7 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.animation.Animator;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.SharedElementCallback;
@@ -258,15 +259,33 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
             }
 
+            /* Show gradient, info, and fullscreen fab on transition completion*/
             @Override
             public void onTransitionEnd(Transition transition) {
                 if (!mIsReturning){
-                    // Show info on transition completion
                     LinearLayout photoInformationLayout = findViewById(R.id.photo_information_layout);
                     View gradientOverlay = findViewById(R.id.details_gradient_overlay);
-                    photoInformationLayout.setVisibility(View.VISIBLE);
-                    gradientOverlay.setVisibility(View.VISIBLE);
+
+                    long shortAnimationDuration = getResources().getInteger(
+                            android.R.integer.config_shortAnimTime);
+
                     mFullscreenFab.show();
+
+                    // Fade in gradient overlay
+                    gradientOverlay.setAlpha(0f);
+                    gradientOverlay.setVisibility(View.VISIBLE);
+                    gradientOverlay.animate()
+                            .alpha(1f)
+                            .setDuration(shortAnimationDuration)
+                            .setListener(null);
+
+                    // Fade in photo information
+                    photoInformationLayout.setAlpha(0f);
+                    photoInformationLayout.setVisibility(View.VISIBLE);
+                    photoInformationLayout.animate()
+                            .alpha(1f)
+                            .setDuration(shortAnimationDuration)
+                            .setListener(null);
                 }
             }
 
