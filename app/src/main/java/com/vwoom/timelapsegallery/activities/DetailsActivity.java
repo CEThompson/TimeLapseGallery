@@ -227,15 +227,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorGreen)));
         mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorGreen));
 
-        // Show fab and photo info on create
-        // TODO animate this block on transition completion
-        LinearLayout photoInformationLayout = findViewById(R.id.photo_information_layout);
-        View gradientOverlay = findViewById(R.id.details_gradient_overlay);
-        photoInformationLayout.setVisibility(View.VISIBLE);
-        gradientOverlay.setVisibility(View.VISIBLE);
-        mFullscreenFab.show();
-
-
         // Set the transition name for the image
         String transitionName = mCurrentProject.getId() + mCurrentProject.getName();
         mCardView.setTransitionName(transitionName);
@@ -258,6 +249,42 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         // Set up shared element transition
         prepareSharedElementTransition();
         setEnterSharedElementCallback(mCallback);
+
+        // Set listener to show layout items on transition completion
+        Transition sharedElementTransition = getWindow().getSharedElementEnterTransition();
+        sharedElementTransition.addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                if (!mIsReturning){
+                    // Show info on transition completion
+                    LinearLayout photoInformationLayout = findViewById(R.id.photo_information_layout);
+                    View gradientOverlay = findViewById(R.id.details_gradient_overlay);
+                    photoInformationLayout.setVisibility(View.VISIBLE);
+                    gradientOverlay.setVisibility(View.VISIBLE);
+                    mFullscreenFab.show();
+                }
+            }
+
+            @Override
+            public void onTransitionCancel(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionPause(Transition transition) {
+
+            }
+
+            @Override
+            public void onTransitionResume(Transition transition) {
+
+            }
+        });
     }
 
     @Override
