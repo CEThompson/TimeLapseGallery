@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- TODO get and insert tracking id here -->
-    <string name="ga_trackingId" translatable="false">${YOUR_TRACKING_ID}</string>
+    <!-- Property id for time lapse gallery set up with google analytics -->
+    <string name="ga_trackingId" translatable="false">209799173</string>
 </resources>
