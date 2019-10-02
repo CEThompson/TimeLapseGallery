@@ -81,7 +81,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
     private static final String TAG = NewProjectActivity.class.getSimpleName();
 
-    // TODO implement tags
+    // TODO (update) implement tags
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

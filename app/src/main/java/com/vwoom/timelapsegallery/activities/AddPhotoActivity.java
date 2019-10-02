@@ -349,7 +349,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                     });
                     interstitialAd.show();
                 } else {
-                    // TODO: implement local ad
+                    // TODO: (update) implement local ad
                     activity.finish();
                 }
             }

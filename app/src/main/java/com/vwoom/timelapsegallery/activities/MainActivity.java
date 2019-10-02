@@ -54,8 +54,6 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-// TODO: refactor logs to timber
-
 public class MainActivity extends AppCompatActivity implements ProjectsAdapter.ProjectsAdapterOnClickHandler {
 
     @BindView(R.id.add_project_FAB)
@@ -144,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
         mFilterByToday = getIntent().getBooleanExtra(Keys.PROJECT_FILTER_BY_SCHEDULED_TODAY, false);
 
-        /* TODO: ENABLE FOR MANUAL PROJECT SYNC */
+        /* TODO: (update) implement import projects */
         //importProjects();
 
         // Set up the view model
@@ -176,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         FileUtils.deleteTempFiles(this); // Make sure to clean up temporary files
     }
 
-    // TODO create menu option to filter projects
+    // TODO (update) create menu option to show todays projects
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -269,7 +267,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
     @Override
     public void onClick(ProjectEntry clickedProject, View sharedElement, String transitionName, int position) {
-        // TODO fade out gradient and schedule text if visible
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra(Keys.PROJECT_ENTRY, clickedProject);
         intent.putExtra(Keys.TRANSITION_POSITION, position);

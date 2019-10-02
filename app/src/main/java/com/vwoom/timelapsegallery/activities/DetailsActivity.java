@@ -238,7 +238,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mTransitioned = true;
         }
 
-        // TODO implement pinch zoom on fullscreen image
+        // TODO (update) implement pinch zoom on fullscreen image
         initializeFullscreenImageDialog();
 
         setupViewModel();
@@ -522,7 +522,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         constraintSet.setDimensionRatio(R.id.detail_next_image, ratio);
         constraintSet.applyTo(constraintLayout);
 
-        // TODO streamline code for image loading
+        // TODO (update) streamline code for image loading
         // Load the image
         File f = new File(imagePath);
         Glide.with(this)
@@ -679,7 +679,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mFullscreenImage.setOnTouchListener(mOnSwipeTouchListener);
     };
 
-    // TODO implement dual loading solution for smooth transition between fullscreen images
+    // TODO (update) implement dual loading solution for smooth transition between fullscreen images
     /* Pre loads the selected image into the hidden dialogue so that display appears immediate */
     private void preloadFullscreenImage(){
         File current = new File(mCurrentPhoto.getUrl());
@@ -861,7 +861,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         );
     }
 
-    // TODO recall position after editing project
+    // TODO (update) recall position after editing project
     /* Edits the current project */
     private void editProject(){
         Intent intent = new Intent(this, NewProjectActivity.class);
