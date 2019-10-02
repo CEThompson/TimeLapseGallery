@@ -23,7 +23,7 @@ class SettingsActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-            // TODO implement project import button here
+            // TODO (update) implement project import button here
             val syncButton: Preference? =  findPreference(getString(R.string.key_sync))
         }
     }
