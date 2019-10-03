@@ -110,10 +110,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         setSupportActionBar(toolbar);
 
         // Initialize mobile ads
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-            }
+        MobileAds.initialize(this, initializationStatus -> {
         });
 
         // Increase columns for horizontal orientation
