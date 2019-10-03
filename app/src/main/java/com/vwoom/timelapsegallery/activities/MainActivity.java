@@ -180,52 +180,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         }
     }
 
-    /**
-     * Disables or enables notification reminders for scheduled projects
-     */
-    /*
-    private void toggleNotifications(){
-        // Get the current shared preference
-        SharedPreferences sharedPreferences = getSharedPreferences(Keys.PREFERENCES_KEY, Context.MODE_PRIVATE);
-        boolean notificationsEnabled = sharedPreferences.getBoolean(Keys.NOTIFICATIONS_ENABLED, true);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        // Init variables for writing and feedback
-        int optionStringId;
-        String feedback;
-
-        // If notifications are enabled, then disable them
-        if (notificationsEnabled) {
-            editor.putBoolean(Keys.NOTIFICATIONS_ENABLED, false);
-            optionStringId = R.string.enable_notifications;
-            feedback = getResources().getString(R.string.disabling_notifications);
-
-            // Cancel the scheduled notifications and the worker
-            NotificationUtils.cancelNotificationWorker(this);
-        }
-
-        // If notifications are disabled, then enable them
-        else {
-            editor.putBoolean(Keys.NOTIFICATIONS_ENABLED, true);
-            optionStringId = R.string.disable_notifications;
-            feedback = getResources().getString(R.string.enabling_notifications);
-
-            // Start up the worker and schedule any notifications for tomorrow
-            NotificationUtils.scheduleNotificationWorker(this);
-        }
-
-        // write the shared pref
-        editor.apply();
-
-        // update the menu
-        mMenu.findItem(R.id.notification_toggle).setTitle(optionStringId);
-
-        // give feedback to the user
-        View view = findViewById(R.id.main_layout);
-        Snackbar.make(view, feedback, Snackbar.LENGTH_SHORT).show();
-    }
-    */
-
     /* Observes all time lapse projects */
     private void setupViewModel(){
         MainActivityViewModel viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
