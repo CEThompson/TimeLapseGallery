@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.animation.Animator;
 import android.app.ActivityOptions;
 import android.app.SharedElementCallback;
 import android.content.Context;
@@ -198,21 +199,25 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
                 // If there are no projects fade in the welcome text view
                 TextView welcome = findViewById(R.id.welcome_text_view);
+                long longAnimationDuration = getResources().getInteger(
+                    android.R.integer.config_longAnimTime);
                 if (mProjects.size()==0){
-                    long shortAnimationDuration = getResources().getInteger(
-                            android.R.integer.config_longAnimTime);
                     // Fade in gradient overlay
                     welcome.setAlpha(0f);
                     welcome.setVisibility(View.VISIBLE);
                     welcome.animate()
                             .alpha(1f)
-                            .setDuration(shortAnimationDuration)
+                            .setDuration(longAnimationDuration)
                             .setListener(null);
-                    welcome.setVisibility(View.VISIBLE);
                 }
                 // Otherwise leave the welcome text view hidden
                 else {
-                    welcome.setVisibility(View.INVISIBLE);
+                    if (welcome.getVisibility() == View.VISIBLE) {
+                        welcome.animate()
+                                .alpha(0f)
+                                .setDuration(longAnimationDuration)
+                                .setListener(null);
+                    }
                 }
 
                 // Reveal the new project fab
