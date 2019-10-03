@@ -86,7 +86,7 @@ public final class NotificationUtils {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String notificationTimeString = prefs.getString(context.getString(R.string.key_notification_time), "7");
         int notificationTime = Integer.parseInt(notificationTimeString);
-
+        Log.d(TAG, "Notification Tracker: shared pref time = " + notificationTimeString + " int is " + notificationTime);
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_YEAR, dayOfYear);
         c.set(Calendar.HOUR_OF_DAY, notificationTime);
