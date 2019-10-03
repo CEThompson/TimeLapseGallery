@@ -109,6 +109,10 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         Toolbar toolbar = findViewById(R.id.main_activity_toolbar);
         setSupportActionBar(toolbar);
 
+        // Set the icon for the toolbar
+        if (getSupportActionBar()!=null)
+            getSupportActionBar().setIcon(R.drawable.actionbar_space_between_icon_and_title);
+
         // Initialize mobile ads
         MobileAds.initialize(this, initializationStatus -> {
         });
