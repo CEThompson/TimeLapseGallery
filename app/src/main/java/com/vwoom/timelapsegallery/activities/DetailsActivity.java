@@ -233,6 +233,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             postponeEnterTransition();
         } else {
             mTransitioned = true;
+            showPhotoInformation();
         }
 
         // TODO (update) implement pinch zoom on fullscreen image
@@ -259,29 +260,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             @Override
             public void onTransitionEnd(Transition transition) {
                 if (!mIsReturning){
-                    LinearLayout photoInformationLayout = findViewById(R.id.photo_information_layout);
-                    View gradientOverlay = findViewById(R.id.details_gradient_overlay);
-
-                    long shortAnimationDuration = getResources().getInteger(
-                            android.R.integer.config_shortAnimTime);
-
-                    mFullscreenFab.show();
-
-                    // Fade in gradient overlay
-                    gradientOverlay.setAlpha(0f);
-                    gradientOverlay.setVisibility(View.VISIBLE);
-                    gradientOverlay.animate()
-                            .alpha(1f)
-                            .setDuration(shortAnimationDuration)
-                            .setListener(null);
-
-                    // Fade in photo information
-                    photoInformationLayout.setAlpha(0f);
-                    photoInformationLayout.setVisibility(View.VISIBLE);
-                    photoInformationLayout.animate()
-                            .alpha(1f)
-                            .setDuration(shortAnimationDuration)
-                            .setListener(null);
+                    showPhotoInformation();
                 }
             }
 
@@ -300,6 +279,32 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
             }
         });
+    }
+
+    private void showPhotoInformation(){
+        LinearLayout photoInformationLayout = findViewById(R.id.photo_information_layout);
+        View gradientOverlay = findViewById(R.id.details_gradient_overlay);
+
+        long shortAnimationDuration = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
+
+        mFullscreenFab.show();
+
+        // Fade in gradient overlay
+        gradientOverlay.setAlpha(0f);
+        gradientOverlay.setVisibility(View.VISIBLE);
+        gradientOverlay.animate()
+                .alpha(1f)
+                .setDuration(shortAnimationDuration)
+                .setListener(null);
+
+        // Fade in photo information
+        photoInformationLayout.setAlpha(0f);
+        photoInformationLayout.setVisibility(View.VISIBLE);
+        photoInformationLayout.animate()
+                .alpha(1f)
+                .setDuration(shortAnimationDuration)
+                .setListener(null);
     }
 
     @Override
