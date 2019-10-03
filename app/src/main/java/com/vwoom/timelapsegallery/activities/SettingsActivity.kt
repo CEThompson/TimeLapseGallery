@@ -38,6 +38,8 @@ class SettingsActivity : AppCompatActivity() {
                 Log.d("settings activity", "Notification listener activitating for key = $key")
                 if (key.equals(this.getString(R.string.key_notifications_enabled)))
                     NotificationUtils.scheduleNotificationWorker(activity);
+                if (key.equals(this.getString(R.string.key_notification_time)))
+                    NotificationUtils.scheduleNotificationWorker(activity)
             }
 
         }
