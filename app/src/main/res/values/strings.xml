@@ -3,6 +3,9 @@
     <string name="app_name">Time Lapse Gallery</string>
     <string name="project_details">Project Details</string>
 
+    <!-- Welcome -->
+    <string name="welcome">Welcome</string>
+
     <!-- Activities -->
     <string name="main_activity">Main Activity</string>
     <string name="details_activity">Details Activity</string>

@@ -23,6 +23,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.TextView;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
@@ -134,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         });
 
         prepareSharedElementTransition();
-
         mFilterByToday = getIntent().getBooleanExtra(Keys.PROJECT_FILTER_BY_SCHEDULED_TODAY, false);
 
         /* TODO: (update) implement import projects */
@@ -186,12 +186,37 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         viewModel.getProjects().observe(this, (List<ProjectEntry> projectEntries) -> {
                 mProjects = projectEntries;
 
+                // If filter by today grab todays projects and set the data on the adapter
                 if (mFilterByToday){
                     List<ProjectEntry> todaysProjects = ProjectUtils.getProjectsScheduledToday(mProjects);
                     mProjectsAdapter.setProjectData(todaysProjects);
-                } else {
+                }
+                // Otherwise set the adapter to projects gathered by the view model
+                else {
                     mProjectsAdapter.setProjectData(mProjects);
                 }
+
+                // If there are no projects fade in the welcome text view
+                TextView welcome = findViewById(R.id.welcome_text_view);
+                if (mProjects.size()==0){
+                    long shortAnimationDuration = getResources().getInteger(
+                            android.R.integer.config_longAnimTime);
+                    // Fade in gradient overlay
+                    welcome.setAlpha(0f);
+                    welcome.setVisibility(View.VISIBLE);
+                    welcome.animate()
+                            .alpha(1f)
+                            .setDuration(shortAnimationDuration)
+                            .setListener(null);
+                    welcome.setVisibility(View.VISIBLE);
+                }
+                // Otherwise leave the welcome text view hidden
+                else {
+                    welcome.setVisibility(View.INVISIBLE);
+                }
+
+                // Reveal the new project fab
+                mNewProjectFab.show();
         });
     }
 
