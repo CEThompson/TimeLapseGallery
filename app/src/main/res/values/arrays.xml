@@ -14,13 +14,13 @@
 
     <string-array name="playback_interval_entries">
         <item>50ms</item>
-        <item>100ms</item>
         <item>150ms</item>
+        <item>300ms</item>
     </string-array>
 
     <string-array name="playback_interval_values">
         <item>50</item>
-        <item>100</item>
         <item>150</item>
+        <item>300</item>
     </string-array>
 </resources>
