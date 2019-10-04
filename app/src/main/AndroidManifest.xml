@@ -86,7 +86,7 @@
             android:exported="false"
             android:process=":remote">
             <intent-filter>
-                <action android:name="com.vwoom.timelapsegallery.CREATE_NOTIFICATION${applicationId}" />
+                <action android:name="${applicationId}.CREATE_NOTIFICATION" />
             </intent-filter>
         </receiver>
 
