@@ -140,8 +140,8 @@ public class AddPhotoActivity extends AppCompatActivity {
 
                 // Track error
                 Bundle params = new Bundle();
-                params.putString("error_text", e.getMessage());
-                mFirebaseAnalytics.logEvent("take_temporary_picture_error", params);
+                params.putString(getString(R.string.error_text), e.getMessage());
+                mFirebaseAnalytics.logEvent(getString(R.string.take_temporary_picture_error), params);
             }
             // Continue only if the File was successfully created
             if (tempFile != null) {
@@ -291,9 +291,9 @@ public class AddPhotoActivity extends AppCompatActivity {
 
                 // Track added photo
                 Bundle bundle = new Bundle();
-                bundle.putString("project_name", currentProject.getName());
-                bundle.putString("photo_number", String.valueOf(photoToSubmit.getId()));
-                firebaseAnalytics.logEvent("add_photo", bundle);
+                bundle.putString(context.getString(R.string.project_name_analytics), currentProject.getName());
+                bundle.putString(context.getString(R.string.photo_number), String.valueOf(photoToSubmit.getId()));
+                firebaseAnalytics.logEvent(context.getString(R.string.add_photo), bundle);
 
                 // Return the parameters to run in post execute
                 return new ResultParameters(context, photoToSubmit, interstitialAd);
@@ -305,8 +305,8 @@ public class AddPhotoActivity extends AppCompatActivity {
 
                 // Track error
                 Bundle bundle = new Bundle();
-                bundle.putString("error_text", e.getMessage());
-                firebaseAnalytics.logEvent("add_photo_error", bundle);
+                bundle.putString(context.getString(R.string.error_text), e.getMessage());
+                firebaseAnalytics.logEvent(context.getString(R.string.add_photo_error), bundle);
 
                 return new ResultParameters(context, null, null);
             }
