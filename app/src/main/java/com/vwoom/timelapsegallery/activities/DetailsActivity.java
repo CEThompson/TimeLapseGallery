@@ -96,9 +96,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     @BindView(R.id.details_photo_time_tv) TextView mPhotoTimeTv;
 
     // Project display
-    @BindView(R.id.details_project_day_time_textview) TextView mProjectDayTimeTv;
+    @BindView(R.id.details_project_timespan_textview) TextView mProjectTimespanTv;
     @BindView(R.id.details_project_name_text_view) TextView mProjectNameTextView;
-    @BindView(R.id.details_project_date_textview) TextView mProjectDateTextView;
 
     // Database
     private TimeLapseDatabase mTimeLapseDatabase;
@@ -706,12 +705,14 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
             // Set the date of the project based on the first photo entry
             PhotoEntry firstPhoto = mPhotos.get(0);
-            long timestamp = firstPhoto.getTimestamp();
-            String projectDate = TimeUtils.getDateFromTimestamp(timestamp);
-            String day = TimeUtils.getDayFromTimestamp(timestamp);
-            String time = TimeUtils.getTimeFromTimestamp(timestamp);
-            mProjectDayTimeTv.setText(getString(R.string.started_on, day, time));
-            mProjectDateTextView.setText(projectDate);
+            long firstTimestamp = firstPhoto.getTimestamp();
+            String firstProjectDateString = TimeUtils.getShortDateFromTimestamp(firstTimestamp);
+
+            PhotoEntry lastPhoto = mPhotos.get(mPhotos.size()-1);
+            long lastTimestamp = lastPhoto.getTimestamp();
+            String lastProjectDateString = TimeUtils.getShortDateFromTimestamp(lastTimestamp);
+
+            mProjectTimespanTv.setText(getString(R.string.timespan, firstProjectDateString, lastProjectDateString));
 
             // Set max for progress bar
             mProgressBar.setMax(mPhotos.size()-1);

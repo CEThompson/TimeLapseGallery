@@ -66,6 +66,10 @@ public class TimeUtils {
         return c.get(Calendar.MINUTE);
     }
 
+    public static String getShortDateFromTimestamp(long timestamp){
+        return new SimpleDateFormat("M/d/y", Locale.getDefault()).format(new Date(timestamp));
+    }
+
     public static String getDateFromTimestamp(long timestamp){
         return new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault()).format(new Date(timestamp));
     }

@@ -46,20 +46,13 @@
                 tools:text="project name with a very very very long name" />
 
             <TextView
-                android:id="@+id/details_project_day_time_textview"
+                android:id="@+id/details_project_timespan_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="@+id/details_project_name_text_view"
                 app:layout_constraintTop_toBottomOf="@+id/details_project_name_text_view"
-                tools:text="Monday 8:00 PM" />
+                tools:text="7/7/19 - 7/8/19" />
 
-            <TextView
-                android:id="@+id/details_project_date_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="@+id/details_project_name_text_view"
-                app:layout_constraintTop_toBottomOf="@+id/details_project_day_time_textview"
-                tools:text="January 01, 2019" />
         </LinearLayout>
 
         <!-- Photo Layout -->

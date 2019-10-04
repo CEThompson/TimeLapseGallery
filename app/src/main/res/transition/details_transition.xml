@@ -20,8 +20,7 @@
         android:slideEdge="start">
         <targets>
             <target android:targetId="@id/details_project_name_text_view"/>
-            <target android:targetId="@id/details_project_day_time_textview"/>
-            <target android:targetId="@id/details_project_date_textview"/>
+            <target android:targetId="@id/details_project_timespan_textview"/>
         </targets>
     </slide>
 
