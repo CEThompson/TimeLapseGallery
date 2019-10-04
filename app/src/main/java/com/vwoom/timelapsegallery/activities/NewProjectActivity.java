@@ -205,8 +205,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
                 // Log with analytics
                 Bundle params = new Bundle();
-                params.putString("error_text", e.getMessage());
-                mFirebaseAnalytics.logEvent("take_temporary_picture_error", params);
+                params.putString(getString(R.string.error_text), e.getMessage());
+                mFirebaseAnalytics.logEvent(getString(R.string.take_temporary_picture_error), params);
             }
             // Continue only if the File was successfully created
             if (tempFile != null) {
@@ -355,8 +355,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
                     // Track added project
                     Bundle bundle = new Bundle();
-                    bundle.putString("project_name", newProject.getName());
-                    mFirebaseAnalytics.logEvent("new_project", bundle);
+                    bundle.putString(getString(R.string.project_name_analytics), newProject.getName());
+                    mFirebaseAnalytics.logEvent(getString(R.string.new_project_analytics), bundle);
 
                 } catch (IOException e){
                     // Notify project creation error
@@ -365,8 +365,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
                     // Track error
                     Bundle bundle = new Bundle();
-                    bundle.putString("error_text", e.getMessage());
-                    mFirebaseAnalytics.logEvent("submit_new_project_error", bundle);
+                    bundle.putString(getString(R.string.error_text), e.getMessage());
+                    mFirebaseAnalytics.logEvent(getString(R.string.submit_new_project_error), bundle);
                 }
             });
 

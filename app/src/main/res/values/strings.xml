@@ -102,6 +102,8 @@
     <string name="photo_number">photo_number</string>
     <string name="add_photo">add_photo</string>
     <string name="add_photo_error">add_photo_error</string>
+    <string name="new_project_analytics">new_project</string>
+    <string name="submit_new_project_error">submit_new_project_error</string>
 
     <!-- Settings -->
     <string name="title_activity_settings">Settings</string>
