@@ -27,6 +27,6 @@ public final class Keys {
     /* Authorities */
     private static final String applicationId = BuildConfig.APPLICATION_ID;
 
-    public static final String FILEPROVIDER_AUTHORITY = "com.vwoom.timelapsegallery.fileprovider" + applicationId;
-    public static final String CREATE_NOTIFICATION_AUTHORITY = "com.vwoom.timelapsegallery.CREATE_NOTIFICATION" + applicationId;
+    public static final String FILEPROVIDER_AUTHORITY = applicationId + ".fileprovider";
+    public static final String CREATE_NOTIFICATION_AUTHORITY = applicationId + ".CREATE_NOTIFICATION";
 }
