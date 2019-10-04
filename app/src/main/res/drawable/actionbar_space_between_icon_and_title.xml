@@ -2,6 +2,6 @@
 <layer-list
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:drawable="@drawable/ic_tlg_white"
+        android:drawable="@drawable/ic_time_lapse_gallery_white"
         android:right="16dp"/>
 </layer-list>
