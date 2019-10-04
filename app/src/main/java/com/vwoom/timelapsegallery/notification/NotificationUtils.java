@@ -92,6 +92,7 @@ public final class NotificationUtils {
         c.set(Calendar.HOUR_OF_DAY, notificationTime);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
+        Log.d(TAG, "Notification Tracker: returning notification time in ms = " + c.getTimeInMillis());
         return c.getTimeInMillis();
     }
 
