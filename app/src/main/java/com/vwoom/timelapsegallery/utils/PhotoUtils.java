@@ -3,7 +3,6 @@ package com.vwoom.timelapsegallery.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.util.Log;
 
 import androidx.exifinterface.media.ExifInterface;
 
