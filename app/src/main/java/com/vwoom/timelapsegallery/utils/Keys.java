@@ -28,6 +28,5 @@ public final class Keys {
     private static final String applicationId = BuildConfig.APPLICATION_ID;
 
     public static final String FILEPROVIDER_AUTHORITY = "com.vwoom.timelapsegallery.fileprovider" + applicationId;
-    public static final String PREFERENCES_KEY = "com.vwoom.timelapsegallery.preferences" + applicationId;
     public static final String CREATE_NOTIFICATION_AUTHORITY = "com.vwoom.timelapsegallery.CREATE_NOTIFICATION" + applicationId;
 }
