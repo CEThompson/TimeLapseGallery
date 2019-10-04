@@ -384,6 +384,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
+            case R.id.settings:
+                Intent intent = new Intent(DetailsActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
             case R.id.delete_photo:
                 if (mPhotos.size()==1){
                     verifyLastPhotoDeletion();
