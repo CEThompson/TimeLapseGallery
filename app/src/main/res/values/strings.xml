@@ -77,7 +77,7 @@
     <string name="started_on">Started on %1$s %2$s</string>
     <string name="next">Next photo: %1$s at %2$s</string>
     <string name="transition_tag">transition tag</string>
-    <string name="default_aspect_ratio">1:1</string>
+    <string name="default_aspect_ratio" translatable="false">1:1</string>
 
     <!-- Validation -->
     <string name="invalid_name">Invalid Name</string>
@@ -96,46 +96,32 @@
     <string name="error_submitting_photo">Error submitting photo</string>
 
     <!-- Analytics -->
-    <string name="error_text">error_text</string>
-    <string name="take_temporary_picture_error">take_temporary_picture_error</string>
-    <string name="project_name_analytics">project_name</string>
-    <string name="photo_number">photo_number</string>
-    <string name="add_photo">add_photo</string>
-    <string name="add_photo_error">add_photo_error</string>
-    <string name="new_project_analytics">new_project</string>
-    <string name="submit_new_project_error">submit_new_project_error</string>
+    <string name="error_text" translatable="false">error_text</string>
+    <string name="take_temporary_picture_error" translatable="false">take_temporary_picture_error</string>
+    <string name="project_name_analytics" translatable="false">project_name</string>
+    <string name="photo_number" translatable="false">photo_number</string>
+    <string name="add_photo" translatable="false">add_photo</string>
+    <string name="add_photo_error" translatable="false">add_photo_error</string>
+    <string name="new_project_analytics" translatable="false">new_project</string>
+    <string name="submit_new_project_error" translatable="false">submit_new_project_error</string>
 
     <!-- Settings -->
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Preference Headers -->
+    <!-- Notifications -->
     <string name="notifications_header">Notifications</string>
-    <string name="sync_header">Sync</string>
-    <string name="playback_header">Playback</string>
-
-    <!-- Notifications Preferences -->
     <string name="enable_notifications_title">Enable notifications</string>
-    <string name="notifications_summary_on">Notifications enabled
-    </string>
+    <string name="notifications_summary_on">Notifications enabled</string>
     <string name="notifications_summary_off">Notifications disabled</string>
-
     <string name="notification_time_title">Notification time</string>
 
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync files to database</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-
-    <!-- Notifications Preferences -->
+    <!-- Playback -->
+    <string name="playback_header">Playback</string>
     <string name="playback_interval_title">Playback interval (ms)</string>
 
     <!-- Keys -->
-    <string name="key_sync">sync</string>
-    <string name="key_notifications_enabled">notifications_enabled</string>
-    <string name="key_notification_time">notification_time</string>
-    <string name="key_playback_interval">playback_interval</string>
+    <string name="key_notifications_enabled" translatable="false">notifications_enabled</string>
+    <string name="key_notification_time" translatable="false">notification_time</string>
+    <string name="key_playback_interval" translatable="false">playback_interval</string>
 
 </resources>
