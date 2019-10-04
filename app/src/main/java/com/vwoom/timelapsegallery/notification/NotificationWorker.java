@@ -13,7 +13,6 @@ import androidx.work.WorkerParameters;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
-import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
 
 import java.util.Calendar;
