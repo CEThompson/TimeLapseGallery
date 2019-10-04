@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import android.animation.Animator;
 import android.app.ActivityOptions;
 import android.app.SharedElementCallback;
 import android.content.Context;
@@ -39,8 +38,6 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
 import com.vwoom.timelapsegallery.viewmodels.MainActivityViewModel;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -64,10 +61,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
     private List<ProjectEntry> mProjects;
 
     private int mNumberOfColumns = 3;
-
-    private Menu mMenu;
-
-    private boolean mNotificationsEnabled;
 
     private boolean mFilterByToday;
 
@@ -145,10 +138,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         // Set up the view model
         setupViewModel();
 
-        // Determine if notifications are enabled
-        SharedPreferences sharedPreferences = getSharedPreferences(Keys.PREFERENCES_KEY, Context.MODE_PRIVATE);
-        mNotificationsEnabled = sharedPreferences.getBoolean(Keys.NOTIFICATIONS_ENABLED, true);
-
         // Prepare analytics
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
@@ -166,7 +155,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_activity_menu, menu);
-        mMenu = menu;
         return true;
     }
 
