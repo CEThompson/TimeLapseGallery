@@ -24,7 +24,7 @@
     <string name="detail_current_image_content_description">The currently selected image belonging to the time lapse project.</string>
     <string name="first_image_content_description">The first image for the project.</string>
     <string name="widget_grid_item_content_description">Project thumbnail image for a grid item in the widget.</string>
-    <string name="schedule_indicator_content_description">Indicator showing is a project has been scheduled for notifications.</string>
+    <string name="schedule_indicator_content_description">Indicator showing that a project has been scheduled for notifications.</string>
     <string name="previous_photo_content_description">Image of the previous photo in the set.</string>
     <string name="new_photo_content_description">Image of the new photo in the set.</string>
     <string name="fullscreen_image_content_description">Fullscreen image of the currently selected photo.</string>
