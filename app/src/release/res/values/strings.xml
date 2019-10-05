@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Time Lapse Gallery</string>
+
     <!-- Admob id for time lapse gallery release -->
     <string name="admob_id" translatable="false">ca-app-pub-7456876949972231~1412884369</string>
 
