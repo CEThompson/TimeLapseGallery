@@ -23,7 +23,7 @@
             <EditText
                 android:id="@+id/project_name_edit_text"
                 android:layout_width="@dimen/project_name_edit_text_width"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/touch_target_min_height"
                 android:layout_margin="@dimen/textview_margin"
                 android:gravity="center"
                 android:autofillHints="@string/project_name"
@@ -77,6 +77,7 @@
                 <!-- FAB to add the first image -->
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/add_first_photo_fab"
+                    android:contentDescription="@string/add_first_photo_fab_content_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|top"
@@ -100,8 +101,9 @@
             <!-- Selector for notification schedule -->
             <Spinner
                 android:id="@+id/notification_schedule_spinner"
+                android:contentDescription="@string/notification_schedule_spinner_content_description"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/touch_target_min_height"
                 android:layout_margin="@dimen/selector_margin"
                 app:layout_constraintEnd_toEndOf="@+id/image_container"
                 app:layout_constraintTop_toBottomOf="@+id/image_container" />
@@ -135,6 +137,7 @@
     <!-- Submit project FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/submit_new_project_fab"
+        android:contentDescription="@string/submit_new_project_fab_content_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"

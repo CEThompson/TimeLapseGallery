@@ -44,5 +44,8 @@
 
     <dimen name="widget_size">40dp</dimen>
 
+    <dimen name="touch_target_min_height">48dp</dimen>
+
+    <dimen name="welcome_padding">16dp</dimen>
 
 </resources>

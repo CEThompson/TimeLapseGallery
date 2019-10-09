@@ -28,6 +28,11 @@
     <string name="previous_photo_content_description">Image of the previous photo in the set.</string>
     <string name="new_photo_content_description">Image of the new photo in the set.</string>
     <string name="fullscreen_image_content_description">Fullscreen image of the currently selected photo.</string>
+    <string name="projects_recycler_view_content_description">Recycler view showing the last image taken for each time lapse photo sequence.</string>
+    <string name="add_project_FAB_content_description">Floating action button that adds a new time lapse photo sequence project.</string>
+    <string name="add_first_photo_fab_content_description">Floating action button that adds a photo to a new project.</string>
+    <string name="submit_new_project_fab_content_description">Floating action button that submits a project.</string>
+    <string name="notification_schedule_spinner_content_description">Spinner to set the schedule for a project.</string>
 
     <!-- Options -->
     <string name="disable_notifications">Disable notifications</string>
