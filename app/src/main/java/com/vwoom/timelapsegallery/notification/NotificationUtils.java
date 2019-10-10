@@ -67,6 +67,12 @@ public final class NotificationUtils {
         notificationManager.notify(requestCode, builder.build());
     }
 
+    /* Clears any unused notifications */
+    public static void clearPreviousNotifications(Context context){
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        notificationManager.cancelAll();
+    }
+
 
     /* Creates the notification channel for android 8.0 + */
     private static void createNotificationChannel(Context context){

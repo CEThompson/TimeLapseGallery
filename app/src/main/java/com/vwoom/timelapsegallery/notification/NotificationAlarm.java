@@ -32,6 +32,8 @@ public class NotificationAlarm extends BroadcastReceiver {
         Log.d(TAG, "Notification Tracker: Request code is " + requestCode);
         Log.d(TAG, "Notification Tracker: Action type is " + intent.getAction());
 
+        // Clear any previous notifications that are unused
+        NotificationUtils.clearPreviousNotifications(context);
         // Send the notification
         NotificationUtils.notifyUserOfScheduledProjects(context, requestCode);
 
