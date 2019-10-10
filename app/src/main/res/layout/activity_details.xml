@@ -15,6 +15,7 @@
         <!-- FAB to compile a video from the images -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/play_as_video_fab"
+            android:contentDescription="@string/play_as_video_fab_content_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
@@ -143,8 +144,10 @@
                         style="@style/WhiteText"/>
                 </LinearLayout>
 
+                <!-- Fullscreen fab -->
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/fullscreen_fab"
+                    android:contentDescription="@string/fullscreen_fab_content_description"
                     android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -173,6 +176,7 @@
         <!-- Recycler view showing the photos in the project -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/details_recyclerview"
+            android:contentDescription="@string/details_recyclerview_content_description"
             android:paddingEnd="@dimen/fab_size_plus_padding"
             android:layout_width="match_parent"
             android:layout_height="@dimen/detail_recyclerview_height"
@@ -199,6 +203,7 @@
     <!-- FAB to add a new photo -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_photo_fab"
+        android:contentDescription="@string/add_photo_fab_content_description"
         android:transitionName="add_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

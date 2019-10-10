@@ -53,6 +53,7 @@
     <!-- take photo FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/take_photo_fab"
+        android:contentDescription="@string/take_photo_fab_content_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
@@ -64,6 +65,7 @@
     <!-- return to previous activity FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/return_to_details_fab"
+        android:contentDescription="@string/return_to_details_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
@@ -75,6 +77,7 @@
     <!-- submit photo FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/submit_photo_fab"
+        android:contentDescription="@string/submit_photo_fab_content_description"
         android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -88,6 +91,7 @@
     <!-- compare to previous FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/compare_to_previous_fab"
+        android:contentDescription="@string/compare_to_previous_fab_content_description"
         android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -33,6 +33,15 @@
     <string name="add_first_photo_fab_content_description">Floating action button that adds a photo to a new project.</string>
     <string name="submit_new_project_fab_content_description">Floating action button that submits a project.</string>
     <string name="notification_schedule_spinner_content_description">Spinner to set the schedule for a project.</string>
+    <string name="play_as_video_fab_content_description">Floating action button that loads the set of photos in order.</string>
+    <string name="fullscreen_fab_content_description">Floating action button that shows a fullscreen dialog of the current photo.</string>
+    <string name="details_recyclerview_content_description">Recycler view showing the set of photos belonging to a time lapse project.</string>
+    <string name="add_photo_fab_content_description">Floating action button that launches the add photo activity for a time lapse project.</string>
+    <string name="fullscreen_back_fab_content_description">Floating action button that closes the fullscreen image dialog and returns to project details.</string>
+    <string name="take_photo_fab_content_description">Floating action button that requests a camera application to take a photo.</string>
+    <string name="return_to_details_fab">Floating action button that returns from adding a photo to the projects details.</string>
+    <string name="submit_photo_fab_content_description">Floating action button that submits the photo returned from a camera application to the project.</string>
+    <string name="compare_to_previous_fab_content_description">Floating action button that compares the photo returned from a camera application to the last photo taken for the project.</string>
 
     <!-- Options -->
     <string name="disable_notifications">Disable notifications</string>
