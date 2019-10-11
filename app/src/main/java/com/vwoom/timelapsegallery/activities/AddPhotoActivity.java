@@ -348,7 +348,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                     activity.finish();
                 }
             }
-            // If photo insertion unsuccesful do nothing
+            // If photo insertion unsuccessful do nothing
         }
 
         // Used to filter out pre-launch reports bots clicking on ads
