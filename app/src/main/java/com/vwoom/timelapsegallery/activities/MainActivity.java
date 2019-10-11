@@ -8,10 +8,13 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.app.ActivityOptions;
 import android.app.SharedElementCallback;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.util.Log;
@@ -133,6 +136,8 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         /* TODO: (update) implement import projects */
         //importProjects();
 
+        if (isTestDevice(this)) prepareTestDevice();
+
         // Set up the view model
         setupViewModel();
 
@@ -166,6 +171,30 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+
+    // Used to filter out pre-launch reports bots clicking on ads
+    private boolean isTestDevice(Context context) {
+        return Boolean.valueOf(Settings.System.getString(context.getContentResolver(), "firebase.test.lab"));
+    }
+
+    // Creates a project and photo entry for firebase test devices
+    public void prepareTestDevice(){
+        TimeLapseDatabase db = TimeLapseDatabase.getInstance(this);
+
+        Uri uri = Uri.parse("R.drawable.ic_time_lapse_gallery_white");
+        String thumbnail_uri = uri.toString();
+        long time = System.currentTimeMillis();
+
+        // Insert a test project
+        ProjectEntry testProject = new ProjectEntry("test", thumbnail_uri, 0, 0, time);
+
+        long projectId = db.projectDao().insertProject(testProject);
+        PhotoEntry testPhoto = new PhotoEntry(projectId, thumbnail_uri, time);
+
+        // Insert a test photo
+        db.photoDao().insertPhoto(testPhoto);
     }
 
     /* Observes all time lapse projects */
