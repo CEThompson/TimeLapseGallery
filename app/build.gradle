@@ -73,9 +73,7 @@ dependencies {
     // Espresso core
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
-    
-    // Espresso intent stubbing
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.2.0'
 
     // Espresso idling
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
