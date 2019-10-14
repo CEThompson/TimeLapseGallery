@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.activities;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -500,5 +501,10 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         outState.putInt(Keys.PROJECT_SCHEDULE, mSchedule);
         outState.putString(Keys.TEMP_PATH, mTemporaryPhotoPath);
         outState.putLong(Keys.CHOSEN_TIME, mScheduleNextSubmission);
+    }
+
+    @VisibleForTesting
+    public void setmTemporaryPhotoPath(String path){
+        mTemporaryPhotoPath = path;
     }
 }

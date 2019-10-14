@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.activities;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
@@ -173,23 +174,28 @@ public class AddPhotoActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
 
-            // Show the result image
-            mResultPhoto.setVisibility(View.VISIBLE);
-
-            // Load the image
-            loadResultImage();
-
             // Load ad if it isn't loaded
             if (!mInterstitialAd.isLoaded()){
                 mInterstitialAd.loadAd(new AdRequest.Builder().build());
             }
 
-            // Set up the ui for result
-            mSubmitFab.show();
-            mCompareFab.show();
-            mRetakeFab.setImageResource(R.drawable.ic_repeat_white_24dp);
-            mNewPhotoLabel.setVisibility(View.VISIBLE);
+            loadResultUi();
         }
+    }
+
+    /* Sets up the ui after result from taking photo */
+    private void loadResultUi(){
+        // Show the result image
+        mResultPhoto.setVisibility(View.VISIBLE);
+
+        // Load the image
+        loadResultImage();
+
+        // Set up the ui for result
+        mSubmitFab.show();
+        mCompareFab.show();
+        mRetakeFab.setImageResource(R.drawable.ic_repeat_white_24dp);
+        mNewPhotoLabel.setVisibility(View.VISIBLE);
     }
 
     /* Set click listeners for all four fabs */
@@ -406,5 +412,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         public InterstitialAd getInterstitialAd() { return interstitialAd; }
     }
 
+    @VisibleForTesting
+    public void setmTemporaryPhotoPath(String path){ mTemporaryPhotoPath = path; }
 
 }

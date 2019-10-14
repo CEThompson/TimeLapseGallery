@@ -1,86 +1,160 @@
 package com.vwoom.timelapsegallery;
 
+import android.app.Activity;
+import android.app.Instrumentation;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.espresso.core.internal.deps.guava.collect.Iterables;
+import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import androidx.test.runner.lifecycle.Stage;
 
+import com.vwoom.timelapsegallery.activities.AddPhotoActivity;
 import com.vwoom.timelapsegallery.activities.MainActivity;
+import com.vwoom.timelapsegallery.activities.NewProjectActivity;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.utils.FileUtils;
-import com.vwoom.timelapsegallery.utils.PhotoUtils;
 
 import org.junit.After;
-import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.Intents.intending;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.anyIntent;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.toPackage;
+import static androidx.test.espresso.matcher.RootMatchers.isDialog;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 
 // TODO put together end to end test
 @LargeTest
 public class EndToEndTest {
 
     private Context mContext;
-    private File horizontalPhotoFile = null;
-    private File verticalPhotoFile = null;
-    private TimeLapseDatabase mDb;
-
-    private PhotoEntry verticalTestPhoto;
-    private ProjectEntry verticalTestProject;
-
-    private PhotoEntry horizontalTestPhoto;
-    private ProjectEntry horizontalTestProject;
-
     private static String TAG = "EndToEnd";
 
     @Rule
-    public ActivityTestRule<MainActivity> mMainActivityTestRule
-            = new ActivityTestRule<>(MainActivity.class);
+    public IntentsTestRule<MainActivity> mMainActivityTestRule
+            = new IntentsTestRule<>(MainActivity.class);
 
-    @Before
-    public void setUp(){
+    @Test
+    public void endToEndTest(){
         mContext = mMainActivityTestRule.getActivity();
-        mDb = TimeLapseDatabase.getInstance(mContext);
+        onView(withId(R.id.add_project_FAB)).perform(click());
 
-        // create temporary files for test images
-        try {
-            //horizontalPhotoFile = FileUtils.createTemporaryImageFile(mContext);
-            verticalPhotoFile = FileUtils.createTemporaryImageFile(mContext);
-        } catch (IOException e){
-            Log.d(TAG, "Error creating temp file");
+        // Enter a project name
+        onView(withId(R.id.project_name_edit_text)).perform(replaceText("testProject"));
+
+        // Create a test photo file
+        File temp = null;
+        try {temp = FileUtils.createTemporaryImageFile(mContext);}
+        catch (IOException e){
+            Log.d(TAG, "temp file creation failed");
+        }
+        // Assert the file was created then copy test image to it
+        Assert.assertNotNull(temp);
+        writeDrawableToTempFile(temp, R.drawable.vtest);
+
+        // Get current activity and set temp path
+        Activity currentActivity = getActivityInstance();
+        Assert.assertEquals(currentActivity.getClass(), NewProjectActivity.class);
+        ((NewProjectActivity)currentActivity).setmTemporaryPhotoPath(temp.getAbsolutePath());
+
+        // Submit the new project
+        onView(withId(R.id.submit_new_project_fab)).perform(click());
+
+        // Click the new project
+        // Assumes project list is empty
+        onView(withId(R.id.projects_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+
+        // Launch the add photo activity
+        onView(withId(R.id.add_photo_fab)).perform(click());
+
+        currentActivity = getActivityInstance();
+        Assert.assertEquals(currentActivity.getClass(), AddPhotoActivity.class);
+
+        // Create a test photo file
+        File h = null;
+        try {h = FileUtils.createTemporaryImageFile(currentActivity);}
+        catch (IOException e){
+            Log.d(TAG, "temp file creation failed");
+        }
+        // Assert the file was created then copy test image to it
+        Assert.assertNotNull(h);
+
+        // TODO intent stub here...
+        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(Activity.RESULT_OK, null);
+
+        intending(anyIntent()).respondWith(result);
+
+        onView(withId(R.id.take_photo_fab)).perform(click());
+        writeDrawableToTempFile(h, R.drawable.htest);
+        ((AddPhotoActivity)currentActivity).setmTemporaryPhotoPath(h.getAbsolutePath());
+
+
+        //intended(anyIntent());
+        //try {Thread.sleep(3000);} catch(InterruptedException e){
+            // do nothing}
+        //}
+
+        // Submit the temporary photo
+        onView(withId(R.id.submit_photo_fab)).perform(click());
+
+        onView(withId(R.id.details_recyclerview)).perform(RecyclerViewActions.actionOnItemAtPosition(1, click()));
+
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+
+        onView(withText(R.string.delete_project)).perform(click());
+
+        onView(withText(android.R.string.yes))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))
+                .perform(click());
+        onView(withText(android.R.string.yes))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        try {onView(withText(R.string.welcome)).perform(click());}
+        catch (NoMatchingViewException e){
         }
 
-        /*
-        Bitmap horizontalTestImage = BitmapFactory.decodeResource(
-                InstrumentationRegistry.getInstrumentation().getTargetContext().getResources(),
-                R.drawable.htest
-        );
-        */
+    }
 
+    private void writeDrawableToTempFile(File destinationFile, int testImage){
         try {
-            InputStream inputStream = InstrumentationRegistry.getInstrumentation()
-                    .getTargetContext().getResources().openRawResource(R.drawable.vtest);
-            OutputStream out = new FileOutputStream(verticalPhotoFile);
-            byte buf[] = new byte[1024];
+            InputStream inputStream = getInstrumentation()
+                    .getTargetContext().getResources().openRawResource(testImage);
+            OutputStream out = new FileOutputStream(destinationFile);
+            byte[] buf = new byte[1024];
             int len;
             while ((len = inputStream.read(buf)) > 0)
                 out.write(buf, 0, len);
@@ -88,121 +162,20 @@ public class EndToEndTest {
             inputStream.close();
         }
         catch (IOException e){
-            Log.d(TAG, e.getMessage());
+            if(e.getMessage()!=null)
+                Log.d(TAG, e.getMessage());
         }
-
-        // copy test images into temp files
-        /*
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(verticalPhotoFile);
-            verticalTestImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.close();
-
-            //fos = new FileOutputStream(verticalPhotoFile);
-            //horizontalTestImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            //fos.close();
-        } catch (IOException e){
-            if (fos != null) {
-                try { fos.close(); }
-                catch (IOException n){
-                    Log.d(TAG, "Error copying drawable into temp file");
-                }
-            }
-        }
-        */
-
-        // create the test entries
-        long timestamp = System.currentTimeMillis();
-        verticalTestProject =
-                new ProjectEntry("testProject",
-                        verticalPhotoFile.getAbsolutePath(),
-                        0,
-                        0,
-                        timestamp);
-        long projectId = mDb.projectDao().insertProject(verticalTestProject);
-
-        verticalTestProject.setId(projectId);
-
-        /*
-        horizontalTestProject =
-                new ProjectEntry("horizontal test",
-                        horizontalPhotoFile.getAbsolutePath(),
-                        0,
-                        0,
-                        timestamp);
-        horizontalTestPhoto =
-                new PhotoEntry(horizontalTestProject.getId(),
-                        horizontalPhotoFile.getAbsolutePath(),
-                        timestamp);
-        */
-        File finalFile = null;
-        try {
-            finalFile = FileUtils.createFinalFileFromTemp(mContext, verticalPhotoFile.getAbsolutePath(), verticalTestProject, timestamp);
-        } catch (IOException e){
-            Log.d(TAG, e.getMessage());
-        }
-
-        verticalTestPhoto =
-                new PhotoEntry(projectId,
-                        finalFile.getAbsolutePath(),
-                        timestamp);
-
-        verticalTestProject.setThumbnail_url(finalFile.getAbsolutePath());
-
-        // insert the test entries
-        mDb.projectDao().updateProject(verticalTestProject);
-        mDb.photoDao().insertPhoto(verticalTestPhoto);
-        //mDb.projectDao().insertProject(horizontalTestProject);
-        //mDb.photoDao().insertPhoto(horizontalTestPhoto);
     }
 
-    @Test
-    public void endToEndTest(){
-        // Click on FAB to add a new project
-        //onView(withId(R.id.add_project_FAB)).perform(click());
+    private Activity getActivityInstance(){
+        final Activity[] currentActivity = {null};
 
-        // Enter a project name
-        //onView(withId(R.id.project_name_edit_text)).perform(replaceText("testProject"));
+        getInstrumentation().runOnMainSync(() -> {
+            Collection<Activity> resumedActivity = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
+            Iterator<Activity> it = resumedActivity.iterator();
+            currentActivity[0] = it.next();
+        });
 
-        //TODO Simulate camera intent here
-
-        // Submit the new project
-        //onView(withId(R.id.submit_new_project_fab)).perform(click());
-
-        //List<ProjectEntry> projects = mMainActivityTestRule.getActivity().getmProjects();
-        //int lastPosition = projects.size()-1;
-        // Click project recycler view
-        onView(withId(R.id.projects_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
-
-        //try {
-        //    Thread.sleep(2000);
-        //} catch (InterruptedException i){
-        //    Log.d(TAG, "interrupted exception");
-        //}
-        // Test details activity stuff here
-
-        // Click add photo fab
-        //onView(withId(R.id.add_photo_fab)).perform(click());
-
+        return currentActivity[0];
     }
-
-    @After
-    public void cleanUp(){
-        FileUtils.deleteTempFiles(mContext);
-        FileUtils.deleteProject(mContext, verticalTestProject);
-
-        if (horizontalTestProject != null)
-            mDb.projectDao().deleteProject(horizontalTestProject);
-
-        if (verticalTestProject != null)
-            mDb.projectDao().deleteProject(verticalTestProject);
-
-        if (verticalTestPhoto != null)
-            mDb.photoDao().deletePhoto(verticalTestPhoto);
-
-        if (horizontalTestPhoto != null)
-            mDb.photoDao().deletePhoto(horizontalTestPhoto);
-    }
-    
 }
