@@ -71,7 +71,7 @@ public class EndToEndTest {
         onView(withId(R.id.add_project_FAB)).perform(click());
 
         // Enter a project name
-        onView(withId(R.id.project_name_edit_text)).perform(replaceText("testProject"));
+        onView(withId(R.id.project_name_edit_text)).perform(replaceText("verticalTestProject"));
 
         // Create a test photo file
         File temp = null;
@@ -91,7 +91,29 @@ public class EndToEndTest {
         // Submit the new project
         onView(withId(R.id.submit_new_project_fab)).perform(click());
 
-        // Click the new project
+        /* Submit a second project*/
+        onView(withId(R.id.add_project_FAB)).perform(click());
+
+        // Enter a project name
+        onView(withId(R.id.project_name_edit_text)).perform(replaceText("horizontalTestProject"));
+
+        // Create a test photo file
+        temp = null;
+        try {temp = FileUtils.createTemporaryImageFile(mContext);}
+        catch (IOException e){
+            Log.d(TAG, "temp file creation failed");
+        }
+        // Assert the file was created then copy test image to it
+        Assert.assertNotNull(temp);
+        writeDrawableToTempFile(temp, R.drawable.htest);
+
+        currentActivity=getActivityInstance();
+        ((NewProjectActivity)currentActivity).setmTemporaryPhotoPath(temp.getAbsolutePath());
+
+        // Submit the new project
+        onView(withId(R.id.submit_new_project_fab)).perform(click());
+
+        // Click the first project
         // Assumes project list is empty
         onView(withId(R.id.projects_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
@@ -116,9 +138,8 @@ public class EndToEndTest {
         intending(anyIntent()).respondWith(result);
 
         onView(withId(R.id.take_photo_fab)).perform(click());
-        writeDrawableToTempFile(h, R.drawable.htest);
+        writeDrawableToTempFile(h, R.drawable.vtest);
         ((AddPhotoActivity)currentActivity).setmTemporaryPhotoPath(h.getAbsolutePath());
-
 
         //intended(anyIntent());
         //try {Thread.sleep(3000);} catch(InterruptedException e){
@@ -128,7 +149,20 @@ public class EndToEndTest {
         // Submit the temporary photo
         onView(withId(R.id.submit_photo_fab)).perform(click());
 
-        onView(withId(R.id.details_recyclerview)).perform(RecyclerViewActions.actionOnItemAtPosition(1, click()));
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+
+        onView(withText(R.string.delete_project)).perform(click());
+
+        onView(withText(android.R.string.yes))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))
+                .perform(click());
+        onView(withText(android.R.string.yes))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        onView(withId(R.id.projects_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
