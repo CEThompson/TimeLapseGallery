@@ -198,6 +198,7 @@ public class EndToEndTest {
     @After
     public void cleanUp(){
         FileUtils.deleteTempFiles(mContext);
+        FileUtils.deleteProject(mContext, verticalTestProject);
 
         if (horizontalTestProject != null)
             mDb.projectDao().deleteProject(horizontalTestProject);
