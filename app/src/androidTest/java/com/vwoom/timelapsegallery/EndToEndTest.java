@@ -180,7 +180,6 @@ public class EndToEndTest {
         //List<ProjectEntry> projects = mMainActivityTestRule.getActivity().getmProjects();
         //int lastPosition = projects.size()-1;
         // Click project recycler view
-        try {Thread.sleep(2000);} catch (InterruptedException e){Log.d(TAG, e.getMessage());}
         onView(withId(R.id.projects_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
         //try {
