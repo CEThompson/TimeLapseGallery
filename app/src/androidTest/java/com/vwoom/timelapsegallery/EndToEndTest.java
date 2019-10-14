@@ -92,6 +92,7 @@ public class EndToEndTest {
         onView(withId(R.id.submit_new_project_fab)).perform(click());
 
         /* Submit a second project*/
+        /*
         onView(withId(R.id.add_project_FAB)).perform(click());
 
         // Enter a project name
@@ -112,7 +113,7 @@ public class EndToEndTest {
 
         // Submit the new project
         onView(withId(R.id.submit_new_project_fab)).perform(click());
-
+        */
         // Click the first project
         // Assumes project list is empty
         onView(withId(R.id.projects_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
@@ -162,6 +163,7 @@ public class EndToEndTest {
                 .check(matches(isDisplayed()))
                 .perform(click());
 
+        /*
         onView(withId(R.id.projects_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
@@ -180,6 +182,7 @@ public class EndToEndTest {
         try {onView(withText(R.string.welcome)).perform(click());}
         catch (NoMatchingViewException e){
         }
+        */
 
     }
 
