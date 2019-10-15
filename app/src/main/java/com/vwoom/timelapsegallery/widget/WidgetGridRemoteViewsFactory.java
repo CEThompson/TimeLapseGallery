@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -74,7 +75,8 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
             Integer bitmapOrientation = PhotoUtils.getOrientationFromImagePath(currentProject.getThumbnail_url());
             bitmap = PhotoUtils.rotateBitmap(bitmap, bitmapOrientation);
         } catch (IOException e){
-            // TODO (update) log orientation error
+            if (e.getMessage()!=null)
+                Log.e(TAG, e.getMessage());
         }
 
         // Set the view strings
