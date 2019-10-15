@@ -54,15 +54,12 @@
     </PreferenceCategory>
 
     <!-- File sync -->
-    <!--
     <PreferenceCategory app:title="@string/sync_header">
-
         <Preference
             app:key="@string/key_sync"
             app:title="@string/sync_title"
-            app:summary=""/>
+            app:summary="@string/sync_summary"/>
 
     </PreferenceCategory>
-    -->
 
 </androidx.preference.PreferenceScreen>

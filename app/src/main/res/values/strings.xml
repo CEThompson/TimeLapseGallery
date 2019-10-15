@@ -134,9 +134,15 @@
     <string name="playback_header">Playback</string>
     <string name="playback_interval_title">Playback interval (ms)</string>
 
+    <!-- Sync -->
+    <string name="sync_header">Database synchronization</string>
+    <string name="sync_title">Sync database to files</string>
+    <string name="sync_summary">Use this function to synchronize manually modified files with the database.</string>
+
     <!-- Keys -->
     <string name="key_notifications_enabled" translatable="false">notifications_enabled</string>
     <string name="key_notification_time" translatable="false">notification_time</string>
     <string name="key_playback_interval" translatable="false">playback_interval</string>
+    <string name="key_sync" translatable="false">sync</string>
 
 </resources>

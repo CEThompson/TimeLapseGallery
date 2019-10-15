@@ -8,15 +8,9 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.app.ActivityOptions;
 import android.app.SharedElementCallback;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.Settings;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.util.Log;
@@ -31,22 +25,14 @@ import android.widget.TextView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.adapters.ProjectsAdapter;
-import com.vwoom.timelapsegallery.database.AppExecutors;
-import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
-import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.ProjectUtils;
-import com.vwoom.timelapsegallery.utils.TimeUtils;
 import com.vwoom.timelapsegallery.viewmodels.MainActivityViewModel;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -136,9 +122,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
         prepareSharedElementTransition();
         mFilterByToday = getIntent().getBooleanExtra(Keys.PROJECT_FILTER_BY_SCHEDULED_TODAY, false);
-
-        /* TODO: (update) implement import projects */
-        //importProjects();
 
         // Set up the view model
         setupViewModel();
@@ -272,101 +255,5 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
                 .inflateTransition(R.transition.image_shared_element_transition);
         getWindow().setSharedElementExitTransition(transition);
         setExitSharedElementCallback(mCallback);
-    }
-
-    /* Helper to scan through folders and import projects */
-    private void importProjects(){
-        Log.d(TAG, "Importing projects");
-        AppExecutors.getInstance().diskIO().execute(()->{
-            TimeLapseDatabase db = TimeLapseDatabase.getInstance(this);
-
-            File storageDir = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            if (storageDir != null) {
-                File[] files = storageDir.listFiles();
-
-                if (files != null) {
-                    for (File child : files) {
-                        String url = child.getAbsolutePath();
-                        Log.d(TAG, "importing url " + url);
-
-                        String filename = url.substring(url.lastIndexOf("/")+1);
-                        Log.d(TAG, "stripping to filename = " + filename);
-
-                        if (!filename.equals(FileUtils.TEMP_FILE_SUBDIRECTORY)) {
-                            String id = filename.substring(0, filename.lastIndexOf("_"));
-                            Log.d(TAG, "stripping to project id = " + id);
-                            String projectName = filename.substring(filename.lastIndexOf("_") + 1);
-                            Log.d(TAG, "stripping to project name = " + projectName);
-                            File projectDir = new File(storageDir, filename);
-                            File[] projectFiles = projectDir.listFiles();
-
-                            if (projectFiles != null) {
-                                String firstPhotoPath = projectFiles[0].getAbsolutePath();
-                                String lastPhotoPath = projectFiles[projectFiles.length-1].getAbsolutePath();
-
-                                String lastPhotoRelPath = lastPhotoPath.substring(lastPhotoPath.lastIndexOf("/")+1);
-                                long lastPhotoTimeStamp = Long.valueOf(lastPhotoRelPath.replaceFirst("[.][^.]+$",""));
-                                String firstPhotoRelPath = firstPhotoPath.substring(firstPhotoPath.lastIndexOf("/")+1);
-                                long firstPhotoTimestamp = Long.valueOf(firstPhotoRelPath.replaceFirst("[.][^.]+$",""));
-
-                                Log.d(TAG, "first photo path = " + firstPhotoPath);
-                                Log.d(TAG, "last photo path = " + lastPhotoPath);
-
-                                Log.d(TAG, "inserting project = " + projectName);
-                                ProjectEntry currentProject
-                                        = new ProjectEntry(
-                                                Long.valueOf(id),
-                                        projectName,
-                                        firstPhotoPath,
-                                        TimeUtils.SCHEDULE_NONE,
-                                        lastPhotoTimeStamp,
-                                        firstPhotoTimestamp);
-
-                                db.projectDao().insertProject(currentProject);
-
-                                /* import the photos for the project */
-                                importProjectPhotos(db, currentProject);
-                            }
-                        }
-                    }
-                }
-            }
-
-        });
-    }
-
-    /* Finds all photos in the project directory and adds any missing photos to the database */
-    public void importProjectPhotos(TimeLapseDatabase db, ProjectEntry currentProject){
-
-            Log.d(TAG, "syncing files");
-            // Create a list of all photos in the project directory
-            List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(this, currentProject);
-
-            // Create empty list of photos to add
-            List<PhotoEntry> photosMissingInDb = new ArrayList<>();
-
-            // Generate a list of photos missing from the database
-            if (allPhotosInFolder != null) {
-                Log.d(TAG, "checking photos in folder");
-                // Loop through all photos in folder
-                for (PhotoEntry photo : allPhotosInFolder) {
-
-                    long currentTimestamp = photo.getTimestamp();
-                    Log.d(TAG, "checking timestamp " + currentTimestamp);
-                    PhotoEntry dbPhoto = db.photoDao().loadPhotoByTimestamp(currentTimestamp, currentProject.getId());
-
-                    Log.d(TAG, "dbPhoto is null = " + (dbPhoto == null));
-                    if (dbPhoto == null) photosMissingInDb.add(photo);
-                }
-            }
-
-            if (photosMissingInDb.size() == 0) return;
-
-            Log.d(TAG, "photos missing from dabatase is " + photosMissingInDb.toString());
-            Log.d(TAG, "adding the missing photos");
-            // Add the missing photos to the database
-            for (PhotoEntry photo: photosMissingInDb){
-                db.photoDao().insertPhoto(photo);
-            }
     }
 }
