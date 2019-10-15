@@ -29,6 +29,9 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
+/*
+* This test should check appropriate display of images, portrait vs landscape etc.
+*/
 @LargeTest
 public class DetailsActivityTest {
 
@@ -157,10 +160,8 @@ public class DetailsActivityTest {
 
     @Test
     public void detailsTest(){
-
         onView(withId(R.id.projects_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         onView(withId(R.id.add_photo_fab)).perform(click());
-
     }
 
     @After
