@@ -100,6 +100,7 @@ public class EndToEndTest {
         }
         // Assert the file was created then copy test image to it
         Assert.assertNotNull(h);
+        writeDrawableToTempFile(h, R.drawable.htest);
 
         // Set up intent stub for clicking on take photo fab
         Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(Activity.RESULT_OK, null);
@@ -110,7 +111,6 @@ public class EndToEndTest {
 
         // Overwrite the temporary photo path
         // Note that in test the UI will not display the photo but the path should work for test submission
-        writeDrawableToTempFile(h, R.drawable.htest);
         ((AddPhotoActivity)currentActivity).setmTemporaryPhotoPath(h.getAbsolutePath());
 
         // Submit the photo
