@@ -47,11 +47,14 @@ public class ProjectUtils {
         AppExecutors.getInstance().diskIO().execute(()->{
             TimeLapseDatabase db = TimeLapseDatabase.getInstance(context);
 
+            List<ProjectEntry> projects = db.projectDao().
+
             File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
             if (storageDir != null) {
                 File[] files = storageDir.listFiles();
 
                 if (files != null) {
+                    // For each file generate a project
                     for (File child : files) {
                         String url = child.getAbsolutePath();
                         Log.d(TAG, "importing url " + url);
@@ -59,42 +62,53 @@ public class ProjectUtils {
                         String filename = url.substring(url.lastIndexOf("/")+1);
                         Log.d(TAG, "stripping to filename = " + filename);
 
-                        if (!filename.equals(FileUtils.TEMP_FILE_SUBDIRECTORY)) {
-                            String id = filename.substring(0, filename.lastIndexOf("_"));
-                            Log.d(TAG, "stripping to project id = " + id);
-                            String projectName = filename.substring(filename.lastIndexOf("_") + 1);
-                            Log.d(TAG, "stripping to project name = " + projectName);
-                            File projectDir = new File(storageDir, filename);
-                            File[] projectFiles = projectDir.listFiles();
+                        // Skip Temporary Images
+                        if (filename.equals(FileUtils.TEMP_FILE_SUBDIRECTORY))continue;
 
-                            if (projectFiles != null) {
-                                String firstPhotoPath = projectFiles[0].getAbsolutePath();
-                                String lastPhotoPath = projectFiles[projectFiles.length-1].getAbsolutePath();
+                        // Determine ID of project
+                        String id = filename.substring(0, filename.lastIndexOf("_"));
+                        Log.d(TAG, "stripping to project id = " + id);
 
-                                String lastPhotoRelPath = lastPhotoPath.substring(lastPhotoPath.lastIndexOf("/")+1);
-                                long lastPhotoTimeStamp = Long.valueOf(lastPhotoRelPath.replaceFirst("[.][^.]+$",""));
-                                String firstPhotoRelPath = firstPhotoPath.substring(firstPhotoPath.lastIndexOf("/")+1);
-                                long firstPhotoTimestamp = Long.valueOf(firstPhotoRelPath.replaceFirst("[.][^.]+$",""));
+                        // Determine name of project
+                        String projectName = filename.substring(filename.lastIndexOf("_") + 1);
+                        Log.d(TAG, "stripping to project name = " + projectName);
 
-                                Log.d(TAG, "first photo path = " + firstPhotoPath);
-                                Log.d(TAG, "last photo path = " + lastPhotoPath);
+                        // Get the files within the directory
+                        File projectDir = new File(storageDir, filename);
+                        File[] projectFiles = projectDir.listFiles();
 
-                                Log.d(TAG, "inserting project = " + projectName);
-                                ProjectEntry currentProject
-                                        = new ProjectEntry(
-                                        Long.valueOf(id),
-                                        projectName,
-                                        firstPhotoPath,
-                                        TimeUtils.SCHEDULE_NONE,
-                                        lastPhotoTimeStamp,
-                                        firstPhotoTimestamp);
+                        if (projectFiles != null) {
+                            // Get first and last photo
+                            String firstPhotoPath = projectFiles[0].getAbsolutePath();
+                            String lastPhotoPath = projectFiles[projectFiles.length-1].getAbsolutePath();
 
-                                db.projectDao().insertProject(currentProject);
+                            String lastPhotoRelPath = lastPhotoPath.substring(lastPhotoPath.lastIndexOf("/")+1);
+                            long lastPhotoTimeStamp = Long.valueOf(lastPhotoRelPath.replaceFirst("[.][^.]+$",""));
+                            String firstPhotoRelPath = firstPhotoPath.substring(firstPhotoPath.lastIndexOf("/")+1);
+                            long firstPhotoTimestamp = Long.valueOf(firstPhotoRelPath.replaceFirst("[.][^.]+$",""));
 
-                                /* import the photos for the project */
-                                importProjectPhotos(db, currentProject, context);
-                            }
+                            Log.d(TAG, "first photo path = " + firstPhotoPath);
+                            Log.d(TAG, "last photo path = " + lastPhotoPath);
+
+                            Log.d(TAG, "inserting project = " + projectName);
+
+                            // Create the project entry
+                            ProjectEntry currentProject
+                                    = new ProjectEntry(
+                                    Long.valueOf(id),
+                                    projectName,
+                                    firstPhotoPath,
+                                    TimeUtils.SCHEDULE_NONE,
+                                    lastPhotoTimeStamp,
+                                    firstPhotoTimestamp);
+
+                            // Insert the project - this updates on conflict
+                            db.projectDao().insertProject(currentProject);
+
+                            /* import the photos for the project */
+                            importProjectPhotos(db, currentProject, context);
                         }
+
                     }
                 }
             }
@@ -110,30 +124,16 @@ public class ProjectUtils {
         List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(context, currentProject);
 
         // Create empty list of photos to add
-        List<PhotoEntry> photosMissingInDb = new ArrayList<>();
+        List<PhotoEntry> photosInDb = db.photoDao().loadAllPhotosByProjectId_NonLiveData(currentProject.getId());
 
-        // Generate a list of photos missing from the database
-        if (allPhotosInFolder != null) {
-            Log.d(TAG, "checking photos in folder");
-            // Loop through all photos in folder
-            for (PhotoEntry photo : allPhotosInFolder) {
-
-                long currentTimestamp = photo.getTimestamp();
-                Log.d(TAG, "checking timestamp " + currentTimestamp);
-                PhotoEntry dbPhoto = db.photoDao().loadPhotoByTimestamp(currentTimestamp, currentProject.getId());
-
-                Log.d(TAG, "dbPhoto is null = " + (dbPhoto == null));
-                if (dbPhoto == null) photosMissingInDb.add(photo);
-            }
+        // Delete the old entries
+        for (PhotoEntry photo: photosInDb){
+            db.photoDao().deletePhoto(photo);
         }
 
-        if (photosMissingInDb.size() == 0) return;
-
-        Log.d(TAG, "photos missing from dabatase is " + photosMissingInDb.toString());
-        Log.d(TAG, "adding the missing photos");
-        // Add the missing photos to the database
-        for (PhotoEntry photo: photosMissingInDb){
-            db.photoDao().insertPhoto(photo);
+        // Insert the new entries
+        for (PhotoEntry newEntry: allPhotosInFolder){
+            db.photoDao().insertPhoto(newEntry);
         }
     }
 
