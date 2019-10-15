@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.util.Log;
 
 import androidx.exifinterface.media.ExifInterface;
 
@@ -90,8 +91,8 @@ public final class PhotoUtils {
             return bmRotated;
         }
         catch (OutOfMemoryError e) {
-            // TODO (update) display error with toast
-            // TODO (update) Log with crashlytics
+            if(e.getMessage()!=null)
+                Log.e(TAG, e.getMessage());
             return null;
         }
     }
