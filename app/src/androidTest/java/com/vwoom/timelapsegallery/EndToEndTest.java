@@ -110,7 +110,7 @@ public class EndToEndTest {
 
         // Overwrite the temporary photo path
         // Note that in test the UI will not display the photo but the path should work for test submission
-        writeDrawableToTempFile(h, R.drawable.vtest);
+        writeDrawableToTempFile(h, R.drawable.htest);
         ((AddPhotoActivity)currentActivity).setmTemporaryPhotoPath(h.getAbsolutePath());
 
         // Submit the photo
