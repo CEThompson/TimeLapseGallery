@@ -30,7 +30,6 @@ class SettingsActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-            // TODO (update) implement project import button here
             val syncPref: Preference? =  findPreference(getString(R.string.key_sync))
 
             // Listen for changes to shared preferences and update notification worker on change
@@ -45,6 +44,7 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
 
+            // TODO debug and streamline file / database sync
             syncPref?.setOnPreferenceClickListener{
                 Log.d("settings activity", "Importing projects")
                 ProjectUtils.importProjects(context)
