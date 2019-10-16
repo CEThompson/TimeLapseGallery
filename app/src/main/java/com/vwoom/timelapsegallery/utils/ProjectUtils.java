@@ -109,7 +109,7 @@ public class ProjectUtils {
     }
 
     /* Finds all photos in the project directory and adds any missing photos to the database */
-    public static void importProjectPhotos(TimeLapseDatabase db, ProjectEntry currentProject, Context context){
+    private static void importProjectPhotos(TimeLapseDatabase db, ProjectEntry currentProject, Context context){
 
         Log.d(TAG, "Importing photos for project");
         // Create a list of all photos in the project directory

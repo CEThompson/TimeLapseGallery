@@ -55,8 +55,16 @@
 
     <!-- File sync -->
     <PreferenceCategory app:title="@string/sync_header">
+        <SwitchPreferenceCompat
+            app:key="@string/key_sync_allowed"
+            app:title="@string/sync_allowed_title"
+            app:summary="@string/sync_allowed_summary"
+            app:defaultValue="false"
+            />
+
         <Preference
             app:key="@string/key_sync"
+            app:dependency="@string/key_sync_allowed"
             app:title="@string/sync_title"
             app:summary="@string/sync_summary"/>
 
