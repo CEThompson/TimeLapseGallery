@@ -12,7 +12,6 @@ import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ProjectUtils {
