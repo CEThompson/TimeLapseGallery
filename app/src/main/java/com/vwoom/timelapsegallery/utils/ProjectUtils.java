@@ -83,17 +83,6 @@ public class ProjectUtils {
                         File[] projectFiles = projectDir.listFiles();
 
                         if (projectFiles != null) {
-                            Log.d(TAG, "projectFiles are " + Arrays.toString(projectFiles));
-                            // Get first and last photo
-                            String firstPhotoPath = projectFiles[0].getAbsolutePath();
-                            String lastPhotoPath = projectFiles[projectFiles.length-1].getAbsolutePath();
-                            String lastPhotoRelPath = lastPhotoPath.substring(lastPhotoPath.lastIndexOf("/")+1);
-                            long lastPhotoTimeStamp = Long.valueOf(lastPhotoRelPath.replaceFirst("[.][^.]+$",""));
-                            String firstPhotoRelPath = firstPhotoPath.substring(firstPhotoPath.lastIndexOf("/")+1);
-                            long firstPhotoTimestamp = Long.valueOf(firstPhotoRelPath.replaceFirst("[.][^.]+$",""));
-
-                            Log.d(TAG, "first photo path = " + firstPhotoPath);
-                            Log.d(TAG, "last photo path = " + lastPhotoPath);
                             Log.d(TAG, "inserting project = " + projectName);
 
                             // Create the project entry
@@ -101,10 +90,10 @@ public class ProjectUtils {
                                     = new ProjectEntry(
                                     Long.valueOf(id),
                                     projectName,
-                                    firstPhotoPath,
+                                    projectFiles[0].getAbsolutePath(),
                                     TimeUtils.SCHEDULE_NONE,
-                                    lastPhotoTimeStamp,
-                                    firstPhotoTimestamp);
+                                    0,
+                                    0);
 
                             // Insert the project - this updates on conflict
                             db.projectDao().insertProject(currentProject);
@@ -127,12 +116,25 @@ public class ProjectUtils {
         // Create a list of all photos in the project directory
         List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(context, currentProject);
 
+        // Insert the photos from the file structure
         if (allPhotosInFolder!=null) {
             // Insert the new entries
             for (PhotoEntry newEntry : allPhotosInFolder) {
                 db.photoDao().insertPhoto(newEntry);
             }
         }
+
+        // Get the resulting list
+        List<PhotoEntry> result = db.photoDao().loadAllPhotosByProjectId_NonLiveData(currentProject.getId());
+
+        // Update the project entry with information from first and last photo in set
+        PhotoEntry first = result.get(0);
+        PhotoEntry last = result.get(result.size()-1);
+        currentProject.setThumbnail_url(last.getUrl());
+        currentProject.setSchedule_next_submission(last.getTimestamp());
+        currentProject.setTimestamp(first.getTimestamp());
+        db.projectDao().updateProject(currentProject);
+
     }
 
 }
