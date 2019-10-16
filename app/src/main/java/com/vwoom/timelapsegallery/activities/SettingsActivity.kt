@@ -44,7 +44,7 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
 
-            // TODO debug and streamline file / database sync
+            // TODO test file / database sync
             // TODO create dialog verification for importing projects
             syncPref?.setOnPreferenceClickListener{
                 Log.d("settings activity", "Importing projects")
