@@ -53,6 +53,7 @@
 
     </PreferenceCategory>
 
+    <!-- TODO before launch: lock down preference string and wording -->
     <!-- File sync -->
     <PreferenceCategory app:title="@string/sync_header">
         <SwitchPreferenceCompat
