@@ -19,7 +19,7 @@ public interface PhotoDao {
 
     @Query("SELECT * FROM photo WHERE project_id = :project_id ORDER BY timestamp")
     List<PhotoEntry> loadAllPhotosByProjectId_NonLiveData(long project_id);
-    
+
     @Insert
     void insertPhoto(PhotoEntry photoEntry);
 
