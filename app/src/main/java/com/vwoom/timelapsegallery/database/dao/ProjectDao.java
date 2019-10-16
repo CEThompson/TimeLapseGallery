@@ -36,4 +36,6 @@ public interface ProjectDao {
     @Delete
     void deleteProject(ProjectEntry projectEntry);
 
+    @Query("DELETE FROM project")
+    void deleteAllProjects();
 }

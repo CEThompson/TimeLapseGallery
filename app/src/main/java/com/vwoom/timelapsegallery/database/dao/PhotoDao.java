@@ -17,13 +17,9 @@ public interface PhotoDao {
     @Query("SELECT * FROM photo WHERE project_id = :project_id ORDER BY timestamp")
     LiveData<List<PhotoEntry>> loadAllPhotosByProjectId(long project_id);
 
-
     @Query("SELECT * FROM photo WHERE project_id = :project_id ORDER BY timestamp")
     List<PhotoEntry> loadAllPhotosByProjectId_NonLiveData(long project_id);
-
-    @Query("SELECT * FROM photo WHERE project_id = :project_id AND timestamp = :timestamp")
-    PhotoEntry loadPhotoByTimestamp(long timestamp, long project_id);
-
+    
     @Insert
     void insertPhoto(PhotoEntry photoEntry);
 
@@ -33,4 +29,6 @@ public interface PhotoDao {
     @Delete
     void deletePhoto(PhotoEntry photoEntry);
 
+    @Query("DELETE FROM photo")
+    void deleteAllPhotos();
 }
