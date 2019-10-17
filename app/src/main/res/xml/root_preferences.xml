@@ -53,7 +53,6 @@
 
     </PreferenceCategory>
 
-    <!-- TODO before launch: lock down preference string and wording -->
     <!-- File sync -->
     <PreferenceCategory app:title="@string/sync_header">
         <SwitchPreferenceCompat
@@ -61,7 +60,6 @@
             app:title="@string/sync_allowed_title"
             app:summary="@string/sync_allowed_summary"
             app:defaultValue="false"
-            app:icon="@drawable/ic_warning_black_24dp"
             />
 
         <Preference

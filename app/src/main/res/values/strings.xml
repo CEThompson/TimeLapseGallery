@@ -128,7 +128,8 @@
         \n\nPhotos are organized by unix timestamp.
         \n\nPlease backup your files!
     </string>
-    <string name="database_sync_warning">Scheduling information will not be saved.</string>
+    <string name="database_sync_warning">This may cause unintended errors and scheduling information will not be saved.
+    \n\n Do you wish to proceed?</string>
     <string name="import_projects_feedback">Executing synchronization in background</string>
 
     <string name="ok">OK</string>
@@ -148,16 +149,16 @@
     <string name="playback_header">Playback</string>
     <string name="playback_interval_title">Playback interval</string>
 
-    <!-- Manual Database Synchronization -->
-    <string name="sync_header">Manual Database sync</string>
+    <!-- Database Synchronization -->
+    <string name="sync_header">Database Sync</string>
 
     <!-- Manual sync enabled -->
-    <string name="sync_allowed_title">Enable manual database syncing</string>
-    <string name="sync_allowed_summary">Enables syncing of the database to any manual modifications you have made to your files</string>
+    <string name="sync_allowed_title">Enable manual syncing</string>
+    <string name="sync_allowed_summary">Allow synchronization with manual file modifications</string>
 
     <!-- Manual sync -->
     <string name="sync_title">Sync database to files</string>
-    <string name="sync_summary">Deletes previous database references and repopulates the database from your project files</string>
+    <string name="sync_summary">Synchronizes application data to manually modified files</string>
 
     <!-- Preference Keys -->
     <string name="key_notifications_enabled" translatable="false">notifications_enabled</string>
