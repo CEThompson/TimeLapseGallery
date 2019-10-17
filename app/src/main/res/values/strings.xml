@@ -120,6 +120,20 @@
     <string name="new_project_analytics" translatable="false">new_project</string>
     <string name="submit_new_project_error" translatable="false">submit_new_project_error</string>
 
+    <!-- Alerts -->
+    <string name="warning">Warning!</string>
+    <string name="file_modification_information">
+        Files are located on your device at Android/data/com.vwoom.timelapsegallery/files/pictures/
+        \n\nProject folders are organized by ID and Name in the following format: {ID}_{Name}.
+        \n\nPhotos are organized by unix timestamp.
+        \n\nPlease backup your files!
+    </string>
+    <string name="database_sync_warning">Scheduling information will not be saved.</string>
+    <string name="import_projects_feedback">Executing import in background</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
     <!-- Settings -->
     <string name="title_activity_settings">Settings</string>
 
@@ -132,18 +146,18 @@
 
     <!-- Playback -->
     <string name="playback_header">Playback</string>
-    <string name="playback_interval_title">Playback interval (ms)</string>
+    <string name="playback_interval_title">Playback interval</string>
 
     <!-- Manual Database Synchronization -->
-    <string name="sync_header">Manual database synchronization</string>
+    <string name="sync_header">Manual Database sync</string>
 
     <!-- Manual sync enabled -->
     <string name="sync_allowed_title">Enable manual database syncing</string>
-    <string name="sync_allowed_summary">Enable this to manually modify your files and synchronize to the database</string>
+    <string name="sync_allowed_summary">Enables syncing of the database to any manual modifications you have made to your files</string>
 
     <!-- Manual sync -->
     <string name="sync_title">Sync database to files</string>
-    <string name="sync_summary">Use this function to synchronize manually modified files with the database.</string>
+    <string name="sync_summary">Deletes previous database references and repopulates the database from your project files</string>
 
     <!-- Preference Keys -->
     <string name="key_notifications_enabled" translatable="false">notifications_enabled</string>

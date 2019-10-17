@@ -3,6 +3,8 @@ package com.vwoom.timelapsegallery.activities
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -42,13 +44,15 @@ class SettingsActivity : AppCompatActivity() {
                 if (key.equals(this.getString(R.string.key_notification_time))) {
                     NotificationUtils.scheduleNotificationWorker(activity)
                 }
+                if (key.equals(getString(R.string.key_sync_allowed))){
+                    val isSyncAllowed = prefs.getBoolean(key, false)
+                    if (isSyncAllowed) showManualFileModificationDialog()
+                }
             }
 
             // TODO test file / database sync
-            // TODO create dialog verification for importing projects
             syncPref?.setOnPreferenceClickListener{
-                Log.d("settings activity", "Importing projects")
-                ProjectUtils.importProjects(context)
+                verifyImportProjectsDialog()
                 true
             }
         }
@@ -65,6 +69,33 @@ class SettingsActivity : AppCompatActivity() {
             (activity as SettingsActivity).prefs.unregisterOnSharedPreferenceChangeListener(
                     (activity as SettingsActivity).prefListener
             )
+        }
+
+        private fun showManualFileModificationDialog() {
+            val builder = AlertDialog.Builder(activity!!)
+                    .setTitle(R.string.warning)
+                    .setMessage(R.string.file_modification_information)
+                    .setPositiveButton(R.string.ok) { _, _ ->  }
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+
+            val dialog = builder.create()
+            dialog.show()
+        }
+
+        fun verifyImportProjectsDialog(){
+            val builder = AlertDialog.Builder(activity!!)
+                    .setTitle(R.string.warning)
+                    .setMessage(R.string.database_sync_warning)
+                    .setPositiveButton(R.string.ok) { _, _ ->
+                        Log.d("settings activity", "Importing projects")
+                        ProjectUtils.importProjects(context)
+                        Toast.makeText(activity!!, getString(R.string.import_projects_feedback), Toast.LENGTH_LONG).show()
+                    }
+                    .setNegativeButton(R.string.cancel){_,_ -> }
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+
+            val dialog = builder.create()
+            dialog.show()
         }
     }
 }
