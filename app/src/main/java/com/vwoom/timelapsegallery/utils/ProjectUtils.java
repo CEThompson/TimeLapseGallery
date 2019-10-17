@@ -47,7 +47,7 @@ public class ProjectUtils {
         AppExecutors.getInstance().diskIO().execute(()->{
             TimeLapseDatabase db = TimeLapseDatabase.getInstance(context);
 
-            // TODO first verify filestructure is OK
+            // TODO (update) validate filestructure
             // no duplicate ids or restricted characters in names
 
             // Delete all project references in the database

@@ -50,7 +50,7 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
 
-            // TODO test file / database sync
+            // TODO (update) test file / database sync
             syncPref?.setOnPreferenceClickListener{
                 verifyImportProjectsDialog()
                 true
