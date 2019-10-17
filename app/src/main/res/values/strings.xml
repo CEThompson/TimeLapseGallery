@@ -131,7 +131,8 @@
         \n\nManually modifying your file may cause unintended consequences in the application!
         \n\nPlease backup your files!
     </string>
-    <string name="database_sync_warning">This may cause unintended errors and your scheduling information will not be saved.
+    <string name="database_sync_warning">Your scheduling information will not be saved.
+        \n\nThis may cause unintended errors in the application!
     \n\n Do you still wish to proceed?</string>
     <string name="import_projects_feedback">Executing synchronization in background</string>
 
