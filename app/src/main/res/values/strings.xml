@@ -158,7 +158,7 @@
 
     <!-- Manual sync enabled -->
     <string name="sync_allowed_title">Enable manual syncing</string>
-    <string name="sync_allowed_summary">Allow synchronization with manual file modifications</string>
+    <string name="sync_allowed_summary">Allow syncing to manual file modifications</string>
 
     <!-- Manual sync -->
     <string name="sync_title">Sync database to files</string>
