@@ -129,7 +129,7 @@
         \n\nPlease backup your files!
     </string>
     <string name="database_sync_warning">Scheduling information will not be saved.</string>
-    <string name="import_projects_feedback">Executing import in background</string>
+    <string name="import_projects_feedback">Executing synchronization in background</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
