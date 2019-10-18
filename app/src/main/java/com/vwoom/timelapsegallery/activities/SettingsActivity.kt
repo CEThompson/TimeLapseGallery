@@ -1,11 +1,17 @@
 package com.vwoom.timelapsegallery.activities
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.Window
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -32,6 +38,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
+        lateinit var syncDialog: Dialog
+
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
@@ -85,15 +93,56 @@ class SettingsActivity : AppCompatActivity() {
             dialog.show()
         }
 
+        fun showSyncDialog(){
+            // Set the dialog
+            syncDialog = Dialog(activity!!)
+            syncDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            syncDialog.setCancelable(false)
+            syncDialog.setContentView(R.layout.sync_dialog)
+
+            // Set up the button
+            val button = syncDialog.findViewById(R.id.sync_verification_button) as androidx.appcompat.widget.AppCompatButton
+            button.setOnClickListener {
+                syncDialog.dismiss()
+            }
+
+            // Show the dialog
+            syncDialog.show()
+        }
+
+        fun updateSyncDialog(response: String, success: Boolean){
+            // Set the response
+            val responseView = syncDialog.findViewById(R.id.sync_response) as TextView
+            responseView.setText(response)
+
+            val progress = syncDialog.findViewById(R.id.sync_progress) as ProgressBar
+
+            /// Set the image feedback
+            val imageFeedback = syncDialog.findViewById(R.id.sync_feedback_image) as ImageView
+            if (success) {
+                imageFeedback.setImageResource(R.drawable.ic_check_green_40dp)
+                responseView.setText(getString(R.string.executing_sync_complete))
+            }
+            else imageFeedback.setImageResource(R.drawable.ic_error_red_40dp)
+
+            val button = syncDialog.findViewById(R.id.sync_verification_button) as androidx.appcompat.widget.AppCompatButton
+
+            // Show the updated views
+            progress.visibility = View.INVISIBLE
+            imageFeedback.visibility = View.VISIBLE
+            button.visibility = View.VISIBLE
+        }
+
         fun verifyImportProjectsDialog(){
+            val fragment = this
             val builder = AlertDialog.Builder(activity!!)
                     .setTitle(R.string.warning)
                     .setMessage(R.string.database_sync_warning)
                     .setPositiveButton(R.string.ok) { _, _ ->
                         Log.d("settings activity", "Importing projects")
-                        Toast.makeText(context, getString(R.string.executing_sync_notification), Toast.LENGTH_SHORT).show()
+                        showSyncDialog()
                         // Execute the sync in the background
-                        databaseSyncTask().execute(inputParams(activity!!))
+                        databaseSyncTask().execute(inputParams(activity!!, fragment))
                     }
                     .setNegativeButton(R.string.cancel){_,_ -> }
                     .setIcon(R.drawable.ic_warning_black_24dp)
@@ -101,41 +150,39 @@ class SettingsActivity : AppCompatActivity() {
             val dialog = builder.create()
             dialog.show()
         }
-    }
 
-    class databaseSyncTask : AsyncTask<inputParams, Void, outputParams>() {
-        override fun doInBackground(vararg p0: inputParams): outputParams {
-            val context = p0.get(0).activity
-            val response = ProjectUtils.validateFileStructure(context)
+        class databaseSyncTask : AsyncTask<inputParams, Void, outputParams>() {
+            override fun doInBackground(vararg p0: inputParams): outputParams {
+                val context = p0.get(0).activity
+                val fragment = p0.get(0).fragment
+                val response = ProjectUtils.validateFileStructure(context)
 
-            // If modified files are valid go ahead notify user of background work and import
-            if (response.equals(context.getString(R.string.valid_file_structure))){
-                ProjectUtils.importProjects(context)
+                // If modified files are valid go ahead notify user of background work and import
+                if (response.equals(context.getString(R.string.valid_file_structure))){
+                    ProjectUtils.importProjects(context)
+                }
+
+                return outputParams(context, fragment, response)
             }
 
-            return outputParams(context, response)
+            override fun onPreExecute() {
+                super.onPreExecute()
+
+            }
+
+            override fun onPostExecute(result: outputParams) {
+                super.onPostExecute(result)
+
+                val context = result.activity
+                val response = result.response
+                val fragment = result.fragment
+
+                val success: Boolean = response.equals(context.getString(R.string.valid_file_structure))
+                (fragment as SettingsFragment).updateSyncDialog(response, success)
+            }
         }
 
-        override fun onPreExecute() {
-            super.onPreExecute()
-        }
-
-        override fun onPostExecute(result: outputParams) {
-            super.onPostExecute(result)
-
-            val context = result.activity
-            val response = result.response
-
-            // If the file structure was valid finishing task notify the user
-            if (response.equals(context.getString(R.string.valid_file_structure)))
-                Toast.makeText(context, context.getString(R.string.executing_sync_complete), Toast.LENGTH_LONG).show()
-            // Otherwise notify the user of the error response
-            else
-                Toast.makeText(context, response, Toast.LENGTH_LONG).show()
-
-        }
+        class inputParams(val activity: Activity, val fragment: PreferenceFragmentCompat)
+        class outputParams(val activity: Activity, val fragment: PreferenceFragmentCompat, val response: String)
     }
-
-    class inputParams(val activity: Activity)
-    class outputParams(val activity: Activity, val response: String)
 }

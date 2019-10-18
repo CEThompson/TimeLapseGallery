@@ -42,6 +42,7 @@
     <string name="return_to_details_fab">Returns from adding a photo to the projects details.</string>
     <string name="submit_photo_fab_content_description">Submits the photo returned from a camera application to the project.</string>
     <string name="compare_to_previous_fab_content_description">Compares the photo returned from a camera application to the last photo taken for the project.</string>
+    <string name="sync_image_feedback_content_description">Image feedback for the result of syncing files to the database.</string>
 
     <!-- Options -->
     <string name="disable_notifications">Disable notifications</string>
