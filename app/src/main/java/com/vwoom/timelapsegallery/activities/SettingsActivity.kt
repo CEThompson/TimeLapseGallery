@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.activities
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.AsyncTask
@@ -90,9 +91,9 @@ class SettingsActivity : AppCompatActivity() {
                     .setMessage(R.string.database_sync_warning)
                     .setPositiveButton(R.string.ok) { _, _ ->
                         Log.d("settings activity", "Importing projects")
-
+                        Toast.makeText(context, getString(R.string.executing_sync_notification), Toast.LENGTH_SHORT).show()
                         // Execute the sync in the background
-                        databaseSyncTask().execute(inputParams(context!!))
+                        databaseSyncTask().execute(inputParams(activity!!))
                     }
                     .setNegativeButton(R.string.cancel){_,_ -> }
                     .setIcon(R.drawable.ic_warning_black_24dp)
@@ -104,22 +105,25 @@ class SettingsActivity : AppCompatActivity() {
 
     class databaseSyncTask : AsyncTask<inputParams, Void, outputParams>() {
         override fun doInBackground(vararg p0: inputParams): outputParams {
-            val context = p0.get(0).context
+            val context = p0.get(0).activity
             val response = ProjectUtils.validateFileStructure(context)
 
             // If modified files are valid go ahead notify user of background work and import
             if (response.equals(context.getString(R.string.valid_file_structure))){
-                Toast.makeText(context, context.getString(R.string.executing_sync_notification), Toast.LENGTH_LONG).show()
                 ProjectUtils.importProjects(context)
             }
 
             return outputParams(context, response)
         }
 
+        override fun onPreExecute() {
+            super.onPreExecute()
+        }
+
         override fun onPostExecute(result: outputParams) {
             super.onPostExecute(result)
 
-            val context = result.context
+            val context = result.activity
             val response = result.response
 
             // If the file structure was valid finishing task notify the user
@@ -132,6 +136,6 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    class inputParams(val context: Context)
-    class outputParams(val context: Context, val response: String)
+    class inputParams(val activity: Activity)
+    class outputParams(val activity: Activity, val response: String)
 }
