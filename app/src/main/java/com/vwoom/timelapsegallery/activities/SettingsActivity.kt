@@ -26,14 +26,18 @@ class SettingsActivity : AppCompatActivity() {
 
     lateinit var prefs: SharedPreferences
     lateinit var prefListener: SharedPreferences.OnSharedPreferenceChangeListener
+    lateinit var fragment: PreferenceFragmentCompat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
+        fragment = SettingsFragment()
+        fragment.retainInstance = true
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.settings, SettingsFragment())
                 .commit()
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
@@ -49,12 +53,18 @@ class SettingsActivity : AppCompatActivity() {
             (activity as SettingsActivity).prefs = PreferenceManager.getDefaultSharedPreferences(activity);
             (activity as SettingsActivity).prefListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
                 Log.d("settings activity", "Notification listener activitating for key = $key")
+
+                // If the user changes the notifications enabled preference trigger the notification worker to update any alarms
                 if (key.equals(this.getString(R.string.key_notifications_enabled))) {
                     NotificationUtils.scheduleNotificationWorker(activity);
                 }
+
+                // Same for notification time
                 if (key.equals(this.getString(R.string.key_notification_time))) {
                     NotificationUtils.scheduleNotificationWorker(activity)
                 }
+
+                // If the user enables manual file syncing give some info
                 if (key.equals(getString(R.string.key_sync_allowed))){
                     val isSyncAllowed = prefs.getBoolean(key, false)
                     if (isSyncAllowed) showManualFileModificationDialog()
@@ -62,6 +72,7 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             // TODO (update) test file / database sync
+            // Verify the user wants to sync files to the database
             syncPref?.setOnPreferenceClickListener{
                 verifyImportProjectsDialog()
                 true
@@ -82,6 +93,8 @@ class SettingsActivity : AppCompatActivity() {
             )
         }
 
+
+        // Shows dialog that gives info on manual file modification
         private fun showManualFileModificationDialog() {
             val builder = AlertDialog.Builder(activity!!)
                     .setTitle(R.string.warning)
@@ -93,6 +106,7 @@ class SettingsActivity : AppCompatActivity() {
             dialog.show()
         }
 
+        // Shows a dialog to give progress feedback on synchronization
         fun showSyncDialog(){
             // Set the dialog
             syncDialog = Dialog(activity!!)
@@ -110,6 +124,7 @@ class SettingsActivity : AppCompatActivity() {
             syncDialog.show()
         }
 
+        // Updates the dialog showing progress on synchronization
         fun updateSyncDialog(response: String, success: Boolean){
             // Set the response
             val responseView = syncDialog.findViewById(R.id.sync_response) as TextView
@@ -133,6 +148,7 @@ class SettingsActivity : AppCompatActivity() {
             button.visibility = View.VISIBLE
         }
 
+        // Verifies the user wishes to sync files to the database
         fun verifyImportProjectsDialog(){
             val fragment = this
             val builder = AlertDialog.Builder(activity!!)
@@ -151,7 +167,10 @@ class SettingsActivity : AppCompatActivity() {
             dialog.show()
         }
 
+        // This async task validates the files are in correct format then synchronizes to the database
         class databaseSyncTask : AsyncTask<inputParams, Void, outputParams>() {
+
+            // Do in background validates then executes import
             override fun doInBackground(vararg p0: inputParams): outputParams {
                 val context = p0.get(0).activity
                 val fragment = p0.get(0).fragment
@@ -165,11 +184,7 @@ class SettingsActivity : AppCompatActivity() {
                 return outputParams(context, fragment, response)
             }
 
-            override fun onPreExecute() {
-                super.onPreExecute()
-
-            }
-
+            // On post execute updates sync dialog
             override fun onPostExecute(result: outputParams) {
                 super.onPostExecute(result)
 
@@ -182,6 +197,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+        // These classes used for passing references through the async task
         class inputParams(val activity: Activity, val fragment: PreferenceFragmentCompat)
         class outputParams(val activity: Activity, val fragment: PreferenceFragmentCompat, val response: String)
     }
