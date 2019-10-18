@@ -1,6 +1,8 @@
 package com.vwoom.timelapsegallery.activities
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -88,14 +90,9 @@ class SettingsActivity : AppCompatActivity() {
                     .setMessage(R.string.database_sync_warning)
                     .setPositiveButton(R.string.ok) { _, _ ->
                         Log.d("settings activity", "Importing projects")
-                        val fileStructureIsValid = ProjectUtils.validateFileStructure(context)
 
-                        if (fileStructureIsValid) {
-                            ProjectUtils.importProjects(context)
-                            Toast.makeText(activity!!, getString(R.string.import_projects_feedback), Toast.LENGTH_LONG).show()
-                        } else {
-                            Toast.makeText(activity!!, getString(R.string.invalid_files), Toast.LENGTH_LONG).show()
-                        }
+                        // Execute the sync in the background
+                        databaseSyncTask().execute(inputParams(context!!))
                     }
                     .setNegativeButton(R.string.cancel){_,_ -> }
                     .setIcon(android.R.drawable.ic_dialog_alert)
@@ -104,4 +101,37 @@ class SettingsActivity : AppCompatActivity() {
             dialog.show()
         }
     }
+
+    class databaseSyncTask : AsyncTask<inputParams, Void, outputParams>() {
+        override fun doInBackground(vararg p0: inputParams): outputParams {
+            val context = p0.get(0).context
+            val response = ProjectUtils.validateFileStructure(context)
+
+            // If modified files are valid go ahead notify user of background work and import
+            if (response.equals(context.getString(R.string.valid_file_structure))){
+                Toast.makeText(context, context.getString(R.string.executing_sync_notification), Toast.LENGTH_LONG).show()
+                ProjectUtils.importProjects(context)
+            }
+
+            return outputParams(context, response)
+        }
+
+        override fun onPostExecute(result: outputParams) {
+            super.onPostExecute(result)
+
+            val context = result.context
+            val response = result.response
+
+            // If the file structure was valid finishing task notify the user
+            if (response.equals(context.getString(R.string.valid_file_structure)))
+                Toast.makeText(context, context.getString(R.string.executing_sync_complete), Toast.LENGTH_LONG).show()
+            // Otherwise notify the user of the error response
+            else
+                Toast.makeText(context, response, Toast.LENGTH_LONG).show()
+
+        }
+    }
+
+    class inputParams(val context: Context)
+    class outputParams(val context: Context, val response: String)
 }

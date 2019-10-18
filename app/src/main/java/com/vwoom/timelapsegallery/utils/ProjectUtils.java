@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.database.AppExecutors;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
@@ -41,13 +42,13 @@ public class ProjectUtils {
         return projectsForToday;
     }
 
-    public static boolean validateFileStructure(Context context){
+    public static String validateFileStructure(Context context){
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        if (storageDir==null) return false;
+        if (storageDir==null) return context.getString(R.string.no_files_error);
 
         File[] files = storageDir.listFiles();
 
-        if (files == null) return false;
+        if (files == null) return context.getString(R.string.no_files_in_directory_error, storageDir.getAbsolutePath());
 
         HashSet<Long> projectIds = new HashSet<>();
 
@@ -65,17 +66,24 @@ public class ProjectUtils {
 
             /* Ensure ids are unique */
             Long longId = Long.valueOf(id);
-            if (projectIds.contains(longId)) return false;
+            if (projectIds.contains(longId))
+                return context.getString(R.string.duplicate_id_error, projectFilename);
             else projectIds.add(longId);
 
-            /* TODO ensure ids are in sequential order? 1 - n? */
+            /* Ensure no gaps in IDs */
+            int size = projectIds.size();
+            for (long i = 0; i < size; i++){
+                if (!projectIds.contains(i+1))
+                    return context.getString(R.string.missing_id_error, String.valueOf(i+1));
+            }
 
             // Determine name of project
             String projectName = projectFilename.substring(projectFilename.lastIndexOf("_") + 1);
             Log.d(TAG, "deriving project name = " + projectName);
 
             /* Ensure names do not contain reserved characters */
-            if (FileUtils.pathContainsReservedCharacter(projectName)) return false;
+            if (FileUtils.pathContainsReservedCharacter(projectName))
+                return context.getString(R.string.invalid_character_error, projectName, FileUtils.ReservedChars);
 
             // Get the files within the directory
             File[] projectFiles = child.listFiles();
@@ -88,85 +96,78 @@ public class ProjectUtils {
                     try {
                         Long.valueOf(photoFilename.replaceFirst("[.][^.]+$", ""));
                     } catch (Exception e){
-                        return false;
+                        return context.getString(R.string.invalid_photo_file_error, photoFilename, projectName);
                     }
                 }
             }
         }
 
-        return true;
+        return context.getString(R.string.valid_file_structure);
     }
 
     /* Helper to scan through folders and import projects */
     public static void importProjects(Context context){
         Log.d(TAG, "Importing projects");
-        AppExecutors.getInstance().diskIO().execute(()->{
-            TimeLapseDatabase db = TimeLapseDatabase.getInstance(context);
+        TimeLapseDatabase db = TimeLapseDatabase.getInstance(context);
 
-            // TODO (update) validate filestructure
-            // no duplicate ids or restricted characters in names
+        // Delete all project references in the database
+        db.projectDao().deleteAllProjects();
+        db.photoDao().deleteAllPhotos();
 
-            // Delete all project references in the database
-            db.projectDao().deleteAllProjects();
-            db.photoDao().deleteAllPhotos();
+        // Add all project references from the file structure
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if (storageDir != null) {
+            File[] files = storageDir.listFiles();
 
-            // Add all project references from the file structure
-            File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            if (storageDir != null) {
-                File[] files = storageDir.listFiles();
+            if (files != null) {
+                // For each file generate a project
+                for (File child : files) {
+                    // Get the filename of the project
+                    String url = child.getAbsolutePath();
+                    String filename = url.substring(url.lastIndexOf("/")+1);
 
-                if (files != null) {
-                    // For each file generate a project
-                    for (File child : files) {
-                        // Get the filename of the project
-                        String url = child.getAbsolutePath();
-                        String filename = url.substring(url.lastIndexOf("/")+1);
+                    // Skip Temporary Images
+                    if (filename.equals(FileUtils.TEMP_FILE_SUBDIRECTORY))continue;
 
-                        // Skip Temporary Images
-                        if (filename.equals(FileUtils.TEMP_FILE_SUBDIRECTORY))continue;
+                    // Determine ID of project
+                    String id = filename.substring(0, filename.lastIndexOf("_"));
+                    Log.d(TAG, "deriving project id = " + id);
 
-                        // Determine ID of project
-                        String id = filename.substring(0, filename.lastIndexOf("_"));
-                        Log.d(TAG, "deriving project id = " + id);
+                    // Determine name of project
+                    String projectName = filename.substring(filename.lastIndexOf("_") + 1);
+                    Log.d(TAG, "deriving project name = " + projectName);
 
-                        // Determine name of project
-                        String projectName = filename.substring(filename.lastIndexOf("_") + 1);
-                        Log.d(TAG, "deriving project name = " + projectName);
+                    // Get the files within the directory
+                    File projectDir = new File(storageDir, filename);
+                    File[] projectFiles = projectDir.listFiles();
 
-                        // Get the files within the directory
-                        File projectDir = new File(storageDir, filename);
-                        File[] projectFiles = projectDir.listFiles();
+                    if (projectFiles != null) {
+                        Log.d(TAG, "inserting project = " + projectName);
 
-                        if (projectFiles != null) {
-                            Log.d(TAG, "inserting project = " + projectName);
+                        // Create the project entry
+                        ProjectEntry currentProject
+                                = new ProjectEntry(
+                                Long.valueOf(id),
+                                projectName,
+                                projectFiles[0].getAbsolutePath(),
+                                TimeUtils.SCHEDULE_NONE,
+                                0,
+                                0);
 
-                            // Create the project entry
-                            ProjectEntry currentProject
-                                    = new ProjectEntry(
-                                    Long.valueOf(id),
-                                    projectName,
-                                    projectFiles[0].getAbsolutePath(),
-                                    TimeUtils.SCHEDULE_NONE,
-                                    0,
-                                    0);
+                        // Insert the project - this updates on conflict
+                        db.projectDao().insertProject(currentProject);
 
-                            // Insert the project - this updates on conflict
-                            db.projectDao().insertProject(currentProject);
-
-                            /* import the photos for the project */
-                            importProjectPhotos(db, currentProject, context);
-                        }
-
+                        /* import the photos for the project */
+                        importProjectPhotos(db, currentProject, context);
                     }
+
                 }
             }
-
-        });
+        }
     }
 
     /* Finds all photos in the project directory and adds any missing photos to the database */
     private static void importProjectPhotos(TimeLapseDatabase db, ProjectEntry currentProject, Context context){
-
         Log.d(TAG, "Importing photos for project");
         // Create a list of all photos in the project directory
         List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(context, currentProject);
@@ -189,7 +190,5 @@ public class ProjectUtils {
         currentProject.setSchedule_next_submission(last.getTimestamp());
         currentProject.setTimestamp(first.getTimestamp());
         db.projectDao().updateProject(currentProject);
-
     }
-
 }

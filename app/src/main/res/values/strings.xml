@@ -134,12 +134,23 @@
     <string name="database_sync_warning">Your scheduling information will not be saved.
         \n\nThis may cause unintended errors in the application!
     \n\n Do you still wish to proceed?</string>
-    <string name="import_projects_feedback">Executing synchronization in background</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
-    <string name="invalid_files">Invalid file structure</string>
+
+    <!-- Sync errors -->
+    <string name="no_files_error">No files to synchronize</string>
+    <string name="no_files_in_directory_error">No files to synchronize for directory: %1$s</string>
+    <string name="duplicate_id_error">Duplicate ID for project: %1$s</string>
+    <string name="missing_id_error">Missing ID %1$s</string>
+    <string name="invalid_character_error">Invalid characters in project named %1$s \nPlease remove any of the following characters: %2$s</string>
+    <string name="invalid_photo_file_error">Invalid name for photo file %1$s in project %2$s
+    \nPlease use unix timestamp as identification</string>
+
+    <string name="valid_file_structure" translatable="false">valid_file_structure</string>
+    <string name="executing_sync_notification">Executing sync in background</string>
+    <string name="executing_sync_complete">Synchronization completed</string>
 
     <!-- Settings -->
     <string name="title_activity_settings">Settings</string>

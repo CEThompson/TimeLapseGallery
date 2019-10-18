@@ -20,7 +20,7 @@ import java.util.List;
 
 public final class FileUtils {
 
-    private static final String ReservedChars = "|\\?*<\":>+[]/'";
+    public static final String ReservedChars = "|\\?*<\":>+[]/'";
     public static final String TEMP_FILE_SUBDIRECTORY = "temporary_images";
     private static final String TAG = FileUtils.class.getSimpleName();
 
