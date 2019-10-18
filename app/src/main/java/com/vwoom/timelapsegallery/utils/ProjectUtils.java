@@ -76,7 +76,7 @@ public class ProjectUtils {
 
             /* Ensure names do not contain reserved characters */
             if (FileUtils.pathContainsReservedCharacter(projectName))
-                return context.getString(R.string.invalid_character_error, projectName, FileUtils.ReservedChars);
+                return context.getString(R.string.invalid_character_error, projectFilename, FileUtils.ReservedChars);
 
             // Get the files within the directory
             File[] projectFiles = child.listFiles();
