@@ -98,8 +98,10 @@ public class ProjectUtils {
         /* Ensure no gaps in IDs */
         int size = projectIds.size();
         for (long i = 0; i < size; i++){
-            if (!projectIds.contains(i+1))
-                return context.getString(R.string.missing_id_error, String.valueOf(i+1));
+            if (!projectIds.contains(i+1)){
+                int currentId = (int) i+1;
+                return context.getString(R.string.missing_id_error, currentId);
+            }
         }
 
         return context.getString(R.string.valid_file_structure);
