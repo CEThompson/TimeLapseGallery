@@ -143,7 +143,6 @@
     <string name="no_files_error">No files to synchronize</string>
     <string name="no_files_in_directory_error">No files to synchronize for directory: %1$s</string>
     <string name="duplicate_id_error">Duplicate ID for project: %1$s</string>
-    <string name="missing_id_error">Missing ID %1$i</string>
     <string name="invalid_character_error">Invalid characters in project named %1$s \nPlease remove any of the following characters: %2$s</string>
     <string name="invalid_photo_file_error">Invalid name for photo file %1$s in project %2$s
     \nPlease use unix timestamp as identification</string>
