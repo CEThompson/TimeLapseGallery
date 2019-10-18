@@ -146,7 +146,7 @@
     \nPlease use unix timestamp as identification</string>
 
     <string name="valid_file_structure" translatable="false">valid_file_structure</string>
-    <string name="executing_sync_notification">Executing sync in background</string>
+    <string name="executing_sync_notification">Executing synchronization</string>
     <string name="executing_sync_complete">Synchronization completed</string>
 
     <!-- Settings -->
