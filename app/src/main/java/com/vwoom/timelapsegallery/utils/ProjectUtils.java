@@ -70,13 +70,6 @@ public class ProjectUtils {
                 return context.getString(R.string.duplicate_id_error, projectFilename);
             else projectIds.add(longId);
 
-            /* Ensure no gaps in IDs */
-            int size = projectIds.size();
-            for (long i = 0; i < size; i++){
-                if (!projectIds.contains(i+1))
-                    return context.getString(R.string.missing_id_error, String.valueOf(i+1));
-            }
-
             // Determine name of project
             String projectName = projectFilename.substring(projectFilename.lastIndexOf("_") + 1);
             Log.d(TAG, "deriving project name = " + projectName);
@@ -100,6 +93,13 @@ public class ProjectUtils {
                     }
                 }
             }
+        }
+
+        /* Ensure no gaps in IDs */
+        int size = projectIds.size();
+        for (long i = 0; i < size; i++){
+            if (!projectIds.contains(i+1))
+                return context.getString(R.string.missing_id_error, String.valueOf(i+1));
         }
 
         return context.getString(R.string.valid_file_structure);
