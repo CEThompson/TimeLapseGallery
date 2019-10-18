@@ -470,28 +470,28 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         new AlertDialog.Builder(this)
                 .setTitle(R.string.invalid_name)
                 .setMessage(R.string.no_name_message)
-                .setIcon(android.R.drawable.ic_dialog_alert).show();
+                .setIcon(R.drawable.ic_warning_black_24dp).show();
     }
 
     private void notifyUserInvalidCharacters(){
         new AlertDialog.Builder(this)
         .setTitle(R.string.invalid_name)
                 .setMessage(R.string.invalid_characters_message)
-                .setIcon(android.R.drawable.ic_dialog_alert).show();
+                .setIcon(R.drawable.ic_warning_black_24dp).show();
     }
 
     private void notifyUserNoPicture(){
         new AlertDialog.Builder(this)
         .setTitle(R.string.no_picture)
                 .setMessage(R.string.no_picture_message)
-                .setIcon(android.R.drawable.ic_dialog_alert).show();
+                .setIcon(R.drawable.ic_warning_black_24dp).show();
     }
 
     private void notifyUserEditFailed(){
         new AlertDialog.Builder(this)
                 .setTitle(R.string.error)
                 .setMessage(R.string.edit_failed)
-                .setIcon(android.R.drawable.ic_dialog_alert).show();
+                .setIcon(R.drawable.ic_warning_black_24dp).show();
     }
 
     @Override

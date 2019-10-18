@@ -78,7 +78,7 @@ class SettingsActivity : AppCompatActivity() {
                     .setTitle(R.string.warning)
                     .setMessage(R.string.file_modification_information)
                     .setPositiveButton(R.string.ok) { _, _ ->  }
-                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setIcon(R.drawable.ic_warning_black_24dp)
 
             val dialog = builder.create()
             dialog.show()
@@ -95,7 +95,7 @@ class SettingsActivity : AppCompatActivity() {
                         databaseSyncTask().execute(inputParams(context!!))
                     }
                     .setNegativeButton(R.string.cancel){_,_ -> }
-                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setIcon(R.drawable.ic_warning_black_24dp)
 
             val dialog = builder.create()
             dialog.show()
