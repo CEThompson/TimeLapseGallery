@@ -124,16 +124,13 @@
     <!-- Database sync warning information -->
     <string name="warning">Warning!</string>
     <string name="file_modification_information">
-        Files are located on your device at: Android/data/com.vwoom.timelapsegallery/files/pictures/
+        Manually modifying your file may cause unintended consequences, please backup your data!
+        \n\nFiles are located on your device at: Android/data/com.vwoom.timelapsegallery/files/pictures/
         \n\nProject folders are organized by ID and Name in the format: {ID}_{Name}.
-        \n\nUse unique IDs.
-        \n\nUse alpha numeric characters or spaces for the name. Avoid any of the following characters: \" | \? * &lt; : &gt; + [ ] / \'
+        \n\nUse unique IDs and alpha numeric characters or spaces
         \n\nPhotos are organized by unix timestamp.
-        \n\nManually modifying your file may cause unintended consequences in the application!
-        \n\nPlease backup your files!
     </string>
     <string name="database_sync_warning">Your scheduling information will not be saved.
-        \n\nThis may cause unintended errors in the application!
     \n\n Do you still wish to proceed?</string>
 
     <string name="ok">OK</string>
