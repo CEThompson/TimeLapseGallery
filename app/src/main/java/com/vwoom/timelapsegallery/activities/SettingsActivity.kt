@@ -26,13 +26,10 @@ class SettingsActivity : AppCompatActivity() {
 
     lateinit var prefs: SharedPreferences
     lateinit var prefListener: SharedPreferences.OnSharedPreferenceChangeListener
-    lateinit var fragment: PreferenceFragmentCompat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
-        fragment = SettingsFragment()
-        fragment.retainInstance = true
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.settings, SettingsFragment())
@@ -72,6 +69,7 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             // TODO (update) test file / database sync
+            // TODO fix async task error on orientation change
             // Verify the user wants to sync files to the database
             syncPref?.setOnPreferenceClickListener{
                 verifyImportProjectsDialog()
