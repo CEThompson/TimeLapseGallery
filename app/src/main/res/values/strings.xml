@@ -120,7 +120,7 @@
     <string name="new_project_analytics" translatable="false">new_project</string>
     <string name="submit_new_project_error" translatable="false">submit_new_project_error</string>
 
-    <!-- Alerts -->
+    <!-- Database sync warning information -->
     <string name="warning">Warning!</string>
     <string name="file_modification_information">
         Files are located on your device at: Android/data/com.vwoom.timelapsegallery/files/pictures/
@@ -138,6 +138,8 @@
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+
+    <string name="invalid_files">Invalid file structure</string>
 
     <!-- Settings -->
     <string name="title_activity_settings">Settings</string>

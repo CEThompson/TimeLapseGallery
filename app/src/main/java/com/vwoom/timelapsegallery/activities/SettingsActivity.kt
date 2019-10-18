@@ -88,8 +88,14 @@ class SettingsActivity : AppCompatActivity() {
                     .setMessage(R.string.database_sync_warning)
                     .setPositiveButton(R.string.ok) { _, _ ->
                         Log.d("settings activity", "Importing projects")
-                        ProjectUtils.importProjects(context)
-                        Toast.makeText(activity!!, getString(R.string.import_projects_feedback), Toast.LENGTH_LONG).show()
+                        val fileStructureIsValid = ProjectUtils.validateFileStructure(context)
+
+                        if (fileStructureIsValid) {
+                            ProjectUtils.importProjects(context)
+                            Toast.makeText(activity!!, getString(R.string.import_projects_feedback), Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(activity!!, getString(R.string.invalid_files), Toast.LENGTH_LONG).show()
+                        }
                     }
                     .setNegativeButton(R.string.cancel){_,_ -> }
                     .setIcon(android.R.drawable.ic_dialog_alert)

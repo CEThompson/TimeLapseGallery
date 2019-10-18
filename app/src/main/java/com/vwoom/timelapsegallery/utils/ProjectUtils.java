@@ -12,6 +12,7 @@ import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class ProjectUtils {
@@ -40,6 +41,61 @@ public class ProjectUtils {
         return projectsForToday;
     }
 
+    public static boolean validateFileStructure(Context context){
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if (storageDir==null) return false;
+
+        File[] files = storageDir.listFiles();
+
+        if (files == null) return false;
+
+        HashSet<Long> projectIds = new HashSet<>();
+
+        for (File child : files) {
+            // Get the filename of the project
+            String url = child.getAbsolutePath();
+            String projectFilename = url.substring(url.lastIndexOf("/")+1);
+
+            // Skip Temporary Images
+            if (projectFilename.equals(FileUtils.TEMP_FILE_SUBDIRECTORY))continue;
+
+            // Determine ID of project
+            String id = projectFilename.substring(0, projectFilename.lastIndexOf("_"));
+            Log.d(TAG, "deriving project id = " + id);
+
+            /* Ensure ids are unique */
+            Long longId = Long.valueOf(id);
+            if (projectIds.contains(longId)) return false;
+            else projectIds.add(longId);
+
+            /* TODO ensure ids are in sequential order? 1 - n? */
+
+            // Determine name of project
+            String projectName = projectFilename.substring(projectFilename.lastIndexOf("_") + 1);
+            Log.d(TAG, "deriving project name = " + projectName);
+
+            /* Ensure names do not contain reserved characters */
+            if (FileUtils.pathContainsReservedCharacter(projectName)) return false;
+
+            // Get the files within the directory
+            File[] projectFiles = child.listFiles();
+
+            // Check for valid timestamps
+            if (projectFiles != null){
+                for (File photoFile : projectFiles) {
+                    String photoUrl = photoFile.getAbsolutePath();
+                    String photoFilename = photoUrl.substring(photoUrl.lastIndexOf("/")+1);
+                    try {
+                        Long.valueOf(photoFilename.replaceFirst("[.][^.]+$", ""));
+                    } catch (Exception e){
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
 
     /* Helper to scan through folders and import projects */
     public static void importProjects(Context context){
