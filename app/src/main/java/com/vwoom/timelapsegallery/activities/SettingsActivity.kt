@@ -36,8 +36,10 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
 
     // State
     var mSyncing: Boolean? = null
+    var mShowingSyncDialog: Boolean? = null
     var mShowingFileModDialog: Boolean? = null
     var mShowingVerifySyncDialog: Boolean? = null
+    var mResponse: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
@@ -70,15 +72,18 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
         // Restore instance state of sync dialog
         if (savedInstanceState != null) {
             mSyncing = savedInstanceState.getBoolean("mSyncing", false)
+            mShowingSyncDialog = savedInstanceState.getBoolean("mShowingSyncDialog", false)
             mShowingFileModDialog = savedInstanceState.getBoolean("mShowingFileModDialog", false)
             mShowingVerifySyncDialog = savedInstanceState.getBoolean("mShowingVerifySyncDialog", false)
+            mResponse = savedInstanceState.getString("mResponse", null)
 
-            if (mSyncing!!) showSyncDialog()
-            else if (mShowingFileModDialog!!) showFileModificationDialog()
-            else if (mShowingVerifySyncDialog!!) showVerifyProjectImportDialog()
-
-            Log.d(TAG, "restored instance state, mSyncing is $mSyncing, mShowingFileModDialog is" +
-                    " $mShowingFileModDialog, mShowingVerifySync is $mShowingVerifySyncDialog")
+            if (mSyncing == true) showSyncDialog()
+            else if (mShowingSyncDialog == true) {
+                updateSyncDialog(mResponse!!)
+                mSyncDialog?.show()
+            }
+            else if (mShowingFileModDialog == true) showFileModificationDialog()
+            else if (mShowingVerifySyncDialog == true) showVerifyProjectImportDialog()
         }
     }
 
@@ -88,6 +93,8 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
         if (mSyncing == true) outState.putBoolean("mSyncing", true)
         if (mShowingFileModDialog == true) outState.putBoolean("mShowingFileModDialog", true)
         if (mShowingVerifySyncDialog == true) outState.putBoolean("mShowingVerifySyncDialog", true)
+        if (mShowingSyncDialog == true) outState.putBoolean("mShowingSyncDialog", true)
+        if (mResponse != null) outState.putString("mResponse", mResponse)
     }
 
     /* Dialog functions */
@@ -127,7 +134,7 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
         val button = mSyncDialog?.findViewById(R.id.sync_verification_button) as androidx.appcompat.widget.AppCompatButton
         button.setOnClickListener {
             mSyncDialog?.dismiss()
-            mSyncing = false
+            mShowingSyncDialog = false
         }
     }
 
@@ -180,12 +187,15 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
     /* Async Task Callbacks */
     override fun onPostExecute(response: String) {
         Log.d(TAG, "onPostExecute: setting mSyncing to false and updating dialog")
+        mResponse = response
+        mSyncing = false
         updateSyncDialog(response)
     }
     override fun onPreExecute() {
         Log.d(TAG, "onPreExecute: setting mSyncing to true and show dialog")
         mSyncing = true
         showSyncDialog()
+        mShowingSyncDialog = true
     }
     override fun onCancelled() {
         // Do nothing
