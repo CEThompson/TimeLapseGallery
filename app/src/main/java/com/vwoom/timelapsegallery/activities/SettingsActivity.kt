@@ -127,6 +127,7 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
         val button = mSyncDialog?.findViewById(R.id.sync_verification_button) as androidx.appcompat.widget.AppCompatButton
         button.setOnClickListener {
             mSyncDialog?.dismiss()
+            mSyncing = false
         }
     }
 
@@ -179,7 +180,6 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
     /* Async Task Callbacks */
     override fun onPostExecute(response: String) {
         Log.d(TAG, "onPostExecute: setting mSyncing to false and updating dialog")
-        mSyncing = false
         updateSyncDialog(response)
     }
     override fun onPreExecute() {
