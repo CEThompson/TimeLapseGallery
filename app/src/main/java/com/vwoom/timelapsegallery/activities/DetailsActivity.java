@@ -115,6 +115,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     private FloatingActionButton mFullscreenExitFab;
     private FloatingActionButton mFullscreenBackFab;
 
+    private final static String KEY_DIALOG = "fullscreen_dialog";
+
     // For playing timelapse
     private boolean mPlaying = false;
     private Handler mPlayHandler;
@@ -216,10 +218,22 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mPosition = getIntent().getIntExtra(Keys.TRANSITION_POSITION, 0);
         }
 
+        // TODO (update) implement pinch zoom on fullscreen image
+        initializeFullscreenImageDialog();
+
         // If restoring state reload the selected photo
         if (savedInstanceState != null) {
             mCurrentPhoto = savedInstanceState.getParcelable(Keys.PHOTO_ENTRY);
             mPosition = savedInstanceState.getInt(Keys.TRANSITION_POSITION);
+            mTransitioned = true;
+            showPhotoInformation();
+            boolean dialogShowing = savedInstanceState.getBoolean(KEY_DIALOG, false);
+            if (dialogShowing){
+                preloadFullscreenImage();
+                mFullscreenImageDialog.show();
+            }
+        } else {
+            postponeEnterTransition();
         }
 
         // Initialize fab color
@@ -230,17 +244,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         String transitionName = mCurrentProject.getId() + mCurrentProject.getName();
         mCardView.setTransitionName(transitionName);
 
-        if (savedInstanceState == null){
-            postponeEnterTransition();
-        } else {
-            mTransitioned = true;
-            showPhotoInformation();
-        }
-
-        // TODO (update) implement pinch zoom on fullscreen image
-        initializeFullscreenImageDialog();
-
-        setupViewModel();
+        setupViewModel(savedInstanceState);
 
         // Prepare analytics
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -358,6 +362,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         super.onSaveInstanceState(outState);
         outState.putParcelable(Keys.PHOTO_ENTRY, mCurrentPhoto);
         outState.putInt(Keys.TRANSITION_POSITION, mPosition);
+        outState.putBoolean(KEY_DIALOG, mFullscreenImageDialog.isShowing());
     }
 
     @Override
@@ -686,7 +691,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     };
 
     /* Binds project and photos to database */
-    private void setupViewModel(){
+    private void setupViewModel(@Nullable Bundle savedInstanceState){
         DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getId());
         final DetailsActivityViewModel viewModel = ViewModelProviders.of(this, factory)
                 .get(DetailsActivityViewModel.class);
@@ -700,7 +705,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mDetailsAdapter.setPhotoData(mPhotos);
 
             // Set current photo to last if none has been selected
-            mCurrentPhoto = getLastPhoto();
+            if (savedInstanceState == null)
+                mCurrentPhoto = getLastPhoto();
 
             // Load the ui based on the current photo
             loadUi(mCurrentPhoto);
