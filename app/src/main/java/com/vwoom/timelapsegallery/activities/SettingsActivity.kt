@@ -82,6 +82,39 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        Log.d(TAG, "saving instance state")
+        super.onSaveInstanceState(outState)
+        if (mSyncing == true) outState.putBoolean("mSyncing", true)
+        if (mShowingFileModDialog == true) outState.putBoolean("mShowingFileModDialog", true)
+        if (mShowingVerifySyncDialog == true) outState.putBoolean("mShowingVerifySyncDialog", true)
+    }
+
+    /* Dialog functions */
+    fun createVerifyProjectImportDialog(){
+        val context = this
+        val builder = AlertDialog.Builder(context)
+                .setTitle(R.string.warning)
+                .setMessage(R.string.database_sync_warning)
+                .setPositiveButton(R.string.ok) { _, _ ->
+                    Log.d("settings activity", "Launching database sync asynct task")
+                    // Execute the sync in the background
+                    (mTaskFragment as TaskFragment).executeDatabaseSync()
+                    mShowingVerifySyncDialog = false
+                }
+                .setNegativeButton(R.string.cancel){_,_ -> mShowingVerifySyncDialog = false}
+                .setIcon(R.drawable.ic_warning_black_24dp)
+
+        mVerifySyncDialog = builder.create()
+    }
+    fun createManualFileModificationDialog() {
+        val builder = AlertDialog.Builder(this)
+                .setTitle(R.string.warning)
+                .setMessage(R.string.file_modification_information)
+                .setPositiveButton(R.string.ok) { _, _ -> mShowingFileModDialog = false}
+                .setIcon(R.drawable.ic_warning_black_24dp)
+        mFileModDialog = builder.create()
+    }
     fun createSyncDialog(){
         Log.d(TAG, "creating sync dialog")
         mSyncDialog = Dialog(this)
@@ -95,14 +128,6 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
         button.setOnClickListener {
             mSyncDialog?.dismiss()
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        Log.d(TAG, "saving instance state")
-        super.onSaveInstanceState(outState)
-        if (mSyncing == true) outState.putBoolean("mSyncing", true)
-        if (mShowingFileModDialog == true) outState.putBoolean("mShowingFileModDialog", true)
-        if (mShowingVerifySyncDialog == true) outState.putBoolean("mShowingVerifySyncDialog", true)
     }
 
     // Shows a dialog to give progress feedback on synchronization
@@ -157,17 +182,14 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
         mSyncing = false
         updateSyncDialog(response)
     }
-
     override fun onPreExecute() {
         Log.d(TAG, "onPreExecute: setting mSyncing to true and show dialog")
         mSyncing = true
         showSyncDialog()
     }
-
     override fun onCancelled() {
         // Do nothing
     }
-
     override fun onProgressUpdate(percent: Int) {
         // Do nothing
     }
@@ -177,36 +199,9 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
         mShowingVerifySyncDialog = true
         mVerifySyncDialog?.show()
     }
-
-    fun createVerifyProjectImportDialog(){
-        val context = this
-        val builder = AlertDialog.Builder(context)
-                .setTitle(R.string.warning)
-                .setMessage(R.string.database_sync_warning)
-                .setPositiveButton(R.string.ok) { _, _ ->
-                    Log.d("settings activity", "Launching database sync asynct task")
-                    // Execute the sync in the background
-                    (mTaskFragment as TaskFragment).executeDatabaseSync()
-                    mShowingVerifySyncDialog = false
-                }
-                .setNegativeButton(R.string.cancel){_,_ -> mShowingVerifySyncDialog = false}
-                .setIcon(R.drawable.ic_warning_black_24dp)
-
-        mVerifySyncDialog = builder.create()
-    }
-
     override fun showFileModificationDialog() {
         mShowingFileModDialog = true
         mFileModDialog?.show()
-    }
-
-    fun createManualFileModificationDialog() {
-        val builder = AlertDialog.Builder(this)
-                .setTitle(R.string.warning)
-                .setMessage(R.string.file_modification_information)
-                .setPositiveButton(R.string.ok) { _, _ -> mShowingFileModDialog = false}
-                .setIcon(R.drawable.ic_warning_black_24dp)
-        mFileModDialog = builder.create()
     }
 }
 
