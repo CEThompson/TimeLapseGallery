@@ -246,14 +246,14 @@ class TaskFragment: Fragment() {
     }
 
     fun executeDatabaseSync(){
-        DatabaseSyncTask().execute(inputParams(this.context!!))
+        DatabaseSyncTask().execute(this.context!!)
     }
     // This async task validates the files are in correct format then synchronizes to the database
-    inner class DatabaseSyncTask : AsyncTask<inputParams, Void, String>() {
+    inner class DatabaseSyncTask : AsyncTask<Context, Void, String>() {
 
         // Do in background validates then executes import
-        override fun doInBackground(vararg p0: inputParams): String {
-            val context = p0.get(0).context
+        override fun doInBackground(vararg p0: Context): String {
+            val context = p0.get(0)
             val response = ProjectUtils.validateFileStructure(context)
 
             // If modified files are valid go ahead notify user of background work and import
@@ -275,10 +275,8 @@ class TaskFragment: Fragment() {
             mCallbacks?.onPostExecute(result)
         }
     }
-
-    // These classes used for passing references through the async task
-    class inputParams(val context: Context)
 }
+
 class SettingsFragment : PreferenceFragmentCompat() {
     var mCallbacks: TaskCallbacks? = null
     var prefs: SharedPreferences? = null
