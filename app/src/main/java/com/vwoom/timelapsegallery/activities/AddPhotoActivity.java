@@ -102,6 +102,7 @@ public class AddPhotoActivity extends AppCompatActivity {
 
             // load and show image if a temporary photo path has been created / the user has taken a picture
             if (mTemporaryPhotoPath != null) {
+                mRetakeFab.setImageResource(R.drawable.ic_repeat_white_24dp);
                 mNewPhotoLabel.setVisibility(View.VISIBLE);
                 mResultPhoto.setVisibility(View.VISIBLE);
                 mCompareFab.show();
