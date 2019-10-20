@@ -105,16 +105,6 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
         if (mShowingVerifySyncDialog == true) outState.putBoolean("mShowingVerifySyncDialog", true)
     }
 
-    /*
-    override fun onPause() {
-        super.onPause()
-        if (mSyncDialog != null){
-            if (mSyncDialog?.isShowing!!)
-                mSyncDialog?.dismiss()
-        }
-    }
-    */
-
     // Shows a dialog to give progress feedback on synchronization
     fun showSyncDialog(){
         Log.d(TAG, "showing sync dialog")
@@ -246,11 +236,11 @@ class TaskFragment: Fragment() {
     }
 
     fun executeDatabaseSync(){
-        DatabaseSyncTask().execute(this.context!!)
+        DatabaseSyncTask().execute(this.context)
     }
+
     // This async task validates the files are in correct format then synchronizes to the database
     inner class DatabaseSyncTask : AsyncTask<Context, Void, String>() {
-
         // Do in background validates then executes import
         override fun doInBackground(vararg p0: Context): String {
             val context = p0.get(0)
