@@ -167,8 +167,11 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         ButterKnife.bind(this);
         Toolbar toolbar = findViewById(R.id.details_activity_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        
+        if (getSupportActionBar()!=null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         // Set the title of the activity
         setTitle(getResources().getString(R.string.project_details));
