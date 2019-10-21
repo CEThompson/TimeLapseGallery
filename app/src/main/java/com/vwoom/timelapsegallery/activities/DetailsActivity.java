@@ -107,6 +107,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     // Photo and project Information
     private List<PhotoEntry> mPhotos;
     private PhotoEntry mCurrentPhoto;
+    private Integer mCurrentPlayPosition = null;
     private ProjectEntry mCurrentProject;
 
     // Views for fullscreen dialog
@@ -572,6 +573,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     private void playSetOfImages(){
         // Lazy Initialize handler
         if (mPlayHandler == null) mPlayHandler = new Handler();
+        if (mCurrentPlayPosition == null) mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto);
 
         // If already playing cancel
         if (mPlaying){
@@ -583,6 +585,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mPlaying = false;
             mPlayHandler.removeCallbacksAndMessages(null);
             mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+
+            // Set current photo to position set from playing
+            mCurrentPhoto = mPhotos.get(mCurrentPlayPosition);
 
             // Handle UI
             loadUi(mCurrentPhoto);
@@ -599,17 +604,25 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             // Handle UI
             mPlayAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp);
 
-            // Load first photo
-            loadUi(mPhotos.get(0));
-            mProgressBar.setProgress(0);
+            // Schedule the runnable for a certain number of ms from now
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+            String playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), "50");
+            int playbackInterval = Integer.parseInt(playbackIntervalSharedPref);
 
-            // Recursively load the rest of set
-            int firstPhotoPosition = 0;
-            scheduleLoadPhoto(firstPhotoPosition);
+            // If the play position / current photo is at the end, start from the beginning
+            if (mCurrentPlayPosition == mPhotos.size()-1) {
+                mCurrentPlayPosition = 0;
+            } // Otherwise start from wherever it is at
+
+
+            loadUi(mPhotos.get(mCurrentPlayPosition));
+            mProgressBar.setProgress(mCurrentPlayPosition);
+            scheduleLoadPhoto(mCurrentPlayPosition, playbackInterval); // Recursively loads the rest of set from beginning
         }
     }
 
-    private void scheduleLoadPhoto(int position){
+    private void scheduleLoadPhoto(int position, int interval){
+        mCurrentPlayPosition = position;
         Runnable runnable = () -> {
             // If the position is final position clean up
             if (position == mPhotos.size()-1){
@@ -627,25 +640,21 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             if (mImageIsLoaded){
                 loadUi(mPhotos.get(position+1));
                 mProgressBar.setProgress(position+1);
-                scheduleLoadPhoto(position+1);
+                scheduleLoadPhoto(position+1, interval);
             }
             // If the image isn't loaded recheck in 200 ms
             else {
-                scheduleLoadPhoto(position);
+                scheduleLoadPhoto(position, interval);
             }
         };
-
-        // Schedule the runnable for a certain number of ms from now
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        String playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), "50");
-        int playbackInterval = Integer.parseInt(playbackIntervalSharedPref);
-        mPlayHandler.postDelayed(runnable, playbackInterval);
+        mPlayHandler.postDelayed(runnable, interval);
     }
 
     /* Sets the current entry to the clicked photo and loads the image from the entry */
     @Override
     public void onClick(PhotoEntry clickedPhoto) {
         mCurrentPhoto = clickedPhoto;
+        mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto);
         loadUi(mCurrentPhoto);
     }
 
@@ -709,6 +718,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             // Set current photo to last if none has been selected
             if (savedInstanceState == null)
                 mCurrentPhoto = getLastPhoto();
+
+            // Restore the play position
+            mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto);
 
             // Load the ui based on the current photo
             loadUi(mCurrentPhoto);
@@ -797,16 +809,26 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         }
 
         public void onSwipeRight() {
+            // Do nothing if currently playing
+            if (mPlaying) return;
+
+            // Otherwise adjust the current photo to the next
             int currentIndex = mPhotos.indexOf(mCurrentPhoto);
             if (currentIndex == 0) return;
             mCurrentPhoto = mPhotos.get(currentIndex-1);
+            mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto);
             loadUi(mCurrentPhoto);
         }
 
         public void onSwipeLeft() {
+            // Do nothing if currently playing
+            if (mPlaying) return;
+
+            // Otherwise adjust the current photo to the previous
             int currentIndex = mPhotos.indexOf(mCurrentPhoto);
             if (currentIndex == mPhotos.size()-1) return;
             mCurrentPhoto = mPhotos.get(currentIndex+1);
+            mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto);
             loadUi(mCurrentPhoto);
         }
 
