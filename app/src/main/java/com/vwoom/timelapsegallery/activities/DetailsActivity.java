@@ -112,8 +112,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     // Views for fullscreen dialog
     private Dialog mFullscreenImageDialog;
     private ImageView mFullscreenImage;
-    private FloatingActionButton mFullscreenExitFab;
-    private FloatingActionButton mFullscreenBackFab;
 
     private final static String KEY_DIALOG = "fullscreen_dialog";
 
@@ -167,7 +165,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         ButterKnife.bind(this);
         Toolbar toolbar = findViewById(R.id.details_activity_toolbar);
         setSupportActionBar(toolbar);
-        
+
         if (getSupportActionBar()!=null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -661,8 +659,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mFullscreenImage = mFullscreenImageDialog.findViewById(R.id.fullscreen_image);
 
         // Get the fabs
-        mFullscreenExitFab = mFullscreenImageDialog.findViewById(R.id.fullscreen_exit_fab);
-        mFullscreenBackFab = mFullscreenImageDialog.findViewById(R.id.fullscreen_back_fab);
+        FloatingActionButton mFullscreenExitFab = mFullscreenImageDialog.findViewById(R.id.fullscreen_exit_fab);
+        FloatingActionButton mFullscreenBackFab = mFullscreenImageDialog.findViewById(R.id.fullscreen_back_fab);
 
         // Display the dialog on clicking the image
         mFullscreenBackFab.setOnClickListener((View v) -> {
