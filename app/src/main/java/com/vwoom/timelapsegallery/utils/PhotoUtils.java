@@ -147,14 +147,4 @@ public final class PhotoUtils {
         }
         return inSampleSize;
     }
-
-    /* Sends a photo to the phones gallery */
-    public void galleryAddPic(Context context, PhotoEntry photoEntry) {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(photoEntry.getUrl());
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        context.sendBroadcast(mediaScanIntent);
-    }
-
 }
