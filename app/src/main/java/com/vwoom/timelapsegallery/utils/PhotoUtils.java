@@ -1,12 +1,18 @@
 package com.vwoom.timelapsegallery.utils;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.exifinterface.media.ExifInterface;
 
+import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
+
+import java.io.File;
 import java.io.IOException;
 
 public final class PhotoUtils {
@@ -141,4 +147,14 @@ public final class PhotoUtils {
         }
         return inSampleSize;
     }
+
+    /* Sends a photo to the phones gallery */
+    public void galleryAddPic(Context context, PhotoEntry photoEntry) {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(photoEntry.getUrl());
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        context.sendBroadcast(mediaScanIntent);
+    }
+
 }
