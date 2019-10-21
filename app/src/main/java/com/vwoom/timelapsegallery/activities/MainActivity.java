@@ -228,10 +228,10 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
         mReenterState = new Bundle(data.getExtras());
 
-        int position = mReenterState.getInt(Keys.TRANSITION_POSITION);
+        int returnPosition = mReenterState.getInt(Keys.TRANSITION_POSITION);
 
-        mProjectsRecyclerView.scrollToPosition(position);
-        Log.d(TAG, "shared elements: scrolling to position " + position);
+        mProjectsRecyclerView.scrollToPosition(returnPosition);
+        Log.d(TAG, "shared elements: scrolling to position " + returnPosition);
 
         postponeEnterTransition();
 

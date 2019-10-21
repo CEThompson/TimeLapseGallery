@@ -132,7 +132,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     /*Shared Element variables */
     private boolean mIsReturning;
-    private int mPosition;
+    private int mReturnPosition;
     private boolean mTransitioned = false;
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
@@ -216,7 +216,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mCurrentPhotoImageView.setOnTouchListener(mOnSwipeTouchListener);
 
         if (getIntent() != null){
-            mPosition = getIntent().getIntExtra(Keys.TRANSITION_POSITION, 0);
+            mReturnPosition = getIntent().getIntExtra(Keys.TRANSITION_POSITION, 0);
         }
 
         // TODO (update) implement pinch zoom on fullscreen image
@@ -225,7 +225,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         // If restoring state reload the selected photo
         if (savedInstanceState != null) {
             mCurrentPhoto = savedInstanceState.getParcelable(Keys.PHOTO_ENTRY);
-            mPosition = savedInstanceState.getInt(Keys.TRANSITION_POSITION);
+            mReturnPosition = savedInstanceState.getInt(Keys.TRANSITION_POSITION);
             mTransitioned = true;
             showPhotoInformation();
             boolean dialogShowing = savedInstanceState.getBoolean(KEY_DIALOG, false);
@@ -362,7 +362,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(Keys.PHOTO_ENTRY, mCurrentPhoto);
-        outState.putInt(Keys.TRANSITION_POSITION, mPosition);
+        outState.putInt(Keys.TRANSITION_POSITION, mReturnPosition);
         outState.putBoolean(KEY_DIALOG, mFullscreenImageDialog.isShowing());
     }
 
@@ -421,7 +421,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     public void finishAfterTransition() {
         mIsReturning = true;
         Intent data = new Intent();
-        data.putExtra(Keys.TRANSITION_POSITION, mPosition);
+        data.putExtra(Keys.TRANSITION_POSITION, mReturnPosition);
         data.putExtra(Keys.TRANSITION_NAME, mCurrentProject.getThumbnail_url());
         setResult(RESULT_OK, data);
         super.finishAfterTransition();
