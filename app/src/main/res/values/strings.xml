@@ -54,6 +54,7 @@
     <!-- Feedback -->
     <string name="enabling_notifications">Enabling notifications</string>
     <string name="disabling_notifications">Disabling notifications</string>
+    <string name="add_more_photos">Add more photos to play</string>
 
     <!-- Verification strings -->
     <string name="verify_delete_project">Are you sure you wish to delete the project?</string>
@@ -112,14 +113,26 @@
     <string name="error_submitting_photo">Error submitting photo</string>
 
     <!-- Analytics -->
-    <string name="error_text" translatable="false">error_text</string>
-    <string name="take_temporary_picture_error" translatable="false">take_temporary_picture_error</string>
-    <string name="project_name_analytics" translatable="false">project_name</string>
-    <string name="photo_number" translatable="false">photo_number</string>
-    <string name="add_photo" translatable="false">add_photo</string>
-    <string name="add_photo_error" translatable="false">add_photo_error</string>
-    <string name="new_project_analytics" translatable="false">new_project</string>
-    <string name="submit_new_project_error" translatable="false">submit_new_project_error</string>
+    <string name="analytics_error_text" translatable="false">error_text</string>
+    <string name="analytics_take_temporary_picture_error" translatable="false">take_temporary_picture_error</string>
+    <string name="analytics_project_name" translatable="false">project_name</string>
+    <string name="analytics_photo_number" translatable="false">photo_number</string>
+    <string name="analytics_add_photo" translatable="false">add_photo</string>
+    <string name="analytics_add_photo_error" translatable="false">add_photo_error</string>
+    <string name="analytics_new_project" translatable="false">new_project</string>
+    <string name="analytics_submit_new_project_error" translatable="false">submit_new_project_error</string>
+    <string name="analytics_show_ad" translatable="false">show_add</string>
+    <string name="analytics_delete_photo" translatable="false">delete_photo</string>
+    <string name="analytics_delete_project" translatable="false">delete_project</string>
+    <string name="analytics_edit_project" translatable="false">edit_project</string>
+    <string name="analytics_notifications_disabled" translatable="false">notifications_disabled</string>
+    <string name="analytics_select_notification_time" translatable="false">select_notification_time</string>
+    <string name="analytics_notification_time" translatable="false">notification_time</string>
+    <string name="analytics_playback_interval" translatable="false">playback_interval</string>
+    <string name="analytics_select_playback_interval" translatable="false">select_playback_interval</string>
+    <string name="analytics_manual_sync_enabled" translatable="false">manual_sync_enabled</string>
+    <string name="analytics_manual_sync_executed" translatable="false">manual_sync_executed</string>
+    <string name="analytics_sync_response" translatable="false">sync_response</string>
 
     <!-- Database sync warning information -->
     <string name="warning">Warning!</string>

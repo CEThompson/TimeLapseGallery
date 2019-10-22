@@ -142,8 +142,8 @@ public class AddPhotoActivity extends AppCompatActivity {
 
                 // Track error
                 Bundle params = new Bundle();
-                params.putString(getString(R.string.error_text), e.getMessage());
-                mFirebaseAnalytics.logEvent(getString(R.string.take_temporary_picture_error), params);
+                params.putString(getString(R.string.analytics_error_text), e.getMessage());
+                mFirebaseAnalytics.logEvent(getString(R.string.analytics_take_temporary_picture_error), params);
             }
             // Continue only if the File was successfully created
             if (tempFile != null) {
@@ -298,12 +298,12 @@ public class AddPhotoActivity extends AppCompatActivity {
 
                 // Track added photo
                 Bundle bundle = new Bundle();
-                bundle.putString(context.getString(R.string.project_name_analytics), currentProject.getName());
-                bundle.putString(context.getString(R.string.photo_number), String.valueOf(photoToSubmit.getId()));
-                firebaseAnalytics.logEvent(context.getString(R.string.add_photo), bundle);
+                bundle.putString(context.getString(R.string.analytics_project_name), currentProject.getName());
+                bundle.putString(context.getString(R.string.analytics_photo_number), String.valueOf(photoToSubmit.getId()));
+                firebaseAnalytics.logEvent(context.getString(R.string.analytics_add_photo), bundle);
 
                 // Return the parameters to run in post execute
-                return new ResultParameters(context, photoToSubmit, interstitialAd);
+                return new ResultParameters(context, photoToSubmit, interstitialAd, firebaseAnalytics);
             }
             catch (IOException e) {
                 // Notify user of error
@@ -312,10 +312,10 @@ public class AddPhotoActivity extends AppCompatActivity {
 
                 // Track error
                 Bundle bundle = new Bundle();
-                bundle.putString(context.getString(R.string.error_text), e.getMessage());
-                firebaseAnalytics.logEvent(context.getString(R.string.add_photo_error), bundle);
+                bundle.putString(context.getString(R.string.analytics_error_text), e.getMessage());
+                firebaseAnalytics.logEvent(context.getString(R.string.analytics_add_photo_error), bundle);
 
-                return new ResultParameters(context, null, null);
+                return new ResultParameters(context, null, null, null);
             }
         }
 
@@ -327,6 +327,7 @@ public class AddPhotoActivity extends AppCompatActivity {
             Activity activity = (Activity) context;
             PhotoEntry insertedPhoto = resultParameters.getPhotoEntry();
             InterstitialAd interstitialAd = resultParameters.getInterstitialAd();
+            FirebaseAnalytics firebaseAnalytics = resultParameters.getFirebaseAnalytics();
 
             // If photo insertion was succesful
             if (insertedPhoto != null) {
@@ -348,6 +349,9 @@ public class AddPhotoActivity extends AppCompatActivity {
                         }
                     });
                     interstitialAd.show();
+
+                    // Send event to firebase
+                    firebaseAnalytics.logEvent(context.getString(R.string.analytics_show_ad), null);
                 }
                 // Otherwise finish the activity
                 // TODO: (update) implement local ad
@@ -401,16 +405,19 @@ public class AddPhotoActivity extends AppCompatActivity {
         private Context context;
         private PhotoEntry photoEntry;
         private InterstitialAd interstitialAd;
+        private FirebaseAnalytics firebaseAnalytics;
 
-        public ResultParameters(Context context, PhotoEntry photoEntry, InterstitialAd interstitialAd){
+        public ResultParameters(Context context, PhotoEntry photoEntry, InterstitialAd interstitialAd, FirebaseAnalytics firebaseAnalytics){
             this.context = context;
             this.photoEntry = photoEntry;
             this.interstitialAd = interstitialAd;
+            this.firebaseAnalytics = firebaseAnalytics;
         }
         // Getters
         public Context getContext() { return context; }
         public PhotoEntry getPhotoEntry() { return photoEntry; }
         public InterstitialAd getInterstitialAd() { return interstitialAd; }
+        public FirebaseAnalytics getFirebaseAnalytics() { return firebaseAnalytics; }
     }
 
     @VisibleForTesting

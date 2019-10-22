@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
@@ -40,6 +41,9 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
     var mShowingFileModDialog: Boolean? = null
     var mShowingVerifySyncDialog: Boolean? = null
     var mResponse: String? = null
+
+    /* Analytics */
+    private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
@@ -85,6 +89,8 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
             else if (mShowingFileModDialog == true) showFileModificationDialog()
             else if (mShowingVerifySyncDialog == true) showVerifyProjectImportDialog()
         }
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -190,6 +196,11 @@ class SettingsActivity : AppCompatActivity(), TaskFragment.TaskCallbacks, Settin
         mResponse = response
         mSyncing = false
         updateSyncDialog(response)
+
+        // Log syncing and responses
+        val params = Bundle()
+        params.putString(getString(R.string.analytics_sync_response), response)
+        mFirebaseAnalytics?.logEvent(getString(R.string.analytics_manual_sync_executed), params)
     }
     override fun onPreExecute() {
         Log.d(TAG, "onPreExecute: setting mSyncing to true and show dialog")
@@ -277,6 +288,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     var prefs: SharedPreferences? = null
     var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
+    /* Analytics */
+    private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
     interface TaskCallbacks {
         fun showFileModificationDialog()
@@ -286,11 +299,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mCallbacks = context as TaskCallbacks
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
     }
 
     override fun onDetach() {
         super.onDetach()
         mCallbacks = null
+        mFirebaseAnalytics = null
     }
 
     override fun onResume() {
@@ -302,6 +317,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         super.onPause()
         prefs?.unregisterOnSharedPreferenceChangeListener(prefListener)
     }
+
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -316,17 +332,40 @@ class SettingsFragment : PreferenceFragmentCompat() {
             // If the user changes the notifications enabled preference trigger the notification worker to update any alarms
             if (key.equals(this.getString(R.string.key_notifications_enabled))) {
                 NotificationUtils.scheduleNotificationWorker(activity);
+
+                // Log notifications
+                val notificationsEnabled = prefs.getBoolean(activity?.getString(R.string.key_notifications_enabled), true)
+                if (!notificationsEnabled)
+                    mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_notifications_disabled)!!, null)
             }
 
             // Same for notification time
             if (key.equals(this.getString(R.string.key_notification_time))) {
                 NotificationUtils.scheduleNotificationWorker(activity)
+
+                // Log notification time selection
+                val notificationTime = prefs.getString(activity?.getString(R.string.key_notification_time), "7")
+                val params = Bundle()
+                params.putString(context?.getString(R.string.analytics_notification_time)!!, notificationTime)
+                mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_select_notification_time)!!, params)
+            }
+
+            // Track playback interval selection
+            if (key.equals(getString(R.string.key_playback_interval))){
+                val interval = prefs.getString(getString(R.string.key_playback_interval), "50");
+                val params = Bundle()
+                params.putString(context?.getString(R.string.analytics_playback_interval)!!, interval)
+                mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_select_playback_interval)!!, params)
             }
 
             // If the user enables manual file mSyncing give some info
             if (key.equals(getString(R.string.key_sync_allowed))){
                 val isSyncAllowed = prefs.getBoolean(key, false)
-                if (isSyncAllowed) mCallbacks?.showFileModificationDialog()
+                if (isSyncAllowed) {
+                    mCallbacks?.showFileModificationDialog()
+                    // Log manual syncing
+                    mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_manual_sync_enabled)!!, null)
+                }
             }
         }
 

@@ -81,7 +81,6 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     private static final String TAG = NewProjectActivity.class.getSimpleName();
 
     // TODO (update) implement tags
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -206,8 +205,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
                 // Log with analytics
                 Bundle params = new Bundle();
-                params.putString(getString(R.string.error_text), e.getMessage());
-                mFirebaseAnalytics.logEvent(getString(R.string.take_temporary_picture_error), params);
+                params.putString(getString(R.string.analytics_error_text), e.getMessage());
+                mFirebaseAnalytics.logEvent(getString(R.string.analytics_take_temporary_picture_error), params);
             }
             // Continue only if the File was successfully created
             if (tempFile != null) {
@@ -356,8 +355,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
                     // Track added project
                     Bundle bundle = new Bundle();
-                    bundle.putString(getString(R.string.project_name_analytics), newProject.getName());
-                    mFirebaseAnalytics.logEvent(getString(R.string.new_project_analytics), bundle);
+                    bundle.putString(getString(R.string.analytics_project_name), newProject.getName());
+                    mFirebaseAnalytics.logEvent(getString(R.string.analytics_new_project), bundle);
 
                 } catch (IOException e){
                     // Notify project creation error
@@ -366,8 +365,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
                     // Track error
                     Bundle bundle = new Bundle();
-                    bundle.putString(getString(R.string.error_text), e.getMessage());
-                    mFirebaseAnalytics.logEvent(getString(R.string.submit_new_project_error), bundle);
+                    bundle.putString(getString(R.string.analytics_error_text), e.getMessage());
+                    mFirebaseAnalytics.logEvent(getString(R.string.analytics_submit_new_project_error), bundle);
                 }
             });
 
@@ -418,6 +417,9 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                 // 1. Update the project
                 mTimeLapseDatabase.projectDao().updateProject(editedProject);
             });
+
+            // Log with analytics
+            mFirebaseAnalytics.logEvent(getString(R.string.analytics_edit_project), null);
 
             /* Show an add then finish the activity */
             finish();

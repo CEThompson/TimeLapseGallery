@@ -55,9 +55,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
     private boolean mFilterByToday;
 
-    /* Analytics */
-    private FirebaseAnalytics mFirebaseAnalytics;
-
     private static final String TAG = MainActivity.class.getSimpleName();
 
     /* Shared Element Position information */
@@ -125,9 +122,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
         // Set up the view model
         setupViewModel();
-
-        // Prepare analytics
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     /* Ensure deletion of temporary photo files */

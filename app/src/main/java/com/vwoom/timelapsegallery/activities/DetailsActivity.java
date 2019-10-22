@@ -71,7 +71,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-//TODO add share to gallery menu option
+//TODO add share to gallery menu option?
 
 public class DetailsActivity extends AppCompatActivity implements DetailsAdapter.DetailsAdapterOnClickHandler {
 
@@ -573,14 +573,23 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         if (mPlayHandler == null) mPlayHandler = new Handler();
         if (mCurrentPlayPosition == null) mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto);
 
+        // If not enough photos give user feedback
+        if (mPhotos.size()<=1){
+            Toast.makeText(this, getString(R.string.add_more_photos), Toast.LENGTH_LONG).show();
+            return;
+        }
+
         // If already playing cancel
         if (mPlaying){
+            // TODO track stop playing event?
+
             stopPlaying();
             // Handle UI
             loadUi(mCurrentPhoto);
         }
         // Otherwise play the set of images
         else {
+            // TODO track play event?
             // Set color of play fab
             mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorRedAccent)));
             mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorRedAccent));
@@ -861,6 +870,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 // Delete the photo metadata in the database
                 database.photoDao().deletePhoto(photoEntry);
             });
+
+        // Send to analytics
+        mFirebaseAnalytics.logEvent(getString(R.string.analytics_delete_photo), null);
     }
 
     /*
@@ -869,6 +881,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     /* Deletes the project and recursively deletes files from project folder */
     private void deleteProject(TimeLapseDatabase database, ProjectEntry projectEntry){
+
         /* Delete project from the database and photos from the file structure */
         AppExecutors.getInstance().diskIO().execute(() -> {
             // Delete the photos from the file structure
@@ -882,6 +895,11 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 UpdateWidgetService.startActionUpdateWidgets(this);
             }
         });
+
+        // Send to analytics
+        Bundle params = new Bundle();
+        params.putString("project_name", projectEntry.getName());
+        mFirebaseAnalytics.logEvent(getString(R.string.analytics_delete_project), null);
     }
 
     /* Gets the last photo from the set and sets it as the project thumbnail */
