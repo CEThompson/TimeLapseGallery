@@ -210,7 +210,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         // Set a listener to display the image fullscreen
         mFullscreenFab.setOnClickListener( (View v) -> {
-            mFullscreenImageDialog.show();
+            if (!mPlaying)
+                mFullscreenImageDialog.show();
         });
 
         // Set a swipe listener for the image
@@ -593,6 +594,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         }
         // Otherwise play the set of images
         else {
+            mFullscreenFab.hide();
+
             // Set color of play fab
             mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorRedAccent)));
             mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorRedAccent));
@@ -637,6 +640,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         // Set current photo to position set from playing
         mCurrentPhoto = mPhotos.get(mCurrentPlayPosition);
 
+        mFullscreenFab.show();
     }
 
     private void scheduleLoadPhoto(int position, int interval){
@@ -651,6 +655,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
                 mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorGreen)));
                 mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorGreen));
+                mFullscreenFab.show();
                 return;
             }
 
