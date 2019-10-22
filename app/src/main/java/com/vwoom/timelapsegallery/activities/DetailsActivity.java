@@ -317,9 +317,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     @Override
     protected void onPause() {
         super.onPause();
-
         // If the activity stops while playing make sure to cancel runnables
-        if (mPlaying) mPlayHandler.removeCallbacksAndMessages(null);
+        if (mPlaying) stopPlaying();
     }
 
     @Override
@@ -567,7 +566,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 })
                 .into(mNextPhotoImageView);
     }
-    
+
     /* Loads the set of images concurrently */
     private void playSetOfImages(){
         // Lazy Initialize handler
@@ -576,18 +575,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         // If already playing cancel
         if (mPlaying){
-            // Set color of play fab
-            mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorGreen)));
-            mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorGreen));
-
-            // Set playing false and cancel runnable
-            mPlaying = false;
-            mPlayHandler.removeCallbacksAndMessages(null);
-            mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-
-            // Set current photo to position set from playing
-            mCurrentPhoto = mPhotos.get(mCurrentPlayPosition);
-
+            stopPlaying();
             // Handle UI
             loadUi(mCurrentPhoto);
         }
@@ -620,6 +608,22 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         }
     }
 
+    /* Resets the UI & handles state after playing */
+    private void stopPlaying(){
+        // Set color of play fab
+        mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorGreen)));
+        mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorGreen));
+
+        // Set playing false and cancel runnable
+        mPlaying = false;
+        mPlayHandler.removeCallbacksAndMessages(null);
+        mPlayAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+
+        // Set current photo to position set from playing
+        mCurrentPhoto = mPhotos.get(mCurrentPlayPosition);
+
+    }
+
     private void scheduleLoadPhoto(int position, int interval){
         mCurrentPlayPosition = position;
         Runnable runnable = () -> {
@@ -641,7 +645,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 mProgressBar.setProgress(position+1);
                 scheduleLoadPhoto(position+1, interval);
             }
-            // If the image isn't loaded recheck in 200 ms
+            // If the image isn't loaded recheck in interval ms
             else {
                 scheduleLoadPhoto(position, interval);
             }
