@@ -17,6 +17,17 @@
 <androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Notifications -->
+    <PreferenceCategory app:title="@string/ads_header">
+        <!-- Notifications enabled -->
+        <SwitchPreferenceCompat
+            app:key="@string/key_ads_disabled"
+            app:title="@string/disable_ads_title"
+            app:summaryOff="@string/ads_summary_enabled"
+            app:summaryOn="@string/ads_summary_disabled"
+            app:defaultValue="false"/>
+    </PreferenceCategory>
+
+    <!-- Notifications -->
     <PreferenceCategory app:title="@string/notifications_header">
 
         <!-- Notifications enabled -->

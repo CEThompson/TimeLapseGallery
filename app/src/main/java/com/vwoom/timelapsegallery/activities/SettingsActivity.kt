@@ -329,6 +329,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
             Log.d("settings activity", "Notification listener activitating for key = $key")
 
+            if (key.equals(this.getString(R.string.key_ads_disabled))){
+                val adsDisabled = prefs.getBoolean(context?.getString(R.string.key_ads_disabled), false)
+                if (adsDisabled)
+                    mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_ads_disabled)!!, null)
+            }
+
             // If the user changes the notifications enabled preference trigger the notification worker to update any alarms
             if (key.equals(this.getString(R.string.key_notifications_enabled))) {
                 NotificationUtils.scheduleNotificationWorker(activity);

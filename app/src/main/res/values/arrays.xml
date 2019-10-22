@@ -15,10 +15,12 @@
     <string-array name="playback_interval_entries">
         <item>Fast (50ms)</item>
         <item>Slow (200ms)</item>
+        <item>Even Slower (500ms)</item>
     </string-array>
 
     <string-array name="playback_interval_values">
         <item>50</item>
         <item>200</item>
+        <item>500</item>
     </string-array>
 </resources>

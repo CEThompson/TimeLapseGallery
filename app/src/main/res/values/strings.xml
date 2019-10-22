@@ -135,6 +135,7 @@
     <string name="analytics_sync_response" translatable="false">sync_response</string>
     <string name="analytics_play_time_lapse" translatable="false">play_time_lapse</string>
     <string name="analytics_stop_time_lapse" translatable="false">stop_time_lapse</string>
+    <string name="analytics_ads_disabled" translatable="false">ads_disabled</string>
 
     <!-- Database sync warning information -->
     <string name="warning">Warning!</string>
@@ -167,6 +168,12 @@
     <!-- Settings -->
     <string name="title_activity_settings">Settings</string>
 
+    <!-- Ads -->
+    <string name="ads_header">Advertisements</string>
+    <string name="disable_ads_title">Disable ads</string>
+    <string name="ads_summary_enabled">Ads are allowed. \n\nThanks for supporting Time Lapse Gallery!</string>
+    <string name="ads_summary_disabled">Ads are disabled. Enjoy!</string>
+
     <!-- Notifications -->
     <string name="notifications_header">Notifications</string>
     <string name="enable_notifications_title">Enable notifications</string>
@@ -195,5 +202,6 @@
     <string name="key_playback_interval" translatable="false">playback_interval</string>
     <string name="key_sync" translatable="false">sync</string>
     <string name="key_sync_allowed" translatable="false">sync_allowed</string>
+    <string name="key_ads_disabled" translatable="false">ads_disabled</string>
 
 </resources>

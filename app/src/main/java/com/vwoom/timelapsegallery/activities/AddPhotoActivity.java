@@ -3,10 +3,12 @@ package com.vwoom.timelapsegallery.activities;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.preference.PreferenceManager;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
@@ -79,7 +81,6 @@ public class AddPhotoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_photo);
         ButterKnife.bind(this);
 
-        // Set up interstitial ad
         mInterstitialAd = new InterstitialAd(this);
         // This ad unit id points to test ads in debug and actual ads in release
         mInterstitialAd.setAdUnitId(getString(R.string.add_photo_activity_ad_unit_id));
@@ -342,16 +343,25 @@ public class AddPhotoActivity extends AppCompatActivity {
                 }
                 // Show ad if not test device and ad is loaded
                 else if (interstitialAd.isLoaded()) {
-                    interstitialAd.setAdListener(new AdListener() {
-                        @Override
-                        public void onAdClosed() {
-                            activity.finish();
-                        }
-                    });
-                    interstitialAd.show();
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                    boolean adsDisabled = prefs.getBoolean(context.getString(R.string.key_ads_disabled), false);
 
-                    // Send event to firebase
-                    firebaseAnalytics.logEvent(context.getString(R.string.analytics_show_ad), null);
+                    // If the user disabled ads just finish the activity
+                    if (adsDisabled)
+                        activity.finish();
+                    // Otherwise serve and log the ad
+                    else {
+                        interstitialAd.setAdListener(new AdListener() {
+                            @Override
+                            public void onAdClosed() {
+                                activity.finish();
+                            }
+                        });
+                        interstitialAd.show();
+
+                        // Send event to firebase
+                        firebaseAnalytics.logEvent(context.getString(R.string.analytics_show_ad), null);
+                    }
                 }
                 // Otherwise finish the activity
                 // TODO: (update) implement local ad
