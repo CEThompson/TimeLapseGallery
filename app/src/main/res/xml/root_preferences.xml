@@ -71,6 +71,7 @@
             app:title="@string/sync_allowed_title"
             app:summary="@string/sync_allowed_summary"
             app:defaultValue="false"
+            app:icon="@drawable/ic_warning_black_24dp"
             />
 
         <Preference
