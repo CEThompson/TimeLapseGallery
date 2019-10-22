@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.adapters.ProjectsAdapter;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
