@@ -72,7 +72,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-//TODO add share to gallery menu option?
+// TODO (update) add share to gallery menu option?
 
 public class DetailsActivity extends AppCompatActivity implements DetailsAdapter.DetailsAdapterOnClickHandler {
 
