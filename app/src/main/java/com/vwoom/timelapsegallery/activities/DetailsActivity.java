@@ -47,6 +47,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.adapters.DetailsAdapter;
@@ -575,21 +576,23 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         // If not enough photos give user feedback
         if (mPhotos.size()<=1){
-            Toast.makeText(this, getString(R.string.add_more_photos), Toast.LENGTH_LONG).show();
+            Snackbar.make(findViewById(R.id.details_coordinator_layout), R.string.add_more_photos,
+                    Snackbar.LENGTH_LONG)
+                    .show();
             return;
         }
 
         // If already playing cancel
         if (mPlaying){
-            // TODO track stop playing event?
-
             stopPlaying();
             // Handle UI
             loadUi(mCurrentPhoto);
+
+            // Track stop event
+            mFirebaseAnalytics.logEvent(getString(R.string.analytics_stop_time_lapse), null);
         }
         // Otherwise play the set of images
         else {
-            // TODO track play event?
             // Set color of play fab
             mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorRedAccent)));
             mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorRedAccent));
@@ -614,6 +617,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             loadUi(mPhotos.get(mCurrentPlayPosition));
             mProgressBar.setProgress(mCurrentPlayPosition);
             scheduleLoadPhoto(mCurrentPlayPosition, playbackInterval); // Recursively loads the rest of set from beginning
+
+            // Track play button interaction
+            mFirebaseAnalytics.logEvent(getString(R.string.analytics_play_time_lapse), null);
         }
     }
 
