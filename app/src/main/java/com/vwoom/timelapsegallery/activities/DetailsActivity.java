@@ -739,7 +739,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mDetailsAdapter.setPhotoData(mPhotos);
 
             // Set current photo to last if none has been selected
-            if (savedInstanceState == null)
+            if (savedInstanceState == null || mCurrentPhoto == null)
                 mCurrentPhoto = getLastPhoto();
 
             // Restore the play position
