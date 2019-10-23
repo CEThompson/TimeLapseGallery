@@ -365,6 +365,11 @@ public class AddPhotoActivity extends AppCompatActivity {
                             public void onAdClosed() {
                                 activity.finish();
                             }
+                            @Override
+                            public void onAdClicked() {
+                                super.onAdClicked();
+                                firebaseAnalytics.logEvent(context.getString(R.string.analytics_ad_click),null);
+                            }
                         });
                         interstitialAd.show();
 
