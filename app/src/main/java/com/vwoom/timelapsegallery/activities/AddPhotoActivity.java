@@ -81,7 +81,8 @@ public class AddPhotoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_photo);
         ButterKnife.bind(this);
 
-        mInterstitialAd = new InterstitialAd(this);
+        // Passing activity as context apparently causes memory leak, make sure to pass application context to interstitial ad
+        mInterstitialAd = new InterstitialAd(getApplicationContext());
         // This ad unit id points to test ads in debug and actual ads in release
         mInterstitialAd.setAdUnitId(getString(R.string.add_photo_activity_ad_unit_id));
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
@@ -123,6 +124,14 @@ public class AddPhotoActivity extends AppCompatActivity {
         if (!mInterstitialAd.isLoaded()){
             mInterstitialAd.loadAd(new AdRequest.Builder().build());
         }
+    }
+
+    /* Make sure to remove ad listener in lifecycle*/
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mInterstitialAd.setAdListener(null);
     }
 
     /* Creates a temporary file and launches a camera intent to write a photo to that file */
