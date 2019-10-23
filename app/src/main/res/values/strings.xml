@@ -171,8 +171,8 @@
     <!-- Ads -->
     <string name="ads_header">Advertisements</string>
     <string name="disable_ads_title">Disable ads</string>
-    <string name="ads_summary_enabled">Thanks for supporting Time Lapse Gallery!</string>
-    <string name="ads_summary_disabled">Ads are disabled. Enjoy!</string>
+    <string name="ads_summary_enabled">Ads enabled. Thanks for your support!</string>
+    <string name="ads_summary_disabled">Ads disabled. Enjoy!</string>
 
     <!-- Notifications -->
     <string name="notifications_header">Notifications</string>
