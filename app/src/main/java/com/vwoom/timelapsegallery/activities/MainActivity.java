@@ -157,16 +157,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         viewModel.getProjects().observe(this, (List<ProjectEntry> projectEntries) -> {
                 mProjects = projectEntries;
 
-                // If filter by today grab todays projects and set the data on the adapter
-                if (mFilterByToday){
-                    List<ProjectEntry> todaysProjects = ProjectUtils.getProjectsScheduledToday(mProjects);
-                    mProjectsAdapter.setProjectData(todaysProjects);
-                }
-                // Otherwise set the adapter to projects gathered by the view model
-                else {
-                    mProjectsAdapter.setProjectData(mProjects);
-                }
-
                 // If there are no projects fade in the welcome text view
                 TextView welcome = findViewById(R.id.welcome_text_view);
                 long longAnimationDuration = getResources().getInteger(
@@ -189,6 +179,16 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
                                 .setListener(null);
                     }
                 }
+
+            // If filter by today grab todays projects and set the data on the adapter
+            if (mFilterByToday){
+                List<ProjectEntry> todaysProjects = ProjectUtils.getProjectsScheduledToday(mProjects);
+                mProjectsAdapter.setProjectData(todaysProjects);
+            }
+            // Otherwise set the adapter to projects gathered by the view model
+            else {
+                mProjectsAdapter.setProjectData(mProjects);
+            }
 
                 // Reveal the new project fab
                 mNewProjectFab.show();
