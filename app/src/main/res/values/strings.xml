@@ -121,7 +121,7 @@
     <string name="analytics_add_photo_error" translatable="false">add_photo_error</string>
     <string name="analytics_new_project" translatable="false">new_project</string>
     <string name="analytics_submit_new_project_error" translatable="false">submit_new_project_error</string>
-    <string name="analytics_show_ad" translatable="false">show_add</string>
+    <string name="analytics_show_ad" translatable="false">show_ad</string>
     <string name="analytics_delete_photo" translatable="false">delete_photo</string>
     <string name="analytics_delete_project" translatable="false">delete_project</string>
     <string name="analytics_edit_project" translatable="false">edit_project</string>
