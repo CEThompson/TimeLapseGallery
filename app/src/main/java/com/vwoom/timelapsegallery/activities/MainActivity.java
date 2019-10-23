@@ -172,12 +172,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
                 }
                 // Otherwise leave the welcome text view hidden
                 else {
-                    if (welcome.getVisibility() == View.VISIBLE) {
-                        welcome.animate()
-                                .alpha(0f)
-                                .setDuration(longAnimationDuration)
-                                .setListener(null);
-                    }
+                    welcome.setVisibility(View.INVISIBLE);
                 }
 
             // If filter by today grab todays projects and set the data on the adapter
