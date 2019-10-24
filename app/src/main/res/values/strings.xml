@@ -184,7 +184,7 @@
 
     <!-- Playback -->
     <string name="playback_header">Playback</string>
-    <string name="playback_interval_title">Playback interval</string>
+    <string name="playback_interval_title">Playback speed</string>
 
     <!-- Database Synchronization -->
     <string name="sync_header">Database Sync</string>
