@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,19 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"/>
-
-    <!-- Previous image label -->
-    <TextView
-        android:id="@+id/previous_photo_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:text="@string/previous_photo"
-        tools:text="@string/previous_photo"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:layout_margin="@dimen/textview_margin"/>
 
     <!-- New image -->
     <ImageView
@@ -43,12 +30,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:text="@string/new_photo"
-        tools:text="@string/new_photo"
+        android:text="@string/compare"
+        tools:text="@string/compare"
         android:textColor="@color/white"
         android:textStyle="bold"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:layout_margin="@dimen/textview_margin"/>
+        android:layout_margin="@dimen/textview_margin"
+        app:layout_constraintStart_toEndOf="@id/compare_to_previous_fab"
+        app:layout_constraintBottom_toBottomOf="@id/compare_to_previous_fab"
+        app:layout_constraintTop_toTopOf="@id/compare_to_previous_fab"
+        app:layout_constraintVertical_bias="0.5"/>
 
     <!-- take photo FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -60,7 +51,8 @@
         app:fabSize="normal"
         android:backgroundTint="@color/colorAccent"
         android:src="@drawable/ic_add_a_photo_white_24dp"
-        android:layout_gravity="top|end"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- return to previous activity FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -72,7 +64,8 @@
         app:fabSize="normal"
         android:backgroundTint="@color/colorRedAccent"
         android:src="@drawable/ic_arrow_back_white_24dp"
-        android:layout_gravity="top|start"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <!-- submit photo FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -86,7 +79,8 @@
         app:borderWidth="0dp"
         app:fabSize="normal"
         android:src="@drawable/ic_check_white_24dp"
-        android:layout_gravity="bottom|end"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- compare to previous FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -98,6 +92,7 @@
         android:layout_margin="@dimen/fab_margin"
         app:fabSize="normal"
         android:src="@drawable/ic_compare_white_24dp"
-        android:layout_gravity="bottom|start"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

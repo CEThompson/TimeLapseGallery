@@ -84,6 +84,7 @@
     <!-- New project strings -->
     <string name="previous_photo">previous photo</string>
     <string name="new_photo">new photo</string>
+    <string name="compare">compare</string>
 
     <!-- Photo / Project information -->
     <string name="details_photo_number_out_of" translatable="false">%1$d / %2$d</string>

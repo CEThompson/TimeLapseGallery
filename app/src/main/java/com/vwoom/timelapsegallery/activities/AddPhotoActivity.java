@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -218,15 +219,21 @@ public class AddPhotoActivity extends AppCompatActivity {
                 submitPhoto();
         });
 
+        // TODO set touch listener for compare fab
         /* Shows the previous photo for comparison */
-        mCompareFab.setOnClickListener(view -> {
-            if (mResultPhoto.getVisibility() == View.VISIBLE) {
-                mResultPhoto.setVisibility(View.INVISIBLE);
-                mNewPhotoLabel.setVisibility(View.INVISIBLE);
-            }
-            else {
-                mResultPhoto.setVisibility(View.VISIBLE);
-                mNewPhotoLabel.setVisibility(View.VISIBLE);
+        mCompareFab.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN){
+                    mResultPhoto.setVisibility(View.INVISIBLE);
+                    mNewPhotoLabel.setVisibility(View.INVISIBLE);
+                    return true;
+                } else if (event.getAction() == MotionEvent.ACTION_UP){
+                    mResultPhoto.setVisibility(View.VISIBLE);
+                    mNewPhotoLabel.setVisibility(View.VISIBLE);
+                    return true;
+                }
+                return false;
             }
         });
 
