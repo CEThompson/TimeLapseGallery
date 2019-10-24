@@ -19,7 +19,6 @@ import android.provider.Settings;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -58,6 +57,7 @@ public class AddPhotoActivity extends AppCompatActivity {
 
     /* Photo data */
     private String mTemporaryPhotoPath;
+    private String mBackupPhoto;
     private String mPreviousPhotoPath;
 
     private TimeLapseDatabase mTimeLapseDatabase;
@@ -71,6 +71,7 @@ public class AddPhotoActivity extends AppCompatActivity {
     private FirebaseAnalytics mFirebaseAnalytics;
 
     private static final int REQUEST_TAKE_PHOTO = 1;
+    private static final String KEY_BACKUP_PHOTO = "backup_photo"; // If user backs out of camera save a reference to their previous picture if they took one
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +99,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         // Recover the photo path
         if (savedInstanceState != null){
             mTemporaryPhotoPath = savedInstanceState.getString(Keys.TEMP_PATH);
+            mBackupPhoto = savedInstanceState.getString(KEY_BACKUP_PHOTO);
 
             // load and show image if a temporary photo path has been created / the user has taken a picture
             if (mTemporaryPhotoPath != null) {
@@ -140,6 +142,7 @@ public class AddPhotoActivity extends AppCompatActivity {
             File tempFile = null;
             try {
                 tempFile = FileUtils.createTemporaryImageFile(this);
+                if (mTemporaryPhotoPath != null) mBackupPhoto = mTemporaryPhotoPath;
                 mTemporaryPhotoPath = tempFile.getAbsolutePath();
             } catch (IOException e) {
                 // Notify user of error
@@ -185,8 +188,10 @@ public class AddPhotoActivity extends AppCompatActivity {
             if (!mInterstitialAd.isLoaded()){
                 mInterstitialAd.loadAd(new AdRequest.Builder().build());
             }
-
             loadResultUi();
+        } else {
+            // TODO restore previous taken photo
+            mTemporaryPhotoPath = mBackupPhoto;
         }
     }
 
@@ -214,20 +219,17 @@ public class AddPhotoActivity extends AppCompatActivity {
         });
         
         /* Shows the previous photo for comparison */
-        mCompareFab.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN){
-                    mResultPhoto.setVisibility(View.INVISIBLE);
-                    // TODO stop animation of compare fab
-                    return true;
-                } else if (event.getAction() == MotionEvent.ACTION_UP){
-                    mResultPhoto.setVisibility(View.VISIBLE);
-                    // TODO animate compare fab
-                    return true;
-                }
-                return false;
+        mCompareFab.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN){
+                mResultPhoto.setVisibility(View.INVISIBLE);
+                // TODO stop animation of compare fab
+                return true;
+            } else if (event.getAction() == MotionEvent.ACTION_UP){
+                mResultPhoto.setVisibility(View.VISIBLE);
+                // TODO animate compare fab
+                return true;
             }
+            return false;
         });
 
         /* Cancels adding a photo to the project */
@@ -272,6 +274,7 @@ public class AddPhotoActivity extends AppCompatActivity {
 
         /* Store member variables */
         outState.putString(Keys.TEMP_PATH, mTemporaryPhotoPath);
+        outState.putString(KEY_BACKUP_PHOTO, mBackupPhoto);
     }
 
     /* Async Task used to submit a photo to the database and finish the activity */
