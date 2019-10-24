@@ -50,10 +50,6 @@ public class AddPhotoActivity extends AppCompatActivity {
     @BindView(R.id.previous_photo) ImageView mPreviousPhoto;
     @BindView(R.id.add_photo_result) ImageView mResultPhoto;
 
-    /* Photo labels */
-    @BindView(R.id.new_photo_textview)
-    TextView mNewPhotoLabel;
-
     /* Floating Action Buttons */
     @BindView(R.id.take_photo_fab) FloatingActionButton mRetakeFab;
     @BindView(R.id.compare_to_previous_fab) FloatingActionButton mCompareFab;
@@ -106,7 +102,6 @@ public class AddPhotoActivity extends AppCompatActivity {
             // load and show image if a temporary photo path has been created / the user has taken a picture
             if (mTemporaryPhotoPath != null) {
                 mRetakeFab.setImageResource(R.drawable.ic_repeat_white_24dp);
-                mNewPhotoLabel.setVisibility(View.VISIBLE);
                 mResultPhoto.setVisibility(View.VISIBLE);
                 mCompareFab.show();
                 mSubmitFab.show();
@@ -207,7 +202,6 @@ public class AddPhotoActivity extends AppCompatActivity {
         mSubmitFab.show();
         mCompareFab.show();
         mRetakeFab.setImageResource(R.drawable.ic_repeat_white_24dp);
-        mNewPhotoLabel.setVisibility(View.VISIBLE);
     }
 
     /* Set click listeners for all four fabs */
@@ -218,19 +212,18 @@ public class AddPhotoActivity extends AppCompatActivity {
             if (!mTemporaryPhotoPath.isEmpty())
                 submitPhoto();
         });
-
-        // TODO set touch listener for compare fab
+        
         /* Shows the previous photo for comparison */
         mCompareFab.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN){
                     mResultPhoto.setVisibility(View.INVISIBLE);
-                    mNewPhotoLabel.setVisibility(View.INVISIBLE);
+                    // TODO stop animation of compare fab
                     return true;
                 } else if (event.getAction() == MotionEvent.ACTION_UP){
                     mResultPhoto.setVisibility(View.VISIBLE);
-                    mNewPhotoLabel.setVisibility(View.VISIBLE);
+                    // TODO animate compare fab
                     return true;
                 }
                 return false;
