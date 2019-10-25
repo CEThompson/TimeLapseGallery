@@ -78,6 +78,8 @@ public class AddPhotoActivity extends AppCompatActivity {
 
     private static final int REQUEST_TAKE_PHOTO = 1;
     private static final String KEY_BACKUP_PHOTO = "backup_photo"; // If user backs out of camera save a reference to their previous picture if they took one
+    private static final String KEY_RETURNED = "returned";
+    private static final String KEY_COMPARED = "compared";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +108,8 @@ public class AddPhotoActivity extends AppCompatActivity {
         if (savedInstanceState != null){
             mTemporaryPhotoPath = savedInstanceState.getString(Keys.TEMP_PATH);
             mBackupPhoto = savedInstanceState.getString(KEY_BACKUP_PHOTO);
+            mReturned = savedInstanceState.getBoolean(KEY_RETURNED);
+            mCompared = savedInstanceState.getBoolean(KEY_COMPARED);
 
             // load and show image if a temporary photo path has been created / the user has taken a picture
             if (mTemporaryPhotoPath != null) {
@@ -328,6 +332,8 @@ public class AddPhotoActivity extends AppCompatActivity {
         /* Store member variables */
         outState.putString(Keys.TEMP_PATH, mTemporaryPhotoPath);
         outState.putString(KEY_BACKUP_PHOTO, mBackupPhoto);
+        outState.putBoolean(KEY_RETURNED, mReturned);
+        outState.putBoolean(KEY_COMPARED, mCompared);
     }
 
     /* Async Task used to submit a photo to the database and finish the activity */
