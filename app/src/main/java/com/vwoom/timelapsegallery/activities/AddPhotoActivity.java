@@ -19,7 +19,6 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -63,6 +62,9 @@ public class AddPhotoActivity extends AppCompatActivity {
     private String mPreviousPhotoPath;
 
     private TimeLapseDatabase mTimeLapseDatabase;
+
+    private boolean mCompared = false;
+    private boolean mReturned = false;
 
     private ProjectEntry mCurrentProject;
 
@@ -127,7 +129,7 @@ public class AddPhotoActivity extends AppCompatActivity {
             mInterstitialAd.loadAd(new AdRequest.Builder().build());
         }
 
-        if (mTemporaryPhotoPath != null){
+        if (mReturned && !mCompared) {
             animateCompareFab();
         }
     }
@@ -200,18 +202,20 @@ public class AddPhotoActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
 
+            mReturned = true;
+
             // Load ad if it isn't loaded
             if (!mInterstitialAd.isLoaded()){
                 mInterstitialAd.loadAd(new AdRequest.Builder().build());
             }
 
             loadResultUi();
-
-            animateCompareFab();
         } else {
             // TODO restore previous taken photo
             mTemporaryPhotoPath = mBackupPhoto;
         }
+
+        // Note: after activity result fires onResume fires and animates the compare fab depending upon comparison and succesful return state;
     }
 
     /* Sets up the ui after result from taking photo */
@@ -242,10 +246,10 @@ public class AddPhotoActivity extends AppCompatActivity {
             if (event.getAction() == MotionEvent.ACTION_DOWN){
                 mResultPhoto.setVisibility(View.INVISIBLE);
                 stopAnimation();
+                mCompared = true;
                 return true;
             } else if (event.getAction() == MotionEvent.ACTION_UP){
                 mResultPhoto.setVisibility(View.VISIBLE);
-                animateCompareFab();
                 return true;
             }
             return false;
@@ -300,11 +304,10 @@ public class AddPhotoActivity extends AppCompatActivity {
         mCompareFab.animate()
                 .scaleX(1.1f)
                 .scaleY(1.1f)
-                .setDuration(100)
-                .setInterpolator(new OvershootInterpolator())
+                .setDuration(50)
                 .start();
         Runnable runnable = this::fabDecrease;
-        mAnimationHandler.postDelayed(runnable, 250);
+        mAnimationHandler.postDelayed(runnable, 200);
     }
 
     private void fabDecrease(){
@@ -312,10 +315,9 @@ public class AddPhotoActivity extends AppCompatActivity {
                 .scaleX(1f)
                 .scaleY(1f)
                 .setDuration(50)
-                .setInterpolator(new OvershootInterpolator())
                 .start();
         Runnable runnable = this::fabIncrease;
-        mAnimationHandler.postDelayed(runnable, 500);
+        mAnimationHandler.postDelayed(runnable, 200);
     }
 
     /* Save state on configuration change */
