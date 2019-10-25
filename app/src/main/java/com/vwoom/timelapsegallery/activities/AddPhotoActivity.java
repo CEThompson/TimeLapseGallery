@@ -300,18 +300,18 @@ public class AddPhotoActivity extends AppCompatActivity {
         mCompareFab.animate()
                 .scaleX(1.1f)
                 .scaleY(1.1f)
-                .setDuration(500)
+                .setDuration(100)
                 .setInterpolator(new OvershootInterpolator())
                 .start();
         Runnable runnable = this::fabDecrease;
-        mAnimationHandler.postDelayed(runnable, 500);
+        mAnimationHandler.postDelayed(runnable, 250);
     }
 
     private void fabDecrease(){
         mCompareFab.animate()
                 .scaleX(1f)
                 .scaleY(1f)
-                .setDuration(500)
+                .setDuration(50)
                 .setInterpolator(new OvershootInterpolator())
                 .start();
         Runnable runnable = this::fabIncrease;
