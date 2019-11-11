@@ -97,7 +97,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-common-java8:2.1.0"
 
     /* admob */
-    implementation 'com.google.android.gms:play-services-ads:18.2.0'
+    implementation 'com.google.android.gms:play-services-ads:18.3.0'
 
     /* glide */
     implementation 'com.github.bumptech.glide:glide:4.9.0'
