@@ -20,28 +20,6 @@ public class ProjectUtils {
 
     private static final String TAG = ProjectUtils.class.getSimpleName();
 
-    /* Takes all scheduled projects and returns a list of projects scheduled for today */
-    public static List<ProjectEntry> getProjectsScheduledToday(List<ProjectEntry> projects){
-        List<ProjectEntry> projectsForToday = new ArrayList<>();
-
-        /* Go through all scheduled projects and create a list of projects scheduled for today */
-        for (ProjectEntry currentProject : projects){
-
-            // Find the next scheduled time
-            long nextScheduledPhotoTimestamp = currentProject.getSchedule_next_submission();
-            int schedule = currentProject.getSchedule();
-
-            // If that timestamp belongs to today, add it to the list
-            // If the timestamp is due up, add the project to the list as well
-            if (schedule != 0
-                    && (DateUtils.isToday(nextScheduledPhotoTimestamp) || System.currentTimeMillis() > nextScheduledPhotoTimestamp))
-                projectsForToday.add(currentProject);
-        }
-
-        // Return the list of todays scheduled projects
-        return projectsForToday;
-    }
-
     public static String validateFileStructure(Context context){
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         if (storageDir==null) return context.getString(R.string.no_files_error);
@@ -141,11 +119,7 @@ public class ProjectUtils {
                         ProjectEntry currentProject
                                 = new ProjectEntry(
                                 Long.valueOf(id),
-                                projectName,
-                                projectFiles[0].getAbsolutePath(),
-                                TimeUtils.SCHEDULE_NONE,
-                                0,
-                                0);
+                                projectName,false);
 
                         // Insert the project - this updates on conflict
                         db.projectDao().insertProject(currentProject);
@@ -172,16 +146,5 @@ public class ProjectUtils {
                 db.photoDao().insertPhoto(newEntry);
             }
         }
-
-        // Get the resulting list
-        List<PhotoEntry> result = db.photoDao().loadAllPhotosByProjectId_NonLiveData(currentProject.getId());
-
-        // Update the project entry with information from first and last photo in set
-        PhotoEntry first = result.get(0);
-        PhotoEntry last = result.get(result.size()-1);
-        currentProject.setThumbnail_url(last.getUrl());
-        currentProject.setSchedule_next_submission(last.getTimestamp());
-        currentProject.setTimestamp(first.getTimestamp());
-        db.projectDao().updateProject(currentProject);
     }
 }

@@ -52,7 +52,7 @@ public final class FileUtils {
                 String url = child.getAbsolutePath();
                 String filename = url.substring(url.lastIndexOf("/")+1);
                 long timestamp = Long.valueOf(filename.replaceFirst("[.][^.]+$",""));
-                PhotoEntry photoEntry = new PhotoEntry(projectId, url, timestamp);
+                PhotoEntry photoEntry = new PhotoEntry(projectId, timestamp);
                 photos.add(photoEntry);
             }
         } else return null;
@@ -124,46 +124,10 @@ public final class FileUtils {
         boolean success = sourceProject.renameTo(destinationProject);
 
         // Update the photo references
-        if (success){
-            updateProjectPhotoPaths(context, destination);
-            // Return true if rename is successful
-            return true;
-        }
-
+        // Return true if rename is successful
+        if (success) return true;
         // Return false if rename is not successful
         return false;
-    }
-
-    private static void updateProjectPhotoPaths(Context context, ProjectEntry projectEntry){
-        AppExecutors.getInstance().diskIO().execute(()->{
-            // Get reference to database
-            TimeLapseDatabase timeLapseDatabase = TimeLapseDatabase.getInstance(context);
-            // Get all photos for the project
-            List<PhotoEntry> photos = timeLapseDatabase.photoDao().loadAllPhotosByProjectId_NonLiveData(projectEntry.getId());
-
-            // Iterate through photos and update their paths to the new project directory name
-            for (PhotoEntry photo : photos){
-                Log.d(TAG, "updating photo from path " + photo.getUrl());
-                // Build the path to the new project directory
-                String currentPhotoRelativePath = photo.getTimestamp() + ".jpg";
-
-                File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-                String sourceProjectPath = getProjectDirectoryPath(projectEntry);
-                File projectDir = new File(storageDir, sourceProjectPath);
-
-                String projectAbsolutePath = projectDir.getAbsolutePath();
-                String updatedAbsolutePath = projectAbsolutePath + "/" + currentPhotoRelativePath;
-
-                photo.setUrl(updatedAbsolutePath);
-                Log.d(TAG, "updating photo to path" + photo.getUrl());
-                timeLapseDatabase.photoDao().updatePhoto(photo);
-            }
-
-            // Update the cover photo
-            PhotoEntry last = photos.get(photos.size()-1);
-            projectEntry.setThumbnail_url(last.getUrl());
-            timeLapseDatabase.projectDao().updateProject(projectEntry);
-        });
     }
 
     /* Delete temporary directory and files within temporary directory */
@@ -194,8 +158,8 @@ public final class FileUtils {
     }
 
     /* Deletes file referred to in photo entry */
-    public static void deletePhoto(Context context, PhotoEntry photoEntry){
-        File photoFile = new File(photoEntry.getUrl());
+    public static void deletePhoto(Context context, ProjectEntry projectEntry, PhotoEntry photoEntry){
+        File photoFile = new File(getPhotoUrl(context, projectEntry, photoEntry));
         deleteRecursive(photoFile);
     }
 
@@ -213,20 +177,18 @@ public final class FileUtils {
         return projectEntry.getId() + "_" + projectEntry.getName();
     }
 
-
     public static String getPhotoUrl(Context context, ProjectEntry projectEntry, PhotoEntry photoEntry){
-        long timestamp = photoEntry.getTimestamp();
-
-        String imageFileName = getPhotoFileNameFromTimestamp(timestamp);
+        String imageFileName = getPhotoFileName(photoEntry);
         File projectDir = getProjectFolder(context, projectEntry);
-
         File photoFile = new File(projectDir, imageFileName);
-
         return photoFile.getAbsolutePath();
-
     }
 
-    public static String getPhotoFileNameFromTimestamp(long timestamp){
+    public static String getPhotoFileName(PhotoEntry entry){
+        return entry.getTimestamp() + ".jpg";
+    }
+
+    public static String getPhotoFileName(long timestamp){
         return timestamp + ".jpg";
     }
 }

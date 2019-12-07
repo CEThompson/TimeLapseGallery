@@ -13,6 +13,7 @@ import androidx.work.WorkerParameters;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
+import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
 
 import java.util.Calendar;
@@ -58,17 +59,25 @@ public class NotificationWorker extends Worker {
 
             // Loop through scheduled projects and set up alarms for each day
             for (ProjectEntry scheduledProject: scheduledProjects){
+                ProjectScheduleEntry schedule = timeLapseDatabase
+                        .projectScheduleDao()
+                        .loadScheduleByProjectId(scheduledProject.getId());
+
                 Log.d(TAG, "Notification Tracker: Processing alarm for project named " + scheduledProject.getName());
-                long nextSubmissionTime = scheduledProject.getSchedule_next_submission();
+
+                if (schedule == null) break;
+
+                long nextSubmissionTime = schedule.getScheduleTime();
+                long dayInterval = schedule.getIntervalDays();
 
                 // Schedule a notification for tomorrow
                 // If any project has a daily schedule create the notification
-                if (scheduledProject.getSchedule() == 1) {
+                if (dayInterval == 1) {
                     scheduleNotification = true;
                     break;
                 }
                 // If a project has a weekly alarm check if the alarm is set for tomorrow
-                else if (scheduledProject.getSchedule() == 2){
+                else {
                     // If a weekly project is scheduled for tomorrow set the notification flag and stop
                     if (TimeUtils.isTomorrow(nextSubmissionTime)){
                         scheduleNotification = true;
