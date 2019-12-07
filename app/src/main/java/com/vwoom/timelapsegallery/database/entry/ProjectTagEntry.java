@@ -14,6 +14,7 @@ import androidx.room.ForeignKey;
                         parentColumns = "id", childColumns = "tag_id",
                         onDelete = ForeignKey.CASCADE)
         })
+// TODO set index for columns
 
 public class ProjectTagEntry {
     private long project_id;
@@ -24,17 +25,17 @@ public class ProjectTagEntry {
         this.tag_id = tag_id;
     }
 
-    public long getTagId() {
-        return tag_id;
-    }
-    public long getProjectId() {
+    public long getProject_id() {
         return project_id;
     }
-
-    public void setTagId(long tag_id) {
-        this.tag_id = tag_id;
+    public long getTag_id() {
+        return tag_id;
     }
-    public void setProjectId(long project_id) {
+
+    public void setProject_id(long project_id) {
         this.project_id = project_id;
+    }
+    public void setTag_id(long tag_id) {
+        this.tag_id = tag_id;
     }
 }

@@ -32,10 +32,11 @@ public class ProjectEntry implements Parcelable {
     }
 
     /* Getters */
+
     public long getId() {
         return id;
     }
-    public String getName() {
+    public String getProject_name() {
         return project_name;
     }
     public boolean isProject_cover_set_by_user() {
@@ -44,8 +45,9 @@ public class ProjectEntry implements Parcelable {
 
     /* Setters */
     public void setId(long id) { this.id = id; }
-    public void setName(@Nullable String project_name) { this.project_name = project_name; }
-
+    public void setProject_name(@Nullable String project_name) {
+        this.project_name = project_name;
+    }
     public void setProject_cover_set_by_user(boolean project_cover_set_by_user) {
         this.project_cover_set_by_user = project_cover_set_by_user;
     }

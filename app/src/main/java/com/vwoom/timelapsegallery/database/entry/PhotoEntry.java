@@ -28,13 +28,25 @@ public class PhotoEntry implements Parcelable {
     }
 
     /* Getters */
-    public long getPhotoId() { return id; }
-    public long getProjectId() { return project_id; }
-    public long getTimestamp() { return timestamp; }
+
+    public long getId() {
+        return id;
+    }
+    public long getProject_id() {
+        return project_id;
+    }
+    public long getTimestamp() {
+        return timestamp;
+    }
 
     /* Setters */
-    public void setId(long id) { this.id = this.id;}
-    public void setProjectId(long project_id) { this.project_id = project_id; }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+    public void setProject_id(long project_id) {
+        this.project_id = project_id;
+    }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
     /* Parcelable functionality */

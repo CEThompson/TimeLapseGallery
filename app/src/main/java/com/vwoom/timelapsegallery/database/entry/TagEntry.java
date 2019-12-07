@@ -12,24 +12,24 @@ public class TagEntry {
 
     /* For inserting with auto-generated ID */
     @Ignore
-    public TagEntry(String title){
+    public TagEntry(String tag){
         this.tag = tag;
     }
 
-    public TagEntry(long tag_id, String tag){
-        this.id = tag_id;
+    public TagEntry(long id, String tag){
+        this.id = id;
         this.tag = tag;
     }
 
-    public long getTagId() {
+    public long getId() {
         return id;
     }
     public String getTag() {
         return tag;
     }
 
-    public void setTagId(long id) {
-        this.id = this.id;
+    public void setId(long id) {
+        this.id = id;
     }
     public void setTag(String tag) {
         this.tag = tag;
