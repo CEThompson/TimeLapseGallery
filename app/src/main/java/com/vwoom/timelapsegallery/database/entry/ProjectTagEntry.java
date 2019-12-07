@@ -10,10 +10,12 @@ import androidx.room.PrimaryKey;
             primaryKeys = {"project_id", "tag_id"},
             foreignKeys = {
                 @ForeignKey(entity = ProjectEntry.class,
-                    parentColumns = "project_id", childColumns = "project_id",
-                    onDelete = ForeignKey.CASCADE),
+                        parentColumns = "project_id", childColumns = "project_id",
+                        // TODO verify deletion logic
+                        onDelete = ForeignKey.CASCADE),
                 @ForeignKey(entity = TagEntry.class,
                         parentColumns = "tag_id", childColumns = "tag_id",
+                        // TODO verify deletion logic
                         onDelete = ForeignKey.CASCADE)
         })
 
