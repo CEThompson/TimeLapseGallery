@@ -52,9 +52,11 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.adapters.DetailsAdapter;
 import com.vwoom.timelapsegallery.database.AppExecutors;
+import com.vwoom.timelapsegallery.database.entry.CoverPhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
+import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry;
 import com.vwoom.timelapsegallery.notification.NotificationUtils;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
@@ -110,6 +112,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     private PhotoEntry mCurrentPhoto;
     private Integer mCurrentPlayPosition = null;
     private ProjectEntry mCurrentProject;
+    private ProjectScheduleEntry mProjectSchedule;
 
     // Views for fullscreen dialog
     private Dialog mFullscreenImageDialog;
@@ -178,6 +181,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         // Get the project information from the intent
         mCurrentProject = getIntent().getParcelableExtra(Keys.PROJECT_ENTRY);
+        mProjectSchedule = getIntent().getParcelableExtra(Keys.PROJECT_SCHEDULE_ENTRY);
 
         // Get the database
         mTimeLapseDatabase = TimeLapseDatabase.getInstance(this);
@@ -336,9 +340,11 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 // Set the current photo to null, when null the viewmodel will set to last in set
                 mCurrentPhoto = null;
 
-                // Check to update the schedule
-                int schedule = mCurrentProject.getSchedule();
-                long next = mCurrentProject.getSchedule_next_submission();
+                if (mProjectSchedule == null) return;
+
+                // update the schedule
+                int schedule = mProjectSchedule.getInterval_days();
+                long next = mProjectSchedule.getSchedule_time();
 
                 // Update if there is a schedule and the timestamp belongs to today or has elapsed
                 if (schedule > 0
@@ -350,8 +356,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                     // update the database reference
                     final long nextTimestampToSubmit = next;
                     AppExecutors.getInstance().diskIO().execute(() -> {
-                        mCurrentProject.setSchedule_next_submission(nextTimestampToSubmit);
-                        mTimeLapseDatabase.projectDao().updateProject(mCurrentProject);
+                        mProjectSchedule.setSchedule_time(nextTimestampToSubmit);
+                        mTimeLapseDatabase.projectScheduleDao().updateProjectSchedule(mProjectSchedule);
                     });
 
                     UpdateWidgetService.startActionUpdateWidgets(this);
@@ -468,7 +474,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mDetailsAdapter.setCurrentPhoto(photoEntry);
 
         // Load the current image
-        loadImage(photoEntry.getUrl());
+        loadImage(FileUtils.getPhotoUrl(this, mCurrentProject, photoEntry));
 
         // Get info for the current photo
         long timestamp = photoEntry.getTimestamp();
@@ -718,7 +724,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     // TODO (update) implement dual loading solution for smooth transition between fullscreen images
     /* Pre loads the selected image into the hidden dialogue so that display appears immediate */
     private void preloadFullscreenImage(){
-        File current = new File(mCurrentPhoto.getUrl());
+        String path = FileUtils.getPhotoUrl(this, mCurrentProject, mCurrentPhoto);
+        File current = new File(path);
         Glide.with(this)
                 .load(current)
                 .into(mFullscreenImage);
@@ -736,7 +743,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             mPhotos = photoEntries;
 
             // Send the photos to the adapter
-            mDetailsAdapter.setPhotoData(mPhotos);
+            mDetailsAdapter.setPhotoData(mPhotos, mCurrentProject);
 
             // Set current photo to last if none has been selected
             if (savedInstanceState == null || mCurrentPhoto == null)
@@ -774,8 +781,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             // This prevents crashes from occurring
             if (mCurrentProject != null) {
                 // Set project info
-                mProjectNameTextView.setText(mCurrentProject.getName());
+                mProjectNameTextView.setText(mCurrentProject.getProject_name());
             }
+
+            // TODO handle change to cover set by user?
         });
     }
 
@@ -873,15 +882,13 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     }
 
     /* Deletes the current photo */
-    private void deletePhoto(TimeLapseDatabase database, PhotoEntry photoEntry){
+    private void deletePhoto(TimeLapseDatabase database, ProjectEntry projectEntry, PhotoEntry photoEntry){
         AppExecutors.getInstance().diskIO().execute(() -> {
                 // Delete the photo from the file structure
-                FileUtils.deletePhoto(this, photoEntry);
-
+                FileUtils.deletePhoto(this, projectEntry, photoEntry);
                 // Delete the photo metadata in the database
                 database.photoDao().deletePhoto(photoEntry);
             });
-
         // Send to analytics
         mFirebaseAnalytics.logEvent(getString(R.string.analytics_delete_photo), null);
     }
@@ -897,11 +904,14 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         AppExecutors.getInstance().diskIO().execute(() -> {
             // Delete the photos from the file structure
             FileUtils.deleteProject(DetailsActivity.this, projectEntry);
+
+            ProjectScheduleEntry schedule = database.projectScheduleDao().loadScheduleByProjectId(projectEntry.getId());
+
             // Delete the project from the database
             database.projectDao().deleteProject(projectEntry);
 
             /* If project had a schedule ensure widget and notification worker are updated */
-            if (projectEntry.getSchedule() != 0) {
+            if (schedule != null) {
                 NotificationUtils.scheduleNotificationWorker(this);
                 UpdateWidgetService.startActionUpdateWidgets(this);
             }
@@ -909,15 +919,15 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         // Send to analytics
         Bundle params = new Bundle();
-        params.putString("project_name", projectEntry.getName());
+        params.putString("project_name", projectEntry.getProject_name());
         mFirebaseAnalytics.logEvent(getString(R.string.analytics_delete_project), null);
     }
 
     /* Gets the last photo from the set and sets it as the project thumbnail */
     private void updateProjectThumbnail(TimeLapseDatabase database, ProjectEntry project, PhotoEntry photo){
         AppExecutors.getInstance().diskIO().execute(() -> {
-                    project.setThumbnail_url(photo.getUrl());
-                    database.projectDao().updateProject(project);
+                    CoverPhotoEntry coverPhotoEntry = new CoverPhotoEntry(project.getId(), photo.getId());
+                    database.coverPhotoDao().insertPhoto(coverPhotoEntry);
                 }
         );
     }
@@ -952,7 +962,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                     mCurrentPhoto = null;
 
                     // Delete the photo
-                    deletePhoto(mTimeLapseDatabase, photoToDelete);
+                    deletePhoto(mTimeLapseDatabase, mCurrentProject, photoToDelete);
                 })
                 .setNegativeButton(android.R.string.no, null).show();
     }
@@ -989,7 +999,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, (DialogInterface dialogInterface, int i) -> {
                     deleteProject(mTimeLapseDatabase, mCurrentProject);
-                    if (mCurrentProject.getSchedule() != 0)
+                    if (mProjectSchedule != null)
                         NotificationUtils.scheduleNotificationWorker(this);
                     finish();
                 })
