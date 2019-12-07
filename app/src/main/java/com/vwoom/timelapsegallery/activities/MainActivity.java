@@ -20,11 +20,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.TextView;
 
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.adapters.ProjectsAdapter;
+import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
+import com.vwoom.timelapsegallery.database.entry.CoverPhotoEntry;
+import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
+import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.ProjectUtils;
@@ -32,6 +35,7 @@ import com.vwoom.timelapsegallery.viewmodels.MainActivityViewModel;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
     private ProjectsAdapter mProjectsAdapter;
 
     private List<ProjectEntry> mProjects;
+    private List<CoverPhotoEntry> mCoverPhotos;
 
     private int mNumberOfColumns = 3;
 
@@ -155,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
     private void setupViewModel(){
         MainActivityViewModel viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         viewModel.getProjects().observe(this, (List<ProjectEntry> projectEntries) -> {
-                mProjects = projectEntries;
+            mProjects = projectEntries;
 
             // If filter by today grab todays projects and set the data on the adapter
             if (mFilterByToday){
@@ -167,8 +172,34 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
                 mProjectsAdapter.setProjectData(mProjects);
             }
 
-                // Reveal the new project fab
-                mNewProjectFab.show();
+            // Reveal the new project fab
+            mNewProjectFab.show();
+        });
+
+        viewModel.getProjectCovers().observe(this, (List<CoverPhotoEntry> coverPhotoEntries) -> {
+            mCoverPhotos = coverPhotoEntries;
+
+            // TODO create a list of the urls for the cover photos off the main thread
+            TimeLapseDatabase db = TimeLapseDatabase.getInstance(this);
+            Map<Long, String> projectIdsToCoverUrls = new HashMap<>();
+            for (int i = 0; i < mCoverPhotos.size(); i++){
+                CoverPhotoEntry current = mCoverPhotos.get(i);
+                long project_id = current.getProject_id();
+                long photo_id = current.getPhoto_id();
+                PhotoEntry coverPhoto = db.photoDao().loadPhoto(project_id, photo_id);
+
+                // TODO get filename from photo entry
+                String photoUrl = FileUtils.getPhotoUrl(coverPhoto);
+                projectIdsToCoverUrls.put(project_id, photoUrl);
+            }
+            mProjectsAdapter.setCoverPhotos(projectIdsToCoverUrls);
+        });
+
+        viewModel.getProjectSchedules().observe(this, (List<ProjectScheduleEntry> projectSchedules) -> {
+            mSchedules = projectSchedules;
+
+            Map<Long, ProjectScheduleEntry> projectIdsToSchedules = new HashMap<>();
+            mProjectsAdapter.setProjectSchedules();
         });
     }
 

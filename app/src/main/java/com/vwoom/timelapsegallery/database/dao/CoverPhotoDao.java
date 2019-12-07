@@ -8,12 +8,18 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.vwoom.timelapsegallery.database.entry.CoverPhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
+
+import java.util.List;
 
 @Dao
 public interface CoverPhotoDao {
     @Query("SELECT * FROM cover_photo WHERE project_id =:projectId")
-    LiveData<PhotoEntry> getCoverPhoto(long projectId);
+    LiveData<CoverPhotoEntry> getCoverPhoto(long projectId);
+
+    @Query("SELECT * FROM cover_photo")
+    LiveData<List<CoverPhotoEntry>> getAllCoverPhotos();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertPhoto(PhotoEntry photoEntry);

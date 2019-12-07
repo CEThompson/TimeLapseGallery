@@ -17,12 +17,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
+import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry;
 import com.vwoom.timelapsegallery.utils.PhotoUtils;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
 
 import java.io.File;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,6 +34,9 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
     private final static String TAG = ProjectsAdapter.class.getSimpleName();
 
     private List<ProjectEntry> mProjectData;
+    private Map<Long, String> mProjectsToPhotos;
+    private Map<Long, ProjectScheduleEntry> mProjectsToSchedules;
+
     private final ProjectsAdapterOnClickHandler mClickHandler;
 
     private ConstraintSet constraintSet = new ConstraintSet();
@@ -81,8 +86,9 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
     public void onBindViewHolder(@NonNull ProjectsAdapterViewHolder holder, int position) {
         // Get project information
         ProjectEntry currentProject = mProjectData.get(position);
-        String thumbnail_path = currentProject.getThumbnail_url();
-        String projectName = currentProject.getName();
+
+        // TODO test photo url from hashmap
+        String thumbnail_path = mProjectsToPhotos.get(currentProject.getId());
 
         // Set the constraint ratio
         String ratio = PhotoUtils.getAspectRatioFromImagePath(thumbnail_path);
@@ -90,15 +96,12 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         constraintSet.setDimensionRatio(holder.mProjectImageView.getId(), ratio);
         constraintSet.applyTo(holder.mConstraintLayout);
 
-        // Set to original color so that views recycle appropriately
-        //holder.mConstraintLayout.setBackgroundColor(ContextCompat
-        //        .getColor(holder.itemView.getContext(), R.color.colorLightPrimary));
-        holder.mConstraintLayout.setPadding(0,0,0,0);
-
         // Display schedule information
-        if (currentProject.getSchedule() !=0) {
+        // TODO test schedule information
+        ProjectScheduleEntry currentSchedule = mProjectsToSchedules.get(currentProject.getId());
+        if (currentSchedule != null) {
             // Get the next submisison
-            long next = currentProject.getSchedule_next_submission();
+            long next = currentSchedule.getScheduleTime();
 
             String nextSchedule;
 
@@ -137,7 +140,8 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         // Set the transition name
         String transitionName = currentProject.getId() + currentProject.getName();
         holder.mCardView.setTransitionName(transitionName);
-        holder.mCardView.setTag(R.string.transition_tag, currentProject.getThumbnail_url());
+        // TODO set the transition name to the photo url
+        holder.mCardView.setTag(R.string.transition_tag, thumbnail_path);
 
         // Load the image
         File f = new File(thumbnail_path);
@@ -154,6 +158,16 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
 
     public void setProjectData(List<ProjectEntry> projectData){
         mProjectData = projectData;
+        notifyDataSetChanged();
+    }
+
+    public void setCoverPhotos(Map<Long, String> projectIdsToPhotoUrls){
+        mProjectsToPhotos = projectIdsToPhotoUrls;
+        notifyDataSetChanged();
+    }
+
+    public void setProjectSchedules(Map<Long, ProjectScheduleEntry> projectsToSchedule){
+        mProjectsToSchedules = projectsToSchedule;
         notifyDataSetChanged();
     }
 }

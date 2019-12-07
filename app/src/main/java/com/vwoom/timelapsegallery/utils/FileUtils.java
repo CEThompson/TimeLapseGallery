@@ -212,4 +212,24 @@ public final class FileUtils {
     private static String getProjectDirectoryPath(ProjectEntry projectEntry){
         return projectEntry.getId() + "_" + projectEntry.getName();
     }
+
+    // TODO get the project directory from the project id
+    private static String getProjectDirectoryPath(long projectId){
+
+    }
+
+    private static String getAbsolutePhotoUrl(Context context, PhotoEntry photoEntry){
+        long timestamp = photoEntry.getTimestamp();
+        long projectId = photoEntry.getProjectId();
+
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        // TODO get the project path by id
+        String projectPath = getProjectDirectoryPath(projectId);
+
+        File project = new File(storageDir, projectPath);
+
+        return sourceProjectPath
+
+    }
 }
