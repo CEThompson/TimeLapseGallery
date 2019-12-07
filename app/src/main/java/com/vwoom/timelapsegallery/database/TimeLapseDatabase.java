@@ -14,7 +14,7 @@ import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectTagEntry;
 import com.vwoom.timelapsegallery.database.entry.TagEntry;
 
-@Database(entities = {ProjectEntry.class, PhotoEntry.class, TagEntry.class, ProjectTagEntry.class}, version = 1, exportSchema = true)
+@Database(entities = {ProjectEntry.class, PhotoEntry.class, TagEntry.class, ProjectTagEntry.class}, version = 2, exportSchema = true)
 public abstract class TimeLapseDatabase extends RoomDatabase{
 
     private static final Object LOCK = new Object();
