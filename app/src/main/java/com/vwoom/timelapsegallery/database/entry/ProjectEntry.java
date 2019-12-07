@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -11,65 +12,41 @@ import androidx.room.PrimaryKey;
 @Entity (tableName = "project")
 public class ProjectEntry implements Parcelable {
 
-    @PrimaryKey(autoGenerate = true) private long id;
-    private String name;
-    private String thumbnail_url;
-    private int schedule;
-    private long schedule_next_submission;
-    private long timestamp;
+    @PrimaryKey(autoGenerate = true) private long project_id;
+    private String project_name;
+    private Long cover_photo_id;
 
     /* For inserting with auto-generated ID */
     @Ignore
-    public ProjectEntry(String name,
-                        String thumbnail_url,
-                        int schedule,
-                        long schedule_next_submission,
-                        long timestamp){
-        this.name = name;
-        this.thumbnail_url = thumbnail_url;
-        this.schedule = schedule;
-        this.schedule_next_submission = schedule_next_submission;
-        this.timestamp = timestamp;
+    public ProjectEntry(@Nullable String project_name,
+                        @Nullable Long cover_photo_id){
+        this.project_name = project_name;
+        this.cover_photo_id = cover_photo_id;
     }
 
-    public ProjectEntry(long id,
-                        String name,
-                        String thumbnail_url,
-                        int schedule,
-                        long schedule_next_submission,
-                        long timestamp){
-        this.id = id;
-        this.name = name;
-        this.thumbnail_url = thumbnail_url;
-        this.schedule= schedule;
-        this.schedule_next_submission = schedule_next_submission;
-        this.timestamp = timestamp;
+    public ProjectEntry(long project_id,
+                        @Nullable String project_name,
+                        @Nullable Long cover_photo_id){
+        this.project_id = project_id;
+        this.project_name = project_name;
+        this.cover_photo_id = cover_photo_id;
     }
 
     /* Getters */
     public long getId() {
-        return id;
+        return project_id;
     }
     public String getName() {
-        return name;
+        return project_name;
     }
-    public String getThumbnail_url() { return thumbnail_url; }
-    public int getSchedule() { return schedule; }
-    public long getSchedule_next_submission() { return schedule_next_submission; }
-    public long getTimestamp() { return timestamp; }
+    public Long getCoverPhotoId() { return cover_photo_id; }
 
     /* Setters */
-    public void setId(long id) { this.id = id; }
-    public void setName(@NonNull String name) { this.name = name; }
-    public void setThumbnail_url(String thumbnail_url) {
-        this.thumbnail_url = thumbnail_url;
+    public void setId(long project_id) { this.project_id = project_id; }
+    public void setName(@Nullable String project_name) { this.project_name = project_name; }
+    public void setCoverPhotoId(@Nullable Long cover_photo_id) {
+        this.cover_photo_id = cover_photo_id;
     }
-    public void setSchedule(int schedule) {
-        this.schedule = schedule;
-    }
-    public void setSchedule_next_submission(long schedule_next_submission) { this.schedule_next_submission = schedule_next_submission; }
-    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
-
 
     /* Parcelable functionality */
     @Override
@@ -79,12 +56,9 @@ public class ProjectEntry implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(id);
-        parcel.writeString(name);
-        parcel.writeString(thumbnail_url);
-        parcel.writeInt(schedule);
-        parcel.writeLong(schedule_next_submission);
-        parcel.writeLong(timestamp);
+        parcel.writeLong(project_id);
+        parcel.writeString(project_name);
+        parcel.writeLong(cover_photo_id);
     }
 
     public static final Parcelable.Creator<ProjectEntry> CREATOR
@@ -99,11 +73,8 @@ public class ProjectEntry implements Parcelable {
     };
 
     private ProjectEntry(Parcel in){
-        id = in.readLong();
-        name = in.readString();
-        thumbnail_url = in.readString();
-        schedule = in.readInt();
-        schedule_next_submission = in.readLong();
-        timestamp = in.readLong();
+        project_id = in.readLong();
+        project_name = in.readString();
+        cover_photo_id = in.readLong();
     }
 }

@@ -1,45 +1,42 @@
 package com.vwoom.timelapsegallery.database.entry;
 
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity (tableName = "project_tag")
+// TODO verify foreign keys for validation table
+@Entity (tableName = "project_tag",
+            primaryKeys = {"project_id", "tag_id"},
+            foreignKeys = {
+                @ForeignKey(entity = ProjectEntry.class,
+                    parentColumns = "project_id", childColumns = "project_id",
+                    onDelete = ForeignKey.CASCADE),
+                @ForeignKey(entity = TagEntry.class,
+                        parentColumns = "tag_id", childColumns = "tag_id",
+                        onDelete = ForeignKey.CASCADE)
+        })
+
 public class ProjectTagEntry {
-
-    @PrimaryKey private long id;
-    private long tag_id;
     private long project_id;
+    private long tag_id;
 
-    @Ignore
-    public ProjectTagEntry(long tag_id, long project_id){
-        this.tag_id = tag_id;
+    public ProjectTagEntry(long project_id, long tag_id){
         this.project_id = project_id;
-    }
-
-    public ProjectTagEntry(long id, long tag_id, long project_id){
-        this.id = id;
         this.tag_id = tag_id;
-        this.project_id = project_id;
     }
 
-    public long getId() {
-        return id;
-    }
-    public long getTag_id() {
+    public long getTagId() {
         return tag_id;
     }
-    public long getProject_id() {
+    public long getProjectId() {
         return project_id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-    public void setTag_id(long tag_id) {
+    public void setTagId(long tag_id) {
         this.tag_id = tag_id;
     }
-    public void setProject_id(long project_id) {
+    public void setProjectId(long project_id) {
         this.project_id = project_id;
     }
 }

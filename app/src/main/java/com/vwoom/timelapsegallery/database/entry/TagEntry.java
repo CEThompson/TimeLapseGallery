@@ -7,31 +7,31 @@ import androidx.room.PrimaryKey;
 @Entity (tableName = "tag")
 public class TagEntry {
 
-    @PrimaryKey (autoGenerate = true) private long id;
-    private String title;
+    @PrimaryKey (autoGenerate = true) private long tag_id;
+    private String tag;
 
     /* For inserting with auto-generated ID */
     @Ignore
     public TagEntry(String title){
-        this.title = title;
+        this.tag = tag;
     }
 
-    public TagEntry(long id, String title){
-        this.id = id;
-        this.title = title;
+    public TagEntry(long tag_id, String tag){
+        this.tag_id = tag_id;
+        this.tag = tag;
     }
 
-    public long getId() {
-        return id;
+    public long getTagId() {
+        return tag_id;
     }
-    public String getTitle() {
-        return title;
+    public String getTag() {
+        return tag;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setTagId(long id) {
+        this.tag_id = tag_id;
     }
-    public void setTitle(String title) {
-        this.title = title;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }

@@ -10,38 +10,32 @@ import androidx.room.PrimaryKey;
 @Entity (tableName = "photo")
 public class PhotoEntry implements Parcelable {
 
-    @PrimaryKey(autoGenerate = true) private long id;
+    @PrimaryKey(autoGenerate = true) private long photo_id;
     private long project_id;
-    private String url;
     private long timestamp;
 
     /* For inserting with auto-generated ID */
     @Ignore
-    public PhotoEntry(long project_id, String url, long timestamp) {
+    public PhotoEntry(long project_id, long timestamp) {
         this.project_id = project_id;
-        this.url = url;
         this.timestamp = timestamp;
     }
 
-    public PhotoEntry(long id, long project_id, String url, long timestamp){
-        this.id = id;
+    public PhotoEntry(long photo_id, long project_id, long timestamp){
+        this.photo_id = photo_id;
         this.project_id = project_id;
-        this.url = url;
         this.timestamp = timestamp;
     }
 
     /* Getters */
-
-    public long getId() { return id; }
-    public long getProject_id() { return project_id; }
+    public long getPhotoId() { return photo_id; }
+    public long getProjectId() { return project_id; }
     public long getTimestamp() { return timestamp; }
-    public String getUrl() { return url; }
 
     /* Setters */
-    public void setId(long id) { this.id = id;}
-    public void setProject_id(long project_id) { this.project_id = project_id; }
+    public void setId(long id) { this.photo_id = photo_id;}
+    public void setProjectId(long project_id) { this.project_id = project_id; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
-    public void setUrl(String url) { this.url = url; }
 
     /* Parcelable functionality */
     @Override
@@ -51,9 +45,8 @@ public class PhotoEntry implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(id);
+        parcel.writeLong(photo_id);
         parcel.writeLong(project_id);
-        parcel.writeString(url);
         parcel.writeLong(timestamp);
     }
 
@@ -69,9 +62,8 @@ public class PhotoEntry implements Parcelable {
     };
 
     private PhotoEntry(Parcel in){
-        id = in.readLong();
+        photo_id = in.readLong();
         project_id = in.readLong();
-        url = in.readString();
         timestamp = in.readLong();
     }
 }
