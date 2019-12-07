@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
     private ProjectsAdapter mProjectsAdapter;
 
     private List<ProjectEntry> mProjects;
-    private List<CoverPhotoEntry> mCoverPhotos;
 
     private int mNumberOfColumns = 3;
 
@@ -156,12 +155,15 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         }
     }
 
-    /* Observes all time lapse projects */
+    /* Sets up view models */
     private void setupViewModel(){
         MainActivityViewModel viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+
+        /* Observe projects */
         viewModel.getProjects().observe(this, (List<ProjectEntry> projectEntries) -> {
             mProjects = projectEntries;
 
+            // TODO account for user selected filtration
             // If filter by today grab todays projects and set the data on the adapter
             if (mFilterByToday){
                 List<ProjectEntry> todaysProjects = ProjectUtils.getProjectsScheduledToday(mProjects);
@@ -176,30 +178,33 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
             mNewProjectFab.show();
         });
 
+        /* Observe cover photos */
         viewModel.getProjectCovers().observe(this, (List<CoverPhotoEntry> coverPhotoEntries) -> {
-            mCoverPhotos = coverPhotoEntries;
 
             // TODO create a list of the urls for the cover photos off the main thread
             TimeLapseDatabase db = TimeLapseDatabase.getInstance(this);
             Map<Long, String> projectIdsToCoverUrls = new HashMap<>();
-            for (int i = 0; i < mCoverPhotos.size(); i++){
-                CoverPhotoEntry current = mCoverPhotos.get(i);
+            for (int i = 0; i < coverPhotoEntries.size(); i++){
+                CoverPhotoEntry current = coverPhotoEntries.get(i);
                 long project_id = current.getProject_id();
                 long photo_id = current.getPhoto_id();
                 PhotoEntry coverPhoto = db.photoDao().loadPhoto(project_id, photo_id);
-
+                ProjectEntry project = db.projectDao().loadProjectById(project_id);
                 // TODO get filename from photo entry
-                String photoUrl = FileUtils.getPhotoUrl(coverPhoto);
+                String photoUrl = FileUtils.getPhotoUrl(this, project, coverPhoto);
                 projectIdsToCoverUrls.put(project_id, photoUrl);
             }
             mProjectsAdapter.setCoverPhotos(projectIdsToCoverUrls);
         });
 
+        /* Observe project schedules */
         viewModel.getProjectSchedules().observe(this, (List<ProjectScheduleEntry> projectSchedules) -> {
-            mSchedules = projectSchedules;
-
             Map<Long, ProjectScheduleEntry> projectIdsToSchedules = new HashMap<>();
-            mProjectsAdapter.setProjectSchedules();
+            for (int i = 0; i < projectSchedules.size(); i++){
+                ProjectScheduleEntry entry = projectSchedules.get(i);
+                projectIdsToSchedules.put(entry.getProjectId(), entry);
+            }
+            mProjectsAdapter.setProjectSchedules(projectIdsToSchedules);
         });
     }
 

@@ -213,23 +213,20 @@ public final class FileUtils {
         return projectEntry.getId() + "_" + projectEntry.getName();
     }
 
-    // TODO get the project directory from the project id
-    private static String getProjectDirectoryPath(long projectId){
+
+    public static String getPhotoUrl(Context context, ProjectEntry projectEntry, PhotoEntry photoEntry){
+        long timestamp = photoEntry.getTimestamp();
+
+        String imageFileName = getPhotoFileNameFromTimestamp(timestamp);
+        File projectDir = getProjectFolder(context, projectEntry);
+
+        File photoFile = new File(projectDir, imageFileName);
+
+        return photoFile.getAbsolutePath();
 
     }
 
-    private static String getAbsolutePhotoUrl(Context context, PhotoEntry photoEntry){
-        long timestamp = photoEntry.getTimestamp();
-        long projectId = photoEntry.getProjectId();
-
-        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-
-        // TODO get the project path by id
-        String projectPath = getProjectDirectoryPath(projectId);
-
-        File project = new File(storageDir, projectPath);
-
-        return sourceProjectPath
-
+    public static String getPhotoFileNameFromTimestamp(long timestamp){
+        return timestamp + ".jpg";
     }
 }

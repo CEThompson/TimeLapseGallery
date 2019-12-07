@@ -11,7 +11,6 @@ import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
 import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry;
 
 import java.util.List;
-import java.util.Map;
 
 public class MainActivityViewModel extends AndroidViewModel {
 
