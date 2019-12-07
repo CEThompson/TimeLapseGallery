@@ -110,7 +110,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     // Photo and project Information
     private List<PhotoEntry> mPhotos;
     private PhotoEntry mCurrentPhoto;
+    private PhotoEntry mCoverPhoto;
+
     private Integer mCurrentPlayPosition = null;
+
     private ProjectEntry mCurrentProject;
     private ProjectScheduleEntry mProjectSchedule;
 
@@ -430,7 +433,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mIsReturning = true;
         Intent data = new Intent();
         data.putExtra(Keys.TRANSITION_POSITION, mReturnPosition);
-        data.putExtra(Keys.TRANSITION_NAME, mCurrentProject.getThumbnail_url());
+        data.putExtra(Keys.TRANSITION_NAME, FileUtils.getPhotoUrl(this, mCurrentProject, mCoverPhoto));
         setResult(RESULT_OK, data);
         super.finishAfterTransition();
     }

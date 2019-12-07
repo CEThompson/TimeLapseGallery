@@ -52,7 +52,7 @@ public class UpdateWidgetService extends IntentService {
             List<ProjectEntry> allScheduledProjects = timeLapseDatabase.projectDao().loadAllScheduledProjects();
 
             // Get the list of projects scheduled for today
-            List<ProjectEntry> projectsScheduledForToday = ProjectUtils.getProjectsScheduledToday(allScheduledProjects);
+            List<ProjectEntry> projectsScheduledForToday = timeLapseDatabase.projectDao().loadAllScheduledProjects();
 
             // Update the widgets
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);

@@ -363,14 +363,14 @@ public class AddPhotoActivity extends AppCompatActivity {
                 currentPhotoPath = finalFile.getAbsolutePath();
 
                 // Create and insert the photo entry
-                PhotoEntry photoToSubmit = new PhotoEntry(currentProject.getId(),
-                        currentPhotoPath,
+                PhotoEntry photoToSubmit = new PhotoEntry(
+                        currentProject.getId(),
                         timestamp);
                 timeLapseDatabase.photoDao().insertPhoto(photoToSubmit);
 
                 // Track added photo
                 Bundle bundle = new Bundle();
-                bundle.putString(context.getString(R.string.analytics_project_name), currentProject.getName());
+                bundle.putString(context.getString(R.string.analytics_project_name), currentProject.getProject_name());
                 bundle.putString(context.getString(R.string.analytics_photo_number), String.valueOf(photoToSubmit.getId()));
                 firebaseAnalytics.logEvent(context.getString(R.string.analytics_add_photo), bundle);
 

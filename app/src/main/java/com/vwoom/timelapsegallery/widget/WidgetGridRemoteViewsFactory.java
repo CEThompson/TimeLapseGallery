@@ -9,11 +9,14 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.vwoom.timelapsegallery.R;
+import com.vwoom.timelapsegallery.database.entry.CoverPhotoEntry;
+import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
+import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry;
+import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.PhotoUtils;
-import com.vwoom.timelapsegallery.utils.ProjectUtils;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
 
 import java.io.IOException;
@@ -23,12 +26,13 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
 
     private Context mContext;
     private List<ProjectEntry> mProjects;
-
+    private TimeLapseDatabase mTimeLapseDatabase;
     private static final String TAG = WidgetGridRemoteViewsFactory.class.getSimpleName();
 
     public WidgetGridRemoteViewsFactory(Context applicationContext, Intent intent){
         mContext = applicationContext;
         mProjects = null;
+        mTimeLapseDatabase = TimeLapseDatabase.getInstance(mContext);
     }
 
     @Override
@@ -39,9 +43,8 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
     @Override
     public void onDataSetChanged() {
         /* Load the projects for the day */
-        TimeLapseDatabase timeLapseDatabase = TimeLapseDatabase.getInstance(mContext);
-        List<ProjectEntry> allScheduledProjects = timeLapseDatabase.projectDao().loadAllScheduledProjects();
-        mProjects = ProjectUtils.getProjectsScheduledToday(allScheduledProjects);
+        mProjects = mTimeLapseDatabase.projectDao().loadAllScheduledProjects();
+
     }
 
     @Override
@@ -59,7 +62,11 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
     public RemoteViews getViewAt(int i) {
         // Get the current project
         ProjectEntry currentProject = mProjects.get(i);
-        long nextSubmissionTime = TimeUtils.getNextScheduledSubmission(currentProject.getSchedule_next_submission(), currentProject.getSchedule());
+        ProjectScheduleEntry schedule = mTimeLapseDatabase.projectScheduleDao().loadScheduleByProjectId(currentProject.getId());
+        CoverPhotoEntry coverPhotoEntry = mTimeLapseDatabase.coverPhotoDao().getCoverPhoto_nonLiveData(currentProject.getId());
+        PhotoEntry coverPhoto = mTimeLapseDatabase.photoDao().loadPhoto(currentProject.getId(), coverPhotoEntry.getPhoto_id());
+
+        long nextSubmissionTime = TimeUtils.getNextScheduledSubmission(schedule.getSchedule_time(), schedule.getInterval_days());
 
         // Get strings
         String nextSubmissionTimeString = TimeUtils.getTimeFromTimestamp(nextSubmissionTime);
@@ -67,12 +74,16 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
         // Create the remote views
         RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.widget_list_item);
 
+        String coverPhotoPath = FileUtils.getPhotoUrl(mContext, currentProject, coverPhoto);
         // Decode the bitmap from path
-        Bitmap bitmap = PhotoUtils.decodeSampledBitmapFromPath(currentProject.getThumbnail_url(), 100, 100);
+        Bitmap bitmap = PhotoUtils.decodeSampledBitmapFromPath(
+                coverPhotoPath,
+                100,
+                100);
 
         // Rotate the bitmap
         try {
-            Integer bitmapOrientation = PhotoUtils.getOrientationFromImagePath(currentProject.getThumbnail_url());
+            Integer bitmapOrientation = PhotoUtils.getOrientationFromImagePath(coverPhotoPath);
             bitmap = PhotoUtils.rotateBitmap(bitmap, bitmapOrientation);
         } catch (IOException e){
             if (e.getMessage()!=null)
@@ -80,7 +91,7 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
         }
 
         // Set the view strings
-        views.setTextViewText(R.id.widget_list_item_name_text_view, currentProject.getName());
+        views.setTextViewText(R.id.widget_list_item_name_text_view, currentProject.getProject_name());
         views.setTextViewText(R.id.widget_list_item_time_text_view, nextSubmissionTimeString);
         views.setImageViewBitmap(R.id.widget_list_item_image_view, bitmap);
 

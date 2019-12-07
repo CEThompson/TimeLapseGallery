@@ -18,6 +18,9 @@ public interface CoverPhotoDao {
     @Query("SELECT * FROM cover_photo WHERE project_id =:projectId")
     LiveData<CoverPhotoEntry> getCoverPhoto(long projectId);
 
+    @Query("SELECT * FROM cover_photo WHERE project_id =:projectId")
+    CoverPhotoEntry getCoverPhoto_nonLiveData(long projectId);
+
     @Query("SELECT * FROM cover_photo")
     LiveData<List<CoverPhotoEntry>> getAllCoverPhotos();
 
