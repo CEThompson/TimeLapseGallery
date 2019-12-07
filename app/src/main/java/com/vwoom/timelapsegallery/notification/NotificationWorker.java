@@ -63,12 +63,12 @@ public class NotificationWorker extends Worker {
                         .projectScheduleDao()
                         .loadScheduleByProjectId(scheduledProject.getId());
 
-                Log.d(TAG, "Notification Tracker: Processing alarm for project named " + scheduledProject.getName());
+                Log.d(TAG, "Notification Tracker: Processing alarm for project named " + scheduledProject.getProject_name());
 
                 if (schedule == null) break;
 
-                long nextSubmissionTime = schedule.getScheduleTime();
-                long dayInterval = schedule.getIntervalDays();
+                long nextSubmissionTime = schedule.getSchedule_time();
+                long dayInterval = schedule.getInterval_days();
 
                 // Schedule a notification for tomorrow
                 // If any project has a daily schedule create the notification

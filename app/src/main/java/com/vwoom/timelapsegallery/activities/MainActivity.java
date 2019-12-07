@@ -30,7 +30,6 @@ import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
-import com.vwoom.timelapsegallery.utils.ProjectUtils;
 import com.vwoom.timelapsegallery.viewmodels.MainActivityViewModel;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
     private int mNumberOfColumns = 3;
 
-    private boolean mFilterByToday;
+    private boolean mFilter;
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -121,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         });
 
         prepareSharedElementTransition();
-        mFilterByToday = getIntent().getBooleanExtra(Keys.PROJECT_FILTER_BY_SCHEDULED_TODAY, false);
+        mFilter = getIntent().getBooleanExtra(Keys.PROJECT_FILTER_BY_SCHEDULED_TODAY, false);
 
         // Set up the view model
         setupViewModel();
@@ -163,11 +162,11 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
         viewModel.getProjects().observe(this, (List<ProjectEntry> projectEntries) -> {
             mProjects = projectEntries;
 
-            // TODO account for user selected filtration
             // If filter by today grab todays projects and set the data on the adapter
-            if (mFilterByToday){
-                List<ProjectEntry> todaysProjects = ProjectUtils.getProjectsScheduledToday(mProjects);
-                mProjectsAdapter.setProjectData(todaysProjects);
+            if (mFilter){
+                // TODO account for user selected filtration
+                List<ProjectEntry> filteredProjects = mProjects;
+                mProjectsAdapter.setProjectData(filteredProjects);
             }
             // Otherwise set the adapter to projects gathered by the view model
             else {
@@ -202,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
             Map<Long, ProjectScheduleEntry> projectIdsToSchedules = new HashMap<>();
             for (int i = 0; i < projectSchedules.size(); i++){
                 ProjectScheduleEntry entry = projectSchedules.get(i);
-                projectIdsToSchedules.put(entry.getProjectId(), entry);
+                projectIdsToSchedules.put(entry.getProject_id(), entry);
             }
             mProjectsAdapter.setProjectSchedules(projectIdsToSchedules);
         });

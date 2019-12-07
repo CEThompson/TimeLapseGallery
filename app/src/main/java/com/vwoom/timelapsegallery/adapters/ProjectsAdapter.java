@@ -101,7 +101,7 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         ProjectScheduleEntry currentSchedule = mProjectsToSchedules.get(currentProject.getId());
         if (currentSchedule != null) {
             // Get the next submisison
-            long next = currentSchedule.getScheduleTime();
+            long next = currentSchedule.getSchedule_time();
 
             String nextSchedule;
 
@@ -138,7 +138,7 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         }
 
         // Set the transition name
-        String transitionName = currentProject.getId() + currentProject.getName();
+        String transitionName = currentProject.getId() + currentProject.getProject_name();
         holder.mCardView.setTransitionName(transitionName);
         // TODO set the transition name to the photo url
         holder.mCardView.setTag(R.string.transition_tag, thumbnail_path);

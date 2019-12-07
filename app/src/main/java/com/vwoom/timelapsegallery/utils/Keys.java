@@ -8,6 +8,8 @@ public final class Keys {
     public static final String PROJECT_SCHEDULE = "project_schedule";
     public static final String PROJECT_ENTRY = "project_entry";
     public static final String PROJECT_FILTER_BY_SCHEDULED_TODAY = "filter_by_scheduled_today";
+    public static final String PROJECT_SCHEDULE_ENTRY = "project_schedule_entry";
+    public static final String COVER_PHOTO_ENTRY = "cover_photo_entry";
 
     /* Photo Keys */
     public static final String PHOTO_ENTRY = "photo_entry";

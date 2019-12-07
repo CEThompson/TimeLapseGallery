@@ -193,7 +193,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mAddPhotoFab.setOnClickListener((View v) -> {
             Intent addPhotoIntent = new Intent(DetailsActivity.this, AddPhotoActivity.class);
             PhotoEntry lastPhoto = getLastPhoto();
-            String lastPhotoPath = lastPhoto.getUrl();
+            String lastPhotoPath = FileUtils.getPhotoUrl(this, mCurrentProject, lastPhoto);
 
             // Send the path of the last photo and the project id
             addPhotoIntent.putExtra(Keys.PHOTO_PATH, lastPhotoPath);
@@ -245,7 +245,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorGreen));
 
         // Set the transition name for the image
-        String transitionName = mCurrentProject.getId() + mCurrentProject.getName();
+        String transitionName = mCurrentProject.getId() + mCurrentProject.getProject_name();
         mCardView.setTransitionName(transitionName);
 
         setupViewModel(savedInstanceState);

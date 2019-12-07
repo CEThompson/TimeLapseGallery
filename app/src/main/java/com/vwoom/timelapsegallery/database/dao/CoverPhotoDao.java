@@ -22,11 +22,11 @@ public interface CoverPhotoDao {
     LiveData<List<CoverPhotoEntry>> getAllCoverPhotos();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertPhoto(PhotoEntry photoEntry);
+    void insertPhoto(CoverPhotoEntry entry);
 
     @Update
-    void updatePhoto(PhotoEntry photoEntry);
+    void updatePhoto(CoverPhotoEntry entry);
 
     @Delete
-    void deletePhoto(PhotoEntry photoEntry);
+    void deletePhoto(CoverPhotoEntry entry);
 }

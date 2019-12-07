@@ -32,9 +32,11 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.database.AppExecutors;
+import com.vwoom.timelapsegallery.database.entry.CoverPhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
+import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry;
 import com.vwoom.timelapsegallery.notification.NotificationUtils;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
@@ -62,6 +64,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
     private TimeLapseDatabase mTimeLapseDatabase;
     private ProjectEntry mProjectToEdit;
+    private ProjectScheduleEntry mProjectScheduleToEdit;
+    private CoverPhotoEntry mCoverPhotoToEdit;
 
     /* For spinner */
     private String mScheduleString;
@@ -113,14 +117,17 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         });
 
         mProjectToEdit = getIntent().getParcelableExtra(Keys.PROJECT_ENTRY);
+        mProjectScheduleToEdit = getIntent().getParcelableExtra(Keys.PROJECT_SCHEDULE_ENTRY);
+        mCoverPhotoToEdit = getIntent().getParcelableExtra(Keys.COVER_PHOTO_ENTRY);
 
         /* If a project was sent along with the intent set up the activity instead to edit the project */
         if (mProjectToEdit != null){
             // Restore the project info
-            mName = mProjectToEdit.getName();
-            mSchedule = mProjectToEdit.getSchedule();
-            mScheduleNextSubmission = mProjectToEdit.getSchedule_next_submission();
-            mTemporaryPhotoPath = mProjectToEdit.getThumbnail_url();
+            mName = mProjectToEdit.getProject_name();
+            mScheduleNextSubmission = mProjectScheduleToEdit.getSchedule_time();
+            PhotoEntry coverPhoto = mTimeLapseDatabase.photoDao().loadPhoto(mCoverPhotoToEdit.getProject_id(), mCoverPhotoToEdit.getPhoto_id());
+            String coverPhotoPath = FileUtils.getPhotoUrl(this, mProjectToEdit, coverPhoto);
+            mTemporaryPhotoPath = coverPhotoPath;
 
             // Hide the add photo button
             mFirstPhotoFab.hide();
@@ -275,25 +282,30 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     }
 
     /* Gathers user input into a project entry object */
-    private ProjectEntry gatherUserInput(){
+    private ProjectEntry gatherNameInput(){
         /* Get the name from the edit text */
         mName = mProjectNameEditText.getText().toString();
 
-        /* Get the schedule from the spinner value */
-        mSchedule = TimeUtils.convertScheduleStringToInt(this, mScheduleString);
 
-        /* Get the current timestamp */
-        long timestamp = System.currentTimeMillis();
+        /* Return the new project */
+        return new ProjectEntry(
+                mName,
+                false);
+    }
 
+    private ProjectScheduleEntry gatherScheduleInput(){
         /* Set the next submission, but if there is a schedule calc the next submission time */
         long pickerTime = getTimestampFromPicker();
         if (pickerTime > System.currentTimeMillis())
             mScheduleNextSubmission = pickerTime;
         else
-            mScheduleNextSubmission = getTimestampFromPicker() + TimeUtils.getTimeIntervalFromSchedule(mSchedule);
+            mScheduleNextSubmission = getTimestampFromPicker()
+                    + TimeUtils.getTimeIntervalFromSchedule(mSchedule);
 
-        /* Return the new project */
-        return new ProjectEntry(mName, mTemporaryPhotoPath, mSchedule, mScheduleNextSubmission, timestamp);
+        return new ProjectScheduleEntry(
+                mProjectToEdit.getId(),
+                mScheduleNextSubmission,
+                mSchedule);
     }
 
     private long getTimestampFromPicker(){
@@ -320,7 +332,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     /* Submits the new project to the database */
     private void submitNewProject(){
         /* 1. Get the input */
-        ProjectEntry newProject = gatherUserInput();
+        ProjectEntry newProject = gatherNameInput();
 
         /* 2. If the input is valid perform the submission */
         if (validateNewProject(newProject)) {
@@ -333,29 +345,29 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                         .insertProject(newProject);
 
                 ProjectEntry result = mTimeLapseDatabase.projectDao().loadProjectById(projectId);
-
+                long timestamp = System.currentTimeMillis();
                 try {
                     // Create the file for the photo
-                    File finalFile = FileUtils.createFinalFileFromTemp(this, mTemporaryPhotoPath, result, result.getTimestamp());
+                    File finalFile = FileUtils.createFinalFileFromTemp(
+                            this,
+                            mTemporaryPhotoPath,
+                            result,
+                            timestamp);
 
                     // Submit the photo entry for the project
                     String photo_path = finalFile.getAbsolutePath();
-                    PhotoEntry currentPhoto = new PhotoEntry(result.getId(), photo_path, result.getTimestamp());
+                    PhotoEntry currentPhoto = new PhotoEntry(
+                            projectId,
+                            timestamp);
                     mTimeLapseDatabase.photoDao().insertPhoto(currentPhoto);
 
                     // Set the cover photo for the project
-                    result.setThumbnail_url(photo_path);
-                    mTimeLapseDatabase.projectDao().updateProject(result);
-
-                    // If the new project has a schedule trigger the notification worker to restart
-                    if (newProject.getSchedule() > 0) {
-                        NotificationUtils.scheduleNotificationWorker(this);
-                        UpdateWidgetService.startActionUpdateWidgets(this);
-                    }
+                    CoverPhotoEntry coverPhotoEntry = new CoverPhotoEntry(projectId, currentPhoto.getId());
+                    mTimeLapseDatabase.coverPhotoDao().insertPhoto(coverPhotoEntry);
 
                     // Track added project
                     Bundle bundle = new Bundle();
-                    bundle.putString(getString(R.string.analytics_project_name), newProject.getName());
+                    bundle.putString(getString(R.string.analytics_project_name), newProject.getProject_name());
                     mFirebaseAnalytics.logEvent(getString(R.string.analytics_new_project), bundle);
 
                 } catch (IOException e){
@@ -378,21 +390,21 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     /* Submits a project to edit */
     private void submitProjectEdit(){
         // Gather that data from the inputs and create a project for the edit
-        ProjectEntry editedProject = gatherUserInput();
+        ProjectEntry editedProject = gatherNameInput();
+        ProjectScheduleEntry editedSchedule = gatherScheduleInput();
 
-        // Restore id to user submitted project
+        // Restore fields unable to be edited from this screen
         editedProject.setId(mProjectToEdit.getId());
-        // Restore thumbnail
-        editedProject.setThumbnail_url(mProjectToEdit.getThumbnail_url());
-        // Restore timestamp
-        editedProject.setTimestamp(mProjectToEdit.getTimestamp());
+        editedProject.setProject_cover_set_by_user(
+                mProjectToEdit.isProject_cover_set_by_user());
+
 
         /* If the project info is valid proceed to update it */
         if (validateEditProject(editedProject)) {
             boolean renameSuccessful;
 
             /* If the user changed the name of the project rename the directory */
-            if (!mProjectToEdit.getName().equals(editedProject.getName())){
+            if (!mProjectToEdit.getProject_name().equals(editedProject.getProject_name())){
                 renameSuccessful = FileUtils.renameProject(this, mProjectToEdit, editedProject);
             }
             // Otherwise user did not try to rename the project
@@ -406,8 +418,9 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                 return;
             }
 
+            // TODO verify schedule change
             // If the schedule has been changed start the notification worker
-            if (mProjectToEdit.getSchedule() != editedProject.getSchedule()) {
+            if (!mProjectScheduleToEdit.equals(editedSchedule)) {
                 NotificationUtils.scheduleNotificationWorker(this);
                 UpdateWidgetService.startActionUpdateWidgets(this);
             }
@@ -435,7 +448,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         }
 
         /* If the name contains any reserved characters project invalid */
-        if (FileUtils.pathContainsReservedCharacter(newProject.getName())) {
+        if (FileUtils.pathContainsReservedCharacter(newProject.getProject_name())) {
             notifyUserInvalidCharacters();
             return false;
         }
@@ -453,13 +466,13 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     /* Validates prior to editing */
     private boolean validateEditProject(ProjectEntry editedProject){
         /* If the name is empty do not progress */
-        if (editedProject.getName().isEmpty()) {
+        if (editedProject.getProject_name().isEmpty()) {
             notifyUserNoName();
             return false;
         }
 
         /* Check name of edited project for reserved characters */
-        if (FileUtils.pathContainsReservedCharacter(editedProject.getName())) {
+        if (FileUtils.pathContainsReservedCharacter(editedProject.getProject_name())) {
             notifyUserInvalidCharacters();
             return false;
         }
