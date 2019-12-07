@@ -5,18 +5,22 @@ import android.content.pm.PackageManager
 import android.graphics.Matrix
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Rational
 import android.util.Size
 import android.view.Surface
 import android.view.TextureView
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraX
 import androidx.camera.core.Preview
 import androidx.camera.core.PreviewConfig
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import com.vwoom.timelapsegallery.R
+import java.util.concurrent.Executors
 
 // Arbitrary number to keep track of permission request
 private const val REQUEST_CODE_PERMISSIONS = 10
@@ -24,7 +28,7 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
-class CameraActivity : AppCompatActivity() {
+class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,17 +50,27 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    private val executor = Executors.newSingleThreadExecutor()
     private lateinit var viewFinder: TextureView
 
     private fun startCamera() {
+        val metrics = DisplayMetrics().also{viewFinder.display.getRealMetrics(it)}
+        val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
+
+        // TODO use aspect ratio?
+        val screenAspectRatio = Rational(metrics.widthPixels, metrics.heightPixels)
+
+
         // TODO: Implement CameraX operations
         val previewConfig = PreviewConfig.Builder().apply {
-            setTargetAspectRatio(Rational(1,1))
-            setTargetResolution(Size(640, 640))
+            setLensFacing(CameraX.LensFacing.BACK)
+            setTargetResolution(screenSize)
+            setTargetAspectRatio(AspectRatio.RATIO_16_9)
+            setTargetRotation(windowManager.defaultDisplay.rotation)
+            setTargetRotation(viewFinder.display.rotation)
         }.build()
 
         val preview = Preview(previewConfig)
-
         preview.setOnPreviewOutputUpdateListener {
             val parent = viewFinder.parent as ViewGroup
             parent.removeView(viewFinder)
@@ -89,7 +103,8 @@ class CameraActivity : AppCompatActivity() {
         viewFinder.setTransform(matrix)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+            requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS){
             if (allPermissionsGranted()){
                 viewFinder.post { startCamera() }
