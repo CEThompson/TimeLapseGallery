@@ -11,7 +11,7 @@ import androidx.room.PrimaryKey;
 @Entity (tableName = "project")
 public class ProjectEntry implements Parcelable {
 
-    @PrimaryKey(autoGenerate = true) private long project_id;
+    @PrimaryKey(autoGenerate = true) private long id;
     private String project_name;
     private boolean project_cover_set_by_user = false;
 
@@ -23,17 +23,17 @@ public class ProjectEntry implements Parcelable {
         this.project_cover_set_by_user = project_cover_set_by_user;
     }
 
-    public ProjectEntry(long project_id,
+    public ProjectEntry(long id,
                         @Nullable String project_name,
                         boolean project_cover_set_by_user){
-        this.project_id = project_id;
+        this.id = id;
         this.project_name = project_name;
         this.project_cover_set_by_user = project_cover_set_by_user;
     }
 
     /* Getters */
     public long getId() {
-        return project_id;
+        return id;
     }
     public String getName() {
         return project_name;
@@ -43,7 +43,7 @@ public class ProjectEntry implements Parcelable {
     }
 
     /* Setters */
-    public void setId(long project_id) { this.project_id = project_id; }
+    public void setId(long id) { this.id = id; }
     public void setName(@Nullable String project_name) { this.project_name = project_name; }
 
     public void setProject_cover_set_by_user(boolean project_cover_set_by_user) {
@@ -58,7 +58,7 @@ public class ProjectEntry implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(project_id);
+        parcel.writeLong(id);
         parcel.writeString(project_name);
         // Convert boolean to 0 = false, 1 = true;
         parcel.writeByte((byte) (project_cover_set_by_user ? 1 : 0));
@@ -76,7 +76,7 @@ public class ProjectEntry implements Parcelable {
     };
 
     private ProjectEntry(Parcel in){
-        project_id = in.readLong();
+        id = in.readLong();
         project_name = in.readString();
         // Convert 0 to false and 1 to true
         project_cover_set_by_user = in.readByte() != 0;

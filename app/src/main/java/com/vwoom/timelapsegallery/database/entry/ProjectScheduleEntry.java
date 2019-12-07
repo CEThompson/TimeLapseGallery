@@ -1,12 +1,19 @@
 package com.vwoom.timelapsegallery.database.entry;
 
 import androidx.room.Entity;
-import androidx.room.PrimaryKey;
+import androidx.room.ForeignKey;
 
-@Entity (tableName = "project_schedule")
+@Entity(tableName = "project_schedule",
+        primaryKeys = "project_id",
+        foreignKeys = {
+                @ForeignKey(entity = ProjectEntry.class,
+                        parentColumns = "id",
+                        childColumns = "project_id",
+                        onDelete = ForeignKey.CASCADE),
+        })
+
 public class ProjectScheduleEntry {
-
-    @PrimaryKey private long project_id;
+    private long project_id;
     private long schedule_time;
     private int interval_days;
 

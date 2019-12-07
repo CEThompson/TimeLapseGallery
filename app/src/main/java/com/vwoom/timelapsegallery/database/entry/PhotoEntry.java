@@ -10,7 +10,7 @@ import androidx.room.PrimaryKey;
 @Entity (tableName = "photo")
 public class PhotoEntry implements Parcelable {
 
-    @PrimaryKey(autoGenerate = true) private long photo_id;
+    @PrimaryKey(autoGenerate = true) private long id;
     private long project_id;
     private long timestamp;
 
@@ -21,19 +21,19 @@ public class PhotoEntry implements Parcelable {
         this.timestamp = timestamp;
     }
 
-    public PhotoEntry(long photo_id, long project_id, long timestamp){
-        this.photo_id = photo_id;
+    public PhotoEntry(long id, long project_id, long timestamp){
+        this.id = id;
         this.project_id = project_id;
         this.timestamp = timestamp;
     }
 
     /* Getters */
-    public long getPhotoId() { return photo_id; }
+    public long getPhotoId() { return id; }
     public long getProjectId() { return project_id; }
     public long getTimestamp() { return timestamp; }
 
     /* Setters */
-    public void setId(long id) { this.photo_id = photo_id;}
+    public void setId(long id) { this.id = this.id;}
     public void setProjectId(long project_id) { this.project_id = project_id; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
@@ -45,7 +45,7 @@ public class PhotoEntry implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(photo_id);
+        parcel.writeLong(id);
         parcel.writeLong(project_id);
         parcel.writeLong(timestamp);
     }
@@ -62,7 +62,7 @@ public class PhotoEntry implements Parcelable {
     };
 
     private PhotoEntry(Parcel in){
-        photo_id = in.readLong();
+        id = in.readLong();
         project_id = in.readLong();
         timestamp = in.readLong();
     }

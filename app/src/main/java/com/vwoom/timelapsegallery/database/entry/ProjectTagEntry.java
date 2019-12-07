@@ -2,20 +2,16 @@ package com.vwoom.timelapsegallery.database.entry;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
 
-// TODO verify foreign keys for validation table
+// TODO verify cascade deletion works appropriately
 @Entity (tableName = "project_tag",
             primaryKeys = {"project_id", "tag_id"},
             foreignKeys = {
                 @ForeignKey(entity = ProjectEntry.class,
-                        parentColumns = "project_id", childColumns = "project_id",
-                        // TODO verify deletion logic
+                        parentColumns = "id", childColumns = "project_id",
                         onDelete = ForeignKey.CASCADE),
                 @ForeignKey(entity = TagEntry.class,
-                        parentColumns = "tag_id", childColumns = "tag_id",
-                        // TODO verify deletion logic
+                        parentColumns = "id", childColumns = "tag_id",
                         onDelete = ForeignKey.CASCADE)
         })
 
