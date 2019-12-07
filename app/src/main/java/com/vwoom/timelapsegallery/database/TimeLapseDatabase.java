@@ -67,11 +67,19 @@ public abstract class TimeLapseDatabase extends RoomDatabase {
             // Create new tables
             // (1) Cover Photo
             // columns: project_id, photo_id
+
+            // Create the table
             database.execSQL("CREATE TABLE cover_photo (project_id LONG, photo_id LONG, PRIMARY KEY(project_id))");
+
+            // TODO Copy data
+            database.execSQL("INSERT INTO cover_photo (project_id, photo_id) " +
+                    "SELECT id FROM project INNER JOIN ");
 
             // (2) Project Schedule
             // columns: project_id, schedule_time, interval_days
             database.execSQL("CREATE TABLE project_schedule (project_id LONG, schedule_time LONG, interval_days INT, PRIMARY KEY(project_id))");
+
+            // TODO copy data
 
             // Copy data into new tables
             // (1) Project
@@ -90,6 +98,8 @@ public abstract class TimeLapseDatabase extends RoomDatabase {
             // (2) Photo
             // init: id, project_id, url, timestamp
             // altered: id, project_id, timestamp
+
+            
 
             // (3) Project Tag
             // init: id, tag_id, project_id
