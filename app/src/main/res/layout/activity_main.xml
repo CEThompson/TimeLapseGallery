@@ -50,21 +50,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             />
 
-        <TextView
-            android:id="@+id/welcome_text_view"
-            android:visibility="invisible"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/welcome"
-            android:textStyle="italic"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:paddingEnd="@dimen/welcome_padding"
-            app:layout_constraintEnd_toStartOf="@id/add_project_FAB"
-            app:layout_constraintTop_toTopOf="@id/add_project_FAB"
-            app:layout_constraintBottom_toBottomOf="@id/add_project_FAB"
-            app:layout_constraintVertical_bias="0.5"
-            tools:text="Welcome"/>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
