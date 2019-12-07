@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
         // Set up click listener to add new projects
         mNewProjectFab.setOnClickListener((View v) ->{
-            Intent newProjectIntent = new Intent(MainActivity.this, NewProjectActivity.class);
+            Intent newProjectIntent = new Intent(MainActivity.this, CameraActivity.class);
             startActivity(newProjectIntent);
         });
 
