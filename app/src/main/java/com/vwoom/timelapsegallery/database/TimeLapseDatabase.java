@@ -5,8 +5,10 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import com.vwoom.timelapsegallery.database.dao.CoverPhotoDao;
 import com.vwoom.timelapsegallery.database.dao.PhotoDao;
 import com.vwoom.timelapsegallery.database.dao.ProjectDao;
+import com.vwoom.timelapsegallery.database.dao.ProjectScheduleDao;
 import com.vwoom.timelapsegallery.database.dao.ProjectTagDao;
 import com.vwoom.timelapsegallery.database.dao.TagDao;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
@@ -40,5 +42,9 @@ public abstract class TimeLapseDatabase extends RoomDatabase{
     public abstract TagDao tagDao();
 
     public abstract ProjectTagDao projectTagDao();
+
+    public abstract CoverPhotoDao coverPhotoDao();
+
+    public abstract ProjectScheduleDao projectScheduleDao();
 
 }

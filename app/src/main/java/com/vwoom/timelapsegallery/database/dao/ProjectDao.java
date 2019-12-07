@@ -18,7 +18,12 @@ public interface ProjectDao {
     @Query("SELECT * FROM project ORDER BY id")
     LiveData<List<ProjectEntry>> loadAllProjects();
 
-    @Query("SELECT * FROM project WHERE schedule != 0 ORDER BY schedule_next_submission")
+    // TODO test this join query
+    //@Query("SELECT * FROM project WHERE schedule != 0 ORDER BY schedule_next_submission")
+    @Query("SELECT * FROM project " +
+            "INNER JOIN project_schedule " +
+            "ON project.id = project_schedule.project_id " +
+            "ORDER BY project_schedule.schedule_time")
     List<ProjectEntry> loadAllScheduledProjects();
 
     @Query("SELECT * FROM project WHERE id = :id")
