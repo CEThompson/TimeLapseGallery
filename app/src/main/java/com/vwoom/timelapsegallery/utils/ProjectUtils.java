@@ -119,7 +119,7 @@ public class ProjectUtils {
                         ProjectEntry currentProject
                                 = new ProjectEntry(
                                 Long.valueOf(id),
-                                projectName,false);
+                                projectName,0);
 
                         // Insert the project - this updates on conflict
                         db.projectDao().insertProject(currentProject);

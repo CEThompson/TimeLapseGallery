@@ -5,7 +5,7 @@ import androidx.room.ForeignKey;
 
 // TODO verify cascade deletion works appropriately
 @Entity (tableName = "project_tag",
-            primaryKeys = {"project_id", "tag_id"},
+            primaryKeys = {"project_id"},
             foreignKeys = {
                 @ForeignKey(entity = ProjectEntry.class,
                         parentColumns = "id", childColumns = "project_id",

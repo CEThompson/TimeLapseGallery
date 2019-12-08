@@ -4,7 +4,7 @@ import androidx.room.Entity;
 import androidx.room.ForeignKey;
 
 @Entity(tableName = "cover_photo",
-        primaryKeys = {"project_id", "photo_id"},
+        primaryKeys = {"project_id",},
         foreignKeys = {
                 @ForeignKey(entity = ProjectEntry.class,
                         parentColumns = "id",

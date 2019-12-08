@@ -13,22 +13,22 @@ public class ProjectEntry implements Parcelable {
 
     @PrimaryKey(autoGenerate = true) private long id;
     private String project_name;
-    private boolean project_cover_set_by_user = false;
+    private int cover_set_by_user = 0;
 
     /* For inserting with auto-generated ID */
     @Ignore
     public ProjectEntry(@Nullable String project_name,
-                        boolean project_cover_set_by_user){
+                        int cover_set_by_user){
         this.project_name = project_name;
-        this.project_cover_set_by_user = project_cover_set_by_user;
+        this.cover_set_by_user = cover_set_by_user;
     }
 
     public ProjectEntry(long id,
                         @Nullable String project_name,
-                        boolean project_cover_set_by_user){
+                        int cover_set_by_user){
         this.id = id;
         this.project_name = project_name;
-        this.project_cover_set_by_user = project_cover_set_by_user;
+        this.cover_set_by_user = cover_set_by_user;
     }
 
     /* Getters */
@@ -39,8 +39,8 @@ public class ProjectEntry implements Parcelable {
     public String getProject_name() {
         return project_name;
     }
-    public boolean isProject_cover_set_by_user() {
-        return project_cover_set_by_user;
+    public int getCover_set_by_user() {
+        return cover_set_by_user;
     }
 
     /* Setters */
@@ -48,8 +48,9 @@ public class ProjectEntry implements Parcelable {
     public void setProject_name(@Nullable String project_name) {
         this.project_name = project_name;
     }
-    public void setProject_cover_set_by_user(boolean project_cover_set_by_user) {
-        this.project_cover_set_by_user = project_cover_set_by_user;
+
+    public void setCover_set_by_user(int cover_set_by_user) {
+        this.cover_set_by_user = cover_set_by_user;
     }
 
     /* Parcelable functionality */
@@ -63,7 +64,7 @@ public class ProjectEntry implements Parcelable {
         parcel.writeLong(id);
         parcel.writeString(project_name);
         // Convert boolean to 0 = false, 1 = true;
-        parcel.writeByte((byte) (project_cover_set_by_user ? 1 : 0));
+        parcel.writeInt(cover_set_by_user);
     }
 
     public static final Parcelable.Creator<ProjectEntry> CREATOR
@@ -81,6 +82,6 @@ public class ProjectEntry implements Parcelable {
         id = in.readLong();
         project_name = in.readString();
         // Convert 0 to false and 1 to true
-        project_cover_set_by_user = in.readByte() != 0;
+        cover_set_by_user = in.readInt();
     }
 }

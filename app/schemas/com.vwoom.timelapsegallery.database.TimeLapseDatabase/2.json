@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "0bc1a0a0e5b6ce1c6e827e7ff700c9a7",
+    "identityHash": "faf57ffe1841f9389a9237744b9c250b",
     "entities": [
       {
         "tableName": "project",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `project_name` TEXT, `project_cover_set_by_user` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `project_name` TEXT, `cover_set_by_user` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -21,8 +21,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "project_cover_set_by_user",
-            "columnName": "project_cover_set_by_user",
+            "fieldPath": "cover_set_by_user",
+            "columnName": "cover_set_by_user",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -96,7 +96,7 @@
       },
       {
         "tableName": "project_tag",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`project_id` INTEGER NOT NULL, `tag_id` INTEGER NOT NULL, PRIMARY KEY(`project_id`, `tag_id`), FOREIGN KEY(`project_id`) REFERENCES `project`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`tag_id`) REFERENCES `tag`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`project_id` INTEGER NOT NULL, `tag_id` INTEGER NOT NULL, PRIMARY KEY(`project_id`), FOREIGN KEY(`project_id`) REFERENCES `project`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`tag_id`) REFERENCES `tag`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "project_id",
@@ -113,8 +113,7 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "project_id",
-            "tag_id"
+            "project_id"
           ],
           "autoGenerate": false
         },
@@ -190,7 +189,7 @@
       },
       {
         "tableName": "cover_photo",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`project_id` INTEGER NOT NULL, `photo_id` INTEGER NOT NULL, PRIMARY KEY(`project_id`, `photo_id`), FOREIGN KEY(`project_id`) REFERENCES `project`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`photo_id`) REFERENCES `photo`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`project_id` INTEGER NOT NULL, `photo_id` INTEGER NOT NULL, PRIMARY KEY(`project_id`), FOREIGN KEY(`project_id`) REFERENCES `project`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`photo_id`) REFERENCES `photo`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "project_id",
@@ -207,8 +206,7 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "project_id",
-            "photo_id"
+            "project_id"
           ],
           "autoGenerate": false
         },
@@ -242,7 +240,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0bc1a0a0e5b6ce1c6e827e7ff700c9a7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'faf57ffe1841f9389a9237744b9c250b')"
     ]
   }
 }

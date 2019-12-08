@@ -290,7 +290,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         /* Return the new project */
         return new ProjectEntry(
                 mName,
-                false);
+                0);
     }
 
     private ProjectScheduleEntry gatherScheduleInput(){
@@ -395,8 +395,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
         // Restore fields unable to be edited from this screen
         editedProject.setId(mProjectToEdit.getId());
-        editedProject.setProject_cover_set_by_user(
-                mProjectToEdit.isProject_cover_set_by_user());
+        editedProject.setCover_set_by_user(
+                mProjectToEdit.getCover_set_by_user());
 
 
         /* If the project info is valid proceed to update it */

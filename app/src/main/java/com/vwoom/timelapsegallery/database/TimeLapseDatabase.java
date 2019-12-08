@@ -69,13 +69,18 @@ public abstract class TimeLapseDatabase extends RoomDatabase {
             // columns: project_id, photo_id
 
             // Create the table
-            database.execSQL("CREATE TABLE cover_photo (project_id LONG, photo_id LONG, PRIMARY KEY(project_id))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS cover_photo " +
+                    "(project_id INTEGER PRIMARY KEY NOT NULL, photo_id INTEGER NOT NULL," +
+                    "CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE," +
+                    "CONSTRAINT fk_photo FOREIGN KEY (photo_id) REFERENCES photo (id) ON DELETE CASCADE)");
 
             // TODO determine if I can copy last photo over to cover photo
 
             // (2) Project Schedule
             // columns: project_id, schedule_time, interval_days
-            database.execSQL("CREATE TABLE project_schedule (project_id LONG, schedule_time LONG, interval_days INT, PRIMARY KEY(project_id))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS project_schedule " +
+                    "(project_id INTEGER PRIMARY KEY NOT NULL, schedule_time INTEGER NOT NULL, interval_days INTEGER NOT NULL," +
+                    "CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE)");
 
             // TODO copy data
 
@@ -95,7 +100,8 @@ public abstract class TimeLapseDatabase extends RoomDatabase {
             //database.execSQL("ALTER TABLE project_new RENAME TO project");
 
             database.execSQL("DROP TABLE project");
-            database.execSQL("CREATE TABLE project (id LONG, project_name TEXT, cover_set_by_user INT, PRIMARY KEY(id))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS project " +
+                    "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, project_name TEXT, cover_set_by_user INTEGER NOT NULL)");
 
             // (2) Photo
             // init: id, project_id, url, timestamp
@@ -109,19 +115,24 @@ public abstract class TimeLapseDatabase extends RoomDatabase {
             //database.execSQL("ALTER TABLE photo_new RENAME TO photo");
 
             database.execSQL("DROP TABLE photo");
-            database.execSQL("CREATE TABLE photo (id LONG, project_id LONG, timestamp LONG, PRIMARY KEY(id))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS photo " +
+                    "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, project_id INTEGER NOT NULL, timestamp INTEGER NOT NULL)");
 
             // (3) Project Tag
             // init: id, tag_id, project_id
             // altered: project_id, tag_id
             database.execSQL("DROP TABLE project_tag");
-            database.execSQL("CREATE TABLE project_tag (project_id LONG, tag_id LONG, PRIMARY KEY(project_id))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS project_tag " +
+                    "(project_id INTEGER PRIMARY KEY NOT NULL, tag_id INTEGER NOT NULL, " +
+                    "CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE," +
+                    "CONSTRAINT fk_tag FOREIGN KEY (tag_id) REFERENCES tag (id) ON DELETE CASCADE)");
 
             // (4) Tag
             // init: id, title
             // altered: project_id, tag
             database.execSQL("DROP TABLE tag");
-            database.execSQL("CREATE TABLE tag (tag_id LONG, tag TEXT, PRIMARY KEY(tag_id))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS tag " +
+                    "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, tag TEXT)");
 
         }
     };
