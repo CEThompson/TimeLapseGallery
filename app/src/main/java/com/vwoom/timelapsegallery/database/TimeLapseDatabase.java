@@ -84,25 +84,32 @@ public abstract class TimeLapseDatabase extends RoomDatabase {
             // initial columns: id, name, thumbnail_url, schedule, schedule_next_submission, timestamp
             // altered columns: id, project_name, cover_set_by_user
 
+            // This WOULD be the pattern!
             // Create new table
-            database.execSQL("CREATE TABLE project_new (id LONG, project_name TEXT, cover_set_by_user INT, PRIMARY KEY(id))");
+            //database.execSQL("CREATE TABLE project_new (id LONG, project_name TEXT, cover_set_by_user INT, PRIMARY KEY(id))");
             // Copy the data
-            database.execSQL("INSERT INTO project_new (id, project_name) SELECT id, name FROM project");
+            //database.execSQL("INSERT INTO project_new (id, project_name) SELECT id, name FROM project");
             // Remove old table
-            database.execSQL("DROP TABLE project");
+            //database.execSQL("DROP TABLE project");
             // Change table name to old one
-            database.execSQL("ALTER TABLE project_new RENAME TO project");
+            //database.execSQL("ALTER TABLE project_new RENAME TO project");
+
+            database.execSQL("DROP TABLE project");
+            database.execSQL("CREATE TABLE project (id LONG, project_name TEXT, cover_set_by_user INT, PRIMARY KEY(id))");
 
             // (2) Photo
             // init: id, project_id, url, timestamp
             // altered: id, project_id, timestamp
 
             // Create the new
-            database.execSQL("CREATE TABLE photo_new (id LONG, project_id LONG, timestamp LONG, PRIMARY KEY(id))");
+            //database.execSQL("CREATE TABLE photo_new (id LONG, project_id LONG, timestamp LONG, PRIMARY KEY(id))");
             // Add the old
-            database.execSQL("DROP TABLE photo");
+            //database.execSQL("DROP TABLE photo");
             // Rename the new
-            database.execSQL("ALTER TABLE photo_new RENAME TO photo");
+            //database.execSQL("ALTER TABLE photo_new RENAME TO photo");
+
+            database.execSQL("DROP TABLE photo");
+            database.execSQL("CREATE TABLE photo (id LONG, project_id LONG, timestamp LONG, PRIMARY KEY(id))");
 
             // (3) Project Tag
             // init: id, tag_id, project_id
