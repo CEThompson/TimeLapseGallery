@@ -65,7 +65,6 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
         val previewConfig = PreviewConfig.Builder().apply {
             setLensFacing(CameraX.LensFacing.BACK)
             setTargetResolution(screenSize)
-            setTargetAspectRatio(AspectRatio.RATIO_16_9)
             setTargetRotation(windowManager.defaultDisplay.rotation)
             setTargetRotation(viewFinder.display.rotation)
         }.build()
