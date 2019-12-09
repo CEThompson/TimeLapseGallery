@@ -31,7 +31,7 @@ public interface ProjectDao {
     ProjectEntry loadProjectById(long id);
 
     @Query("SELECT * FROM project WHERE id = :id")
-    LiveData<ProjectEntry> loadLiveDataProjectById(long id);
+    LiveData<Project> loadLiveDataProjectById(long id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertProject(ProjectEntry projectEntry);
@@ -46,5 +46,17 @@ public interface ProjectDao {
     void deleteAllProjects();
 
     /* Returns a livedata object for observing projects view */
+    @Query("SELECT " +
+            "project.id AS project_id, " +
+            "project.project_name AS project_name, " +
+            "project.cover_set_by_user AS cover_set_by_user, " +
+            "project_schedule.schedule_time AS schedule_time, " +
+            "project_schedule.interval_days AS interval_days, " +
+            "cover_photo.photo_id AS cover_photo_id, " +
+            "photo.timestamp AS cover_photo_timestamp " +
+            "FROM project " +
+            "LEFT JOIN project_schedule ON project.id = project_schedule.project_id " +
+            "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
+            "LEFT JOIN photo ON cover_photo.photo_id = photo.id")
     LiveData<List<Project>> loadProjectsWithInfo();
 }

@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.room.DatabaseView
 import kotlinx.android.parcel.Parcelize
 
-
 @DatabaseView("SELECT " +
         "project.id AS project_id, " +
         "project.project_name AS project_name, " +
