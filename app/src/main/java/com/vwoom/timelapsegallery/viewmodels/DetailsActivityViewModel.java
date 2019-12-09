@@ -20,7 +20,7 @@ public class DetailsActivityViewModel extends ViewModel {
 
     public DetailsActivityViewModel(TimeLapseDatabase database, long projectId){
         photos = database.photoDao().loadAllPhotosByProjectId(projectId);
-        currentProject = database.projectDao().loadLiveDataProjectById(projectId);
+        currentProject = database.projectDao().loadProjectView(projectId);
     }
 
     public LiveData<List<PhotoEntry>> getPhotos(){ return photos;}

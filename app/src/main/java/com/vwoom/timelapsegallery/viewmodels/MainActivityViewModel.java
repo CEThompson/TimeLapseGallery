@@ -19,7 +19,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     public MainActivityViewModel(Application application) {
         super(application);
         TimeLapseDatabase database = TimeLapseDatabase.getInstance(this.getApplication());
-        projects = database.projectDao().loadProjectsWithInfo();
+        projects = database.projectDao().loadProjectViews();
     }
 
     public LiveData<List<Project>> getProjects() {

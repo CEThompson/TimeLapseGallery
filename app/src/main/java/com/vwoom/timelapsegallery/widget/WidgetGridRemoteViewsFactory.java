@@ -97,7 +97,9 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
 
         // Send the project in an intent
         Bundle extras = new Bundle();
-        extras.putParcelable(Keys.PROJECT_ENTRY, currentProject);
+
+        // TODO determine what to pass here!
+        //extras.putParcelable(Keys.PROJECT, currentProject);
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
         views.setOnClickFillInIntent(R.id.widget_grid_item_layout, fillInIntent);

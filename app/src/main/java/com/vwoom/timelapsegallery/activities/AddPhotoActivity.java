@@ -405,7 +405,9 @@ public class AddPhotoActivity extends AppCompatActivity {
             if (insertedPhoto != null) {
                 // Set the result to return to the details activity
                 Intent resultIntent = new Intent();
-                resultIntent.putExtra(Keys.PHOTO_ENTRY, insertedPhoto);
+
+                // TODO determine if I need to pass a photo along in intent!
+                //resultIntent.putExtra(Keys.PHOTO_ENTRY, insertedPhoto);
                 activity.setResult(RESULT_OK, resultIntent);
 
                 // Do not show ads to firebase lab test devices
