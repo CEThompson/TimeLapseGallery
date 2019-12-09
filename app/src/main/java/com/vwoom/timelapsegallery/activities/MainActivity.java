@@ -194,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
                 projectIdsToCoverUrls.put(project_id, photoUrl);
             }
             mProjectsAdapter.setCoverPhotos(projectIdsToCoverUrls);
+            Log.d("check me out", "projects to urls " + projectIdsToCoverUrls.toString());
         });
 
         /* Observe project schedules */

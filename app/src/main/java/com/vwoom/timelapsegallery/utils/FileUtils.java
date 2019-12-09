@@ -178,7 +178,8 @@ public final class FileUtils {
 
     /* Returns the pattern for a projects path : project path = {project_id}_{project_name} */
     private static String getProjectDirectoryPath(ProjectEntry projectEntry){
-        return projectEntry.getId() + "_" + projectEntry.getProject_name();
+        if (projectEntry.getProject_name() == null) return String.valueOf(projectEntry.getId());
+        else return projectEntry.getId() + "_" + projectEntry.getProject_name();
     }
 
     public static String getPhotoUrl(Context context, ProjectEntry projectEntry, PhotoEntry photoEntry){

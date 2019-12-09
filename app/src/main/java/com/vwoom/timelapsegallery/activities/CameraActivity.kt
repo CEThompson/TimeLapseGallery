@@ -6,6 +6,7 @@ import android.graphics.Matrix
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.Log
 import android.util.Rational
 import android.util.Size
 import android.view.Surface
@@ -98,8 +99,9 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                                 imageCaptureError: ImageCapture.ImageCaptureError,
                                 message: String,
                                 cause: Throwable?) {
-                            viewFinder.post{Toast.makeText(baseContext, "Capture failed", Toast.LENGTH_LONG).show()}
+                            viewFinder.post{Toast.makeText(baseContext, "Capture failed: $message", Toast.LENGTH_LONG).show()}
                             // TODO error log
+                            Log.e("Camera Activity", "Capture Failed: $message")
                         }
 
                         override fun onImageSaved(file: File) {
@@ -124,7 +126,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
         }
 
-        CameraX.bindToLifecycle(this, preview)
+        CameraX.bindToLifecycle(this, preview, imageCapture)
     }
 
     private fun updateTransform() {
