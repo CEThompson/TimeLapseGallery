@@ -8,7 +8,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity (tableName = "photo")
-public class PhotoEntry implements Parcelable {
+public class PhotoEntry {
 
     @PrimaryKey(autoGenerate = true) private long id;
     private long project_id;
@@ -48,34 +48,4 @@ public class PhotoEntry implements Parcelable {
         this.project_id = project_id;
     }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
-
-    /* Parcelable functionality */
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(id);
-        parcel.writeLong(project_id);
-        parcel.writeLong(timestamp);
-    }
-
-    public static final Parcelable.Creator<PhotoEntry> CREATOR
-            = new Parcelable.Creator<PhotoEntry>() {
-        public PhotoEntry createFromParcel(Parcel in) {
-            return new PhotoEntry(in);
-        }
-
-        public PhotoEntry[] newArray(int size) {
-            return new PhotoEntry[size];
-        }
-    };
-
-    private PhotoEntry(Parcel in){
-        id = in.readLong();
-        project_id = in.readLong();
-        timestamp = in.readLong();
-    }
 }

@@ -9,7 +9,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity (tableName = "project")
-public class ProjectEntry implements Parcelable {
+public class ProjectEntry {
 
     @PrimaryKey(autoGenerate = true) private long id;
     private String project_name;
@@ -51,37 +51,5 @@ public class ProjectEntry implements Parcelable {
 
     public void setCover_set_by_user(int cover_set_by_user) {
         this.cover_set_by_user = cover_set_by_user;
-    }
-
-    /* Parcelable functionality */
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(id);
-        parcel.writeString(project_name);
-        // Convert boolean to 0 = false, 1 = true;
-        parcel.writeInt(cover_set_by_user);
-    }
-
-    public static final Parcelable.Creator<ProjectEntry> CREATOR
-            = new Parcelable.Creator<ProjectEntry>() {
-        public ProjectEntry createFromParcel(Parcel in) {
-            return new ProjectEntry(in);
-        }
-
-        public ProjectEntry[] newArray(int size) {
-            return new ProjectEntry[size];
-        }
-    };
-
-    private ProjectEntry(Parcel in){
-        id = in.readLong();
-        project_name = in.readString();
-        // Convert 0 to false and 1 to true
-        cover_set_by_user = in.readInt();
     }
 }
