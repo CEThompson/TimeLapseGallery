@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
+import com.vwoom.timelapsegallery.database.view.Project;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 
 import java.io.File;
@@ -26,7 +27,7 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsA
     private final static String TAG = DetailsAdapter.class.getSimpleName();
 
     private List<PhotoEntry> mPhotos;
-    private ProjectEntry mProject;
+    private Project mProject;
     private final DetailsAdapterOnClickHandler mClickHandler;
     private PhotoEntry mCurrentPhoto;
 
@@ -93,7 +94,7 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsA
         return mPhotos.size();
     }
 
-    public void setPhotoData(List<PhotoEntry> photoData, ProjectEntry project){
+    public void setPhotoData(List<PhotoEntry> photoData, Project project){
         mPhotos = photoData;
         mProject = project;
         notifyDataSetChanged();

@@ -4,6 +4,7 @@ import com.vwoom.timelapsegallery.BuildConfig;
 
 public final class Keys {
     /* Project Keys */
+    public static final String PROJECT = "project";
     public static final String PROJECT_NAME = "project_name";
     public static final String PROJECT_SCHEDULE = "project_schedule";
     public static final String PROJECT_ENTRY = "project_entry";

@@ -57,6 +57,7 @@ import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
 import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry;
+import com.vwoom.timelapsegallery.database.view.Project;
 import com.vwoom.timelapsegallery.notification.NotificationUtils;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
@@ -110,11 +111,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     // Photo and project Information
     private List<PhotoEntry> mPhotos;
     private PhotoEntry mCurrentPhoto;
-    private PhotoEntry mCoverPhoto;
 
     private Integer mCurrentPlayPosition = null;
 
-    private ProjectEntry mCurrentProject;
+    private Project mCurrentProject;
     private ProjectScheduleEntry mProjectSchedule;
 
     // Views for fullscreen dialog
@@ -252,7 +252,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mPlayAsVideoFab.setRippleColor(getResources().getColor(R.color.colorGreen));
 
         // Set the transition name for the image
-        String transitionName = mCurrentProject.getId() + mCurrentProject.getProject_name();
+        String transitionName = mCurrentProject.getProject_id() + mCurrentProject.getProject_name();
         mCardView.setTransitionName(transitionName);
 
         setupViewModel(savedInstanceState);
@@ -372,7 +372,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(Keys.PHOTO_ENTRY, mCurrentPhoto);
+        outState.putParcelable(Keys.PROJECT, mCurrentProject);
         outState.putInt(Keys.TRANSITION_POSITION, mReturnPosition);
         outState.putBoolean(KEY_DIALOG, mFullscreenImageDialog.isShowing());
     }
@@ -433,7 +433,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mIsReturning = true;
         Intent data = new Intent();
         data.putExtra(Keys.TRANSITION_POSITION, mReturnPosition);
-        data.putExtra(Keys.TRANSITION_NAME, FileUtils.getPhotoUrl(this, mCurrentProject, mCoverPhoto));
+        data.putExtra(Keys.TRANSITION_NAME, FileUtils.getPhotoUrl(this, mCurrentProject, mCurrentPhoto));
         setResult(RESULT_OK, data);
         super.finishAfterTransition();
     }
@@ -736,7 +736,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     /* Binds project and photos to database */
     private void setupViewModel(@Nullable Bundle savedInstanceState){
-        DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getId());
+        DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getProject_id());
         final DetailsActivityViewModel viewModel = ViewModelProviders.of(this, factory)
                 .get(DetailsActivityViewModel.class);
 
@@ -885,10 +885,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     }
 
     /* Deletes the current photo */
-    private void deletePhoto(TimeLapseDatabase database, ProjectEntry projectEntry, PhotoEntry photoEntry){
+    private void deletePhoto(TimeLapseDatabase database, Project project, PhotoEntry photoEntry){
         AppExecutors.getInstance().diskIO().execute(() -> {
                 // Delete the photo from the file structure
-                FileUtils.deletePhoto(this, projectEntry, photoEntry);
+                FileUtils.deletePhoto(this, project, photoEntry);
                 // Delete the photo metadata in the database
                 database.photoDao().deletePhoto(photoEntry);
             });
@@ -901,10 +901,12 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
      */
 
     /* Deletes the project and recursively deletes files from project folder */
-    private void deleteProject(TimeLapseDatabase database, ProjectEntry projectEntry){
+    private void deleteProject(TimeLapseDatabase database, Project project){
 
         /* Delete project from the database and photos from the file structure */
         AppExecutors.getInstance().diskIO().execute(() -> {
+            ProjectEntry projectEntry = database.projectDao().loadProjectById(project.getProject_id());
+
             // Delete the photos from the file structure
             FileUtils.deleteProject(DetailsActivity.this, projectEntry);
 
@@ -914,7 +916,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             database.projectDao().deleteProject(projectEntry);
 
             /* If project had a schedule ensure widget and notification worker are updated */
-            if (schedule != null) {
+            if (schedule.getSchedule_time() != null && schedule.getInterval_days() !=null) {
                 NotificationUtils.scheduleNotificationWorker(this);
                 UpdateWidgetService.startActionUpdateWidgets(this);
             }
@@ -922,14 +924,14 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         // Send to analytics
         Bundle params = new Bundle();
-        params.putString("project_name", projectEntry.getProject_name());
+        params.putString("project_name", project.getProject_name());
         mFirebaseAnalytics.logEvent(getString(R.string.analytics_delete_project), null);
     }
 
     /* Gets the last photo from the set and sets it as the project thumbnail */
-    private void updateProjectThumbnail(TimeLapseDatabase database, ProjectEntry project, PhotoEntry photo){
+    private void updateProjectThumbnail(TimeLapseDatabase database, Project project, PhotoEntry photo){
         AppExecutors.getInstance().diskIO().execute(() -> {
-                    CoverPhotoEntry coverPhotoEntry = new CoverPhotoEntry(project.getId(), photo.getId());
+                    CoverPhotoEntry coverPhotoEntry = new CoverPhotoEntry(project.getProject_id(), photo.getId());
                     database.coverPhotoDao().insertPhoto(coverPhotoEntry);
                 }
         );

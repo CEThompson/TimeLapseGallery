@@ -174,6 +174,10 @@ public final class FileUtils {
         File photoFile = new File(getPhotoUrl(context, projectEntry, photoEntry));
         deleteRecursive(photoFile);
     }
+    public static void deletePhoto(Context context, Project project, PhotoEntry photoEntry){
+        File photoFile = new File(getPhotoUrl(context, project, photoEntry));
+        deleteRecursive(photoFile);
+    }
 
     /* Returns true if a path contains reserved characters */
     public static boolean pathContainsReservedCharacter(String path){
@@ -198,6 +202,13 @@ public final class FileUtils {
     public static String getPhotoUrl(Context context, ProjectEntry projectEntry, PhotoEntry photoEntry){
         String imageFileName = getPhotoFileName(photoEntry);
         File projectDir = getProjectFolder(context, projectEntry);
+        File photoFile = new File(projectDir, imageFileName);
+        return photoFile.getAbsolutePath();
+    }
+
+    public static String getPhotoUrl(Context context, Project project, PhotoEntry photoEntry){
+        String imageFileName = getPhotoFileName(photoEntry);
+        File projectDir = getProjectFolder(context, project);
         File photoFile = new File(projectDir, imageFileName);
         return photoFile.getAbsolutePath();
     }
