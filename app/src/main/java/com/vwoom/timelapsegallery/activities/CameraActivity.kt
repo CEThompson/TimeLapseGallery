@@ -86,7 +86,7 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
         val imageCaptureConfig = ImageCaptureConfig.Builder()
                 .apply {
-                    setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
+                    setCaptureMode(ImageCapture.CaptureMode.MAX_QUALITY)
                 }.build()
 
         val imageCapture = ImageCapture(imageCaptureConfig)
