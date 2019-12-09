@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.vwoom.timelapsegallery.database.AppExecutors;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
+import com.vwoom.timelapsegallery.database.dao.ProjectDao;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 
@@ -36,6 +37,12 @@ public final class FileUtils {
     }
 
     private static File getProjectFolder(Context context, ProjectEntry project){
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        String projectPath = getProjectDirectoryPath(project);
+        return new File(storageDir, projectPath);
+    }
+
+    private static File getProjectFolder(Context context, ProjectDao.Project project){
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         String projectPath = getProjectDirectoryPath(project);
         return new File(storageDir, projectPath);
@@ -182,9 +189,21 @@ public final class FileUtils {
         else return projectEntry.getId() + "_" + projectEntry.getProject_name();
     }
 
+    private static String getProjectDirectoryPath(ProjectDao.Project project){
+        if (project.project_name == null) return String.valueOf(project.project_id);
+        else return project.project_id + "_" + project.project_name;
+    }
+
     public static String getPhotoUrl(Context context, ProjectEntry projectEntry, PhotoEntry photoEntry){
         String imageFileName = getPhotoFileName(photoEntry);
         File projectDir = getProjectFolder(context, projectEntry);
+        File photoFile = new File(projectDir, imageFileName);
+        return photoFile.getAbsolutePath();
+    }
+
+    public static String getPhotoUrl(Context context, ProjectDao.Project project){
+        String imageFileName = getPhotoFileName(project.cover_photo_timestamp);
+        File projectDir = getProjectFolder(context, project);
         File photoFile = new File(projectDir, imageFileName);
         return photoFile.getAbsolutePath();
     }

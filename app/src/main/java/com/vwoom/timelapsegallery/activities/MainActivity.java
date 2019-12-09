@@ -24,6 +24,7 @@ import android.view.ViewTreeObserver;
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.adapters.ProjectsAdapter;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
+import com.vwoom.timelapsegallery.database.dao.ProjectDao;
 import com.vwoom.timelapsegallery.database.entry.CoverPhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
     private ProjectsAdapter mProjectsAdapter;
 
-    private List<ProjectEntry> mProjects;
+    private List<ProjectDao.Project> mProjects;
 
     private int mNumberOfColumns = 3;
 
@@ -158,8 +159,15 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
     private void setupViewModel(){
         MainActivityViewModel viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
+        viewModel.getProjects().observe(this, (List<ProjectDao.Project> projects) -> {
+            mProjects = projects;
+            mProjectsAdapter.setProjectData(projects);
+            mNewProjectFab.show();
+        });
+
         /* Observe projects */
-        viewModel.getProjects().observe(this, (List<ProjectEntry> projectEntries) -> {
+        /*
+        viewModel.getProjectEntries().observe(this, (List<ProjectEntry> projectEntries) -> {
             mProjects = projectEntries;
 
             // If filter by today grab todays projects and set the data on the adapter
@@ -176,42 +184,14 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
             // Reveal the new project fab
             mNewProjectFab.show();
         });
-
-        /* Observe cover photos */
-        viewModel.getProjectCovers().observe(this, (List<CoverPhotoEntry> coverPhotoEntries) -> {
-
-            // TODO create a list of the urls for the cover photos off the main thread
-            TimeLapseDatabase db = TimeLapseDatabase.getInstance(this);
-            Map<Long, String> projectIdsToCoverUrls = new HashMap<>();
-            for (int i = 0; i < coverPhotoEntries.size(); i++){
-                CoverPhotoEntry current = coverPhotoEntries.get(i);
-                long project_id = current.getProject_id();
-                long photo_id = current.getPhoto_id();
-                PhotoEntry coverPhoto = db.photoDao().loadPhoto(project_id, photo_id);
-                ProjectEntry project = db.projectDao().loadProjectById(project_id);
-                // TODO get filename from photo entry
-                String photoUrl = FileUtils.getPhotoUrl(this, project, coverPhoto);
-                projectIdsToCoverUrls.put(project_id, photoUrl);
-            }
-            mProjectsAdapter.setCoverPhotos(projectIdsToCoverUrls);
-            Log.d("check me out", "projects to urls " + projectIdsToCoverUrls.toString());
-        });
-
-        /* Observe project schedules */
-        viewModel.getProjectSchedules().observe(this, (List<ProjectScheduleEntry> projectSchedules) -> {
-            Map<Long, ProjectScheduleEntry> projectIdsToSchedules = new HashMap<>();
-            for (int i = 0; i < projectSchedules.size(); i++){
-                ProjectScheduleEntry entry = projectSchedules.get(i);
-                projectIdsToSchedules.put(entry.getProject_id(), entry);
-            }
-            mProjectsAdapter.setProjectSchedules(projectIdsToSchedules);
-        });
+        */
     }
 
     @Override
-    public void onClick(ProjectEntry clickedProject, View sharedElement, String transitionName, int position) {
+    public void onClick(ProjectDao.Project clickedProject, View sharedElement, String transitionName, int position) {
         Intent intent = new Intent(this, DetailsActivity.class);
-        intent.putExtra(Keys.PROJECT_ENTRY, clickedProject);
+        // TODO implement clicked project as parcelable
+        //intent.putExtra(Keys.PROJECT_ENTRY, clickedProject);
         intent.putExtra(Keys.TRANSITION_POSITION, position);
 
         Pair<View, String> p1 = Pair.create((sharedElement), transitionName);

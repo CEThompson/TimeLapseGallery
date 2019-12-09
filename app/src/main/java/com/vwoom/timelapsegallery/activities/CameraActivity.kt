@@ -106,20 +106,24 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
                         override fun onImageSaved(file: File) {
                             viewFinder.post{Toast.makeText(baseContext, "Capture success", Toast.LENGTH_LONG).show()}
+                            val db = TimeLapseDatabase.getInstance(baseContext)
 
                             // Create database entries
                             val timestamp = System.currentTimeMillis()
+
+                            // Create and insert the project
                             val projectEntry = ProjectEntry(null, 0)
-                            val photoEntry = PhotoEntry(projectEntry.id, timestamp)
-                            val coverPhotoEntry = CoverPhotoEntry(projectEntry.id, photoEntry.id)
+                            val project_id = db.projectDao().insertProject(projectEntry)
 
                             // Copy temp file to project folder file
                             FileUtils.createFinalFileFromTemp(baseContext, file.absolutePath, projectEntry, timestamp)
 
-                            // Get and insert into the database
-                            val db = TimeLapseDatabase.getInstance(baseContext)
-                            db.projectDao().insertProject(projectEntry)
+                            // Create and insert the photo
+                            val photoEntry = PhotoEntry(project_id, timestamp)
                             db.photoDao().insertPhoto(photoEntry)
+
+                            // Create and insert the cover photo
+                            val coverPhotoEntry = CoverPhotoEntry(projectEntry.id, photoEntry.id)
                             db.coverPhotoDao().insertPhoto(coverPhotoEntry)
                         }
                     })

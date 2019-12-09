@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.adapters;
 
 import android.content.Context;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.vwoom.timelapsegallery.R;
+import com.vwoom.timelapsegallery.database.dao.ProjectDao;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry;
+import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.PhotoUtils;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
 
@@ -33,16 +36,14 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
 
     private final static String TAG = ProjectsAdapter.class.getSimpleName();
 
-    private List<ProjectEntry> mProjectData;
-    private Map<Long, String> mProjectsToPhotos;
-    private Map<Long, ProjectScheduleEntry> mProjectsToSchedules;
+    private List<ProjectDao.Project> mProjectData;
 
     private final ProjectsAdapterOnClickHandler mClickHandler;
 
     private ConstraintSet constraintSet = new ConstraintSet();
 
     public interface ProjectsAdapterOnClickHandler {
-        void onClick(ProjectEntry clickedProject, View sharedElement, String transitionName, int position);
+        void onClick(ProjectDao.Project clickedProject, View sharedElement, String transitionName, int position);
     }
 
     public ProjectsAdapter(ProjectsAdapterOnClickHandler handler){ mClickHandler = handler;}
@@ -65,7 +66,7 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         @Override
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
-            ProjectEntry clickedProject = mProjectData.get(adapterPosition);
+            ProjectDao.Project clickedProject = mProjectData.get(adapterPosition);
             String transitionName = mCardView.getTransitionName();
             mClickHandler.onClick(clickedProject, mCardView, transitionName, adapterPosition);
         }
@@ -85,10 +86,11 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
     @Override
     public void onBindViewHolder(@NonNull ProjectsAdapterViewHolder holder, int position) {
         // Get project information
-        ProjectEntry currentProject = mProjectData.get(position);
+        ProjectDao.Project currentProject = mProjectData.get(position);
 
         // TODO test photo url from hashmap
-        String thumbnail_path = mProjectsToPhotos.get(currentProject.getId());
+        String thumbnail_path = FileUtils.getPhotoUrl(holder.itemView.getContext(), currentProject);
+        Log.d(TAG, "thumbnail_path is " + thumbnail_path);
 
         // Set the constraint ratio
         String ratio = PhotoUtils.getAspectRatioFromImagePath(thumbnail_path);
@@ -98,11 +100,9 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
 
         // Display schedule information
         // TODO test schedule information
-        ProjectScheduleEntry currentSchedule = mProjectsToSchedules.get(currentProject.getId());
-        if (currentSchedule != null) {
-            // Get the next submisison
-            long next = currentSchedule.getSchedule_time();
-
+        Long next = currentProject.schedule_time;
+        Integer interval = currentProject.interval_days;
+        if (next != null) {
             String nextSchedule;
 
             // Calculate day countdown
@@ -138,7 +138,7 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         }
 
         // Set the transition name
-        String transitionName = currentProject.getId() + currentProject.getProject_name();
+        String transitionName = currentProject.project_id + currentProject.project_name;
         holder.mCardView.setTransitionName(transitionName);
         // TODO set the transition name to the photo url
         holder.mCardView.setTag(R.string.transition_tag, thumbnail_path);
@@ -156,18 +156,8 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         return mProjectData.size();
     }
 
-    public void setProjectData(List<ProjectEntry> projectData){
+    public void setProjectData(List<ProjectDao.Project> projectData){
         mProjectData = projectData;
-        notifyDataSetChanged();
-    }
-
-    public void setCoverPhotos(Map<Long, String> projectIdsToPhotoUrls){
-        mProjectsToPhotos = projectIdsToPhotoUrls;
-        notifyDataSetChanged();
-    }
-
-    public void setProjectSchedules(Map<Long, ProjectScheduleEntry> projectsToSchedule){
-        mProjectsToSchedules = projectsToSchedule;
         notifyDataSetChanged();
     }
 }

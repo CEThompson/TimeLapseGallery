@@ -43,4 +43,44 @@ public interface ProjectDao {
 
     @Query("DELETE FROM project")
     void deleteAllProjects();
+
+/*
+    @Query("SELECT " +
+            "id, " +
+            "project_name, " +
+            "cover_set_by_user, " +
+            "project_schedule.schedule_time, " +
+            "project_schedule.interval_days, " +
+            "cover_photo.photo_id " +
+            "photo.timestamp " +
+            "FROM " +
+            "project " +
+            "LEFT JOIN project_schedule ON project.id = project_schedule.project_id " +
+            "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
+            "LEFT JOIN photo ON photo.id = cover_photo.photo_id")
+            */
+    @Query("SELECT " +
+            "project.id AS project_id, " +
+            "project.project_name AS project_name, " +
+            "project.cover_set_by_user AS cover_set_by_user, " +
+            "project_schedule.schedule_time AS schedule_time, " +
+            "project_schedule.interval_days AS interval_days, " +
+            "cover_photo.photo_id AS cover_photo_id, " +
+            "photo.timestamp AS cover_photo_timestamp " +
+            "FROM project " +
+            "LEFT JOIN project_schedule ON project.id = project_schedule.project_id " +
+            "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
+            "LEFT JOIN photo ON cover_photo.photo_id = photo.id")
+    LiveData<List<Project>> loadProjectsWithInfo();
+
+    class Project {
+        public long project_id;
+        public String project_name;
+        public int cover_set_by_user;
+        public Long schedule_time;
+        public Integer interval_days;
+        public long cover_photo_id;
+        public long cover_photo_timestamp;
+    }
+
 }
