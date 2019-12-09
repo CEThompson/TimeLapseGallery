@@ -23,6 +23,7 @@ import com.vwoom.timelapsegallery.database.TimeLapseDatabase
 import com.vwoom.timelapsegallery.database.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry
+import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.utils.FileUtils
 import java.io.File
 import java.util.concurrent.Executors
@@ -133,6 +134,8 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                             Log.d("abcde", "cover photo, project id ${coverPhotoEntry.project_id}")
                             Log.d("abcde", "cover photo, photo id ${coverPhotoEntry.photo_id}")
 
+                            val projectScheduleEntry = ProjectScheduleEntry(project_id, null, null)
+                            db.projectScheduleDao().insertProjectSchedule(projectScheduleEntry)
                         }
                     })
 
