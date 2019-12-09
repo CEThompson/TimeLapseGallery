@@ -11,15 +11,19 @@ import android.util.Size
 import android.view.Surface
 import android.view.TextureView
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.Toast
-import androidx.camera.core.AspectRatio
-import androidx.camera.core.CameraX
-import androidx.camera.core.Preview
-import androidx.camera.core.PreviewConfig
+import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.database.TimeLapseDatabase
+import com.vwoom.timelapsegallery.database.entry.CoverPhotoEntry
+import com.vwoom.timelapsegallery.database.entry.PhotoEntry
+import com.vwoom.timelapsegallery.database.entry.ProjectEntry
+import com.vwoom.timelapsegallery.utils.FileUtils
+import java.io.File
 import java.util.concurrent.Executors
 
 // Arbitrary number to keep track of permission request
@@ -77,6 +81,47 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
             viewFinder.surfaceTexture = it.surfaceTexture
             updateTransform()
+        }
+
+        val imageCaptureConfig = ImageCaptureConfig.Builder()
+                .apply {
+                    setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
+                }.build()
+
+        val imageCapture = ImageCapture(imageCaptureConfig)
+        findViewById<ImageButton>(R.id.take_picture_fab).setOnClickListener {
+            val file = FileUtils.createTemporaryImageFile(this)
+
+            imageCapture.takePicture(file, executor,
+                    object: ImageCapture.OnImageSavedListener{
+                        override fun onError(
+                                imageCaptureError: ImageCapture.ImageCaptureError,
+                                message: String,
+                                cause: Throwable?) {
+                            viewFinder.post{Toast.makeText(baseContext, "Capture failed", Toast.LENGTH_LONG).show()}
+                            // TODO error log
+                        }
+
+                        override fun onImageSaved(file: File) {
+                            viewFinder.post{Toast.makeText(baseContext, "Capture success", Toast.LENGTH_LONG).show()}
+
+                            // Create database entries
+                            val timestamp = System.currentTimeMillis()
+                            val projectEntry = ProjectEntry(null, 0)
+                            val photoEntry = PhotoEntry(projectEntry.id, timestamp)
+                            val coverPhotoEntry = CoverPhotoEntry(projectEntry.id, photoEntry.id)
+
+                            // Copy temp file to project folder file
+                            FileUtils.createFinalFileFromTemp(baseContext, file.absolutePath, projectEntry, timestamp)
+
+                            // Get and insert into the database
+                            val db = TimeLapseDatabase.getInstance(baseContext)
+                            db.projectDao().insertProject(projectEntry)
+                            db.photoDao().insertPhoto(photoEntry)
+                            db.coverPhotoDao().insertPhoto(coverPhotoEntry)
+                        }
+                    })
+
         }
 
         CameraX.bindToLifecycle(this, preview)
