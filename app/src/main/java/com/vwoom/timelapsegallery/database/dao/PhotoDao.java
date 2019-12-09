@@ -24,7 +24,7 @@ public interface PhotoDao {
     PhotoEntry loadPhoto(long project_id, long photo_id);
 
     @Insert
-    void insertPhoto(PhotoEntry photoEntry);
+    long insertPhoto(PhotoEntry photoEntry);
 
     @Update
     void updatePhoto(PhotoEntry photoEntry);

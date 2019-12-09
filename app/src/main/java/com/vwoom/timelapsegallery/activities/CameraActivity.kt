@@ -107,24 +107,32 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                         override fun onImageSaved(file: File) {
                             viewFinder.post{Toast.makeText(baseContext, "Capture success", Toast.LENGTH_LONG).show()}
                             val db = TimeLapseDatabase.getInstance(baseContext)
-
+                            Log.d("abcde", "inserting project, photo, and cover photo")
                             // Create database entries
                             val timestamp = System.currentTimeMillis()
 
                             // Create and insert the project
                             val projectEntry = ProjectEntry(null, 0)
                             val project_id = db.projectDao().insertProject(projectEntry)
+                            Log.d("abcde", "project id is $project_id")
 
+                            // Update the id for final file creation
+                            projectEntry.id = project_id
                             // Copy temp file to project folder file
                             FileUtils.createFinalFileFromTemp(baseContext, file.absolutePath, projectEntry, timestamp)
 
                             // Create and insert the photo
                             val photoEntry = PhotoEntry(project_id, timestamp)
-                            db.photoDao().insertPhoto(photoEntry)
+                            val photo_id = db.photoDao().insertPhoto(photoEntry)
+                            Log.d("abcde", "photo entry id $photo_id")
+                            Log.d("abcde", "photo entry timestamp ${photoEntry.timestamp}")
 
                             // Create and insert the cover photo
-                            val coverPhotoEntry = CoverPhotoEntry(projectEntry.id, photoEntry.id)
+                            val coverPhotoEntry = CoverPhotoEntry(project_id, photo_id)
                             db.coverPhotoDao().insertPhoto(coverPhotoEntry)
+                            Log.d("abcde", "cover photo, project id ${coverPhotoEntry.project_id}")
+                            Log.d("abcde", "cover photo, photo id ${coverPhotoEntry.photo_id}")
+
                         }
                     })
 

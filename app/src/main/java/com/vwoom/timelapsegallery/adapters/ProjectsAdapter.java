@@ -88,6 +88,24 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         // Get project information
         ProjectDao.Project currentProject = mProjectData.get(position);
 
+        // LOGS!
+        long project_id = currentProject.project_id;
+        Log.d(TAG, "project_id is " + project_id);
+        String project_name = currentProject.project_name;
+        Log.d(TAG, "project name is " + project_name);
+        int cover_set_by_user = currentProject.cover_set_by_user;
+        Log.d(TAG, "cover set by user is " + cover_set_by_user);
+        Long schedule_time = currentProject.schedule_time;
+        Log.d(TAG, "schedule time is " + schedule_time);
+        Integer interval_days = currentProject.interval_days;
+        Log.d(TAG, "interval days is " + interval_days);
+        long cover_photo_id = currentProject.cover_photo_id;
+        Log.d(TAG, "cover photo id is " + cover_photo_id);
+        long cover_photo_timestamp = currentProject.cover_photo_timestamp;
+        Log.d(TAG, "cover photo timestamp is " + cover_photo_timestamp);
+
+        Log.d(TAG, "");
+
         // TODO test photo url from hashmap
         String thumbnail_path = FileUtils.getPhotoUrl(holder.itemView.getContext(), currentProject);
         Log.d(TAG, "thumbnail_path is " + thumbnail_path);

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -21,7 +22,7 @@ public interface ProjectScheduleDao {
     @Query ("SELECT * FROM project_schedule WHERE project_id = :projectId")
     ProjectScheduleEntry loadScheduleByProjectId(long projectId);
 
-    @Insert
+    @Insert (onConflict = OnConflictStrategy.REPLACE)
     void insertProjectSchedule(ProjectScheduleEntry projectScheduleEntry);
 
     @Delete
