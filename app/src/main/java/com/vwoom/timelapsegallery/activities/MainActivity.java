@@ -23,19 +23,13 @@ import android.view.ViewTreeObserver;
 
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.adapters.ProjectsAdapter;
-import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
-import com.vwoom.timelapsegallery.database.dao.ProjectDao;
-import com.vwoom.timelapsegallery.database.entry.CoverPhotoEntry;
-import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
-import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
-import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry;
+import com.vwoom.timelapsegallery.database.view.Project;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.viewmodels.MainActivityViewModel;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
 
     private ProjectsAdapter mProjectsAdapter;
 
-    private List<ProjectDao.Project> mProjects;
+    private List<Project> mProjects;
 
     private int mNumberOfColumns = 3;
 
@@ -159,39 +153,19 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
     private void setupViewModel(){
         MainActivityViewModel viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
-        viewModel.getProjects().observe(this, (List<ProjectDao.Project> projects) -> {
+        /* Observe projects */
+        viewModel.getProjects().observe(this, (List<Project> projects) -> {
             mProjects = projects;
             mProjectsAdapter.setProjectData(projects);
             mNewProjectFab.show();
         });
-
-        /* Observe projects */
-        /*
-        viewModel.getProjectEntries().observe(this, (List<ProjectEntry> projectEntries) -> {
-            mProjects = projectEntries;
-
-            // If filter by today grab todays projects and set the data on the adapter
-            if (mFilter){
-                // TODO account for user selected filtration
-                List<ProjectEntry> filteredProjects = mProjects;
-                mProjectsAdapter.setProjectData(filteredProjects);
-            }
-            // Otherwise set the adapter to projects gathered by the view model
-            else {
-                mProjectsAdapter.setProjectData(mProjects);
-            }
-
-            // Reveal the new project fab
-            mNewProjectFab.show();
-        });
-        */
     }
 
     @Override
-    public void onClick(ProjectDao.Project clickedProject, View sharedElement, String transitionName, int position) {
+    public void onClick(Project clickedProject, View sharedElement, String transitionName, int position) {
         Intent intent = new Intent(this, DetailsActivity.class);
-        // TODO implement clicked project as parcelable
-        //intent.putExtra(Keys.PROJECT_ENTRY, clickedProject);
+
+        intent.putExtra(Keys.PROJECT_ENTRY, clickedProject);
         intent.putExtra(Keys.TRANSITION_POSITION, position);
 
         Pair<View, String> p1 = Pair.create((sharedElement), transitionName);

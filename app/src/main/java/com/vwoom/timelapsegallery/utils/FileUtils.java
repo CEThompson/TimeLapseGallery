@@ -9,6 +9,7 @@ import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
 import com.vwoom.timelapsegallery.database.dao.ProjectDao;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
+import com.vwoom.timelapsegallery.database.view.Project;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +43,7 @@ public final class FileUtils {
         return new File(storageDir, projectPath);
     }
 
-    private static File getProjectFolder(Context context, ProjectDao.Project project){
+    private static File getProjectFolder(Context context, Project project){
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         String projectPath = getProjectDirectoryPath(project);
         return new File(storageDir, projectPath);
@@ -189,9 +190,9 @@ public final class FileUtils {
         else return projectEntry.getId() + "_" + projectEntry.getProject_name();
     }
 
-    private static String getProjectDirectoryPath(ProjectDao.Project project){
-        if (project.project_name == null) return String.valueOf(project.project_id);
-        else return project.project_id + "_" + project.project_name;
+    private static String getProjectDirectoryPath(Project project){
+        if (project.getProject_name() == null) return String.valueOf(project.getProject_id());
+        else return project.getProject_id() + "_" + project.getProject_name();
     }
 
     public static String getPhotoUrl(Context context, ProjectEntry projectEntry, PhotoEntry photoEntry){
@@ -201,8 +202,8 @@ public final class FileUtils {
         return photoFile.getAbsolutePath();
     }
 
-    public static String getPhotoUrl(Context context, ProjectDao.Project project){
-        String imageFileName = getPhotoFileName(project.cover_photo_timestamp);
+    public static String getPhotoUrl(Context context, Project project){
+        String imageFileName = getPhotoFileName(project.getCover_photo_timestamp());
         File projectDir = getProjectFolder(context, project);
         File photoFile = new File(projectDir, imageFileName);
         return photoFile.getAbsolutePath();

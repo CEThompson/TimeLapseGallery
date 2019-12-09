@@ -5,8 +5,8 @@ import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.vwoom.timelapsegallery.database.dao.ProjectDao;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
+import com.vwoom.timelapsegallery.database.view.Project;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     private static final String TAG = MainActivityViewModel.class.getSimpleName();
 
-    private LiveData<List<ProjectDao.Project>> projects;
+    private LiveData<List<Project>> projects;
 
     public MainActivityViewModel(Application application) {
         super(application);
@@ -22,7 +22,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         projects = database.projectDao().loadProjectsWithInfo();
     }
 
-    public LiveData<List<ProjectDao.Project>> getProjects() {
+    public LiveData<List<Project>> getProjects() {
         return projects;
     }
 }
