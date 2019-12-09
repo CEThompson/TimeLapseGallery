@@ -74,15 +74,11 @@ public abstract class TimeLapseDatabase extends RoomDatabase {
                     "CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE," +
                     "CONSTRAINT fk_photo FOREIGN KEY (photo_id) REFERENCES photo (id) ON DELETE CASCADE)");
 
-            // TODO determine if I can copy last photo over to cover photo
-
             // (2) Project Schedule
             // columns: project_id, schedule_time, interval_days
             database.execSQL("CREATE TABLE IF NOT EXISTS project_schedule " +
-                    "(project_id INTEGER PRIMARY KEY NOT NULL, schedule_time INTEGER NOT NULL, interval_days INTEGER NOT NULL," +
+                    "(project_id INTEGER PRIMARY KEY NOT NULL, schedule_time INTEGER, interval_days INTEGER," +
                     "CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE)");
-
-            // TODO copy data
 
             // Copy data into new tables
             // (1) Project
