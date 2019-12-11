@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "780c72e6a7e7b5fbf9f83d05276e139c",
+    "identityHash": "472046d13061318d56284c0c96eec14e",
     "entities": [
       {
         "tableName": "project",
@@ -70,7 +70,7 @@
       },
       {
         "tableName": "tag",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tag` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tag` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -82,7 +82,7 @@
             "fieldPath": "tag",
             "columnName": "tag",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -240,7 +240,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '780c72e6a7e7b5fbf9f83d05276e139c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '472046d13061318d56284c0c96eec14e')"
     ]
   }
 }
