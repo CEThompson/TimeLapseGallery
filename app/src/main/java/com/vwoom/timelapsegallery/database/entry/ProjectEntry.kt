@@ -11,8 +11,7 @@ data class ProjectEntry(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 
-
-    /* For manually creating with ID */
+    /* For creation with manual ID */
     @Ignore
     constructor(id: Long,
                 project_name: String?,

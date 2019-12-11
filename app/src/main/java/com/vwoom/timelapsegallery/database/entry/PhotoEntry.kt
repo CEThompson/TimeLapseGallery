@@ -5,24 +5,16 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "photo")
-class PhotoEntry {
+data class PhotoEntry(var project_id: Long,
+                      var timestamp: Long) {
     /* Getters *//* Setters */
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
-    var project_id: Long
-    var timestamp: Long
 
     /* For inserting with auto-generated ID */
     @Ignore
-    constructor(project_id: Long, timestamp: Long) {
-        this.project_id = project_id
-        this.timestamp = timestamp
-    }
-
-    constructor(id: Long, project_id: Long, timestamp: Long) {
+    constructor(id: Long, project_id: Long, timestamp: Long) : this(project_id, timestamp) {
         this.id = id
-        this.project_id = project_id
-        this.timestamp = timestamp
     }
 
 }

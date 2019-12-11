@@ -15,6 +15,4 @@ import com.vwoom.timelapsegallery.database.entry.ProjectEntry
                     parentColumns = ["id"],
                     childColumns = ["photo_id"],
                     onDelete = ForeignKey.CASCADE)])
-class CoverPhotoEntry(// Setters
-        // Getters
-        var project_id: Long, var photo_id: Long)
+data class CoverPhotoEntry(var project_id: Long, var photo_id: Long)

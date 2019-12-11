@@ -6,6 +6,7 @@ import com.vwoom.timelapsegallery.database.entry.ProjectEntry
 import com.vwoom.timelapsegallery.database.entry.TagEntry
 
 // TODO verify cascade deletion works appropriately
+// TODO set index for columns
 @Entity(tableName = "project_tag",
         primaryKeys = ["project_id"],
         foreignKeys = [ForeignKey(entity = ProjectEntry::class,
@@ -15,5 +16,5 @@ import com.vwoom.timelapsegallery.database.entry.TagEntry
             ForeignKey(entity = TagEntry::class,
                     parentColumns = ["id"],
                     childColumns = ["tag_id"],
-                    onDelete = ForeignKey.CASCADE)]) // TODO set index for columns
-class ProjectTagEntry(var project_id: Long, var tag_id: Long)
+                    onDelete = ForeignKey.CASCADE)])
+data class ProjectTagEntry(var project_id: Long, var tag_id: Long)

@@ -5,20 +5,14 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "tag")
-class TagEntry {
+data class TagEntry (var tag: String){
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
-    var tag: String
 
-    /* For inserting with auto-generated ID */
+    /* For creation with manual ID */
     @Ignore
-    constructor(tag: String) {
-        this.tag = tag
-    }
-
-    constructor(id: Long, tag: String) {
+    constructor(id: Long, tag: String): this(tag) {
         this.id = id
-        this.tag = tag
     }
 
 }

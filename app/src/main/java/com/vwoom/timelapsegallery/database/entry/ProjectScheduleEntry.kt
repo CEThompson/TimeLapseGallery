@@ -10,4 +10,4 @@ import com.vwoom.timelapsegallery.database.entry.ProjectEntry
                 parentColumns = ["id"],
                 childColumns = ["project_id"],
                 onDelete = ForeignKey.CASCADE)])
-class ProjectScheduleEntry(var project_id: Long, var schedule_time: Long?, var interval_days: Int?)
+data class ProjectScheduleEntry(var project_id: Long, var schedule_time: Long?, var interval_days: Int?)
