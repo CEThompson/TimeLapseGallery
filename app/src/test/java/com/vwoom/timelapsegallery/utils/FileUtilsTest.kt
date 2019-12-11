@@ -15,7 +15,7 @@ class FileUtilsTest {
 
     /* Tests retrieving a list of photo entries from a project folder*/
     @Test
-    fun getPhotosInDirectoryTest_() {
+    fun getPhotoEntriesInProjectDirectory_shouldPass() {
         // Create the project to test
         val projectName = "test project"
         val projectEntry = ProjectEntry(1, projectName, 0)
@@ -51,14 +51,25 @@ class FileUtilsTest {
                 assertionList))
 
         // TODO convert to logs?
-        System.out.println("$TAG $projectFolder")
-        System.out.println("$TAG ${listOfPhotoEntries == null}")
-        System.out.println("$TAG returned list is $listOfPhotoEntries")
-        System.out.println("$TAG test list is $assertionList")
+        //System.out.println("$TAG $projectFolder")
+        //System.out.println("$TAG ${listOfPhotoEntries == null}")
+        //System.out.println("$TAG returned list is $listOfPhotoEntries")
+        //System.out.println("$TAG test list is $assertionList")
     }
 
     @Test
-    fun createTemporaryImageFile() {
+    fun createTemporaryImageFileTest_shouldPass() {
+
+        val picturesFolder = folder.newFolder("pictures")
+
+        // Create the project directory
+        val tempFolder = File(picturesFolder, FileUtils.TEMP_FILE_SUBDIRECTORY)
+        tempFolder.mkdir()
+
+        val fileCreated = FileUtils.createTemporaryImageFile(tempFolder)
+
+        System.out.println("$TAG $fileCreated")
+        assert(fileCreated != null)
     }
 
     @Test
