@@ -14,6 +14,7 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -62,6 +63,7 @@ public class AddPhotoActivity extends AppCompatActivity {
     private String mPreviousPhotoPath;
 
     private TimeLapseDatabase mTimeLapseDatabase;
+    private File mExternalFilesDir;
 
     private boolean mCompared = false;
     private boolean mReturned = false;
@@ -95,6 +97,7 @@ public class AddPhotoActivity extends AppCompatActivity {
 
         // Set up db
         mTimeLapseDatabase = TimeLapseDatabase.getInstance(this);
+        mExternalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         // Get information from intent
         mPreviousPhotoPath = getIntent().getStringExtra(Keys.PHOTO_PATH);
@@ -163,7 +166,7 @@ public class AddPhotoActivity extends AppCompatActivity {
             // Create the File where the photo should go
             File tempFile = null;
             try {
-                tempFile = FileUtils.createTemporaryImageFile(this);
+                tempFile = FileUtils.createTemporaryImageFile(mExternalFilesDir);
                 if (mTemporaryPhotoPath != null) mBackupPhoto = mTemporaryPhotoPath;
                 mTemporaryPhotoPath = tempFile.getAbsolutePath();
             } catch (IOException e) {
@@ -289,7 +292,8 @@ public class AddPhotoActivity extends AppCompatActivity {
                 mCurrentProject,
                 mTimeLapseDatabase,
                 mInterstitialAd,
-                mFirebaseAnalytics);
+                mFirebaseAnalytics,
+                mExternalFilesDir);
 
         new SubmitPhotoAsyncTask().execute(taskParameters);
     }
@@ -349,6 +353,7 @@ public class AddPhotoActivity extends AppCompatActivity {
             TimeLapseDatabase timeLapseDatabase = taskParameters.getTimeLapseDatabase();
             InterstitialAd interstitialAd = taskParameters.getInterstitialAd();
             FirebaseAnalytics firebaseAnalytics = taskParameters.getFirebaseAnalytics();
+            File externalFilesDir = taskParameters.getExternalFilesDir();
 
             // Initialize the path for the final photo file
             String currentPhotoPath;
@@ -356,7 +361,7 @@ public class AddPhotoActivity extends AppCompatActivity {
 
             try {
                 // Create the final file & get path
-                File finalFile = FileUtils.createFinalFileFromTemp(context,
+                File finalFile = FileUtils.createFinalFileFromTemp(externalFilesDir,
                         temporaryPhotoPath,
                         currentProject,
                         timestamp);
@@ -364,14 +369,14 @@ public class AddPhotoActivity extends AppCompatActivity {
 
                 // Create and insert the photo entry
                 PhotoEntry photoToSubmit = new PhotoEntry(
-                        currentProject.id,
+                        currentProject.getId(),
                         timestamp);
                 timeLapseDatabase.photoDao().insertPhoto(photoToSubmit);
 
                 // Track added photo
                 Bundle bundle = new Bundle();
-                bundle.putString(context.getString(R.string.analytics_project_name), currentProject.project_name);
-                bundle.putString(context.getString(R.string.analytics_photo_number), String.valueOf(photoToSubmit.id));
+                bundle.putString(context.getString(R.string.analytics_project_name), currentProject.getProject_name());
+                bundle.putString(context.getString(R.string.analytics_photo_number), String.valueOf(photoToSubmit.getId()));
                 firebaseAnalytics.logEvent(context.getString(R.string.analytics_add_photo), bundle);
 
                 // Return the parameters to run in post execute
@@ -465,19 +470,22 @@ public class AddPhotoActivity extends AppCompatActivity {
         private TimeLapseDatabase timeLapseDatabase;
         private InterstitialAd interstitialAd;
         private FirebaseAnalytics firebaseAnalytics;
+        private File externalFilesDir;
 
         public TaskParameters(Context context,
                               String tempPhotoPath,
                               ProjectEntry currentProject,
                               TimeLapseDatabase timeLapseDatabase,
                               InterstitialAd interstitialAd,
-                              FirebaseAnalytics firebaseAnalytics){
+                              FirebaseAnalytics firebaseAnalytics,
+                              File externalFilesDir){
             this.context = context;
             this.tempPhotoPath = tempPhotoPath;
             this.currentProject = currentProject;
             this.timeLapseDatabase = timeLapseDatabase;
             this.interstitialAd = interstitialAd;
             this.firebaseAnalytics = firebaseAnalytics;
+            this.externalFilesDir = externalFilesDir;
         }
         // Getters
         public Context getContext() { return context; }
@@ -486,6 +494,9 @@ public class AddPhotoActivity extends AppCompatActivity {
         public TimeLapseDatabase getTimeLapseDatabase() { return timeLapseDatabase; }
         public InterstitialAd getInterstitialAd() { return interstitialAd; }
         public FirebaseAnalytics getFirebaseAnalytics() { return firebaseAnalytics; }
+        public File getExternalFilesDir() {
+            return externalFilesDir;
+        }
     }
 
     /* Class to pass result references for async task */

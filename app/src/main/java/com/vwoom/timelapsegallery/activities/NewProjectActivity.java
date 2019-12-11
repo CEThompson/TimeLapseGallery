@@ -14,6 +14,7 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -66,6 +67,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     private ProjectEntry mProjectToEdit;
     private ProjectScheduleEntry mProjectScheduleToEdit;
     private CoverPhotoEntry mCoverPhotoToEdit;
+    private File mExternalFilesDir;
 
     /* For spinner */
     private String mScheduleString;
@@ -100,6 +102,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         /* Set up the database */
         mTimeLapseDatabase = TimeLapseDatabase.getInstance(this);
 
+        mExternalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
         /* Populate the spinner */
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.schedule_options, android.R.layout.simple_spinner_item);
@@ -123,10 +127,10 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         /* If a project was sent along with the intent set up the activity instead to edit the project */
         if (mProjectToEdit != null){
             // Restore the project info
-            mName = mProjectToEdit.project_name;
+            mName = mProjectToEdit.getProject_name();
             mScheduleNextSubmission = mProjectScheduleToEdit.getSchedule_time();
             PhotoEntry coverPhoto = mTimeLapseDatabase.photoDao().loadPhoto(mCoverPhotoToEdit.getProject_id(), mCoverPhotoToEdit.getPhoto_id());
-            String coverPhotoPath = FileUtils.getPhotoUrl(this, mProjectToEdit, coverPhoto);
+            String coverPhotoPath = FileUtils.getPhotoUrl(mExternalFilesDir, mProjectToEdit, coverPhoto);
             mTemporaryPhotoPath = coverPhotoPath;
 
             // Hide the add photo button
@@ -201,7 +205,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             // Create the File where the photo should go
             File tempFile = null;
             try {
-                tempFile = FileUtils.createTemporaryImageFile(this);
+                tempFile = FileUtils.createTemporaryImageFile(mExternalFilesDir);
                 mTemporaryPhotoPath = tempFile.getAbsolutePath();
             } catch (IOException e) {
                 Log.e(TAG, "failure creating file", e);
@@ -303,7 +307,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                     + TimeUtils.getTimeIntervalFromSchedule(mSchedule);
 
         return new ProjectScheduleEntry(
-                mProjectToEdit.id,
+                mProjectToEdit.getId(),
                 mScheduleNextSubmission,
                 mSchedule);
     }
@@ -349,7 +353,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                 try {
                     // Create the file for the photo
                     File finalFile = FileUtils.createFinalFileFromTemp(
-                            this,
+                            mExternalFilesDir,
                             mTemporaryPhotoPath,
                             result,
                             timestamp);
@@ -362,12 +366,12 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                     mTimeLapseDatabase.photoDao().insertPhoto(currentPhoto);
 
                     // Set the cover photo for the project
-                    CoverPhotoEntry coverPhotoEntry = new CoverPhotoEntry(projectId, currentPhoto.id);
+                    CoverPhotoEntry coverPhotoEntry = new CoverPhotoEntry(projectId, currentPhoto.getId());
                     mTimeLapseDatabase.coverPhotoDao().insertPhoto(coverPhotoEntry);
 
                     // Track added project
                     Bundle bundle = new Bundle();
-                    bundle.putString(getString(R.string.analytics_project_name), newProject.project_name);
+                    bundle.putString(getString(R.string.analytics_project_name), newProject.getProject_name());
                     mFirebaseAnalytics.logEvent(getString(R.string.analytics_new_project), bundle);
 
                 } catch (IOException e){
@@ -394,8 +398,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         ProjectScheduleEntry editedSchedule = gatherScheduleInput();
 
         // Restore fields unable to be edited from this screen
-        editedProject.id = mProjectToEdit.id;
-        editedProject.cover_set_by_user = mProjectToEdit.cover_set_by_user;
+        editedProject.setId(mProjectToEdit.getId());
+        editedProject.setCover_set_by_user(mProjectToEdit.getCover_set_by_user());
 
 
         /* If the project info is valid proceed to update it */
@@ -403,7 +407,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             boolean renameSuccessful;
 
             /* If the user changed the name of the project rename the directory */
-            if (!mProjectToEdit.project_name.equals(editedProject.project_name)){
+            if (!mProjectToEdit.getProject_name().equals(editedProject.getProject_name())){
                 renameSuccessful = FileUtils.renameProject(this, mProjectToEdit, editedProject);
             }
             // Otherwise user did not try to rename the project
@@ -447,7 +451,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         }
 
         /* If the name contains any reserved characters project invalid */
-        if (FileUtils.pathContainsReservedCharacter(newProject.project_name)) {
+        if (FileUtils.pathContainsReservedCharacter(newProject.getProject_name())) {
             notifyUserInvalidCharacters();
             return false;
         }
@@ -465,13 +469,14 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     /* Validates prior to editing */
     private boolean validateEditProject(ProjectEntry editedProject){
         /* If the name is empty do not progress */
-        if (editedProject.project_name.isEmpty()) {
+        String name = editedProject.getProject_name();
+        if (name != null && !name.isEmpty()) {
             notifyUserNoName();
             return false;
         }
 
         /* Check name of edited project for reserved characters */
-        if (FileUtils.pathContainsReservedCharacter(editedProject.project_name)) {
+        if (FileUtils.pathContainsReservedCharacter(editedProject.getProject_name())) {
             notifyUserInvalidCharacters();
             return false;
         }

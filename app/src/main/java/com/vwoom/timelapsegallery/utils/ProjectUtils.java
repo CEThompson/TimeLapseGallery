@@ -125,7 +125,7 @@ public class ProjectUtils {
                         db.projectDao().insertProject(currentProject);
 
                         /* import the photos for the project */
-                        importProjectPhotos(db, currentProject, context);
+                        importProjectPhotos(storageDir, db, currentProject);
                     }
 
                 }
@@ -134,10 +134,10 @@ public class ProjectUtils {
     }
 
     /* Finds all photos in the project directory and adds any missing photos to the database */
-    private static void importProjectPhotos(TimeLapseDatabase db, ProjectEntry currentProject, Context context){
+    private static void importProjectPhotos(File externalFilesDir, TimeLapseDatabase db, ProjectEntry currentProject){
         Log.d(TAG, "Importing photos for project");
         // Create a list of all photos in the project directory
-        List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(context, currentProject);
+        List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(externalFilesDir, currentProject);
 
         // Insert the photos from the file structure
         if (allPhotosInFolder!=null) {

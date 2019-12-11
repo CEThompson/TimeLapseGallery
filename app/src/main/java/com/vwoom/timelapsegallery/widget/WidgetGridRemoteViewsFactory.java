@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -19,6 +20,7 @@ import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.PhotoUtils;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,10 +29,12 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
     private Context mContext;
     private List<ProjectEntry> mProjects;
     private TimeLapseDatabase mTimeLapseDatabase;
+    private File mExternalFilesDir;
     private static final String TAG = WidgetGridRemoteViewsFactory.class.getSimpleName();
 
     public WidgetGridRemoteViewsFactory(Context applicationContext, Intent intent){
         mContext = applicationContext;
+        mExternalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         mProjects = null;
         mTimeLapseDatabase = TimeLapseDatabase.getInstance(mContext);
     }
@@ -62,9 +66,9 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
     public RemoteViews getViewAt(int i) {
         // Get the current project
         ProjectEntry currentProject = mProjects.get(i);
-        ProjectScheduleEntry schedule = mTimeLapseDatabase.projectScheduleDao().loadScheduleByProjectId(currentProject.id);
-        CoverPhotoEntry coverPhotoEntry = mTimeLapseDatabase.coverPhotoDao().getCoverPhoto_nonLiveData(currentProject.id);
-        PhotoEntry coverPhoto = mTimeLapseDatabase.photoDao().loadPhoto(currentProject.id, coverPhotoEntry.getPhoto_id());
+        ProjectScheduleEntry schedule = mTimeLapseDatabase.projectScheduleDao().loadScheduleByProjectId(currentProject.getId());
+        CoverPhotoEntry coverPhotoEntry = mTimeLapseDatabase.coverPhotoDao().getCoverPhoto_nonLiveData(currentProject.getId());
+        PhotoEntry coverPhoto = mTimeLapseDatabase.photoDao().loadPhoto(currentProject.getId(), coverPhotoEntry.getPhoto_id());
 
         long nextSubmissionTime = TimeUtils.getNextScheduledSubmission(schedule.getSchedule_time(), schedule.getInterval_days());
 
@@ -74,7 +78,7 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
         // Create the remote views
         RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.widget_list_item);
 
-        String coverPhotoPath = FileUtils.getPhotoUrl(mContext, currentProject, coverPhoto);
+        String coverPhotoPath = FileUtils.getPhotoUrl(mExternalFilesDir, currentProject, coverPhoto);
         // Decode the bitmap from path
         Bitmap bitmap = PhotoUtils.decodeSampledBitmapFromPath(
                 coverPhotoPath,
@@ -91,7 +95,7 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
         }
 
         // Set the view strings
-        views.setTextViewText(R.id.widget_list_item_name_text_view, currentProject.project_name);
+        views.setTextViewText(R.id.widget_list_item_name_text_view, currentProject.getProject_name());
         views.setTextViewText(R.id.widget_list_item_time_text_view, nextSubmissionTimeString);
         views.setImageViewBitmap(R.id.widget_list_item_image_view, bitmap);
 
