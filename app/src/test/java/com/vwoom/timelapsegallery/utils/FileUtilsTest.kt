@@ -16,25 +16,45 @@ class FileUtilsTest {
     /* Tests retrieving a list of photo entries from a project folder*/
     @Test
     fun getPhotosInDirectoryTest_() {
+        // Create the project to test
         val projectName = "test project"
         val projectEntry = ProjectEntry(1, projectName, 0)
 
-        // Create the folder for the project
-        val projectFolder = folder.newFolder("1_$projectName")
+        // Create the base folder for the pictures
+        val picturesFolder = folder.newFolder("pictures")
 
-        // Create files to test
-        var file = File(projectFolder, "1.jpg")
+        // Create the project directory
+        val projectFolder = File(picturesFolder, "1_$projectName")
+        projectFolder.mkdir()
+
+        // Create a set of image files to test: note the ordering on these
+        var file = File(projectFolder, "99999999.jpg")
+        file.createNewFile()
+        file = File(projectFolder, "11111111.jpg")
+        file.createNewFile()
+        // Also create folder to contain encoded videos
+        file = File(projectFolder, "videos")
+        file.mkdir()
+        // And txt to contain tags
+        file = File(projectFolder, "tags.txt")
         file.createNewFile()
 
-        file = File(projectFolder, "2.jpg")
-        file.createNewFile()
+        /* Actually use the method we are testing with mocked data */
+        val listOfPhotoEntries = FileUtils.getPhotoEntriesInProjectDirectory(picturesFolder, projectEntry)
 
-        val listOfPhotoEntries = FileUtils.getPhotosInDirectory(projectFolder, projectEntry)
+        val assertionList = listOf(
+                PhotoEntry(1,11111111),
+                PhotoEntry(1,99999999))
+
+        /* Assert out response is equal to the expectation */
         assert(listOfPhotoEntries.equals(
-                listOf(
-                PhotoEntry(1,1,1),
-                PhotoEntry(2,1,2))
-        ))
+                assertionList))
+
+        // TODO convert to logs?
+        System.out.println("$TAG $projectFolder")
+        System.out.println("$TAG ${listOfPhotoEntries == null}")
+        System.out.println("$TAG returned list is $listOfPhotoEntries")
+        System.out.println("$TAG test list is $assertionList")
     }
 
     @Test
@@ -67,5 +87,9 @@ class FileUtilsTest {
 
     @Test
     fun pathContainsReservedCharacter() {
+    }
+
+    companion object {
+        private val TAG = FileUtilsTest::class.java.simpleName
     }
 }

@@ -2,17 +2,14 @@ package com.vwoom.timelapsegallery.utils;
 
 import android.content.Context;
 import android.os.Environment;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.vwoom.timelapsegallery.R;
-import com.vwoom.timelapsegallery.database.AppExecutors;
 import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -137,7 +134,7 @@ public class ProjectUtils {
     private static void importProjectPhotos(File externalFilesDir, TimeLapseDatabase db, ProjectEntry currentProject){
         Log.d(TAG, "Importing photos for project");
         // Create a list of all photos in the project directory
-        List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotosInDirectory(externalFilesDir, currentProject);
+        List<PhotoEntry> allPhotosInFolder = FileUtils.getPhotoEntriesInProjectDirectory(externalFilesDir, currentProject);
 
         // Insert the photos from the file structure
         if (allPhotosInFolder!=null) {

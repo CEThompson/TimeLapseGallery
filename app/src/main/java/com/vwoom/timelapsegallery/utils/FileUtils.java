@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public final class FileUtils {
@@ -46,21 +49,40 @@ public final class FileUtils {
         return new File(externalFilesDir, projectPath);
     }
 
-    public static List<PhotoEntry> getPhotosInDirectory(File externalFilesDir, ProjectEntry project){
+    /* This method scans through a project folder and creates a list for each photo in it,
+    skipping interior folders and non-image files */
+    public static List<PhotoEntry> getPhotoEntriesInProjectDirectory(File externalFilesDir, ProjectEntry project){
         List<PhotoEntry> photos = new ArrayList<>();
         File projectFolder = getProjectFolder(externalFilesDir, project);
         File[] files = projectFolder.listFiles();
 
-        long projectId = project.getId();
         if (files != null) {
             for (File child : files) {
+                if (!child.isFile()) continue; // If the child is a directory skip it
+
                 String url = child.getAbsolutePath();
                 String filename = url.substring(url.lastIndexOf("/")+1);
-                long timestamp = Long.valueOf(filename.replaceFirst("[.][^.]+$",""));
-                PhotoEntry photoEntry = new PhotoEntry(projectId, timestamp);
+
+                // Split the filename at the extension
+                String[] filenameParts = filename.split("\\.");
+                String extension = filenameParts[1];
+                System.out.println("FileUtilsTest " + Arrays.toString(filenameParts));
+
+                if (extension.equals("txt")) continue; // If the child is a text file skip it
+
+                // This regex matches and replaces (removes) the file extension
+                // long timestamp = Long.valueOf(filename.replaceFirst("[.][^.]+$",""));
+
+                long timestamp = Long.valueOf(filenameParts[0]);
+                PhotoEntry photoEntry = new PhotoEntry(project.getId(), timestamp);
                 photos.add(photoEntry);
             }
         } else return null;
+
+        // Sort the photo entries by timestamp
+        Comparator<PhotoEntry> photoEntryComparator =
+                (o1, o2) -> Long.compare(o1.getTimestamp(), o2.getTimestamp());
+        Collections.sort(photos, photoEntryComparator);
 
         return photos;
     }
