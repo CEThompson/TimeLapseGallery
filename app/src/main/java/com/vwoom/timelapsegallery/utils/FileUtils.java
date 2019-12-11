@@ -24,31 +24,31 @@ public final class FileUtils {
     private static final String TAG = FileUtils.class.getSimpleName();
 
     /* Used to create a photo file in its final location */
-    private static File createImageFileForProject(Context context, ProjectEntry currentProject, long timestamp) {
+    private static File createImageFileForProject(File storageDirectory, ProjectEntry currentProject, long timestamp) {
         // Create an image file name from the current timestamp
         String imageFileName = timestamp + ".jpg";
-        File projectDir = getProjectFolder(context, currentProject);
+        File projectDir = getProjectFolder(storageDirectory, currentProject);
 
         if (!projectDir.exists()) projectDir.mkdirs();
 
         return new File(projectDir, imageFileName);
     }
 
-    private static File getProjectFolder(Context context, ProjectEntry project){
-        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+    private static File getProjectFolder(File externalFilesDir, ProjectEntry project){
+        //File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         String projectPath = getProjectDirectoryPath(project);
-        return new File(storageDir, projectPath);
+        return new File(externalFilesDir, projectPath);
     }
 
-    private static File getProjectFolder(Context context, Project project){
-        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+    private static File getProjectFolder(File externalFilesDir, Project project){
+        //File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         String projectPath = getProjectDirectoryPath(project);
-        return new File(storageDir, projectPath);
+        return new File(externalFilesDir, projectPath);
     }
 
-    public static List<PhotoEntry> getPhotosInDirectory(Context context, ProjectEntry project){
+    public static List<PhotoEntry> getPhotosInDirectory(File externalFilesDir, ProjectEntry project){
         List<PhotoEntry> photos = new ArrayList<>();
-        File projectFolder = getProjectFolder(context, project);
+        File projectFolder = getProjectFolder(externalFilesDir, project);
         File[] files = projectFolder.listFiles();
 
         long projectId = project.getId();
@@ -66,11 +66,11 @@ public final class FileUtils {
     }
 
     /* Creates a file in a temporary location */
-    public static File createTemporaryImageFile(Context context) throws IOException {
+    public static File createTemporaryImageFile(File externalFilesDir) throws IOException {
         // Create an image file name
         String imageFileName = "TEMP_";
-        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File tempFolder = new File(storageDir, TEMP_FILE_SUBDIRECTORY);
+        //File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File tempFolder = new File(externalFilesDir, TEMP_FILE_SUBDIRECTORY);
         if (!tempFolder.exists()) tempFolder.mkdirs();
 
         return File.createTempFile(
@@ -82,13 +82,12 @@ public final class FileUtils {
 
     /* Used to create a photo file from its temporary location */
     public static File createFinalFileFromTemp(
-            Context context,
+            File externalFilesDir,
             String tempPath,
             ProjectEntry currentProject,
-            long timestamp)
-    throws IOException {
+            long timestamp) throws IOException {
         // Create the permanent file for the photo
-        File finalFile = createImageFileForProject(context, currentProject, timestamp);
+        File finalFile = createImageFileForProject(externalFilesDir, currentProject, timestamp);
         // Create tempfile from previous path
         File tempFile = new File(tempPath);
         // Copy file to new destination
@@ -167,12 +166,12 @@ public final class FileUtils {
     }
 
     /* Deletes file referred to in photo entry */
-    public static void deletePhoto(Context context, ProjectEntry projectEntry, PhotoEntry photoEntry){
-        File photoFile = new File(getPhotoUrl(context, projectEntry, photoEntry));
+    public static void deletePhoto(File externalFilesDir, ProjectEntry projectEntry, PhotoEntry photoEntry){
+        File photoFile = new File(getPhotoUrl(externalFilesDir, projectEntry, photoEntry));
         deleteRecursive(photoFile);
     }
-    public static void deletePhoto(Context context, Project project, PhotoEntry photoEntry){
-        File photoFile = new File(getPhotoUrl(context, project, photoEntry));
+    public static void deletePhoto(File externalFilesDir, Project project, PhotoEntry photoEntry){
+        File photoFile = new File(getPhotoUrl(externalFilesDir, project, photoEntry));
         deleteRecursive(photoFile);
     }
 
@@ -185,9 +184,12 @@ public final class FileUtils {
         return false;
     }
 
-    /* Returns the pattern for a projects path : project path = {project_id}_{project_name} */
+    /* Returns the pattern for a projects path : project path = {project_id}_{project_name}
+    * example: 1_My Project
+    * */
     private static String getProjectDirectoryPath(ProjectEntry projectEntry){
-        if (projectEntry.getProject_name() == null) return String.valueOf(projectEntry.getId());
+        String name = projectEntry.getProject_name();
+        if (name == null) return String.valueOf(projectEntry.getId());
         else return projectEntry.getId() + "_" + projectEntry.getProject_name();
     }
 
@@ -196,23 +198,23 @@ public final class FileUtils {
         else return project.getProject_id() + "_" + project.getProject_name();
     }
 
-    public static String getPhotoUrl(Context context, ProjectEntry projectEntry, PhotoEntry photoEntry){
+    public static String getPhotoUrl(File externalFilesDir, ProjectEntry projectEntry, PhotoEntry photoEntry){
         String imageFileName = getPhotoFileName(photoEntry);
-        File projectDir = getProjectFolder(context, projectEntry);
+        File projectDir = getProjectFolder(externalFilesDir, projectEntry);
         File photoFile = new File(projectDir, imageFileName);
         return photoFile.getAbsolutePath();
     }
 
-    public static String getPhotoUrl(Context context, Project project, PhotoEntry photoEntry){
+    public static String getPhotoUrl(File externalFilesDir, Project project, PhotoEntry photoEntry){
         String imageFileName = getPhotoFileName(photoEntry);
-        File projectDir = getProjectFolder(context, project);
+        File projectDir = getProjectFolder(externalFilesDir, project);
         File photoFile = new File(projectDir, imageFileName);
         return photoFile.getAbsolutePath();
     }
 
-    public static String getPhotoUrl(Context context, Project project){
+    public static String getPhotoUrl(File externalFilesDir, Project project){
         String imageFileName = getPhotoFileName(project.getCover_photo_timestamp());
-        File projectDir = getProjectFolder(context, project);
+        File projectDir = getProjectFolder(externalFilesDir, project);
         File photoFile = new File(projectDir, imageFileName);
         return photoFile.getAbsolutePath();
     }
