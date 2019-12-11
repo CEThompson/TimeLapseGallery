@@ -62,9 +62,9 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
     public RemoteViews getViewAt(int i) {
         // Get the current project
         ProjectEntry currentProject = mProjects.get(i);
-        ProjectScheduleEntry schedule = mTimeLapseDatabase.projectScheduleDao().loadScheduleByProjectId(currentProject.getId());
-        CoverPhotoEntry coverPhotoEntry = mTimeLapseDatabase.coverPhotoDao().getCoverPhoto_nonLiveData(currentProject.getId());
-        PhotoEntry coverPhoto = mTimeLapseDatabase.photoDao().loadPhoto(currentProject.getId(), coverPhotoEntry.getPhoto_id());
+        ProjectScheduleEntry schedule = mTimeLapseDatabase.projectScheduleDao().loadScheduleByProjectId(currentProject.id);
+        CoverPhotoEntry coverPhotoEntry = mTimeLapseDatabase.coverPhotoDao().getCoverPhoto_nonLiveData(currentProject.id);
+        PhotoEntry coverPhoto = mTimeLapseDatabase.photoDao().loadPhoto(currentProject.id, coverPhotoEntry.getPhoto_id());
 
         long nextSubmissionTime = TimeUtils.getNextScheduledSubmission(schedule.getSchedule_time(), schedule.getInterval_days());
 
@@ -91,7 +91,7 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
         }
 
         // Set the view strings
-        views.setTextViewText(R.id.widget_list_item_name_text_view, currentProject.getProject_name());
+        views.setTextViewText(R.id.widget_list_item_name_text_view, currentProject.project_name);
         views.setTextViewText(R.id.widget_list_item_time_text_view, nextSubmissionTimeString);
         views.setImageViewBitmap(R.id.widget_list_item_image_view, bitmap);
 

@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.adapters;
 
 import android.content.Context;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,12 +31,16 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsA
     private Project mProject;
     private final DetailsAdapterOnClickHandler mClickHandler;
     private PhotoEntry mCurrentPhoto;
+    private File mExternalFilesDir;
 
     public interface DetailsAdapterOnClickHandler {
         void onClick(PhotoEntry clickedPhoto);
     }
 
-    public DetailsAdapter(DetailsAdapterOnClickHandler handler){ mClickHandler = handler;}
+    public DetailsAdapter(DetailsAdapterOnClickHandler handler, Context context){
+        mClickHandler = handler;
+        mExternalFilesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+    }
 
     public class DetailsAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -72,7 +77,7 @@ public class DetailsAdapter extends RecyclerView.Adapter<DetailsAdapter.DetailsA
     public void onBindViewHolder(@NonNull DetailsAdapterViewHolder holder, int position) {
         Context context = holder.itemView.getContext();
         PhotoEntry currentPhoto = mPhotos.get(position);
-        String photo_path = FileUtils.getPhotoUrl(context, mProject, currentPhoto);
+        String photo_path = FileUtils.getPhotoUrl(mExternalFilesDir, mProject, currentPhoto);
         File f = new File(photo_path);
 
         // TODO (update) dynamically resize detail view

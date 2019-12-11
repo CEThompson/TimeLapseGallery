@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.graphics.Matrix
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Rational
@@ -92,7 +93,9 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
 
         val imageCapture = ImageCapture(imageCaptureConfig)
         findViewById<ImageButton>(R.id.take_picture_fab).setOnClickListener {
-            val file = FileUtils.createTemporaryImageFile(this)
+            // TODO handle external files directory better, perhaps as a companion object?
+            val externalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val file = FileUtils.createTemporaryImageFile(externalFilesDir)
 
             imageCapture.takePicture(file, executor,
                     object: ImageCapture.OnImageSavedListener{
@@ -120,7 +123,8 @@ class CameraActivity : AppCompatActivity(), LifecycleOwner {
                             // Update the id for final file creation
                             projectEntry.id = project_id
                             // Copy temp file to project folder file
-                            FileUtils.createFinalFileFromTemp(baseContext, file.absolutePath, projectEntry, timestamp)
+
+                            FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
 
                             // Create and insert the photo
                             val photoEntry = PhotoEntry(project_id, timestamp)

@@ -123,7 +123,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         /* If a project was sent along with the intent set up the activity instead to edit the project */
         if (mProjectToEdit != null){
             // Restore the project info
-            mName = mProjectToEdit.getProject_name();
+            mName = mProjectToEdit.project_name;
             mScheduleNextSubmission = mProjectScheduleToEdit.getSchedule_time();
             PhotoEntry coverPhoto = mTimeLapseDatabase.photoDao().loadPhoto(mCoverPhotoToEdit.getProject_id(), mCoverPhotoToEdit.getPhoto_id());
             String coverPhotoPath = FileUtils.getPhotoUrl(this, mProjectToEdit, coverPhoto);
@@ -303,7 +303,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                     + TimeUtils.getTimeIntervalFromSchedule(mSchedule);
 
         return new ProjectScheduleEntry(
-                mProjectToEdit.getId(),
+                mProjectToEdit.id,
                 mScheduleNextSubmission,
                 mSchedule);
     }
@@ -362,12 +362,12 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                     mTimeLapseDatabase.photoDao().insertPhoto(currentPhoto);
 
                     // Set the cover photo for the project
-                    CoverPhotoEntry coverPhotoEntry = new CoverPhotoEntry(projectId, currentPhoto.getId());
+                    CoverPhotoEntry coverPhotoEntry = new CoverPhotoEntry(projectId, currentPhoto.id);
                     mTimeLapseDatabase.coverPhotoDao().insertPhoto(coverPhotoEntry);
 
                     // Track added project
                     Bundle bundle = new Bundle();
-                    bundle.putString(getString(R.string.analytics_project_name), newProject.getProject_name());
+                    bundle.putString(getString(R.string.analytics_project_name), newProject.project_name);
                     mFirebaseAnalytics.logEvent(getString(R.string.analytics_new_project), bundle);
 
                 } catch (IOException e){
@@ -394,9 +394,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         ProjectScheduleEntry editedSchedule = gatherScheduleInput();
 
         // Restore fields unable to be edited from this screen
-        editedProject.setId(mProjectToEdit.getId());
-        editedProject.setCover_set_by_user(
-                mProjectToEdit.getCover_set_by_user());
+        editedProject.id = mProjectToEdit.id;
+        editedProject.cover_set_by_user = mProjectToEdit.cover_set_by_user;
 
 
         /* If the project info is valid proceed to update it */
@@ -404,7 +403,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             boolean renameSuccessful;
 
             /* If the user changed the name of the project rename the directory */
-            if (!mProjectToEdit.getProject_name().equals(editedProject.getProject_name())){
+            if (!mProjectToEdit.project_name.equals(editedProject.project_name)){
                 renameSuccessful = FileUtils.renameProject(this, mProjectToEdit, editedProject);
             }
             // Otherwise user did not try to rename the project
@@ -448,7 +447,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         }
 
         /* If the name contains any reserved characters project invalid */
-        if (FileUtils.pathContainsReservedCharacter(newProject.getProject_name())) {
+        if (FileUtils.pathContainsReservedCharacter(newProject.project_name)) {
             notifyUserInvalidCharacters();
             return false;
         }
@@ -466,13 +465,13 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     /* Validates prior to editing */
     private boolean validateEditProject(ProjectEntry editedProject){
         /* If the name is empty do not progress */
-        if (editedProject.getProject_name().isEmpty()) {
+        if (editedProject.project_name.isEmpty()) {
             notifyUserNoName();
             return false;
         }
 
         /* Check name of edited project for reserved characters */
-        if (FileUtils.pathContainsReservedCharacter(editedProject.getProject_name())) {
+        if (FileUtils.pathContainsReservedCharacter(editedProject.project_name)) {
             notifyUserInvalidCharacters();
             return false;
         }

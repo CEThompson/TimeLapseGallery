@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.adapters;
 
 import android.content.Context;
+import android.os.Environment;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,16 +35,18 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
     private final static String TAG = ProjectsAdapter.class.getSimpleName();
 
     private List<Project> mProjectData;
-
     private final ProjectsAdapterOnClickHandler mClickHandler;
-
     private ConstraintSet constraintSet = new ConstraintSet();
+    private File mExternalFilesDir;
 
     public interface ProjectsAdapterOnClickHandler {
         void onClick(Project clickedProject, View sharedElement, String transitionName, int position);
     }
 
-    public ProjectsAdapter(ProjectsAdapterOnClickHandler handler){ mClickHandler = handler;}
+    public ProjectsAdapter(ProjectsAdapterOnClickHandler handler, Context context){
+        mClickHandler = handler;
+        mExternalFilesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+    }
 
     public class ProjectsAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -85,7 +88,9 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         // Get project information
         Project currentProject = mProjectData.get(position);
 
-        // LOGS!
+        // TODO remove these logs
+        // Logs for project information
+        /*
         long project_id = currentProject.getProject_id();
         Log.d(TAG, "project_id is " + project_id);
         String project_name = currentProject.getProject_name();
@@ -100,11 +105,10 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         Log.d(TAG, "cover photo id is " + cover_photo_id);
         long cover_photo_timestamp = currentProject.getCover_photo_timestamp();
         Log.d(TAG, "cover photo timestamp is " + cover_photo_timestamp);
-
-        Log.d(TAG, "");
+        */
 
         // TODO test photo url from hashmap
-        String thumbnail_path = FileUtils.getPhotoUrl(holder.itemView.getContext(), currentProject);
+        String thumbnail_path = FileUtils.getPhotoUrl(mExternalFilesDir, currentProject);
         Log.d(TAG, "thumbnail_path is " + thumbnail_path);
 
         // Set the constraint ratio

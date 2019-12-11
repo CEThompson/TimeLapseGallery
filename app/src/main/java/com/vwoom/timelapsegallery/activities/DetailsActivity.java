@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.text.format.DateUtils;
 import android.transition.Transition;
@@ -108,6 +109,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     // Database
     private TimeLapseDatabase mTimeLapseDatabase;
 
+    private File mExternalFilesDir;
+
     // Photo and project Information
     private List<PhotoEntry> mPhotos;
     private PhotoEntry mCurrentPhoto;
@@ -188,9 +191,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         // Get the database
         mTimeLapseDatabase = TimeLapseDatabase.getInstance(this);
+        mExternalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         // Set up adapter and recycler view
-        mDetailsAdapter = new DetailsAdapter(this);
+        mDetailsAdapter = new DetailsAdapter(this, this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         //linearLayoutManager.setStackFromEnd(true);
         mDetailsRecyclerView.setLayoutManager(linearLayoutManager);
@@ -200,7 +204,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mAddPhotoFab.setOnClickListener((View v) -> {
             Intent addPhotoIntent = new Intent(DetailsActivity.this, AddPhotoActivity.class);
             PhotoEntry lastPhoto = getLastPhoto();
-            String lastPhotoPath = FileUtils.getPhotoUrl(this, mCurrentProject, lastPhoto);
+
+            String lastPhotoPath = FileUtils.getPhotoUrl(mExternalFilesDir, mCurrentProject, lastPhoto);
 
             // Send the path of the last photo and the project id
             addPhotoIntent.putExtra(Keys.PHOTO_PATH, lastPhotoPath);
@@ -433,7 +438,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mIsReturning = true;
         Intent data = new Intent();
         data.putExtra(Keys.TRANSITION_POSITION, mReturnPosition);
-        data.putExtra(Keys.TRANSITION_NAME, FileUtils.getPhotoUrl(this, mCurrentProject, mCurrentPhoto));
+        data.putExtra(Keys.TRANSITION_NAME,
+                FileUtils.getPhotoUrl(mExternalFilesDir, mCurrentProject, mCurrentPhoto));
         setResult(RESULT_OK, data);
         super.finishAfterTransition();
     }
@@ -477,7 +483,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mDetailsAdapter.setCurrentPhoto(photoEntry);
 
         // Load the current image
-        loadImage(FileUtils.getPhotoUrl(this, mCurrentProject, photoEntry));
+        loadImage(FileUtils.getPhotoUrl(mExternalFilesDir, mCurrentProject, photoEntry));
 
         // Get info for the current photo
         long timestamp = photoEntry.getTimestamp();
@@ -727,7 +733,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     // TODO (update) implement dual loading solution for smooth transition between fullscreen images
     /* Pre loads the selected image into the hidden dialogue so that display appears immediate */
     private void preloadFullscreenImage(){
-        String path = FileUtils.getPhotoUrl(this, mCurrentProject, mCurrentPhoto);
+        String path = FileUtils.getPhotoUrl(mExternalFilesDir, mCurrentProject, mCurrentPhoto);
         File current = new File(path);
         Glide.with(this)
                 .load(current)
@@ -888,7 +894,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     private void deletePhoto(TimeLapseDatabase database, Project project, PhotoEntry photoEntry){
         AppExecutors.getInstance().diskIO().execute(() -> {
                 // Delete the photo from the file structure
-                FileUtils.deletePhoto(this, project, photoEntry);
+                FileUtils.deletePhoto(mExternalFilesDir, project, photoEntry);
                 // Delete the photo metadata in the database
                 database.photoDao().deletePhoto(photoEntry);
             });

@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements ProjectsAdapter.P
             mNumberOfColumns = 6;
 
         // Set up the adapter for the recycler view
-        mProjectsAdapter = new ProjectsAdapter(this);
+        mProjectsAdapter = new ProjectsAdapter(this, this);
 
         // Set up the recycler view
         StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL);
