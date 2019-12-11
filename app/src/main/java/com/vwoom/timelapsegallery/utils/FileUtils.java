@@ -4,9 +4,6 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
-import com.vwoom.timelapsegallery.database.AppExecutors;
-import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
-import com.vwoom.timelapsegallery.database.dao.ProjectDao;
 import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
 import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
 import com.vwoom.timelapsegallery.database.view.Project;
@@ -27,7 +24,7 @@ public final class FileUtils {
     private static final String TAG = FileUtils.class.getSimpleName();
 
     /* Used to create a photo file in its final location */
-    private static File createImageFile(Context context, ProjectEntry currentProject, long timestamp) {
+    private static File createImageFileForProject(Context context, ProjectEntry currentProject, long timestamp) {
         // Create an image file name from the current timestamp
         String imageFileName = timestamp + ".jpg";
         File projectDir = getProjectFolder(context, currentProject);
@@ -91,7 +88,7 @@ public final class FileUtils {
             long timestamp)
     throws IOException {
         // Create the permanent file for the photo
-        File finalFile = createImageFile(context, currentProject, timestamp);
+        File finalFile = createImageFileForProject(context, currentProject, timestamp);
         // Create tempfile from previous path
         File tempFile = new File(tempPath);
         // Copy file to new destination
