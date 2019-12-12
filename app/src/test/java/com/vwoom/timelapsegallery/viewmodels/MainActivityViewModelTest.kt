@@ -8,6 +8,9 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MainActivityViewModelTest {
 
+    @get:Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
+
     @Test
     fun getProjects() {
         // Given - some projects in database
