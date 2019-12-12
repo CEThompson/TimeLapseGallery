@@ -73,7 +73,33 @@ class FileUtilsTest {
     }
 
     @Test
-    fun createFinalFileFromTemp() {
+    fun createFinalFileFromTempTest_shouldPass() {
+        // Create the pictures directory and temporary_images directory
+        val picturesFolder = folder.newFolder("pictures")
+        val tempFolder = File(picturesFolder, FileUtils.TEMP_FILE_SUBDIRECTORY)
+        tempFolder.mkdir()
+
+        // Create the temporary image file
+        val tempFile = FileUtils.createTemporaryImageFile(tempFolder)
+        val timestamp = System.currentTimeMillis()
+
+        // Create the project
+        val projectEntry = ProjectEntry("test project", 0)
+
+        // Create the folder for the project
+        val finalFile = FileUtils.createFinalFileFromTemp(picturesFolder, tempFile.absolutePath, projectEntry, timestamp)
+
+        assert(!tempFile.exists()) // make sure temp file was deleted
+        assert(finalFile != null) // make sure final file was created
+        assert(finalFile.exists())
+        // TODO make other assertions about the final copied file?
+
+        // TODO convert to logs?
+        System.out.println("$TAG tempFile path $finalFile")
+        System.out.println("$TAG finalFile path $tempFile")
+        System.out.println("$TAG tempFile exists ${tempFile.exists()}")
+        System.out.println("$TAG finalFile exists ${finalFile.exists()}")
+
     }
 
     @Test
