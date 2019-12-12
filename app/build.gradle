@@ -63,6 +63,10 @@ android {
     androidExtensions{
         experimental = true
     }
+
+    testOptions.unitTests{
+        includeAndroidResources = true
+    }
 }
 
 dependencies {
