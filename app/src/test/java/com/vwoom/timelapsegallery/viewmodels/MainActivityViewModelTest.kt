@@ -1,13 +1,17 @@
 package com.vwoom.timelapsegallery.viewmodels
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class MainActivityViewModelTest {
 
     @Test
     fun getProjects() {
         // Given - some projects in database
-        val mainActivityViewModel = MainActivityViewModel()
+        val mainActivityViewModel = MainActivityViewModel(ApplicationProvider.getApplicationContext())
 
         // When calling getProjects()
 
