@@ -1,23 +1,14 @@
-package com.vwoom.timelapsegallery.database.dao;
+package com.vwoom.timelapsegallery.database.dao
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
-import com.vwoom.timelapsegallery.database.view.Project;
-
-import java.util.List;
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import com.vwoom.timelapsegallery.database.entry.ProjectEntry
+import com.vwoom.timelapsegallery.database.view.Project
 
 @Dao
-public interface ProjectDao {
-
+interface ProjectDao {
     @Query("SELECT * FROM project ORDER BY id")
-    LiveData<List<ProjectEntry>> loadAllProjects();
+    fun loadAllProjects(): LiveData<List<ProjectEntry?>?>?
 
     // TODO test this join query
     //@Query("SELECT * FROM project WHERE schedule != 0 ORDER BY schedule_next_submission")
@@ -25,25 +16,25 @@ public interface ProjectDao {
             "INNER JOIN project_schedule " +
             "ON project.id = project_schedule.project_id " +
             "ORDER BY project_schedule.schedule_time")
-    List<ProjectEntry> loadAllScheduledProjects();
+    fun loadAllScheduledProjects(): List<ProjectEntry?>?
 
     @Query("SELECT * FROM project WHERE id = :id")
-    ProjectEntry loadProjectById(long id);
+    fun loadProjectById(id: Long): ProjectEntry?
 
     @Query("SELECT * FROM project WHERE id = :id")
-    LiveData<ProjectEntry> loadLiveDataProjectById(long id);
+    fun loadLiveDataProjectById(id: Long): LiveData<ProjectEntry?>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long insertProject(ProjectEntry projectEntry);
+    fun insertProject(projectEntry: ProjectEntry?): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateProject(ProjectEntry projectEntry);
+    fun updateProject(projectEntry: ProjectEntry?)
 
     @Delete
-    void deleteProject(ProjectEntry projectEntry);
+    fun deleteProject(projectEntry: ProjectEntry?)
 
     @Query("DELETE FROM project")
-    void deleteAllProjects();
+    fun deleteAllProjects()
 
     /* Returns a livedata object for observing projects view */
     @Query("SELECT " +
@@ -58,7 +49,7 @@ public interface ProjectDao {
             "LEFT JOIN project_schedule ON project.id = project_schedule.project_id " +
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id")
-    LiveData<List<Project>> loadProjectViews();
+    fun loadProjectViews(): LiveData<List<Project?>?>?
 
     @Query("SELECT " +
             "project.id AS project_id, " +
@@ -73,6 +64,5 @@ public interface ProjectDao {
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id " +
             "WHERE project.id =:id")
-    LiveData<Project> loadProjectView(long id);
-
+    fun loadProjectView(id: Long): LiveData<Project?>?
 }
