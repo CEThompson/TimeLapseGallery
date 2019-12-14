@@ -60,11 +60,11 @@ android {
     }
 
     // For kotlin parcelize
-    androidExtensions{
+    androidExtensions {
         experimental = true
     }
 
-    testOptions.unitTests{
+    testOptions.unitTests {
         includeAndroidResources = true
     }
 }
