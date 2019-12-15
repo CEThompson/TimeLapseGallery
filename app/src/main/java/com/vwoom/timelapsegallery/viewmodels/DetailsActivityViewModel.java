@@ -3,10 +3,9 @@ package com.vwoom.timelapsegallery.viewmodels;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
-import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
-import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
-import com.vwoom.timelapsegallery.database.view.Project;
+import com.vwoom.timelapsegallery.data.entry.PhotoEntry;
+import com.vwoom.timelapsegallery.data.TimeLapseDatabase;
+import com.vwoom.timelapsegallery.data.view.Project;
 
 import java.util.List;
 

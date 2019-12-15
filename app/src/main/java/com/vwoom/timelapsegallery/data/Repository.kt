@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.database
+package com.vwoom.timelapsegallery.data
 
 class Repository {
 

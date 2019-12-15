@@ -1,9 +1,9 @@
-package com.vwoom.timelapsegallery.database.dao
+package com.vwoom.timelapsegallery.data.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.vwoom.timelapsegallery.database.entry.ProjectEntry
-import com.vwoom.timelapsegallery.database.view.Project
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.view.Project
 
 @Dao
 interface ProjectDao {

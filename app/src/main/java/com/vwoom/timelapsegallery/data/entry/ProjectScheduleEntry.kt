@@ -1,8 +1,7 @@
-package com.vwoom.timelapsegallery.database.entry
+package com.vwoom.timelapsegallery.data.entry
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.vwoom.timelapsegallery.database.entry.ProjectEntry
 
 @Entity(tableName = "project_schedule",
         primaryKeys = ["project_id"],

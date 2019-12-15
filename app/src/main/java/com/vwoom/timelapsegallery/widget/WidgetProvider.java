@@ -10,7 +10,7 @@ import android.widget.RemoteViews;
 
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.activities.DetailsActivity;
-import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry;
 
 import java.util.List;
 

@@ -4,9 +4,9 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
-import com.vwoom.timelapsegallery.database.entry.PhotoEntry;
-import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
-import com.vwoom.timelapsegallery.database.view.Project;
+import com.vwoom.timelapsegallery.data.entry.PhotoEntry;
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry;
+import com.vwoom.timelapsegallery.data.view.Project;
 
 import java.io.File;
 import java.io.FileInputStream;

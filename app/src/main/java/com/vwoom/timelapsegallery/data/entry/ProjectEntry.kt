@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.database.entry
+package com.vwoom.timelapsegallery.data.entry
 
 import androidx.room.Entity
 import androidx.room.Ignore

@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.database.view
+package com.vwoom.timelapsegallery.data.view
 
 import android.os.Parcelable
 import androidx.room.DatabaseView

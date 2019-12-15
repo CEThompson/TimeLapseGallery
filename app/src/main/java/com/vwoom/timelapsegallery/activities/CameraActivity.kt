@@ -20,11 +20,11 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.database.TimeLapseDatabase
-import com.vwoom.timelapsegallery.database.entry.CoverPhotoEntry
-import com.vwoom.timelapsegallery.database.entry.PhotoEntry
-import com.vwoom.timelapsegallery.database.entry.ProjectEntry
-import com.vwoom.timelapsegallery.database.entry.ProjectScheduleEntry
+import com.vwoom.timelapsegallery.data.TimeLapseDatabase
+import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
+import com.vwoom.timelapsegallery.data.entry.PhotoEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.utils.FileUtils
 import java.io.File
 import java.util.concurrent.Executors

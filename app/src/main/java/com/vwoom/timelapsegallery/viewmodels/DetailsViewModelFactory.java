@@ -5,7 +5,7 @@ import android.util.Log;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
+import com.vwoom.timelapsegallery.data.TimeLapseDatabase;
 
 public class DetailsViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 

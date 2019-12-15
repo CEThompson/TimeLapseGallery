@@ -1,9 +1,7 @@
-package com.vwoom.timelapsegallery.database.entry
+package com.vwoom.timelapsegallery.data.entry
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.vwoom.timelapsegallery.database.entry.ProjectEntry
-import com.vwoom.timelapsegallery.database.entry.TagEntry
 
 // TODO verify cascade deletion works appropriately
 // TODO set index for columns

@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.database
+package com.vwoom.timelapsegallery.data
 
 import android.content.Context
 import androidx.room.Database
@@ -6,8 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.vwoom.timelapsegallery.database.dao.*
-import com.vwoom.timelapsegallery.database.entry.*
+import com.vwoom.timelapsegallery.data.dao.*
+import com.vwoom.timelapsegallery.data.entry.*
 
 @Database(entities = [ProjectEntry::class, PhotoEntry::class, TagEntry::class, ProjectTagEntry::class, ProjectScheduleEntry::class, CoverPhotoEntry::class], version = 2, exportSchema = true)
 abstract class TimeLapseDatabase : RoomDatabase() {

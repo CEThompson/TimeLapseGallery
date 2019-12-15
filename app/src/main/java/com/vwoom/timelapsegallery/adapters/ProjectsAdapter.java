@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.vwoom.timelapsegallery.R;
-import com.vwoom.timelapsegallery.database.view.Project;
+import com.vwoom.timelapsegallery.data.view.Project;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.PhotoUtils;
 import com.vwoom.timelapsegallery.utils.TimeUtils;

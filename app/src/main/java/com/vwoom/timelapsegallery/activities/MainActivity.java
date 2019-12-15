@@ -23,7 +23,7 @@ import android.view.ViewTreeObserver;
 
 import com.vwoom.timelapsegallery.R;
 import com.vwoom.timelapsegallery.adapters.ProjectsAdapter;
-import com.vwoom.timelapsegallery.database.view.Project;
+import com.vwoom.timelapsegallery.data.view.Project;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.viewmodels.MainActivityViewModel;

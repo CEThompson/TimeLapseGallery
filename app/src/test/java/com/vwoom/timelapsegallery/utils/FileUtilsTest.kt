@@ -1,8 +1,8 @@
 package com.vwoom.timelapsegallery.utils
 
 
-import com.vwoom.timelapsegallery.database.entry.PhotoEntry
-import com.vwoom.timelapsegallery.database.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.entry.PhotoEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule

@@ -1,8 +1,8 @@
-package com.vwoom.timelapsegallery.database.dao
+package com.vwoom.timelapsegallery.data.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.vwoom.timelapsegallery.database.entry.CoverPhotoEntry
+import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 
 @Dao
 interface CoverPhotoDao {

@@ -5,8 +5,8 @@ import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
-import com.vwoom.timelapsegallery.database.view.Project;
+import com.vwoom.timelapsegallery.data.TimeLapseDatabase;
+import com.vwoom.timelapsegallery.data.view.Project;
 
 import java.util.List;
 

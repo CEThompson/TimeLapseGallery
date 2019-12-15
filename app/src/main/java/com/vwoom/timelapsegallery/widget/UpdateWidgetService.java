@@ -9,10 +9,9 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.vwoom.timelapsegallery.database.AppExecutors;
-import com.vwoom.timelapsegallery.database.entry.ProjectEntry;
-import com.vwoom.timelapsegallery.database.TimeLapseDatabase;
-import com.vwoom.timelapsegallery.utils.ProjectUtils;
+import com.vwoom.timelapsegallery.data.AppExecutors;
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry;
+import com.vwoom.timelapsegallery.data.TimeLapseDatabase;
 
 import java.util.List;
 

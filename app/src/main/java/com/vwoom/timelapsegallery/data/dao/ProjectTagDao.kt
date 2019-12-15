@@ -1,7 +1,7 @@
-package com.vwoom.timelapsegallery.database.dao
+package com.vwoom.timelapsegallery.data.dao
 
 import androidx.room.*
-import com.vwoom.timelapsegallery.database.entry.ProjectTagEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 
 @Dao
 interface ProjectTagDao {
