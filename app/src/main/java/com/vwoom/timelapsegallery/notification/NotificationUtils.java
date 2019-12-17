@@ -17,7 +17,6 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.vwoom.timelapsegallery.R;
-import com.vwoom.timelapsegallery.activities.MainActivity;
 import com.vwoom.timelapsegallery.utils.Keys;
 
 import java.util.Calendar;

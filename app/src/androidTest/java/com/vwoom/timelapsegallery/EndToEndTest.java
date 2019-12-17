@@ -12,7 +12,6 @@ import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import androidx.test.runner.lifecycle.Stage;
 
 import com.vwoom.timelapsegallery.activities.AddPhotoActivity;
-import com.vwoom.timelapsegallery.activities.MainActivity;
 import com.vwoom.timelapsegallery.activities.NewProjectActivity;
 import com.vwoom.timelapsegallery.utils.FileUtils;
 

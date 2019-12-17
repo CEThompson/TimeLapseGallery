@@ -202,4 +202,7 @@
     <string name="key_sync_allowed" translatable="false">sync_allowed</string>
     <string name="key_ads_disabled" translatable="false">ads_disabled</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
