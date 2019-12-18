@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import butterknife.BindView
@@ -58,17 +59,12 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
 
         // Set up click listener to add new projects
         mNewProjectFab!!.setOnClickListener { v: View? ->
-            val newProjectIntent = Intent(this@MainActivity, CameraActivity::class.java)
-            startActivity(newProjectIntent)
+            val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment()
+            findNavController().navigate(action)
         }
 
-        prepareSharedElementTransition()
-        mFilter = getIntent().getBooleanExtra(Keys.PROJECT_FILTER_BY_SCHEDULED_TODAY, false)
-
-        // Set up the view model
         // Set up the view model
         setupViewModel()
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
