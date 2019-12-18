@@ -90,9 +90,9 @@ class CameraFragment: Fragment(), LifecycleOwner {
                 }.build()
 
         val imageCapture = ImageCapture(imageCaptureConfig)
-        findViewById<ImageButton>(R.id.take_picture_fab).setOnClickListener {
+        activity?.take_picture_fab?.setOnClickListener {
             // TODO handle external files directory better, perhaps as a companion object?
-            val externalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val externalFilesDir = context?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             val file = FileUtils.createTemporaryImageFile(externalFilesDir)
 
             imageCapture.takePicture(file, executor,
@@ -101,43 +101,43 @@ class CameraFragment: Fragment(), LifecycleOwner {
                                 imageCaptureError: ImageCapture.ImageCaptureError,
                                 message: String,
                                 cause: Throwable?) {
-                            viewFinder.post{ Toast.makeText(baseContext, "Capture failed: $message", Toast.LENGTH_LONG).show()}
+                            viewFinder.post{ Toast.makeText(context, "Capture failed: $message", Toast.LENGTH_LONG).show()}
                             // TODO error log
                             Log.e("Camera Activity", "Capture Failed: $message")
                         }
 
                         override fun onImageSaved(file: File) {
-                            viewFinder.post{ Toast.makeText(baseContext, "Capture success", Toast.LENGTH_LONG).show()}
-                            val db = TimeLapseDatabase.getInstance(baseContext)
+                            viewFinder.post{ Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show()}
+                            val db = TimeLapseDatabase.getInstance(this@CameraFragment.requireContext())
                             Log.d("abcde", "inserting project, photo, and cover photo")
                             // Create database entries
                             val timestamp = System.currentTimeMillis()
 
                             // Create and insert the project
                             val projectEntry = ProjectEntry(null, 0)
-                            val project_id = db.projectDao().insertProject(projectEntry)
+                            val project_id = db?.projectDao()?.insertProject(projectEntry)
                             Log.d("abcde", "project id is $project_id")
 
                             // Update the id for final file creation
-                            projectEntry.id = project_id
+                            projectEntry.id = project_id!!
                             // Copy temp file to project folder file
 
                             FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
 
                             // Create and insert the photo
                             val photoEntry = PhotoEntry(project_id, timestamp)
-                            val photo_id = db.photoDao().insertPhoto(photoEntry)
+                            val photo_id = db.photoDao()?.insertPhoto(photoEntry)
                             Log.d("abcde", "photo entry id $photo_id")
                             Log.d("abcde", "photo entry timestamp ${photoEntry.timestamp}")
 
                             // Create and insert the cover photo
-                            val coverPhotoEntry = CoverPhotoEntry(project_id, photo_id)
-                            db.coverPhotoDao().insertPhoto(coverPhotoEntry)
+                            val coverPhotoEntry = CoverPhotoEntry(project_id, photo_id!!)
+                            db.coverPhotoDao()?.insertPhoto(coverPhotoEntry)
                             Log.d("abcde", "cover photo, project id ${coverPhotoEntry.project_id}")
                             Log.d("abcde", "cover photo, photo id ${coverPhotoEntry.photo_id}")
 
                             val projectScheduleEntry = ProjectScheduleEntry(project_id, null, null)
-                            db.projectScheduleDao().insertProjectSchedule(projectScheduleEntry)
+                            db.projectScheduleDao()?.insertProjectSchedule(projectScheduleEntry)
                         }
                     })
 
@@ -172,14 +172,13 @@ class CameraFragment: Fragment(), LifecycleOwner {
             if (allPermissionsGranted()){
                 viewFinder.post { startCamera() }
             } else {
-                Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
-                finish()
+                Toast.makeText(this.requireContext(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
-                baseContext, it) == PackageManager.PERMISSION_GRANTED
+                requireContext(), it) == PackageManager.PERMISSION_GRANTED
     }
 }
