@@ -82,17 +82,12 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
         })
     }
 
-    override fun onClick(clickedProject: Project?, sharedElement: View, transitionName: String, position: Int) {
-        //val bundle = bundleOf(Keys.PHOTO_ENTRY to clickedProject,
-        //        Keys.TRANSITION_POSITION to position)
+    override fun onClick(clickedProject: Project, sharedElement: View, transitionName: String, position: Int) {
         val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProject, position)
-
         val extras = FragmentNavigatorExtras(
                 mNewProjectFab as View to Keys.ADD_FAB_TRANSITION_NAME,
                 sharedElement to transitionName
         )
-
-
         findNavController().navigate(action, extras)
     }
 }
