@@ -6,6 +6,19 @@
     android:layout_height="match_parent"
     tools:context="com.vwoom.timelapsegallery.activities.GalleryFragment">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/main_activity_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppToolbar"
+            android:minHeight="?attr/actionBarSize"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
     <!-- Recycler View to display time lapse photo projects -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/projects_recycler_view"

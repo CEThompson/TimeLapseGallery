@@ -16,12 +16,6 @@ import com.vwoom.timelapsegallery.utils.FileUtils
 
 // TODO refactor app to use one activity with multiple fragments paradigm
 // TODO convert activities
-// TODO (1) AddPhotoActivity -> AddPhotoFragment
-// TODO (2) CameraActivity -> CameraFragment
-// TODO (3) DetailsActivity -> DetailFragment
-// TODO (4) MainActivity -> GalleryFragment
-// TODO (5) NewProjectActivity -> EditFragment?
-// TODO (6) SettingsActivity -> SettingsFragment
 
 class TimeLapseGalleryActivity : AppCompatActivity() {
 
@@ -30,7 +24,7 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_time_lapse_gallery)
 
         ButterKnife.bind(this)
-        val toolbar: Toolbar = findViewById<Toolbar>(R.id.main_activity_toolbar)
+        val toolbar: Toolbar = findViewById(R.id.main_activity_toolbar)
         setSupportActionBar(toolbar)
 
         // Set the icon for the toolbar

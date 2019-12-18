@@ -24,7 +24,8 @@
     <fragment
         android:id="@+id/detailsFragment"
         android:name="com.vwoom.timelapsegallery.activities.DetailsFragment"
-        android:label="fragment_details">
+        android:label="fragment_details"
+        tools:layout="@layout/fragment_details">
         <action
             android:id="@+id/action_detailsFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
@@ -36,7 +37,8 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.vwoom.timelapsegallery.activities.SettingsFragment"
-        android:label="fragment_settings" />
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
 
     <fragment
         android:id="@+id/cameraFragment"
