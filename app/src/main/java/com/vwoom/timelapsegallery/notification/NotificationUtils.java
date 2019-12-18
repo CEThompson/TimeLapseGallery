@@ -17,6 +17,7 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.vwoom.timelapsegallery.R;
+import com.vwoom.timelapsegallery.activities.TimeLapseGalleryActivity;
 import com.vwoom.timelapsegallery.utils.Keys;
 
 import java.util.Calendar;
@@ -40,7 +41,7 @@ public final class NotificationUtils {
         String content = context.getString(R.string.projects_scheduled_today);
 
         // Create the pending intent to take the user to the relevant project on click
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, TimeLapseGalleryActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra(Keys.PROJECT_FILTER_BY_SCHEDULED_TODAY, true);
 
