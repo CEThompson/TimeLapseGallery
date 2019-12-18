@@ -1,26 +1,20 @@
 package com.vwoom.timelapsegallery.activities
 
-import android.app.ActivityOptions
-import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Bundle
 import android.transition.TransitionInflater
-import android.util.Log
-import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import butterknife.BindView
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.adapters.ProjectsAdapter
@@ -42,6 +36,10 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // TODO implement shared element transition
+        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
+
         // Increase columns for horizontal orientation
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) mNumberOfColumns = 6
 
@@ -52,16 +50,19 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
         val gridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
         mProjectsRecyclerView!!.layoutManager = gridLayoutManager
         mProjectsRecyclerView!!.setHasFixedSize(false) // adjusting views at runtime
-
         mProjectsRecyclerView!!.adapter = mProjectsAdapter
 
-        // Set up click listener to add new projects
+        // Set up navigation to add new projects
         mNewProjectFab!!.setOnClickListener { v: View? ->
             val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment()
-            findNavController().navigate(action)
+
+            // TODO fix extras of shared elements
+            val extras = FragmentNavigatorExtras(
+                    mNewProjectFab as View to Keys.ADD_FAB_TRANSITION_NAME
+            )
+            findNavController().navigate(action, extras)
         }
 
-        // Set up the view model
         setupViewModel()
     }
 
@@ -72,10 +73,9 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
     }
 
 
-    /* Sets up view models */
     private fun setupViewModel() {
         val viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
-        /* Observe projects */viewModel.projects.observe(this, Observer { projects: List<Project?> ->
+        /* Observe projects */viewModel.projects.observe(this, Observer { projects: List<Project> ->
             mProjects = projects
             mProjectsAdapter!!.setProjectData(projects)
             mNewProjectFab!!.show()
@@ -83,17 +83,16 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
     }
 
     override fun onClick(clickedProject: Project?, sharedElement: View, transitionName: String, position: Int) {
-        val intent = Intent(this, DetailsActivity::class.java)
-        intent.putExtra(Keys.PROJECT_ENTRY, clickedProject)
-        intent.putExtra(Keys.TRANSITION_POSITION, position)
-        val p1 = Pair.create(sharedElement, transitionName)
-        val p2 = Pair.create<View, String>(mNewProjectFab, Keys.ADD_FAB_TRANSITION_NAME)
-        // Start the activity with a shared element if lollipop or higher
-        val bundle = ActivityOptions
-                .makeSceneTransitionAnimation(this@MainActivity,
-                        p1,
-                        p2)
-                .toBundle()
-        startActivity(intent, bundle)
+        //val bundle = bundleOf(Keys.PHOTO_ENTRY to clickedProject,
+        //        Keys.TRANSITION_POSITION to position)
+        val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProject, position)
+
+        val extras = FragmentNavigatorExtras(
+                mNewProjectFab as View to Keys.ADD_FAB_TRANSITION_NAME,
+                sharedElement to transitionName
+        )
+
+
+        findNavController().navigate(action, extras)
     }
 }
