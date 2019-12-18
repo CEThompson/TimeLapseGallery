@@ -19,13 +19,6 @@
         <action
             android:id="@+id/action_galleryFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
-        <argument
-            android:name="clickedProject"
-            app:argType="com.vwoom.timelapsegallery.data.view.Project" />
-        <argument
-            android:name="transitionPosition"
-            app:argType="integer" />
-
     </fragment>
 
     <fragment
@@ -39,6 +32,12 @@
         <action
             android:id="@+id/action_detailsFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <argument
+            android:name="clickedProject"
+            app:argType="com.vwoom.timelapsegallery.data.view.Project" />
+        <argument
+            android:name="transitionPosition"
+            app:argType="integer" />
     </fragment>
 
     <fragment
