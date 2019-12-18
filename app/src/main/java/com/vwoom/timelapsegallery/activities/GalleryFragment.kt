@@ -152,33 +152,4 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
                 .toBundle()
         startActivity(intent, bundle)
     }
-
-    fun onActivityReenter(resultCode: Int, data: Intent) {
-        super.onActivityReenter(resultCode, data)
-        Log.d(FragmentActivity.TAG, "shared elements: reentering activity")
-        mReenterState = Bundle(data.extras)
-        val returnPosition = mReenterState!!.getInt(Keys.TRANSITION_POSITION)
-        mProjectsRecyclerView!!.scrollToPosition(returnPosition)
-        Log.d(FragmentActivity.TAG, "shared elements: scrolling to position $returnPosition")
-        postponeEnterTransition()
-        schedulePostponedTransition()
-    }
-
-    private fun schedulePostponedTransition() {
-        mProjectsRecyclerView!!.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                mProjectsRecyclerView!!.viewTreeObserver.removeOnPreDrawListener(this)
-                mProjectsRecyclerView!!.requestLayout()
-                startPostponedEnterTransition()
-                return true
-            }
-        })
-    }
-
-    private fun prepareSharedElementTransition() {
-        val transition = TransitionInflater.from(this)
-                .inflateTransition(R.transition.image_shared_element_transition)
-        getWindow().setSharedElementExitTransition(transition)
-        setExitSharedElementCallback(mCallback)
-    }
 }
