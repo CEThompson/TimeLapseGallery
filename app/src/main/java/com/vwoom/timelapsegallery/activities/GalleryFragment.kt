@@ -1,7 +1,6 @@
 package com.vwoom.timelapsegallery.activities
 
 import android.app.ActivityOptions
-import android.app.SharedElementCallback
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -42,44 +41,14 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
     private var mNumberOfColumns = 3
     private val TAG = GalleryFragment::class.java.simpleName
 
-    /* Shared Element Position information */
-    private var mReenterState: Bundle? = null
-    private val mCallback: SharedElementCallback = object : SharedElementCallback() {
-        override fun onMapSharedElements(names: MutableList<String>, sharedElements: MutableMap<String, View>) { // If reenter state contains bundle the activity is returning
-            if (mReenterState != null) {
-                Log.d(TAG, "shared elements: main activity callback firing")
-                val transitionName = mReenterState!!.getString(Keys.TRANSITION_NAME)
-                val photoView: View? = mProjectsRecyclerView?.findViewWithTag(transitionName)
-                Log.d(TAG, "shared elements: transition name is $transitionName")
-                if (photoView != null && transitionName != null) {
-                    names.clear()
-                    names.add(transitionName)
-                    sharedElements.clear()
-                    sharedElements[transitionName] = photoView
-                }
-                mReenterState = null
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-
-
-
-        // Increase columns for horizontal orientation
         // Increase columns for horizontal orientation
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) mNumberOfColumns = 6
 
         // Set up the adapter for the recycler view
-        // Set up the adapter for the recycler view
-        mProjectsAdapter = ProjectsAdapter(this, this)
+        mProjectsAdapter = ProjectsAdapter(this, this.context)
 
-        // Set up the recycler view
         // Set up the recycler view
         val gridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
         mProjectsRecyclerView!!.layoutManager = gridLayoutManager
@@ -87,7 +56,6 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
 
         mProjectsRecyclerView!!.adapter = mProjectsAdapter
 
-        // Set up click listener to add new projects
         // Set up click listener to add new projects
         mNewProjectFab!!.setOnClickListener { v: View? ->
             val newProjectIntent = Intent(this@MainActivity, CameraActivity::class.java)
