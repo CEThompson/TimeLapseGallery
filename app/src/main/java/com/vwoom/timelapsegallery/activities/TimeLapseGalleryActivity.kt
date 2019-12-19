@@ -23,13 +23,14 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_time_lapse_gallery)
 
+        /*
         ButterKnife.bind(this)
         val toolbar: Toolbar = findViewById(R.id.main_activity_toolbar)
         setSupportActionBar(toolbar)
 
         // Set the icon for the toolbar
         if (getSupportActionBar() != null) getSupportActionBar()?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
-
+*/
         // Initialize mobile ads
         MobileAds.initialize(this, OnInitializationCompleteListener { initializationStatus: InitializationStatus? -> })
     }
