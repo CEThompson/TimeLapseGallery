@@ -22,15 +22,7 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_time_lapse_gallery)
-
-        /*
-        ButterKnife.bind(this)
-        val toolbar: Toolbar = findViewById(R.id.main_activity_toolbar)
-        setSupportActionBar(toolbar)
-
-        // Set the icon for the toolbar
-        if (getSupportActionBar() != null) getSupportActionBar()?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
-*/
+        
         // Initialize mobile ads
         MobileAds.initialize(this, OnInitializationCompleteListener { initializationStatus: InitializationStatus? -> })
     }
@@ -40,23 +32,5 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
         super.onDestroy()
         Log.d("deletion check", "onStop newProjectActivity firing")
         FileUtils.deleteTempFiles(this) // Make sure to clean up temporary files
-    }
-
-    // TODO (update) create menu option to show todays projects
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.main_activity_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.settings -> {
-                val intent = Intent(this@TimeLapseGalleryActivity, SettingsActivity::class.java)
-                startActivity(intent)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 }
