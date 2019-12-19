@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.activities
 import android.content.res.Configuration
 import android.os.Bundle
 import android.transition.TransitionInflater
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,22 +23,29 @@ import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.Keys
 import com.vwoom.timelapsegallery.viewmodels.GalleryViewModel
 import kotlinx.android.synthetic.main.fragment_gallery.*
+import kotlinx.android.synthetic.main.fragment_gallery.view.*
 
 
 class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandler {
 
-    // TODO convert to view binding
-    @BindView(R.id.add_project_FAB)
     var mNewProjectFab: FloatingActionButton? = null
-    @BindView(R.id.projects_recycler_view)
     var mProjectsRecyclerView: RecyclerView? = null
+
     private var mProjectsAdapter: ProjectsAdapter? = null
     private var mProjects: List<Project>? = null
+
     private var mNumberOfColumns = 3
     private val TAG = GalleryFragment::class.java.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+            }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val projectsRecyclerView = view.projects_recycler_view
+        mNewProjectFab = view.add_project_FAB
 
         // TODO implement shared element transition
         sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
@@ -46,14 +54,14 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) mNumberOfColumns = 6
 
         // Set up the adapter for the recycler view
-        mProjectsAdapter = ProjectsAdapter(this, this.context)
-
+        mProjectsAdapter = ProjectsAdapter(this, this.requireContext())
+        Log.d(TAG, "mProjectsAdapter is null: ${mProjectsAdapter == null}")
         // Set up the recycler view
         val gridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
-        mProjectsRecyclerView = this.projects_recycler_view // TODO implement as view binding?
-        mProjectsRecyclerView?.layoutManager = gridLayoutManager
-        mProjectsRecyclerView?.setHasFixedSize(false) // adjusting views at runtime
-        mProjectsRecyclerView?.adapter = mProjectsAdapter
+
+        projectsRecyclerView.layoutManager = gridLayoutManager
+        projectsRecyclerView.setHasFixedSize(false) // adjusting views at runtime
+        projectsRecyclerView.adapter = mProjectsAdapter
 
         // Set up navigation to add new projects
         mNewProjectFab?.setOnClickListener { v: View? ->
@@ -67,6 +75,7 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
         }
 
         setupViewModel()
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -78,10 +87,14 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
 
     // TODO figure out  why view model isn't setting up
     private fun setupViewModel() {
+        Log.d(TAG, "setup view model in fragment fired")
         val viewModel = ViewModelProviders.of(this).get(GalleryViewModel::class.java)
         /* Observe projects */viewModel.projects.observe(this, Observer { projects: List<Project> ->
             mProjects = projects
+            Log.d(TAG, "$mProjects")
+            Log.d(TAG, "mProjects is null ${mProjects == null}")
             mProjectsAdapter?.setProjectData(projects)
+            Log.d(TAG, "mNewProject fab is null: ${mNewProjectFab == null}")
             mNewProjectFab?.show()
         })
     }

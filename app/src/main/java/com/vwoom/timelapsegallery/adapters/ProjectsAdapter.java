@@ -50,16 +50,23 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
 
     public class ProjectsAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @BindView(R.id.project_image) ImageView mProjectImageView;
-        @BindView(R.id.project_recyclerview_constraint_layout) ConstraintLayout mConstraintLayout;
-        @BindView(R.id.schedule_indicator) ImageView mScheduleIndicator;
-        @BindView(R.id.next_submission_day_countdown_textview) TextView mNextScheduleString;
-        @BindView(R.id.project_card_view) CardView mCardView;
-        @BindView(R.id.project_image_gradient_overlay) View mGradientOverlay;
+        ImageView mProjectImageView;
+        ConstraintLayout mConstraintLayout;
+        ImageView mScheduleIndicator;
+        TextView mNextScheduleString;
+        CardView mCardView;
+        View mGradientOverlay;
 
         public ProjectsAdapterViewHolder(View view){
             super(view);
-            ButterKnife.bind(this, view);
+
+            // TODO convert to view binding or data binding?
+            mConstraintLayout = view.findViewById(R.id.project_recyclerview_constraint_layout);
+            mProjectImageView = view.findViewById(R.id.project_image);
+            mScheduleIndicator = view.findViewById(R.id.schedule_indicator);
+            mNextScheduleString = view.findViewById(R.id.next_submission_day_countdown_textview);
+            mCardView = view.findViewById(R.id.project_card_view);
+            mGradientOverlay = view.findViewById(R.id.project_image_gradient_overlay);
             view.setOnClickListener(this);
         }
 
@@ -113,6 +120,8 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
 
         // Set the constraint ratio
         String ratio = PhotoUtils.getAspectRatioFromImagePath(thumbnail_path);
+        Log.d(TAG, "constraint set is null: " + (constraintSet == null));
+        Log.d(TAG, "holder.mConstraintlayout is null: " + (holder.mConstraintLayout == null));
         constraintSet.clone(holder.mConstraintLayout);
         constraintSet.setDimensionRatio(holder.mProjectImageView.getId(), ratio);
         constraintSet.applyTo(holder.mConstraintLayout);

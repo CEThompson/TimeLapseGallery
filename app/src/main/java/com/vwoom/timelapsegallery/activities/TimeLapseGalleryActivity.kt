@@ -22,7 +22,7 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_time_lapse_gallery)
-        
+
         // Initialize mobile ads
         MobileAds.initialize(this, OnInitializationCompleteListener { initializationStatus: InitializationStatus? -> })
     }
