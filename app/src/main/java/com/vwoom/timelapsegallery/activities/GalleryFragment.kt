@@ -20,11 +20,13 @@ import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.adapters.ProjectsAdapter
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.Keys
-import com.vwoom.timelapsegallery.viewmodels.MainActivityViewModel
+import com.vwoom.timelapsegallery.viewmodels.GalleryViewModel
+import kotlinx.android.synthetic.main.fragment_gallery.*
 
 
 class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandler {
 
+    // TODO convert to view binding
     @BindView(R.id.add_project_FAB)
     var mNewProjectFab: FloatingActionButton? = null
     @BindView(R.id.projects_recycler_view)
@@ -48,12 +50,13 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
 
         // Set up the recycler view
         val gridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
-        mProjectsRecyclerView!!.layoutManager = gridLayoutManager
-        mProjectsRecyclerView!!.setHasFixedSize(false) // adjusting views at runtime
-        mProjectsRecyclerView!!.adapter = mProjectsAdapter
+        mProjectsRecyclerView = this.projects_recycler_view // TODO implement as view binding?
+        mProjectsRecyclerView?.layoutManager = gridLayoutManager
+        mProjectsRecyclerView?.setHasFixedSize(false) // adjusting views at runtime
+        mProjectsRecyclerView?.adapter = mProjectsAdapter
 
         // Set up navigation to add new projects
-        mNewProjectFab!!.setOnClickListener { v: View? ->
+        mNewProjectFab?.setOnClickListener { v: View? ->
             val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment()
 
             // TODO fix extras of shared elements
@@ -73,12 +76,13 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
     }
 
 
+    // TODO figure out  why view model isn't setting up
     private fun setupViewModel() {
-        val viewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
+        val viewModel = ViewModelProviders.of(this).get(GalleryViewModel::class.java)
         /* Observe projects */viewModel.projects.observe(this, Observer { projects: List<Project> ->
             mProjects = projects
-            mProjectsAdapter!!.setProjectData(projects)
-            mNewProjectFab!!.show()
+            mProjectsAdapter?.setProjectData(projects)
+            mNewProjectFab?.show()
         })
     }
 
