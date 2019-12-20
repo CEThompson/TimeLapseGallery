@@ -19,22 +19,23 @@ abstract class TimeLapseDatabase : RoomDatabase() {
     abstract fun projectScheduleDao(): ProjectScheduleDao?
 
     companion object {
-        private val LOCK = Any()
+
+        @Volatile private var instance: TimeLapseDatabase? = null
         private const val DATABASE_NAME = "time_lapse_db"
-        private var sInstance: TimeLapseDatabase? = null
-        @JvmStatic
-        fun getInstance(context: Context): TimeLapseDatabase? {
-            if (sInstance == null) {
-                synchronized(LOCK) {
-                    sInstance = Room.databaseBuilder(context.applicationContext,
-                            TimeLapseDatabase::class.java, DATABASE_NAME)
-                            .addMigrations(MIGRATION_1_2)
-                            .build()
-                }
+
+        fun getInstance(context: Context): TimeLapseDatabase {
+            return instance ?: synchronized(this) {
+                instance ?: buildDatabase(context).also {instance = it}
             }
-            return sInstance
         }
 
+        private fun buildDatabase(context: Context): TimeLapseDatabase {
+            return Room.databaseBuilder(context, TimeLapseDatabase::class.java, DATABASE_NAME)
+                    .addMigrations(MIGRATION_1_2)
+                    .build()
+        }
+
+        // TODO lock down migration
         val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // Create new tables
