@@ -8,7 +8,7 @@ import com.vwoom.timelapsegallery.data.view.Project
 @Dao
 interface ProjectDao {
     @Query("SELECT * FROM project ORDER BY id")
-    fun loadAllProjects(): LiveData<List<ProjectEntry?>?>?
+    fun loadAllProjects(): LiveData<List<ProjectEntry>>
 
     // TODO test this join query
     //@Query("SELECT * FROM project WHERE schedule != 0 ORDER BY schedule_next_submission")
@@ -16,22 +16,22 @@ interface ProjectDao {
             "INNER JOIN project_schedule " +
             "ON project.id = project_schedule.project_id " +
             "ORDER BY project_schedule.schedule_time")
-    fun loadAllScheduledProjects(): List<ProjectEntry?>?
+    fun loadAllScheduledProjects(): List<ProjectEntry>
 
     @Query("SELECT * FROM project WHERE id = :id")
     fun loadProjectById(id: Long): ProjectEntry?
 
     @Query("SELECT * FROM project WHERE id = :id")
-    fun loadLiveDataProjectById(id: Long): LiveData<ProjectEntry?>?
+    fun loadLiveDataProjectById(id: Long): LiveData<ProjectEntry>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertProject(projectEntry: ProjectEntry?): Long
+    fun insertProject(projectEntry: ProjectEntry): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun updateProject(projectEntry: ProjectEntry?)
+    fun updateProject(projectEntry: ProjectEntry)
 
     @Delete
-    fun deleteProject(projectEntry: ProjectEntry?)
+    fun deleteProject(projectEntry: ProjectEntry)
 
     @Query("DELETE FROM project")
     fun deleteAllProjects()
@@ -49,7 +49,7 @@ interface ProjectDao {
             "LEFT JOIN project_schedule ON project.id = project_schedule.project_id " +
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id")
-    fun loadProjectViews(): LiveData<List<Project?>?>?
+    fun loadProjectViews(): LiveData<List<Project>>
 
     @Query("SELECT " +
             "project.id AS project_id, " +
@@ -64,5 +64,5 @@ interface ProjectDao {
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id " +
             "WHERE project.id =:id")
-    fun loadProjectView(id: Long): LiveData<Project?>?
+    fun loadProjectView(id: Long): LiveData<Project>
 }
