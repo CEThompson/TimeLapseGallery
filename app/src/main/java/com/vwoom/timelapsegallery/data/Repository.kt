@@ -3,12 +3,17 @@ package com.vwoom.timelapsegallery.data
 import android.content.Context
 import com.vwoom.timelapsegallery.data.dao.PhotoDao
 import com.vwoom.timelapsegallery.data.dao.ProjectDao
+import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 
 class Repository private constructor(private val projectDao: ProjectDao, private val photoDao: PhotoDao) {
 
     suspend fun createProject(projectEntry: ProjectEntry){
         projectDao.insertProject(projectEntry)
+    }
+
+    suspend fun addPhotoToProject(photoEntry: PhotoEntry){
+        photoDao.insertPhoto(photoEntry)
     }
 
     fun getProjectViews() = projectDao.loadProjectViews()

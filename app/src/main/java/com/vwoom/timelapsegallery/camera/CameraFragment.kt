@@ -74,7 +74,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // TODO set up binding
         val binding = DataBindingUtil.inflate<FragmentCameraBinding>(inflater, R.layout.fragment_camera, container, false).apply {
-            viewModel = cameraViewModel
+            //viewModel = cameraViewModel
             lifecycleOwner = viewLifecycleOwner
         }
         return binding.root
@@ -128,6 +128,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
                         }
 
                         override fun onImageSaved(file: File) {
+                            
                             viewFinder.post{ Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show()}
                             val db = TimeLapseDatabase.getInstance(this@CameraFragment.requireContext())
                             Log.d("abcde", "inserting project, photo, and cover photo")
