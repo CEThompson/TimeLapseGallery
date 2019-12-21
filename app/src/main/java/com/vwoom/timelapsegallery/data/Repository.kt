@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.data
 
+import android.content.Context
 import com.vwoom.timelapsegallery.data.dao.PhotoDao
 import com.vwoom.timelapsegallery.data.dao.ProjectDao
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
@@ -15,4 +16,19 @@ class Repository private constructor(private val projectDao: ProjectDao, private
     fun getProjectView(projectId: Long) = projectDao.loadProjectView(projectId)
 
     fun getPhotos(projectId: Long) = photoDao.loadAllPhotosByProjectId(projectId)
+
+
+    companion object {
+        @Volatile private var instance: Repository? = null
+
+        fun getInstance(context: Context) =
+                instance ?: synchronized(this) {
+                    instance ?: Repository(
+                            TimeLapseDatabase.getInstance(context).projectDao(),
+                            TimeLapseDatabase.getInstance(context).photoDao()
+                    ).also { instance = it }
+                }
+
+    }
+
 }
