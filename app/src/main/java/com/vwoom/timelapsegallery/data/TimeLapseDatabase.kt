@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.vwoom.timelapsegallery.data.dao.*
 import com.vwoom.timelapsegallery.data.entry.*
 
 @Database(entities = [ProjectEntry::class, PhotoEntry::class, TagEntry::class, ProjectTagEntry::class, ProjectScheduleEntry::class, CoverPhotoEntry::class], version = 2, exportSchema = true)
+@TypeConverters(Converters::class)
 abstract class TimeLapseDatabase : RoomDatabase() {
     abstract fun projectDao(): ProjectDao
     abstract fun photoDao(): PhotoDao

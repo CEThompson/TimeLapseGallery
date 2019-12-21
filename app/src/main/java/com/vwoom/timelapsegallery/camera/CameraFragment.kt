@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
@@ -26,6 +27,7 @@ import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
+import com.vwoom.timelapsegallery.databinding.FragmentCameraBinding
 import com.vwoom.timelapsegallery.details.CameraViewModel
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
@@ -47,7 +49,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
     private val args: CameraFragmentArgs by navArgs()
 
     private val cameraViewModel: CameraViewModel by viewModels {
-        InjectorUtils.provideCameraViewModelFactory(requireActivity(), args.projectId)
+        InjectorUtils.provideCameraViewModelFactory(requireActivity(), args.photo)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +69,15 @@ class CameraFragment: Fragment(), LifecycleOwner {
         viewFinder.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             updateTransform()
         }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        // TODO set up binding
+        val binding = DataBindingUtil.inflate<FragmentCameraBinding>(inflater, R.layout.fragment_camera, container, false).apply {
+            viewModel = cameraViewModel
+            lifecycleOwner = viewLifecycleOwner
+        }
+        return binding.root
     }
 
     private fun startCamera() {
