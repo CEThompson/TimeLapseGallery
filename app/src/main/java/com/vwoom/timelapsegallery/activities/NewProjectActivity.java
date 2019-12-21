@@ -51,17 +51,21 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class NewProjectActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    @BindView(R.id.submit_new_project_fab) FloatingActionButton mNewProjectFab;
-    @BindView(R.id.add_first_photo_fab) FloatingActionButton mFirstPhotoFab;
-    @BindView(R.id.project_name_edit_text) EditText mProjectNameEditText;
-    @BindView(R.id.notification_schedule_spinner) Spinner mScheduleSpinner;
-    @BindView(R.id.project_first_image) ImageView mProjectFirstImage;
-    @BindView(R.id.notification_schedule_picker) TimePicker mTimePicker;
+    //@BindView(R.id.submit_new_project_fab)
+    FloatingActionButton mNewProjectFab;
+    //@BindView(R.id.add_first_photo_fab)
+    FloatingActionButton mFirstPhotoFab;
+    //@BindView(R.id.project_name_edit_text)
+    EditText mProjectNameEditText;
+    //@BindView(R.id.notification_schedule_spinner)
+    Spinner mScheduleSpinner;
+    //@BindView(R.id.project_first_image)
+    ImageView mProjectFirstImage;
+    //@BindView(R.id.notification_schedule_picker)
+    TimePicker mTimePicker;
 
     private TimeLapseDatabase mTimeLapseDatabase;
     private ProjectEntry mProjectToEdit;
@@ -91,7 +95,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_project);
-        ButterKnife.bind(this);
+        //ButterKnife.bind(this);
         Toolbar toolbar = findViewById(R.id.new_project_toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {

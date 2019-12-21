@@ -3,15 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <variable name="project" type="com.vwoom.timelapsegallery.data.view.Project"/>
-    </data>
-
     <androidx.cardview.widget.CardView
         android:id="@+id/project_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/cardview_padding"
+        android:onClick="@{clickListener}"
         android:minWidth="@dimen/touch_target_min"
         android:minHeight="@dimen/touch_target_min">
 
@@ -32,7 +29,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <!-- Gradient overlay -->
             <View

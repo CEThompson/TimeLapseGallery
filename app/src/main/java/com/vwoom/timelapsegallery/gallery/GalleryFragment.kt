@@ -19,7 +19,7 @@ import com.vwoom.timelapsegallery.utils.Keys
 import kotlinx.android.synthetic.main.fragment_gallery.view.*
 
 
-class GalleryFragment : Fragment(), GalleryAdapter.ProjectsAdapterOnClickHandler {
+class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     var mNewProjectFab: FloatingActionButton? = null
 

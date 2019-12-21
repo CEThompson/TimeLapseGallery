@@ -11,7 +11,6 @@ import com.vwoom.timelapsegallery.data.dao.*
 import com.vwoom.timelapsegallery.data.entry.*
 
 @Database(entities = [ProjectEntry::class, PhotoEntry::class, TagEntry::class, ProjectTagEntry::class, ProjectScheduleEntry::class, CoverPhotoEntry::class], version = 2, exportSchema = true)
-@TypeConverters(Converters::class)
 abstract class TimeLapseDatabase : RoomDatabase() {
     abstract fun projectDao(): ProjectDao
     abstract fun photoDao(): PhotoDao

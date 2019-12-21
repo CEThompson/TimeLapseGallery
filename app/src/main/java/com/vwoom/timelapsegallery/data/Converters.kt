@@ -8,6 +8,7 @@ import com.vwoom.timelapsegallery.utils.FileUtils
 class Converters {
 
     // TODO figure out proper converter from timestamp to photo file path
+    /*
     @TypeConverter
     fun photoFromPhotoEntry(photoEntry: PhotoEntry): Photo {
         return Photo(
@@ -16,4 +17,5 @@ class Converters {
                 FileUtils.photo
                 FileUtils.getPhotoFileName(photoEntry))
     }
+    */
 }

@@ -40,22 +40,25 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class AddPhotoActivity extends AppCompatActivity {
 
     public static final String TAG = AddPhotoActivity.class.getSimpleName();
 
     /* Photo Views */
-    @BindView(R.id.previous_photo) ImageView mPreviousPhoto;
-    @BindView(R.id.add_photo_result) ImageView mResultPhoto;
+    //@BindView(R.id.previous_photo)
+    ImageView mPreviousPhoto;
+    //@BindView(R.id.add_photo_result)
+    ImageView mResultPhoto;
 
     /* Floating Action Buttons */
-    @BindView(R.id.take_photo_fab) FloatingActionButton mRetakeFab;
-    @BindView(R.id.compare_to_previous_fab) FloatingActionButton mCompareFab;
-    @BindView(R.id.submit_photo_fab) FloatingActionButton mSubmitFab;
-    @BindView(R.id.return_to_details_fab) FloatingActionButton mCancelFab;
+    //@BindView(R.id.take_photo_fab)
+    FloatingActionButton mRetakeFab;
+    //@BindView(R.id.compare_to_previous_fab)
+    FloatingActionButton mCompareFab;
+    //@BindView(R.id.submit_photo_fab)
+    FloatingActionButton mSubmitFab;
+    //@BindView(R.id.return_to_details_fab)
+    FloatingActionButton mCancelFab;
 
     /* Photo data */
     private String mTemporaryPhotoPath;
@@ -87,7 +90,7 @@ public class AddPhotoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_photo);
-        ButterKnife.bind(this);
+        //ButterKnife.bind(this);
 
         // Passing activity as context apparently causes memory leak, make sure to pass application context to interstitial ad
         mInterstitialAd = new InterstitialAd(getApplicationContext());

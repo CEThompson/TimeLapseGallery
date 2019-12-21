@@ -7,46 +7,36 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.gallery.GalleryAdapter.ProjectsAdapterViewHolder
+import com.vwoom.timelapsegallery.gallery.GalleryAdapter.GalleryAdapterViewHolder
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 import java.util.*
 
-class GalleryAdapter(private val mClickHandler: ProjectsAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<ProjectsAdapterViewHolder>() {
+class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
     private var mProjectData: List<Project>? = null
     private val constraintSet: ConstraintSet? = ConstraintSet()
     private val mExternalFilesDir: File?
 
-    interface ProjectsAdapterOnClickHandler {
+    interface GalleryAdapterOnClickHandler {
         fun onClick(clickedProject: Project, sharedElement: View, transitionName: String, position: Int)
     }
 
-    inner class ProjectsAdapterViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
-        @BindView(R.id.project_image)
-        var mProjectImageView: ImageView? = null
-        @BindView(R.id.project_recyclerview_constraint_layout)
-        var mConstraintLayout: ConstraintLayout? = null
-        @BindView(R.id.schedule_indicator)
-        var mScheduleIndicator: ImageView? = null
-        @BindView(R.id.next_submission_day_countdown_textview)
-        var mNextScheduleString: TextView? = null
-        @BindView(R.id.project_card_view)
-        var mCardView: CardView? = null
-        @BindView(R.id.project_image_gradient_overlay)
-        var mGradientOverlay: View? = null
+    inner class GalleryAdapterViewHolder(binding: GalleryRecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+
+        var mProjectImageView = binding.projectImage
+        var mConstraintLayout = binding.projectRecyclerviewConstraintLayout
+        var mScheduleIndicator = binding.scheduleIndicator
+        var mNextScheduleString = binding.nextSubmissionDayCountdownTextview
+        var mCardView = binding.projectCardView
+        var mGradientOverlay = binding.projectImageGradientOverlay
 
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
@@ -56,21 +46,23 @@ class GalleryAdapter(private val mClickHandler: ProjectsAdapterOnClickHandler, c
         }
 
         init {
-            ButterKnife.bind(this, view)
-            view.setOnClickListener(this)
+            binding.root.setOnClickListener(this)
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectsAdapterViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryAdapterViewHolder {
         val context = parent.context
-        val layoutIdForGridItem = R.layout.gallery_recyclerview_item
+        //val layoutIdForGridItem = R.layout.gallery_recyclerview_item
         val inflater = LayoutInflater.from(context)
         val shouldAttachToParentImmediately = false
-        val view = inflater.inflate(layoutIdForGridItem, parent, shouldAttachToParentImmediately)
-        return ProjectsAdapterViewHolder(view)
+
+        val binding = GalleryRecyclerviewItemBinding.inflate(inflater, parent, shouldAttachToParentImmediately)
+        //val view = inflater.inflate(layoutIdForGridItem, parent, shouldAttachToParentImmediately)
+        //return ProjectsAdapterViewHolder(view)
+        return GalleryAdapterViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ProjectsAdapterViewHolder, position: Int) { // Get project information
+    override fun onBindViewHolder(holder: GalleryAdapterViewHolder, position: Int) { // Get project information
         val currentProject = mProjectData!![position]
         // TODO remove these logs
         // Logs for project information

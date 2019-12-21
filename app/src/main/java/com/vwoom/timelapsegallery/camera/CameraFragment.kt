@@ -113,7 +113,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
         val imageCapture = ImageCapture(imageCaptureConfig)
         activity?.take_picture_fab?.setOnClickListener {
             // TODO handle external files directory better, perhaps as a companion object?
-            val externalFilesDir = context?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             val file = FileUtils.createTemporaryImageFile(externalFilesDir)
 
             imageCapture.takePicture(file, executor,
@@ -128,33 +128,10 @@ class CameraFragment: Fragment(), LifecycleOwner {
                         }
 
                         override fun onImageSaved(file: File) {
-                            
+
                             viewFinder.post{ Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show()}
-                            val db = TimeLapseDatabase.getInstance(this@CameraFragment.requireContext())
-                            Log.d("abcde", "inserting project, photo, and cover photo")
-                            // Create database entries
-                            val timestamp = System.currentTimeMillis()
 
-                            // Create and insert the project
-                            val projectEntry = ProjectEntry(null, 0)
-                            val project_id = db?.projectDao()?.insertProject(projectEntry)
-                            Log.d("abcde", "project id is $project_id")
-
-                            // Update the id for final file creation
-                            projectEntry.id = project_id!!
-                            // Copy temp file to project folder file
-
-                            FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
-
-                            // Create and insert the photo
-                            val photoEntry = PhotoEntry(project_id, timestamp)
-                            val photo_id = db.photoDao()?.insertPhoto(photoEntry)
-                            // Create and insert the cover photo
-                            val coverPhotoEntry = CoverPhotoEntry(project_id, photo_id!!)
-                            db.coverPhotoDao()?.insertPhoto(coverPhotoEntry)
-
-                            val projectScheduleEntry = ProjectScheduleEntry(project_id, null, null)
-                            db.projectScheduleDao()?.insertProjectSchedule(projectScheduleEntry)
+                            cameraViewModel.handleFile(file, externalFilesDir!!)
                         }
                     })
 

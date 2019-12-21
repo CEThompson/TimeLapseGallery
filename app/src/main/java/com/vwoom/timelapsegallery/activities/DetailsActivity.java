@@ -74,38 +74,48 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 // TODO (update) add share to gallery menu option?
 
 public class DetailsActivity extends AppCompatActivity implements DetailsAdapter.DetailsAdapterOnClickHandler {
 
     // Photo Views
-    @BindView(R.id.detail_current_image) ImageView mCurrentPhotoImageView;
-    @BindView(R.id.detail_next_image) ImageView mNextPhotoImageView;
-    @BindView(R.id.details_card_container) CardView mCardView;
+    //@BindView(R.id.detail_current_image)
+    ImageView mCurrentPhotoImageView;
+    //@BindView(R.id.detail_next_image)
+    ImageView mNextPhotoImageView;
+    //@BindView(R.id.details_card_container)
+    CardView mCardView;
 
     // Progress Indication
-    @BindView(R.id.image_loading_progress) ProgressBar mProgressBar;
+    //@BindView(R.id.image_loading_progress)
+    ProgressBar mProgressBar;
 
     // Recycler View
-    @BindView(R.id.details_recyclerview) RecyclerView mDetailsRecyclerView;
+    //@BindView(R.id.details_recyclerview)
+    RecyclerView mDetailsRecyclerView;
     private DetailsAdapter mDetailsAdapter;
 
     // Fabs
-    @BindView(R.id.add_photo_fab) FloatingActionButton mAddPhotoFab;
-    @BindView(R.id.fullscreen_fab) FloatingActionButton mFullscreenFab;
-    @BindView(R.id.play_as_video_fab) FloatingActionButton mPlayAsVideoFab;
+    //@BindView(R.id.add_photo_fab)
+    FloatingActionButton mAddPhotoFab;
+    //@BindView(R.id.fullscreen_fab)
+    FloatingActionButton mFullscreenFab;
+    //@BindView(R.id.play_as_video_fab)
+    FloatingActionButton mPlayAsVideoFab;
 
     // Photo display
-    @BindView(R.id.details_photo_date_tv) TextView mPhotoDateTv;
-    @BindView(R.id.details_photo_number_tv) TextView mPhotoNumberTv;
-    @BindView(R.id.details_photo_time_tv) TextView mPhotoTimeTv;
+    //@BindView(R.id.details_photo_date_tv)
+    TextView mPhotoDateTv;
+    //@BindView(R.id.details_photo_number_tv)
+    TextView mPhotoNumberTv;
+    //@BindView(R.id.details_photo_time_tv)
+    TextView mPhotoTimeTv;
 
     // Project display
-    @BindView(R.id.details_project_timespan_textview) TextView mProjectTimespanTv;
-    @BindView(R.id.details_project_name_text_view) TextView mProjectNameTextView;
+    //@BindView(R.id.details_project_timespan_textview)
+    TextView mProjectTimespanTv;
+    //@BindView(R.id.details_project_name_text_view)
+    TextView mProjectNameTextView;
 
     // Database
     private TimeLapseDatabase mTimeLapseDatabase;
@@ -174,7 +184,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
-        ButterKnife.bind(this);
+        //ButterKnife.bind(this);
         Toolbar toolbar = findViewById(R.id.details_activity_toolbar);
         setSupportActionBar(toolbar);
 
@@ -743,12 +753,13 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     /* Binds project and photos to database */
     private void setupViewModel(@Nullable Bundle savedInstanceState){
-        DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getProject_id());
+        //DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getProject_id());
+        DetailsViewModelFactory factory = null; // TODO fix this
         final DetailsViewModel viewModel = ViewModelProviders.of(this, factory)
                 .get(DetailsViewModel.class);
 
         /* Observe the list of photos */
-        viewModel.photos.observe(this, photoEntries -> {
+        viewModel.getPhotos().observe(this, photoEntries -> {
             // Save the list of photos
             mPhotos = photoEntries;
 
@@ -783,7 +794,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         /* Observe the current selected project */
         // Note: this ensures that project data is updated correctly when editing
-        viewModel.currentProject.observe(this, currentProject -> {
+        viewModel.getCurrentProject().observe(this, currentProject -> {
             mCurrentProject = currentProject;
 
             // mCurrentProject will be null upon deletion
@@ -920,7 +931,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             ProjectScheduleEntry schedule = database.projectScheduleDao().loadScheduleByProjectId(projectEntry.getId());
 
             // Delete the project from the database
-            database.projectDao().deleteProject(projectEntry);
+            //TODO delete project :: database.projectDao().deleteProject(projectEntry);
 
             /* If project had a schedule ensure widget and notification worker are updated */
             if (schedule.getSchedule_time() != null && schedule.getInterval_days() !=null) {

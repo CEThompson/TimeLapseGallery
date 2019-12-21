@@ -3,7 +3,6 @@ package com.vwoom.timelapsegallery.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
-import com.vwoom.timelapsegallery.data.view.Photo
 
 @Dao
 interface PhotoDao {
@@ -17,7 +16,7 @@ interface PhotoDao {
     fun loadPhoto(project_id: Long, photo_id: Long): PhotoEntry
 
     @Query("SELECT * FROM photo WHERE project_id = :project_id ORDER BY timestamp DESC LIMIT 1")
-    fun getLastPhoto(project_id: Long): Photo
+    fun getLastPhoto(project_id: Long): PhotoEntry
 
     @Insert
     fun insertPhoto(photoEntry: PhotoEntry): Long
