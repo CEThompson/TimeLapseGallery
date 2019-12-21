@@ -14,8 +14,8 @@
             android:id="@+id/main_activity_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AppToolbar"
-            android:minHeight="?attr/actionBarSize"/>
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/AppToolbar" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

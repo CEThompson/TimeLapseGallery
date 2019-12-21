@@ -4,20 +4,17 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.transition.TransitionInflater
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.Keys
 import kotlinx.android.synthetic.main.fragment_gallery.view.*
 
@@ -71,9 +68,23 @@ class GalleryFragment : Fragment(), GalleryAdapter.ProjectsAdapterOnClickHandler
         return inflater.inflate(R.layout.fragment_gallery, container, false)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.gallery_fragment_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId){
+            R.id.settings_option -> {
+                val action = GalleryFragmentDirections.actionGalleryFragmentToSettingsFragment()
+                findNavController().navigate(action)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
     private fun setupViewModel() {
-        val viewModel = ViewModelProviders.of(this).get(GalleryViewModel::class.java)
+        val viewModel = InjectorUtils.provideGalleryViewModel(requireContext())
         /* Observe projects */viewModel.projects.observe(this, Observer { projects: List<Project> ->
             mProjects = projects
             mGalleryAdapter?.setProjectData(projects)
