@@ -100,7 +100,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         }
 
         /* Set up the database */
-        mTimeLapseDatabase = TimeLapseDatabase.getInstance(this);
+        mTimeLapseDatabase = TimeLapseDatabase.Companion.getInstance(this);
 
         mExternalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
@@ -345,8 +345,11 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             AppExecutors.getInstance().diskIO().execute(() -> {
 
                 // Submit the project to the database and get the id
-                long projectId = mTimeLapseDatabase.projectDao()
-                        .insertProject(newProject);
+
+                // TODO convert to coroutine
+                long projectId = 1; // TODO REMOVE HARDCODED TEMPORARY ID
+                //long projectId = mTimeLapseDatabase.projectDao()
+                //        .insertProject(newProject);
 
                 ProjectEntry result = mTimeLapseDatabase.projectDao().loadProjectById(projectId);
                 long timestamp = System.currentTimeMillis();
@@ -431,7 +434,8 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             /* Submit the edit to the database */
             AppExecutors.getInstance().diskIO().execute(() -> {
                 // 1. Update the project
-                mTimeLapseDatabase.projectDao().updateProject(editedProject);
+                // TODO convert to coroutine
+                //mTimeLapseDatabase.projectDao().updateProject(editedProject);
             });
 
             // Log with analytics

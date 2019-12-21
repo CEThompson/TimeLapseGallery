@@ -52,7 +52,7 @@ class GalleryAdapter(private val mClickHandler: ProjectsAdapterOnClickHandler, c
             val adapterPosition = adapterPosition
             val clickedProject = mProjectData!![adapterPosition]
             val transitionName = mCardView!!.transitionName
-            mClickHandler.onClick(clickedProject, mCardView, transitionName, adapterPosition)
+            mClickHandler.onClick(clickedProject, mCardView!!, transitionName, adapterPosition)
         }
 
         init {
@@ -63,7 +63,7 @@ class GalleryAdapter(private val mClickHandler: ProjectsAdapterOnClickHandler, c
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectsAdapterViewHolder {
         val context = parent.context
-        val layoutIdForGridItem = R.layout.project_recyclerview_item
+        val layoutIdForGridItem = R.layout.gallery_recyclerview_item
         val inflater = LayoutInflater.from(context)
         val shouldAttachToParentImmediately = false
         val view = inflater.inflate(layoutIdForGridItem, parent, shouldAttachToParentImmediately)

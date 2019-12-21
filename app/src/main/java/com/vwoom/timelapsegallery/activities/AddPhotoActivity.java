@@ -96,7 +96,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
         // Set up db
-        mTimeLapseDatabase = TimeLapseDatabase.getInstance(this);
+        mTimeLapseDatabase = TimeLapseDatabase.Companion.getInstance(this);
         mExternalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         // Get information from intent
