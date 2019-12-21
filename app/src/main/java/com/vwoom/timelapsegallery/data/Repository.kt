@@ -1,8 +1,13 @@
 package com.vwoom.timelapsegallery.data
 
-class Repository {
+import com.vwoom.timelapsegallery.data.dao.ProjectDao
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 
-    // TODO implement repository
-    // TODO decouple viewmodel from database
+class Repository private constructor(private val projectDao: ProjectDao) {
 
+    suspend fun createProject(projectEntry: ProjectEntry){
+        projectDao.insertProject(projectEntry)
+    }
+
+    fun getProjectViews() = projectDao.loadProjectViews()
 }

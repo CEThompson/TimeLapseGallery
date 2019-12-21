@@ -25,16 +25,16 @@ interface ProjectDao {
     fun loadLiveDataProjectById(id: Long): LiveData<ProjectEntry>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertProject(projectEntry: ProjectEntry): Long
+    suspend fun insertProject(projectEntry: ProjectEntry): Long
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun updateProject(projectEntry: ProjectEntry)
+    suspend fun updateProject(projectEntry: ProjectEntry)
 
     @Delete
-    fun deleteProject(projectEntry: ProjectEntry)
+    suspend fun deleteProject(projectEntry: ProjectEntry)
 
     @Query("DELETE FROM project")
-    fun deleteAllProjects()
+    suspend fun deleteAllProjects()
 
     /* Returns a livedata object for observing projects view */
     @Query("SELECT " +
