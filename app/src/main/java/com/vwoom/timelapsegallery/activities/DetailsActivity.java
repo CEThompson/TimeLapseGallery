@@ -65,7 +65,7 @@ import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.PhotoUtils;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
-import com.vwoom.timelapsegallery.details.DetailsActivityViewModel;
+import com.vwoom.timelapsegallery.details.DetailsViewModel;
 import com.vwoom.timelapsegallery.details.DetailsViewModelFactory;
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -744,8 +744,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     /* Binds project and photos to database */
     private void setupViewModel(@Nullable Bundle savedInstanceState){
         DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getProject_id());
-        final DetailsActivityViewModel viewModel = ViewModelProviders.of(this, factory)
-                .get(DetailsActivityViewModel.class);
+        final DetailsViewModel viewModel = ViewModelProviders.of(this, factory)
+                .get(DetailsViewModel.class);
 
         /* Observe the list of photos */
         viewModel.photos.observe(this, photoEntries -> {
