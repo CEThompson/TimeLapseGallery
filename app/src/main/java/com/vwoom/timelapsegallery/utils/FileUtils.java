@@ -234,7 +234,7 @@ public final class FileUtils {
         return photoFile.getAbsolutePath();
     }
 
-    public static String getPhotoUrl(File externalFilesDir, Project project){
+    public static String getCoverPhotoUrl(File externalFilesDir, Project project){
         String imageFileName = getPhotoFileName(project.getCover_photo_timestamp());
         File projectDir = getProjectFolder(externalFilesDir, project);
         File photoFile = new File(projectDir, imageFileName);
