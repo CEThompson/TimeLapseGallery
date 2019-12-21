@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.Keys
+import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.fragment_gallery.view.*
 
 
@@ -65,11 +67,17 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_gallery, container, false)
+        setHasOptionsMenu(true)
+        val rootView = inflater.inflate(R.layout.fragment_gallery, container, false)
+        val toolbar = rootView.gallery_fragment_toolbar
+        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
+        toolbar.title = getString(R.string.app_name)
+        return rootView
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.gallery_fragment_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
