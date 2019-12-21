@@ -11,12 +11,12 @@ import com.vwoom.timelapsegallery.data.entry.*
 
 @Database(entities = [ProjectEntry::class, PhotoEntry::class, TagEntry::class, ProjectTagEntry::class, ProjectScheduleEntry::class, CoverPhotoEntry::class], version = 2, exportSchema = true)
 abstract class TimeLapseDatabase : RoomDatabase() {
-    abstract fun projectDao(): ProjectDao?
-    abstract fun photoDao(): PhotoDao?
-    abstract fun tagDao(): TagDao?
-    abstract fun projectTagDao(): ProjectTagDao?
-    abstract fun coverPhotoDao(): CoverPhotoDao?
-    abstract fun projectScheduleDao(): ProjectScheduleDao?
+    abstract fun projectDao(): ProjectDao
+    abstract fun photoDao(): PhotoDao
+    abstract fun tagDao(): TagDao
+    abstract fun projectTagDao(): ProjectTagDao
+    abstract fun coverPhotoDao(): CoverPhotoDao
+    abstract fun projectScheduleDao(): ProjectScheduleDao
 
     companion object {
 
