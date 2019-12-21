@@ -6,7 +6,7 @@ import com.vwoom.timelapsegallery.data.Repository
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.view.Project
 
-class DetailsActivityViewModel(repository: Repository, projectId: Long) : ViewModel() {
+class DetailsFragmentViewModel(repository: Repository, projectId: Long) : ViewModel() {
     val photos: LiveData<List<PhotoEntry>> = repository.getPhotos(projectId)
     val currentProject: LiveData<Project> = repository.getProjectView(projectId)
 }

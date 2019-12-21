@@ -50,6 +50,11 @@
         android:id="@+id/cameraFragment"
         android:name="com.vwoom.timelapsegallery.activities.CameraFragment"
         android:label="fragment_camera"
-        tools:layout="@layout/fragment_camera" />
+        tools:layout="@layout/fragment_camera" >
+        <argument
+            android:name="projectId"
+            app:argType="integer"
+            android:defaultValue="-1"/>
+    </fragment>
 
 </navigation>
