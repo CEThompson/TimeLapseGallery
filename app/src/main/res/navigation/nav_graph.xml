@@ -54,6 +54,7 @@
         <argument
             android:name="photo"
             app:argType="com.vwoom.timelapsegallery.data.view.Photo"
+            app:nullable="true"
             android:defaultValue="@null"/>
     </fragment>
 
