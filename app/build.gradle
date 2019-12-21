@@ -120,7 +120,7 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
     /* room */
-    implementation 'androidx.room:room-runtime:2.2.3'
+    implementation 'androidx.room:room-ktx:2.2.3'
     kapt 'androidx.room:room-compiler:2.2.3'
 
     /* live data & viewmodel */
