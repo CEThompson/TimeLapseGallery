@@ -34,7 +34,7 @@ public class NotificationWorker extends Worker {
     public Result doWork() {
         Log.d(TAG, "Notification Tracker: Executing work");
         // Get all the scheduled projects from the database
-        TimeLapseDatabase timeLapseDatabase = TimeLapseDatabase.getInstance(getApplicationContext());
+        TimeLapseDatabase timeLapseDatabase = TimeLapseDatabase.Companion.getInstance(getApplicationContext());
         List<ProjectEntry> scheduledProjects = timeLapseDatabase.projectDao().loadAllScheduledProjects();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

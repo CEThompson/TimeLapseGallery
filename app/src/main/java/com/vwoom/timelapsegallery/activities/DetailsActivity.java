@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.activities;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
@@ -70,6 +69,8 @@ import com.vwoom.timelapsegallery.details.DetailsViewModelFactory;
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,7 @@ import java.util.Map;
 
 public class DetailsActivity extends AppCompatActivity implements DetailsAdapter.DetailsAdapterOnClickHandler {
 
+    /*
     // Photo Views
     //@BindView(R.id.detail_current_image)
     ImageView mCurrentPhotoImageView;
@@ -149,10 +151,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     private static final int REQUEST_ADD_PHOTO = 1;
 
-    /* Analytics */
+    // Analytics
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    /*Shared Element variables */
+    // Shared Element variables
     private boolean mIsReturning;
     private int mReturnPosition;
     private boolean mTransitioned = false;
@@ -176,9 +178,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         }
     };
 
-    /*
-     *   Lifecycle
-     */
+    // Lifecycle
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -288,7 +289,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
             }
 
-            /* Show gradient, info, and fullscreen fab on transition completion*/
+            // Show gradient, info, and fullscreen fab on transition completion
             @Override
             public void onTransitionEnd(Transition transition) {
                 if (!mIsReturning){
@@ -404,10 +405,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         supportFinishAfterTransition();
     }
 
-    /*
-    *   Options
-     */
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -440,9 +437,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         }
     }
 
-    /*
-    *   Shared elements methods
-     */
+    //Shared elements methods
+
 
     @Override
     public void finishAfterTransition() {
@@ -481,11 +477,10 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         });
     }
 
-    /*
-    *   UI methods
-     */
+    // UI methods
 
-    /* Update the UI */
+
+    // Update the UI
     public void loadUi(PhotoEntry photoEntry){
         // Set the fullscreen image dialogue to the current photo
         if (!mPlaying) preloadFullscreenImage();
@@ -517,7 +512,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mProgressBar.setProgress(photoNumber-1);
     }
 
-    /* Loads an image into the main photo view */
+    // Loads an image into the main photo view
     private void loadImage(String imagePath){
         mImageIsLoaded = false;
 
@@ -595,7 +590,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .into(mNextPhotoImageView);
     }
 
-    /* Loads the set of images concurrently */
+    // Loads the set of images concurrently
     private void playSetOfImages(){
         // Lazy Initialize handler
         if (mPlayHandler == null) mPlayHandler = new Handler();
@@ -652,7 +647,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         }
     }
 
-    /* Resets the UI & handles state after playing */
+    // Resets the UI & handles state after playing
     private void stopPlaying(){
         // Set color of play fab
         mPlayAsVideoFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(DetailsActivity.this, R.color.colorGreen)));
@@ -699,7 +694,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mPlayHandler.postDelayed(runnable, interval);
     }
 
-    /* Sets the current entry to the clicked photo and loads the image from the entry */
+    // Sets the current entry to the clicked photo and loads the image from the entry
     @Override
     public void onClick(PhotoEntry clickedPhoto) {
         mCurrentPhoto = clickedPhoto;
@@ -707,7 +702,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         loadUi(mCurrentPhoto);
     }
 
-    /* Sets up the full screen image dialog for later use*/
+    // Sets up the full screen image dialog for later use
     private void initializeFullscreenImageDialog(){
         // Create the dialog
         mFullscreenImageDialog = new Dialog(this, R.style.Theme_AppCompat_Light_NoActionBar_FullScreen);
@@ -736,13 +731,13 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             return true;
         });
 
-        /* Set a listener to change the current photo on swipe */
-        /* Note: this may be preferable as a viewpager instead */
+        // Set a listener to change the current photo on swipe
+        // Note: this may be preferable as a viewpager instead
         mFullscreenImage.setOnTouchListener(mOnSwipeTouchListener);
     };
 
     // TODO (update) implement dual loading solution for smooth transition between fullscreen images
-    /* Pre loads the selected image into the hidden dialogue so that display appears immediate */
+    // Pre loads the selected image into the hidden dialogue so that display appears immediate
     private void preloadFullscreenImage(){
         String path = FileUtils.getPhotoUrl(mExternalFilesDir, mCurrentProject, mCurrentPhoto);
         File current = new File(path);
@@ -751,14 +746,14 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .into(mFullscreenImage);
     };
 
-    /* Binds project and photos to database */
+    // Binds project and photos to database
     private void setupViewModel(@Nullable Bundle savedInstanceState){
         //DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getProject_id());
         DetailsViewModelFactory factory = null; // TODO fix this
         final DetailsViewModel viewModel = ViewModelProviders.of(this, factory)
                 .get(DetailsViewModel.class);
 
-        /* Observe the list of photos */
+        // Observe the list of photos
         viewModel.getPhotos().observe(this, photoEntries -> {
             // Save the list of photos
             mPhotos = photoEntries;
@@ -792,7 +787,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         });
 
-        /* Observe the current selected project */
+        // Observe the current selected project
         // Note: this ensures that project data is updated correctly when editing
         viewModel.getCurrentProject().observe(this, currentProject -> {
             mCurrentProject = currentProject;
@@ -809,7 +804,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         });
     }
 
-    /* Changes photo on swipe */
+    // Changes photo on swipe
     public class OnSwipeTouchListener implements View.OnTouchListener {
         private final GestureDetector gestureDetector;
 
@@ -893,16 +888,15 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
     }
 
-    /*
-    *   Photo management
-     */
+    //Photo management
 
-    /* Returns the last photo */
+
+    // Returns the last photo
     private PhotoEntry getLastPhoto(){
         return mPhotos.get(mPhotos.size()-1);
     }
 
-    /* Deletes the current photo */
+    //Deletes the current photo
     private void deletePhoto(TimeLapseDatabase database, Project project, PhotoEntry photoEntry){
         AppExecutors.getInstance().diskIO().execute(() -> {
                 // Delete the photo from the file structure
@@ -914,14 +908,13 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mFirebaseAnalytics.logEvent(getString(R.string.analytics_delete_photo), null);
     }
 
-    /*
-    *   Project management
-     */
+    // management
 
-    /* Deletes the project and recursively deletes files from project folder */
+
+    // Deletes the project and recursively deletes files from project folder
     private void deleteProject(TimeLapseDatabase database, Project project){
 
-        /* Delete project from the database and photos from the file structure */
+        // Delete project from the database and photos from the file structure
         AppExecutors.getInstance().diskIO().execute(() -> {
             ProjectEntry projectEntry = database.projectDao().loadProjectById(project.getProject_id());
 
@@ -933,7 +926,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
             // Delete the project from the database
             //TODO delete project :: database.projectDao().deleteProject(projectEntry);
 
-            /* If project had a schedule ensure widget and notification worker are updated */
+            // If project had a schedule ensure widget and notification worker are updated
             if (schedule.getSchedule_time() != null && schedule.getInterval_days() !=null) {
                 NotificationUtils.scheduleNotificationWorker(this);
                 UpdateWidgetService.startActionUpdateWidgets(this);
@@ -946,7 +939,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mFirebaseAnalytics.logEvent(getString(R.string.analytics_delete_project), null);
     }
 
-    /* Gets the last photo from the set and sets it as the project thumbnail */
+    // Gets the last photo from the set and sets it as the project thumbnail
     private void updateProjectThumbnail(TimeLapseDatabase database, Project project, PhotoEntry photo){
         AppExecutors.getInstance().diskIO().execute(() -> {
                     CoverPhotoEntry coverPhotoEntry = new CoverPhotoEntry(project.getProject_id(), photo.getId());
@@ -956,18 +949,17 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
     }
 
     // TODO (update) recall position after editing project
-    /* Edits the current project */
+    //Edits the current project
     private void editProject(){
         Intent intent = new Intent(this, NewProjectActivity.class);
         intent.putExtra(Keys.PROJECT_ENTRY, mCurrentProject);
         startActivity(intent);
     }
 
-    /*
-    *   Verification
-     */
+    //Verification
 
-    /* Deletes the current photo after user verification */
+
+    // Deletes the current photo after user verification
     private void verifyPhotoDeletion(){
         new AlertDialog.Builder(this)
                 .setTitle(R.string.delete_photo)
@@ -990,7 +982,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .setNegativeButton(android.R.string.no, null).show();
     }
 
-    /* If the project has only one photo left deletes the project after verification */
+    // If the project has only one photo left deletes the project after verification
     private void verifyLastPhotoDeletion(){
         new AlertDialog.Builder(this)
                 .setTitle(R.string.delete_photo)
@@ -1002,7 +994,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .setNegativeButton(android.R.string.no, null).show();
     }
 
-    /* Deletes the current project after user verification */
+    // Deletes the current project after user verification
     private void verifyProjectDeletion(){
         new AlertDialog.Builder(this)
                 .setTitle(R.string.delete_project)
@@ -1014,7 +1006,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .setNegativeButton(android.R.string.no, null).show();
     }
 
-    /* Double verifies project deletion */
+    // Double verifies project deletion
     private void doubleVerifyProjectDeletion(){
         new AlertDialog.Builder(this)
                 .setTitle(R.string.delete_project)
@@ -1027,5 +1019,16 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                     finish();
                 })
                 .setNegativeButton(android.R.string.no, null).show();
+    }
+    */
+
+    @Override
+    public void onClick(@Nullable PhotoEntry clickedPhoto) {
+
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 }

@@ -45,7 +45,7 @@ public class UpdateWidgetService extends IntentService {
     private void updateWidgets(){
         AppExecutors.getInstance().diskIO().execute(()->{
             // Retrieve the database
-            TimeLapseDatabase timeLapseDatabase = TimeLapseDatabase.getInstance(this);
+            TimeLapseDatabase timeLapseDatabase = TimeLapseDatabase.Companion.getInstance(this);
 
             // Get the list of all scheduled projects from the database
             List<ProjectEntry> allScheduledProjects = timeLapseDatabase.projectDao().loadAllScheduledProjects();

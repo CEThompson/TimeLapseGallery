@@ -52,8 +52,8 @@
         android:label="fragment_camera"
         tools:layout="@layout/fragment_camera" >
         <argument
-            android:name="photo"
-            app:argType="com.vwoom.timelapsegallery.data.view.Photo"
+            android:name="project"
+            app:argType="com.vwoom.timelapsegallery.data.view.Project"
             app:nullable="true"
             android:defaultValue="@null"/>
     </fragment>

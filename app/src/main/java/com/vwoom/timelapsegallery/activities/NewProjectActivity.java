@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.activities;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -15,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -54,6 +56,7 @@ import java.util.List;
 
 public class NewProjectActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    /*
     //@BindView(R.id.submit_new_project_fab)
     FloatingActionButton mNewProjectFab;
     //@BindView(R.id.add_first_photo_fab)
@@ -73,10 +76,10 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     private CoverPhotoEntry mCoverPhotoToEdit;
     private File mExternalFilesDir;
 
-    /* For spinner */
+    // For spinner
     private String mScheduleString;
 
-    /* Project Variables */
+    // Project Variables
     private String mName;
     private long mScheduleNextSubmission = System.currentTimeMillis();
     private int mSchedule;
@@ -85,7 +88,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
     private static final int REQUEST_TAKE_PHOTO = 1;
 
-    /* Analytics */
+    // Analytics
     private FirebaseAnalytics mFirebaseAnalytics;
 
     private static final String TAG = NewProjectActivity.class.getSimpleName();
@@ -103,22 +106,22 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
-        /* Set up the database */
+        // Set up the database
         mTimeLapseDatabase = TimeLapseDatabase.Companion.getInstance(this);
 
         mExternalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
-        /* Populate the spinner */
+        // Populate the spinner
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.schedule_options, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mScheduleSpinner.setAdapter(adapter);
         mScheduleSpinner.setOnItemSelectedListener(this);
 
-        /* Set fab to add initial project photo */
+        // Set fab to add initial project photo
         mFirstPhotoFab.setOnClickListener(view -> takeTemporaryPicture());
 
-        /* Set fab to submit the project */
+        // Set fab to submit the project
         mNewProjectFab.setOnClickListener(view -> {
             if (mTemporaryPhotoPath == null) takeTemporaryPicture();
             else submitNewProject();
@@ -128,7 +131,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         mProjectScheduleToEdit = getIntent().getParcelableExtra(Keys.PROJECT_SCHEDULE_ENTRY);
         mCoverPhotoToEdit = getIntent().getParcelableExtra(Keys.COVER_PHOTO_ENTRY);
 
-        /* If a project was sent along with the intent set up the activity instead to edit the project */
+        // If a project was sent along with the intent set up the activity instead to edit the project
         if (mProjectToEdit != null){
             // Restore the project info
             mName = mProjectToEdit.getProject_name();
@@ -146,7 +149,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             });
         }
 
-        /* Restore the instance state if there is one */
+        // Restore the instance state if there is one
         if (savedInstanceState != null){
             // Restore member variables
             mName = savedInstanceState.getString(Keys.PROJECT_NAME);
@@ -166,7 +169,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
-    /* Sets edit text, spinner, and picture to the values contained in member variables */
+    // Sets edit text, spinner, and picture to the values contained in member variables
     private void populateUi(){
         // Restore ui
         if (mName != null) mProjectNameEditText.setText(mName);
@@ -184,7 +187,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         }
     }
 
-    /* Handles spinner selection */
+    //Handles spinner selection
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         mScheduleString = getResources().getStringArray(R.array.schedule_options)[i];
@@ -194,14 +197,14 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         else mTimePicker.setVisibility(View.VISIBLE);
     }
 
-    /* If no spinner selection set schedule to NONE */
+    // If no spinner selection set schedule to NONE
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
         mScheduleString = getResources().getString(R.string.none);
     }
 
-    /* Creates a temporary file and launches a camera intent to write a photo to that file */
-    /* Note: this is exactly the same as in new project activity, these two methods can be abstracted together later */
+    // Creates a temporary file and launches a camera intent to write a photo to that file
+    // Note: this is exactly the same as in new project activity, these two methods can be abstracted together later
     private void takeTemporaryPicture() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -247,7 +250,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         }
     }
 
-    /* On returning from the implicit camera intent */
+    // On returning from the implicit camera intent
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -259,7 +262,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         }
     }
 
-    /* Loads an image into the main photo view */
+    // Loads an image into the main photo view
     private void loadImage(String imagePath){
 
         // Get photo info
@@ -289,20 +292,20 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
 
     }
 
-    /* Gathers user input into a project entry object */
+    // Gathers user input into a project entry object
     private ProjectEntry gatherNameInput(){
-        /* Get the name from the edit text */
+        // Get the name from the edit text
         mName = mProjectNameEditText.getText().toString();
 
 
-        /* Return the new project */
+        // Return the new project
         return new ProjectEntry(
                 mName,
                 0);
     }
 
     private ProjectScheduleEntry gatherScheduleInput(){
-        /* Set the next submission, but if there is a schedule calc the next submission time */
+        // Set the next submission, but if there is a schedule calc the next submission time
         long pickerTime = getTimestampFromPicker();
         if (pickerTime > System.currentTimeMillis())
             mScheduleNextSubmission = pickerTime;
@@ -337,15 +340,15 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         return c.getTimeInMillis();
     }
 
-    /* Submits the new project to the database */
+    // Submits the new project to the database
     private void submitNewProject(){
-        /* 1. Get the input */
+        // 1. Get the input
         ProjectEntry newProject = gatherNameInput();
 
-        /* 2. If the input is valid perform the submission */
+        // 2. If the input is valid perform the submission
         if (validateNewProject(newProject)) {
 
-            /* Execute submission on a disk IO thread */
+            // Execute submission on a disk IO thread
             AppExecutors.getInstance().diskIO().execute(() -> {
 
                 // Submit the project to the database and get the id
@@ -398,7 +401,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         }
     }
 
-    /* Submits a project to edit */
+    // Submits a project to edit
     private void submitProjectEdit(){
         // Gather that data from the inputs and create a project for the edit
         ProjectEntry editedProject = gatherNameInput();
@@ -409,11 +412,11 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         editedProject.setCover_set_by_user(mProjectToEdit.getCover_set_by_user());
 
 
-        /* If the project info is valid proceed to update it */
+        // If the project info is valid proceed to update it
         if (validateEditProject(editedProject)) {
             boolean renameSuccessful;
 
-            /* If the user changed the name of the project rename the directory */
+            // If the user changed the name of the project rename the directory
             if (!mProjectToEdit.getProject_name().equals(editedProject.getProject_name())){
                 renameSuccessful = FileUtils.renameProject(this, mProjectToEdit, editedProject);
             }
@@ -435,7 +438,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
                 UpdateWidgetService.startActionUpdateWidgets(this);
             }
 
-            /* Submit the edit to the database */
+            //Submit the edit to the database
             AppExecutors.getInstance().diskIO().execute(() -> {
                 // 1. Update the project
                 // TODO convert to coroutine
@@ -445,45 +448,45 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
             // Log with analytics
             mFirebaseAnalytics.logEvent(getString(R.string.analytics_edit_project), null);
 
-            /* Show an add then finish the activity */
+            // Show an add then finish the activity
             finish();
         }
     }
 
-    /* Validates new project */
+    // Validates new project
     private boolean validateNewProject(ProjectEntry newProject){
-        /* If the name is empty do not progress */
+        // If the name is empty do not progress
         if (mName.isEmpty()) {
             notifyUserNoName();
             return false;
         }
 
-        /* If the name contains any reserved characters project invalid */
+        // If the name contains any reserved characters project invalid
         if (FileUtils.pathContainsReservedCharacter(newProject.getProject_name())) {
             notifyUserInvalidCharacters();
             return false;
         }
 
-        /* If the user has not created a first photo do not validate */
+        // If the user has not created a first photo do not validate
         if (mTemporaryPhotoPath == null) {
             notifyUserNoPicture();
             return false;
         }
 
-        /* Continue on to submit project method */
+        // Continue on to submit project method
         return true;
     }
 
-    /* Validates prior to editing */
+    //Validates prior to editing
     private boolean validateEditProject(ProjectEntry editedProject){
-        /* If the name is empty do not progress */
+        //If the name is empty do not progress
         String name = editedProject.getProject_name();
         if (name != null && !name.isEmpty()) {
             notifyUserNoName();
             return false;
         }
 
-        /* Check name of edited project for reserved characters */
+        // Check name of edited project for reserved characters
         if (FileUtils.pathContainsReservedCharacter(editedProject.getProject_name())) {
             notifyUserInvalidCharacters();
             return false;
@@ -492,7 +495,7 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
         return true;
     }
 
-    /* Notification methods give the user feedback on what went wrong */
+    // Notification methods give the user feedback on what went wrong
     private void notifyUserNoName(){
         new AlertDialog.Builder(this)
                 .setTitle(R.string.invalid_name)
@@ -533,5 +536,21 @@ public class NewProjectActivity extends AppCompatActivity implements AdapterView
     @VisibleForTesting
     public void setmTemporaryPhotoPath(String path){
         mTemporaryPhotoPath = path;
+    }
+     */
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 }

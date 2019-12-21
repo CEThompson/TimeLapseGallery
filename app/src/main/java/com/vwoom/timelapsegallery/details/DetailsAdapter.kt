@@ -7,8 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.details.DetailsAdapter.DetailsAdapterViewHolder
@@ -28,9 +26,9 @@ class DetailsAdapter(private val mClickHandler: DetailsAdapterOnClickHandler, co
     }
 
     inner class DetailsAdapterViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
-        @BindView(R.id.detail_thumbnail)
+        //@BindView(R.id.detail_thumbnail)
         var mDetailThumbnail: ImageView? = null
-        @BindView(R.id.selection_indicator)
+        //@BindView(R.id.selection_indicator)
         var mSelectionIndicator: View? = null
 
         override fun onClick(view: View) {
@@ -41,7 +39,7 @@ class DetailsAdapter(private val mClickHandler: DetailsAdapterOnClickHandler, co
         }
 
         init {
-            ButterKnife.bind(this, view)
+            //ButterKnife.bind(this, view)
             view.setOnClickListener(this)
         }
     }

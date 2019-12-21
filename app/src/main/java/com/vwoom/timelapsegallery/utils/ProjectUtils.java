@@ -76,10 +76,10 @@ public class ProjectUtils {
     /* Helper to scan through folders and import projects */
     public static void importProjects(Context context){
         Log.d(TAG, "Importing projects");
-        TimeLapseDatabase db = TimeLapseDatabase.getInstance(context);
+        TimeLapseDatabase db = TimeLapseDatabase.Companion.getInstance(context);
 
         // Delete all project references in the database
-        db.projectDao().deleteAllProjects();
+        //TODO delete all projects db.projectDao().deleteAllProjects();
         db.photoDao().deleteAllPhotos();
 
         // Add all project references from the file structure
@@ -119,7 +119,7 @@ public class ProjectUtils {
                                 projectName,0);
 
                         // Insert the project - this updates on conflict
-                        db.projectDao().insertProject(currentProject);
+                        // TODO insert project :: db.projectDao().insertProject(currentProject);
 
                         /* import the photos for the project */
                         importProjectPhotos(storageDir, db, currentProject);

@@ -49,7 +49,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
     private val args: CameraFragmentArgs by navArgs()
 
     private val cameraViewModel: CameraViewModel by viewModels {
-        InjectorUtils.provideCameraViewModelFactory(requireActivity(), args.photo)
+        InjectorUtils.provideCameraViewModelFactory(requireActivity(), args.project)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

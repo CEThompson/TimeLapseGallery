@@ -35,7 +35,7 @@ public class WidgetGridRemoteViewsFactory implements RemoteViewsService.RemoteVi
         mContext = applicationContext;
         mExternalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         mProjects = null;
-        mTimeLapseDatabase = TimeLapseDatabase.getInstance(mContext);
+        mTimeLapseDatabase = TimeLapseDatabase.Companion.getInstance(mContext);
     }
 
     @Override

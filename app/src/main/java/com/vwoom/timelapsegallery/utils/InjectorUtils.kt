@@ -4,6 +4,7 @@ import android.content.Context
 import com.vwoom.timelapsegallery.data.Repository
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.view.Photo
+import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.details.CameraViewModelFactory
 import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 
@@ -17,9 +18,9 @@ object InjectorUtils {
                 TimeLapseDatabase.getInstance(context.applicationContext).projectScheduleDao())
     }
 
-    fun provideCameraViewModelFactory(context: Context, photo: Photo?): CameraViewModelFactory {
+    fun provideCameraViewModelFactory(context: Context, project: Project?): CameraViewModelFactory {
         val repository = getRepository(context)
-        return CameraViewModelFactory(repository, photo)
+        return CameraViewModelFactory(repository, project)
     }
 
     fun provideGalleryViewModel(context: Context): GalleryViewModel {

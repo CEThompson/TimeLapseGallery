@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.activities;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -42,15 +43,16 @@ import java.util.List;
 
 public class AddPhotoActivity extends AppCompatActivity {
 
+    /*
     public static final String TAG = AddPhotoActivity.class.getSimpleName();
 
-    /* Photo Views */
+    // Photo Views
     //@BindView(R.id.previous_photo)
     ImageView mPreviousPhoto;
     //@BindView(R.id.add_photo_result)
     ImageView mResultPhoto;
 
-    /* Floating Action Buttons */
+    // Floating Action Buttons
     //@BindView(R.id.take_photo_fab)
     FloatingActionButton mRetakeFab;
     //@BindView(R.id.compare_to_previous_fab)
@@ -60,7 +62,7 @@ public class AddPhotoActivity extends AppCompatActivity {
     //@BindView(R.id.return_to_details_fab)
     FloatingActionButton mCancelFab;
 
-    /* Photo data */
+    // Photo data
     private String mTemporaryPhotoPath;
     private String mBackupPhoto;
     private String mPreviousPhotoPath;
@@ -75,10 +77,10 @@ public class AddPhotoActivity extends AppCompatActivity {
 
     private Handler mAnimationHandler;
 
-    /* Admob */
+    // Admob
     private InterstitialAd mInterstitialAd;
 
-    /* Analytics */
+    // Analytics
     private FirebaseAnalytics mFirebaseAnalytics;
 
     private static final int REQUEST_TAKE_PHOTO = 1;
@@ -131,7 +133,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
-    /* Reload ad if consumed */
+    // Reload ad if consumed
     @Override
     protected void onResume() {
         super.onResume();
@@ -152,7 +154,7 @@ public class AddPhotoActivity extends AppCompatActivity {
             mAnimationHandler.removeCallbacksAndMessages(null);
     }
 
-    /* Make sure to remove ad listener in lifecycle*/
+    // Make sure to remove ad listener in lifecycle
 
     @Override
     protected void onDestroy() {
@@ -160,8 +162,8 @@ public class AddPhotoActivity extends AppCompatActivity {
         mInterstitialAd.setAdListener(null);
     }
 
-    /* Creates a temporary file and launches a camera intent to write a photo to that file */
-    /* Note: this is exactly the same as in new project activity, these two methods can be abstracted together later */
+    // Creates a temporary file and launches a camera intent to write a photo to that file
+    // Note: this is exactly the same as in new project activity, these two methods can be abstracted together later
     private void takeTemporaryPicture() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -228,7 +230,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         // Note: after activity result fires onResume fires and animates the compare fab depending upon comparison and succesful return state;
     }
 
-    /* Sets up the ui after result from taking photo */
+    // Sets up the ui after result from taking photo
     private void loadResultUi(){
         // Show the result image
         mResultPhoto.setVisibility(View.VISIBLE);
@@ -242,16 +244,16 @@ public class AddPhotoActivity extends AppCompatActivity {
         mRetakeFab.setImageResource(R.drawable.ic_repeat_white_24dp);
     }
 
-    /* Set click listeners for all four fabs */
+    // Set click listeners for all four fabs
     private void setFabClickListeners(){
-        /* Submits the photo to the project */
+        // Submits the photo to the project
         mSubmitFab.setOnClickListener(view -> {
             // Only proceed with submission if the user has taken a photo
             if (!mTemporaryPhotoPath.isEmpty())
                 submitPhoto();
         });
-        
-        /* Shows the previous photo for comparison */
+
+        // Shows the previous photo for comparison
         mCompareFab.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN){
                 mResultPhoto.setVisibility(View.INVISIBLE);
@@ -265,14 +267,14 @@ public class AddPhotoActivity extends AppCompatActivity {
             return false;
         });
 
-        /* Cancels adding a photo to the project */
+        // Cancels adding a photo to the project
         mCancelFab.setOnClickListener(view -> onSupportNavigateUp());
 
-        /* Resends the implicit camera intent to take another picture */
+        // Resends the implicit camera intent to take another picture
         mRetakeFab.setOnClickListener(view -> takeTemporaryPicture());
     }
 
-    /* Loads the result of the implicit camera intent into the overlaying image view*/
+    // Loads the result of the implicit camera intent into the overlaying image view
     private void loadResultImage() {
         File result = new File(mTemporaryPhotoPath);
         Glide.with(this)
@@ -280,7 +282,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                 .into(mResultPhoto);
     }
 
-    /* Loads the latest photo in the project into a view for comparison to the newly taken photo */
+    // Loads the latest photo in the project into a view for comparison to the newly taken photo
     private void loadPreviousImage(){
         File previous = new File(mPreviousPhotoPath);
         Glide.with(this)
@@ -288,7 +290,7 @@ public class AddPhotoActivity extends AppCompatActivity {
                 .into(mPreviousPhoto);
     }
 
-    /* Submits the photo to the database and saves photo to permanent file structure */
+    // Submits the photo to the database and saves photo to permanent file structure
     private void submitPhoto(){
         TaskParameters taskParameters = new TaskParameters(this,
                 mTemporaryPhotoPath,
@@ -301,7 +303,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         new SubmitPhotoAsyncTask().execute(taskParameters);
     }
 
-    /* Animated the compare fab to draw attention from the user for photo comparison*/
+    // Animated the compare fab to draw attention from the user for photo comparison
     private void animateCompareFab(){
         if (mAnimationHandler == null) mAnimationHandler = new Handler();
         fabIncrease();
@@ -331,21 +333,21 @@ public class AddPhotoActivity extends AppCompatActivity {
         mAnimationHandler.postDelayed(runnable, 200);
     }
 
-    /* Save state on configuration change */
+    // Save state on configuration change
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        /* Store member variables */
+        // Store member variables
         outState.putString(Keys.TEMP_PATH, mTemporaryPhotoPath);
         outState.putString(KEY_BACKUP_PHOTO, mBackupPhoto);
         outState.putBoolean(KEY_RETURNED, mReturned);
         outState.putBoolean(KEY_COMPARED, mCompared);
     }
 
-    /* Async Task used to submit a photo to the database and finish the activity */
+    // Async Task used to submit a photo to the database and finish the activity
     private static class SubmitPhotoAsyncTask extends AsyncTask<TaskParameters, Void, ResultParameters>{
-        /* Writes the photo to disk and submits to database */
+        // Writes the photo to disk and submits to database
         @Override
         protected ResultParameters doInBackground(TaskParameters... params) {
             // Get the parameters
@@ -399,7 +401,7 @@ public class AddPhotoActivity extends AppCompatActivity {
             }
         }
 
-        /* Sets the result intent, launches the ad and finishes the activity */
+        // Sets the result intent, launches the ad and finishes the activity
         @Override
         protected void onPostExecute(ResultParameters resultParameters) {
             // Get the parameters
@@ -465,7 +467,7 @@ public class AddPhotoActivity extends AppCompatActivity {
     }
 
 
-    /* Class to pass references to async task */
+    // Class to pass references to async task
     public static class TaskParameters {
         private Context context;
         private String tempPhotoPath;
@@ -502,7 +504,7 @@ public class AddPhotoActivity extends AppCompatActivity {
         }
     }
 
-    /* Class to pass result references for async task */
+    // Class to pass result references for async task
     private static class ResultParameters {
         private Context context;
         private PhotoEntry photoEntry;
@@ -524,5 +526,10 @@ public class AddPhotoActivity extends AppCompatActivity {
 
     @VisibleForTesting
     public void setmTemporaryPhotoPath(String path){ mTemporaryPhotoPath = path; }
+    */
 
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 }
