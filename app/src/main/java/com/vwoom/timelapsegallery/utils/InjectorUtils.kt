@@ -9,7 +9,8 @@ object InjectorUtils {
 
     private fun getRepository(context: Context): Repository {
         return Repository.getInstance(
-                TimeLapseDatabase.getInstance(context.applicationContext))
+                TimeLapseDatabase.getInstance(context.applicationContext).projectDao(),
+                TimeLapseDatabase.getInstance(context.applicationContext).photoDao())
     }
 
     fun provideCameraViewModelFactory(context: Context, projectId: Long?): CameraViewModelFactory {

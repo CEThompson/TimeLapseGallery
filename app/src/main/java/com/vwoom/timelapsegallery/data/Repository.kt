@@ -21,12 +21,9 @@ class Repository private constructor(private val projectDao: ProjectDao, private
     companion object {
         @Volatile private var instance: Repository? = null
 
-        fun getInstance(context: Context) =
+        fun getInstance(projectDao: ProjectDao, photoDao: PhotoDao) =
                 instance ?: synchronized(this) {
-                    instance ?: Repository(
-                            TimeLapseDatabase.getInstance(context).projectDao(),
-                            TimeLapseDatabase.getInstance(context).photoDao()
-                    ).also { instance = it }
+                    instance ?: Repository(projectDao, photoDao).also { instance = it }
                 }
 
     }

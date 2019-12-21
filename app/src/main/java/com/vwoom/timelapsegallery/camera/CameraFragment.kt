@@ -17,6 +17,7 @@ import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.navArgs
 import com.vwoom.timelapsegallery.R
@@ -25,7 +26,9 @@ import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
+import com.vwoom.timelapsegallery.details.CameraViewModel
 import com.vwoom.timelapsegallery.utils.FileUtils
+import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.android.synthetic.main.fragment_camera.*
 import java.io.File
 import java.util.concurrent.Executors
@@ -41,7 +44,11 @@ class CameraFragment: Fragment(), LifecycleOwner {
     private val executor = Executors.newSingleThreadExecutor()
     private lateinit var viewFinder: TextureView
 
-    //private val args: CameraFragmentArgs by navArgs()
+    private val args: CameraFragmentArgs by navArgs()
+
+    private val cameraViewModel: CameraViewModel by viewModels {
+        InjectorUtils.provideCameraViewModelFactory(requireActivity(), args.projectId)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
