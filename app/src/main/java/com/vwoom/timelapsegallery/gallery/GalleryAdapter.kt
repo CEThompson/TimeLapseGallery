@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.adapters
+package com.vwoom.timelapsegallery.gallery
 
 import android.content.Context
 import android.os.Environment
@@ -17,8 +17,7 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.adapters.ProjectsAdapter
-import com.vwoom.timelapsegallery.adapters.ProjectsAdapter.ProjectsAdapterViewHolder
+import com.vwoom.timelapsegallery.gallery.GalleryAdapter.ProjectsAdapterViewHolder
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
@@ -26,13 +25,13 @@ import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 import java.util.*
 
-class ProjectsAdapter(private val mClickHandler: ProjectsAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<ProjectsAdapterViewHolder>() {
+class GalleryAdapter(private val mClickHandler: ProjectsAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<ProjectsAdapterViewHolder>() {
     private var mProjectData: List<Project>? = null
     private val constraintSet: ConstraintSet? = ConstraintSet()
     private val mExternalFilesDir: File?
 
     interface ProjectsAdapterOnClickHandler {
-        fun onClick(clickedProject: Project?, sharedElement: View?, transitionName: String?, position: Int)
+        fun onClick(clickedProject: Project, sharedElement: View, transitionName: String, position: Int)
     }
 
     inner class ProjectsAdapterViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
@@ -149,7 +148,7 @@ class ProjectsAdapter(private val mClickHandler: ProjectsAdapterOnClickHandler, 
     }
 
     companion object {
-        private val TAG = ProjectsAdapter::class.java.simpleName
+        private val TAG = GalleryAdapter::class.java.simpleName
     }
 
     init {

@@ -51,7 +51,8 @@ import com.bumptech.glide.request.target.Target;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
-import com.vwoom.timelapsegallery.adapters.DetailsAdapter;
+import com.vwoom.timelapsegallery.settings.SettingsActivity;
+import com.vwoom.timelapsegallery.details.DetailsAdapter;
 import com.vwoom.timelapsegallery.data.AppExecutors;
 import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry;
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry;
@@ -64,8 +65,8 @@ import com.vwoom.timelapsegallery.utils.FileUtils;
 import com.vwoom.timelapsegallery.utils.Keys;
 import com.vwoom.timelapsegallery.utils.PhotoUtils;
 import com.vwoom.timelapsegallery.utils.TimeUtils;
-import com.vwoom.timelapsegallery.viewmodels.DetailsActivityViewModel;
-import com.vwoom.timelapsegallery.viewmodels.DetailsViewModelFactory;
+import com.vwoom.timelapsegallery.details.DetailsActivityViewModel;
+import com.vwoom.timelapsegallery.details.DetailsViewModelFactory;
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -190,7 +191,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
         mProjectSchedule = getIntent().getParcelableExtra(Keys.PROJECT_SCHEDULE_ENTRY);
 
         // Get the database
-        mTimeLapseDatabase = TimeLapseDatabase.getInstance(this);
+        mTimeLapseDatabase = TimeLapseDatabase.Companion.getInstance(this);
         mExternalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         // Set up adapter and recycler view
@@ -747,7 +748,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
                 .get(DetailsActivityViewModel.class);
 
         /* Observe the list of photos */
-        viewModel.getPhotos().observe(this, photoEntries -> {
+        viewModel.photos.observe(this, photoEntries -> {
             // Save the list of photos
             mPhotos = photoEntries;
 
@@ -782,7 +783,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsAdapter
 
         /* Observe the current selected project */
         // Note: this ensures that project data is updated correctly when editing
-        viewModel.getCurrentProject().observe(this, currentProject -> {
+        viewModel.currentProject.observe(this, currentProject -> {
             mCurrentProject = currentProject;
 
             // mCurrentProject will be null upon deletion

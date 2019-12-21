@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.vwoom.timelapsegallery.activities.SettingsFragment">
+    tools:context="com.vwoom.timelapsegallery.settings.SettingsFragment">
 
     <FrameLayout
         android:id="@+id/settings"

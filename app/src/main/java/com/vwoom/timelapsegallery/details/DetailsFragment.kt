@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.activities
+package com.vwoom.timelapsegallery.details
 
 import androidx.fragment.app.Fragment
 

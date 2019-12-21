@@ -25,7 +25,7 @@
         android:theme="@style/AppTheme">
 
         <!-- Main Activity -->
-        <activity android:name=".activities.TimeLapseGalleryActivity">
+        <activity android:name=".TimeLapseGalleryActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -34,7 +34,7 @@
 
         <!-- Settings -->
         <activity
-            android:name=".activities.SettingsActivity"
+            android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".activities.MainActivity">
             <meta-data

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.vwoom.timelapsegallery.activities.DetailsFragment">
+    tools:context="com.vwoom.timelapsegallery.details.DetailsFragment">
 
     <!-- Layout containing details for the project -->
     <androidx.constraintlayout.widget.ConstraintLayout

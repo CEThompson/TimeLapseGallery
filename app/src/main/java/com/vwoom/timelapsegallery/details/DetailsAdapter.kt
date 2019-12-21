@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.adapters
+package com.vwoom.timelapsegallery.details
 
 import android.content.Context
 import android.os.Environment
@@ -11,8 +11,7 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.adapters.DetailsAdapter
-import com.vwoom.timelapsegallery.adapters.DetailsAdapter.DetailsAdapterViewHolder
+import com.vwoom.timelapsegallery.details.DetailsAdapter.DetailsAdapterViewHolder
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils

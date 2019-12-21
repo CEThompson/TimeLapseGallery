@@ -4,7 +4,7 @@
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.vwoom.timelapsegallery.activities.GalleryFragment">
+    tools:context="com.vwoom.timelapsegallery.gallery.GalleryFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"

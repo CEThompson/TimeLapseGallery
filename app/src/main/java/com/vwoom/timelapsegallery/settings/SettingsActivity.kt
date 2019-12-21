@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.activities
+package com.vwoom.timelapsegallery.settings
 
 import android.app.Dialog
 import android.content.Context

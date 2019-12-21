@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.activities
+package com.vwoom.timelapsegallery.gallery
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -14,24 +14,21 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import butterknife.BindView
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.adapters.ProjectsAdapter
+import com.vwoom.timelapsegallery.activities.GalleryFragmentDirections
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.Keys
-import com.vwoom.timelapsegallery.viewmodels.GalleryViewModel
-import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.fragment_gallery.view.*
 
 
-class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandler {
+class GalleryFragment : Fragment(), GalleryAdapter.ProjectsAdapterOnClickHandler {
 
     var mNewProjectFab: FloatingActionButton? = null
     var mProjectsRecyclerView: RecyclerView? = null
 
-    private var mProjectsAdapter: ProjectsAdapter? = null
+    private var mGalleryAdapter: GalleryAdapter? = null
     private var mProjects: List<Project>? = null
 
     private var mNumberOfColumns = 3
@@ -54,14 +51,14 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) mNumberOfColumns = 6
 
         // Set up the adapter for the recycler view
-        mProjectsAdapter = ProjectsAdapter(this, this.requireContext())
-        Log.d(TAG, "mProjectsAdapter is null: ${mProjectsAdapter == null}")
+        mGalleryAdapter = GalleryAdapter(this, this.requireContext())
+        Log.d(TAG, "mProjectsAdapter is null: ${mGalleryAdapter == null}")
         // Set up the recycler view
         val gridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
 
         projectsRecyclerView.layoutManager = gridLayoutManager
         projectsRecyclerView.setHasFixedSize(false) // adjusting views at runtime
-        projectsRecyclerView.adapter = mProjectsAdapter
+        projectsRecyclerView.adapter = mGalleryAdapter
 
         // Set up navigation to add new projects
         mNewProjectFab?.setOnClickListener { v: View? ->
@@ -93,7 +90,7 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
             mProjects = projects
             Log.d(TAG, "$mProjects")
             Log.d(TAG, "mProjects is null ${mProjects == null}")
-            mProjectsAdapter?.setProjectData(projects)
+            mGalleryAdapter?.setProjectData(projects)
             Log.d(TAG, "mNewProject fab is null: ${mNewProjectFab == null}")
             mNewProjectFab?.show()
         })
@@ -107,4 +104,5 @@ class GalleryFragment : Fragment(), ProjectsAdapter.ProjectsAdapterOnClickHandle
         )
         findNavController().navigate(action, extras)
     }
+
 }

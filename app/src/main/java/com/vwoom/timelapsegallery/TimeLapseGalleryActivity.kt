@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.activities
+package com.vwoom.timelapsegallery
 
 import android.content.Intent
 import android.os.Bundle

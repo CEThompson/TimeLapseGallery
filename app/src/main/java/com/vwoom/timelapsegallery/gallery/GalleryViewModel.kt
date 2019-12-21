@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.viewmodels
+package com.vwoom.timelapsegallery.gallery
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
