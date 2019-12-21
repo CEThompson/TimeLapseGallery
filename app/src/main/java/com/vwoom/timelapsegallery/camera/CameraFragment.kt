@@ -18,6 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.fragment.navArgs
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
@@ -39,6 +40,8 @@ class CameraFragment: Fragment(), LifecycleOwner {
 
     private val executor = Executors.newSingleThreadExecutor()
     private lateinit var viewFinder: TextureView
+
+    //private val args: CameraFragmentArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,14 +130,9 @@ class CameraFragment: Fragment(), LifecycleOwner {
                             // Create and insert the photo
                             val photoEntry = PhotoEntry(project_id, timestamp)
                             val photo_id = db.photoDao()?.insertPhoto(photoEntry)
-                            Log.d("abcde", "photo entry id $photo_id")
-                            Log.d("abcde", "photo entry timestamp ${photoEntry.timestamp}")
-
                             // Create and insert the cover photo
                             val coverPhotoEntry = CoverPhotoEntry(project_id, photo_id!!)
                             db.coverPhotoDao()?.insertPhoto(coverPhotoEntry)
-                            Log.d("abcde", "cover photo, project id ${coverPhotoEntry.project_id}")
-                            Log.d("abcde", "cover photo, photo id ${coverPhotoEntry.photo_id}")
 
                             val projectScheduleEntry = ProjectScheduleEntry(project_id, null, null)
                             db.projectScheduleDao()?.insertProjectSchedule(projectScheduleEntry)
