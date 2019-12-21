@@ -53,8 +53,7 @@
         tools:layout="@layout/fragment_camera" >
         <argument
             android:name="projectId"
-            app:argType="integer"
-            android:defaultValue="-1"/>
+            app:argType="long" />
     </fragment>
 
 </navigation>
