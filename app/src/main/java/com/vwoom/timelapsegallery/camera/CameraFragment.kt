@@ -11,7 +11,6 @@ import android.util.Log
 import android.util.Rational
 import android.util.Size
 import android.view.*
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
@@ -22,11 +21,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.navArgs
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.data.TimeLapseDatabase
-import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
-import com.vwoom.timelapsegallery.data.entry.PhotoEntry
-import com.vwoom.timelapsegallery.data.entry.ProjectEntry
-import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.databinding.FragmentCameraBinding
 import com.vwoom.timelapsegallery.details.CameraViewModel
 import com.vwoom.timelapsegallery.utils.FileUtils
@@ -52,10 +46,14 @@ class CameraFragment: Fragment(), LifecycleOwner {
         InjectorUtils.provideCameraViewModelFactory(requireActivity(), args.project)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        // TODO set up binding
+        val binding = DataBindingUtil.inflate<FragmentCameraBinding>(inflater, R.layout.fragment_camera, container, false).apply {
+            //viewModel = cameraViewModel
+            lifecycleOwner = viewLifecycleOwner
+        }
 
-        viewFinder = this.view_finder
+        viewFinder = binding.viewFinder
 
         // Request camera permissions
         if (allPermissionsGranted()) {
@@ -69,16 +67,10 @@ class CameraFragment: Fragment(), LifecycleOwner {
         viewFinder.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             updateTransform()
         }
-    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // TODO set up binding
-        val binding = DataBindingUtil.inflate<FragmentCameraBinding>(inflater, R.layout.fragment_camera, container, false).apply {
-            //viewModel = cameraViewModel
-            lifecycleOwner = viewLifecycleOwner
-        }
         return binding.root
     }
+
 
     private fun startCamera() {
         val metrics = DisplayMetrics().also{viewFinder.display.getRealMetrics(it)}
