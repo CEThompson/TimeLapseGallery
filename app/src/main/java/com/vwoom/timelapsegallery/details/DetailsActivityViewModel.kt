@@ -9,8 +9,4 @@ import com.vwoom.timelapsegallery.data.view.Project
 class DetailsActivityViewModel(repository: Repository, projectId: Long) : ViewModel() {
     val photos: LiveData<List<PhotoEntry>> = repository.getPhotos(projectId)
     val currentProject: LiveData<Project> = repository.getProjectView(projectId)
-
-    companion object {
-        private val TAG = DetailsActivityViewModel::class.java.simpleName
-    }
 }

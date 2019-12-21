@@ -7,8 +7,4 @@ import com.vwoom.timelapsegallery.data.view.Project
 
 class GalleryViewModel internal constructor(repository: Repository) : ViewModel() {
     val projects: LiveData<List<Project>> = repository.getProjectViews()
-
-    companion object {
-        private val TAG = GalleryViewModel::class.java.simpleName
-    }
 }

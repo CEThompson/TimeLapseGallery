@@ -21,7 +21,7 @@
 
     <!-- Recycler View to display time lapse photo projects -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/projects_recycler_view"
+        android:id="@+id/gallery_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/projects_recycler_view_content_description"
