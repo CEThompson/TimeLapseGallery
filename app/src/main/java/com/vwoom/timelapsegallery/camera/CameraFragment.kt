@@ -101,6 +101,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
         val imageCaptureConfig = ImageCaptureConfig.Builder()
                 .apply {
                     setCaptureMode(ImageCapture.CaptureMode.MAX_QUALITY)
+                    setTargetResolution(screenSize)
                 }.build()
 
         val imageCapture = ImageCapture(imageCaptureConfig)
@@ -131,6 +132,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
 
         CameraX.bindToLifecycle(this, preview, imageCapture)
     }
+
 
     private fun updateTransform() {
         // TODO: Implement camera viewfinder transformations
