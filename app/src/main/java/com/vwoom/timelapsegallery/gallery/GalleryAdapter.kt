@@ -64,31 +64,29 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
 
     override fun onBindViewHolder(holder: GalleryAdapterViewHolder, position: Int) { // Get project information
         val currentProject = mProjectData!![position]
+
         // TODO remove these logs
         // Logs for project information
-        /*
-        long project_id = currentProject.getProject_id();
-        Log.d(TAG, "project_id is " + project_id);
-        String project_name = currentProject.getProject_name();
-        Log.d(TAG, "project name is " + project_name);
-        int cover_set_by_user = currentProject.getCover_set_by_user();
-        Log.d(TAG, "cover set by user is " + cover_set_by_user);
-        Long schedule_time = currentProject.getSchedule_time();
-        Log.d(TAG, "schedule time is " + schedule_time);
-        Integer interval_days = currentProject.getInterval_days();
-        Log.d(TAG, "interval days is " + interval_days);
-        long cover_photo_id = currentProject.getCover_photo_id();
-        Log.d(TAG, "cover photo id is " + cover_photo_id);
-        long cover_photo_timestamp = currentProject.getCover_photo_timestamp();
-        Log.d(TAG, "cover photo timestamp is " + cover_photo_timestamp);
-        */
+        val project_id = currentProject.project_id
+        Log.d(TAG, "project_id is " + project_id)
+        val project_name = currentProject.project_name
+        Log.d(TAG, "project name is " + project_name)
+        val cover_set_by_user = currentProject.cover_set_by_user
+        Log.d(TAG, "cover set by user is " + cover_set_by_user)
+        val schedule_time = currentProject.schedule_time
+        Log.d(TAG, "schedule time is " + schedule_time)
+        val interval_days = currentProject.interval_days
+        Log.d(TAG, "interval days is " + interval_days)
+        val cover_photo_id = currentProject.cover_photo_id
+        Log.d(TAG, "cover photo id is " + cover_photo_id)
+        val cover_photo_timestamp = currentProject.cover_photo_timestamp
+        Log.d(TAG, "cover photo timestamp is " + cover_photo_timestamp)
+
         // TODO test photo url from hashmap
         val thumbnail_path = FileUtils.getCoverPhotoUrl(mExternalFilesDir, currentProject)
         Log.d(TAG, "thumbnail_path is $thumbnail_path")
         // Set the constraint ratio
         val ratio = PhotoUtils.getAspectRatioFromImagePath(thumbnail_path)
-        Log.d(TAG, "constraint set is null: " + (constraintSet == null))
-        Log.d(TAG, "holder.mConstraintlayout is null: " + (holder.mConstraintLayout == null))
         constraintSet!!.clone(holder.mConstraintLayout)
         constraintSet.setDimensionRatio(holder.mProjectImageView!!.id, ratio)
         constraintSet.applyTo(holder.mConstraintLayout)

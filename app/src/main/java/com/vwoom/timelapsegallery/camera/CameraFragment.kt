@@ -19,6 +19,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.FragmentCameraBinding
@@ -105,7 +106,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
         val imageCapture = ImageCapture(imageCaptureConfig)
         activity?.take_picture_fab?.setOnClickListener {
             // TODO handle external files directory better, perhaps as a companion object?
-            val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
             val file = FileUtils.createTemporaryImageFile(externalFilesDir)
 
             imageCapture.takePicture(file, executor,
@@ -120,10 +121,9 @@ class CameraFragment: Fragment(), LifecycleOwner {
                         }
 
                         override fun onImageSaved(file: File) {
-
                             viewFinder.post{ Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show()}
-
-                            cameraViewModel.handleFile(file, externalFilesDir!!)
+                            cameraViewModel.handleFile(file, externalFilesDir)
+                            //findNavController().popBackStack()
                         }
                     })
 

@@ -79,8 +79,8 @@ public class ProjectUtils {
         TimeLapseDatabase db = TimeLapseDatabase.Companion.getInstance(context);
 
         // Delete all project references in the database
-        //TODO delete all projects db.projectDao().deleteAllProjects();
-        db.photoDao().deleteAllPhotos();
+        // TODO delete all projects db.projectDao().deleteAllProjects();
+        // TODO delete all photos -> db.photoDao().deleteAllPhotos();
 
         // Add all project references from the file structure
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -140,7 +140,7 @@ public class ProjectUtils {
         if (allPhotosInFolder!=null) {
             // Insert the new entries
             for (PhotoEntry newEntry : allPhotosInFolder) {
-                db.photoDao().insertPhoto(newEntry);
+                // TODO: insert photos into db -> db.photoDao().insertPhoto(newEntry);
             }
         }
     }

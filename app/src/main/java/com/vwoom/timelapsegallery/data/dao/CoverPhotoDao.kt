@@ -16,11 +16,11 @@ interface CoverPhotoDao {
     val allCoverPhotos: LiveData<List<CoverPhotoEntry>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertPhoto(entry: CoverPhotoEntry)
+    suspend fun insertPhoto(entry: CoverPhotoEntry)
 
     @Update
-    fun updatePhoto(entry: CoverPhotoEntry)
+    suspend fun updatePhoto(entry: CoverPhotoEntry)
 
     @Delete
-    fun deletePhoto(entry: CoverPhotoEntry)
+    suspend fun deletePhoto(entry: CoverPhotoEntry)
 }

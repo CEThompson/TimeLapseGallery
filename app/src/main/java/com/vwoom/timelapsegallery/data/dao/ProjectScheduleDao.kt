@@ -13,11 +13,11 @@ interface ProjectScheduleDao {
     fun loadScheduleByProjectId(projectId: Long): ProjectScheduleEntry
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertProjectSchedule(projectScheduleEntry: ProjectScheduleEntry)
+    suspend fun insertProjectSchedule(projectScheduleEntry: ProjectScheduleEntry)
 
     @Delete
-    fun deleteProjectSchedule(projectScheduleEntry: ProjectScheduleEntry)
+    suspend fun deleteProjectSchedule(projectScheduleEntry: ProjectScheduleEntry)
 
     @Update
-    fun updateProjectSchedule(projectScheduleEntry: ProjectScheduleEntry)
+    suspend fun updateProjectSchedule(projectScheduleEntry: ProjectScheduleEntry)
 }

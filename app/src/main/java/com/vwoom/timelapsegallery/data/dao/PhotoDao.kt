@@ -19,14 +19,14 @@ interface PhotoDao {
     fun getLastPhoto(project_id: Long): PhotoEntry
 
     @Insert
-    fun insertPhoto(photoEntry: PhotoEntry): Long
+    suspend fun insertPhoto(photoEntry: PhotoEntry): Long
 
     @Update
-    fun updatePhoto(photoEntry: PhotoEntry)
+    suspend fun updatePhoto(photoEntry: PhotoEntry)
 
     @Delete
-    fun deletePhoto(photoEntry: PhotoEntry)
+    suspend fun deletePhoto(photoEntry: PhotoEntry)
 
     @Query("DELETE FROM photo")
-    fun deleteAllPhotos()
+    suspend fun deleteAllPhotos()
 }
