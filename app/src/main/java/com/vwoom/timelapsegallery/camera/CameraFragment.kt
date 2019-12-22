@@ -48,8 +48,8 @@ class CameraFragment: Fragment(), LifecycleOwner {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // TODO set up binding
         val binding = DataBindingUtil.inflate<FragmentCameraBinding>(inflater, R.layout.fragment_camera, container, false).apply {
+            // TODO determine if this apply block is necessary
             //viewModel = cameraViewModel
             lifecycleOwner = viewLifecycleOwner
         }
@@ -64,44 +64,66 @@ class CameraFragment: Fragment(), LifecycleOwner {
                     activity as Activity, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-        // Every time provided texture view changes recompute layout
-        viewFinder.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            updateTransform()
-        }
-
         return binding.root
     }
 
 
     private fun startCamera() {
-        val metrics = DisplayMetrics().also{viewFinder.display.getRealMetrics(it)}
+        var metrics = DisplayMetrics().also{viewFinder.display.getRealMetrics(it)}
         val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
 
-        // TODO use aspect ratio?
-        val screenAspectRatio = Rational(metrics.widthPixels, metrics.heightPixels)
+        Log.d(TAG, "$metrics")
+        Log.d(TAG, "$screenSize")
+        Log.d(TAG, "${activity!!.windowManager.defaultDisplay.rotation}")
+        Log.d(TAG, "${viewFinder.display.rotation}")
 
         // TODO: Implement CameraX operations
         val previewConfig = PreviewConfig.Builder().apply {
             setLensFacing(CameraX.LensFacing.BACK)
             setTargetResolution(screenSize)
             setTargetRotation(activity!!.windowManager.defaultDisplay.rotation)
-            setTargetRotation(viewFinder.display.rotation)
         }.build()
 
         val preview = Preview(previewConfig)
         preview.setOnPreviewOutputUpdateListener {
-            val parent = viewFinder.parent as ViewGroup
-            parent.removeView(viewFinder)
-            parent.addView(viewFinder, 0)
+            // Get all dimensions
+            metrics = DisplayMetrics().also { viewFinder.display.getRealMetrics(it) }
+            val previewWidth = metrics.widthPixels
+            val previewHeight = metrics.heightPixels
+            val width = it.textureSize.width
+            val height = it.textureSize.height
+            val centerX = viewFinder.width.toFloat() / 2
+            val centerY = viewFinder.height.toFloat() / 2
 
+            // Get rotation
+            val rotation = when (viewFinder.display.rotation) {
+                Surface.ROTATION_0 -> 0
+                Surface.ROTATION_90 -> 90
+                Surface.ROTATION_180 -> 180
+                Surface.ROTATION_270 -> 270
+                else -> throw IllegalStateException()
+            }
+            val matrix = Matrix()
+            // Rotate matrix
+            matrix.postRotate(-rotation.toFloat(), centerX, centerY)
+            // Scale matrix
+            matrix.postScale(
+                    previewWidth.toFloat() / height,
+                    previewHeight.toFloat() / width,
+                    centerX,
+                    centerY
+            )
+            // Assign transformation to view
+            viewFinder.setTransform(matrix)
             viewFinder.surfaceTexture = it.surfaceTexture
-            updateTransform()
         }
+
 
         val imageCaptureConfig = ImageCaptureConfig.Builder()
                 .apply {
                     setCaptureMode(ImageCapture.CaptureMode.MAX_QUALITY)
                     setTargetResolution(screenSize)
+                    setTargetRotation(activity!!.windowManager.defaultDisplay.rotation)
                 }.build()
 
         val imageCapture = ImageCapture(imageCaptureConfig)
@@ -124,34 +146,13 @@ class CameraFragment: Fragment(), LifecycleOwner {
                         override fun onImageSaved(file: File) {
                             viewFinder.post{ Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show()}
                             cameraViewModel.handleFile(file, externalFilesDir)
-                            //findNavController().popBackStack()
+                            findNavController().popBackStack()
                         }
                     })
 
         }
 
         CameraX.bindToLifecycle(this, preview, imageCapture)
-    }
-
-
-    private fun updateTransform() {
-        // TODO: Implement camera viewfinder transformations
-        val matrix = Matrix()
-
-        val centerX = viewFinder.width / 2f
-        val centerY = viewFinder.height / 2f
-
-        val rotationDegrees = when(viewFinder.display.rotation){
-            Surface.ROTATION_0 -> 0
-            Surface.ROTATION_90 -> 90
-            Surface.ROTATION_180 -> 180
-            Surface.ROTATION_270 -> 270
-            else -> return
-        }
-
-        matrix.postRotate(-rotationDegrees.toFloat(), centerX, centerY)
-
-        viewFinder.setTransform(matrix)
     }
 
     override fun onRequestPermissionsResult(
@@ -168,5 +169,9 @@ class CameraFragment: Fragment(), LifecycleOwner {
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
                 requireContext(), it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    companion object {
+        val TAG = CameraFragment::class.java.simpleName
     }
 }
