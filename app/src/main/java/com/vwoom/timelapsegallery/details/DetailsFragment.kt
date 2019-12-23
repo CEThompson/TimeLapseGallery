@@ -92,7 +92,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         super.onCreate(savedInstanceState)
 
         mCurrentProject = detailsViewModel.currentProject.value
-        mProjectSchedule = mCurrentProject?.schedule_time // TODO handle project schedule
+        mProjectSchedule = null
 
         mExternalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
@@ -276,7 +276,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         // Get info for the current photo
         val timestamp = photoEntry.timestamp
         val photoNumber = mPhotos!!.indexOf(photoEntry) + 1
-        val photosInProject: Int = mPhotos.size
+        val photosInProject: Int = mPhotos!!.size
         // Get formatted strings
         val photoNumberString = getString(R.string.details_photo_number_out_of, photoNumber, photosInProject)
         val date = TimeUtils.getDateFromTimestamp(timestamp)
@@ -285,7 +285,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         binding.detailsPhotoNumberTv.text = photoNumberString
         binding.detailsPhotoDateTv.text = date
         binding.detailsPhotoTimeTv.text = time
-        val position = mPhotos.indexOf(photoEntry)
+        val position = mPhotos!!.indexOf(photoEntry)
         binding.detailsRecyclerview.scrollToPosition(position)
         binding.imageLoadingProgress.progress = photoNumber - 1
     }
@@ -383,7 +383,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             // Handle UI
             binding.playAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp)
             // Schedule the runnable for a certain number of ms from now
-            val pref = PreferenceManager.getDefaultSharedPreferences(this)
+            val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
             val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), "50")
             val playbackInterval = playbackIntervalSharedPref!!.toInt()
             // If the play position / current photo is at the end, start from the beginning
@@ -419,7 +419,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             if (position == mPhotos!!.size - 1) {
                 mPlaying = false
                 binding.playAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp)
-                mCurrentPhoto = mPhotos[position]
+                mCurrentPhoto = mPhotos!![position]
                 binding.imageLoadingProgress.progress = position
                 binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
                 binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorGreen)
@@ -428,7 +428,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             }
             // If image is loaded load the next photo
             if (mImageIsLoaded) {
-                loadUi(mPhotos[position + 1])
+                loadUi(mPhotos!![position + 1])
                 binding.imageLoadingProgress.progress = position + 1
                 scheduleLoadPhoto(position + 1, interval)
             } else {
@@ -489,44 +489,54 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         detailsViewModel.photos.observe(this, Observer<List<PhotoEntry>> { photoEntries: List<PhotoEntry> ->
             // Save the list of photos
             mPhotos = photoEntries
+
             // Send the photos to the adapter
-            mDetailsAdapter!!.setPhotoData(mPhotos, mCurrentProject)
+            mDetailsAdapter?.setPhotoData(mPhotos, mCurrentProject)
+
             // Set current photo to last if none has been selected
             if (savedInstanceState == null || mCurrentPhoto == null) mCurrentPhoto = getLastPhoto()
+
             // Restore the play position
             mCurrentPlayPosition = mPhotos?.indexOf(mCurrentPhoto)
+
             // Load the ui based on the current photo
             loadUi(mCurrentPhoto!!)
+
             // Set the date of the project based on the first photo entry
             val firstTimestamp = mPhotos?.get(0)?.timestamp
-            val firstProjectDateString = TimeUtils.getShortDateFromTimestamp(firstTimestamp)
-            val lastTimestamp = mPhotos?.get(mPhotos?.size - 1)?.timestamp
-            val lastProjectDateString = TimeUtils.getShortDateFromTimestamp(lastTimestamp)
+            val firstProjectDateString = TimeUtils.getShortDateFromTimestamp(firstTimestamp!!)
+            val lastTimestamp = mPhotos?.get(mPhotos!!.size - 1)?.timestamp
+            val lastProjectDateString = TimeUtils.getShortDateFromTimestamp(lastTimestamp!!)
             binding.detailsProjectTimespanTextview.text = getString(R.string.timespan, firstProjectDateString, lastProjectDateString)
+
             // Set max for progress bar
-            binding.imageLoadingProgress.max = mPhotos?.size - 1
+            binding.imageLoadingProgress.max = mPhotos!!.size - 1
         })
+
+        // Load the ui based on the current photo
+        detailsViewModel.currentPhoto.observe(this, Observer { currentPhoto: PhotoEntry ->
+            loadUi(currentPhoto)
+        })
+
         // Observe the current selected project
-        // Note: this ensures that project data is updated correctly when editing
         detailsViewModel.currentProject.observe(this, Observer { currentProject: Project ->
             mCurrentProject = currentProject
-            // mCurrentProject will be null upon deletion
-            // So when deleting a project the viewmodel attempted to updated a null project causing a crash
-            // This prevents crashes from occurring
-            if (mCurrentProject != null) { // Set project info
-                binding.detailsProjectNameTextView.setText(mCurrentProject?.project_name)
-            }
+            binding.detailsProjectNameTextView.setText(mCurrentProject?.project_name)
         })
     }
 
     // Changes photo on swipe
-    class OnSwipeTouchListener(ctx: Context?) : OnTouchListener {
+    inner class OnSwipeTouchListener(ctx: Context?) : OnTouchListener {
         private val gestureDetector: GestureDetector
         override fun onTouch(v: View, event: MotionEvent): Boolean {
             return gestureDetector.onTouchEvent(event)
         }
 
         private inner class GestureListener : SimpleOnGestureListener() {
+
+            private val SWIPE_THRESHOLD = 100
+            private val SWIPE_VELOCITY_THRESHOLD = 100
+
             override fun onDown(e: MotionEvent): Boolean {
                 return true
             }
@@ -536,7 +546,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 val diffY = e2.y - e1.y
                 val diffX = e2.x - e1.x
                 if (Math.abs(diffX) > Math.abs(diffY)) {
-                    if (Math.abs(diffX) > Companion.SWIPE_THRESHOLD && Math.abs(velocityX) > Companion.SWIPE_VELOCITY_THRESHOLD) {
+                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                         if (diffX > 0) {
                             onSwipeRight()
                         } else {
@@ -544,45 +554,12 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                         }
                         result = true
                     }
-                } else if (Math.abs(diffY) > Companion.SWIPE_THRESHOLD && Math.abs(velocityY) > Companion.SWIPE_VELOCITY_THRESHOLD) {
-                    if (diffY > 0) {
-                        onSwipeBottom()
-                    } else {
-                        onSwipeTop()
-                    }
-                    result = true
                 }
                 return result
             }
-
-            companion object {
-                private const val SWIPE_THRESHOLD = 100
-                private const val SWIPE_VELOCITY_THRESHOLD = 100
-            }
         }
-
-        fun onSwipeRight() { // Do nothing if currently playing
-            if (mPlaying) return
-            // Otherwise adjust the current photo to the next
-            val currentIndex: Int = mPhotos.indexOf(mCurrentPhoto)
-            if (currentIndex == 0) return
-            mCurrentPhoto = mPhotos.get(currentIndex - 1)
-            mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto)
-            loadUi(mCurrentPhoto)
-        }
-
-        fun onSwipeLeft() { // Do nothing if currently playing
-            if (mPlaying) return
-            // Otherwise adjust the current photo to the previous
-            val currentIndex: Int = mPhotos.indexOf(mCurrentPhoto)
-            if (currentIndex == mPhotos.size() - 1) return
-            mCurrentPhoto = mPhotos.get(currentIndex + 1)
-            mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto)
-            loadUi(mCurrentPhoto)
-        }
-
-        fun onSwipeTop() {}
-        fun onSwipeBottom() {}
+        fun onSwipeRight() = detailsViewModel.nextPhoto()
+        fun onSwipeLeft() = detailsViewModel.previousPhoto()
 
         init {
             gestureDetector = GestureDetector(ctx, GestureListener())
@@ -590,37 +567,26 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     }
 
     // Returns the last photo
+
     private fun getLastPhoto(): PhotoEntry? {
-        return mPhotos!![mPhotos!!.size() - 1]
+        return mPhotos!![mPhotos!!.size - 1]
     }
 
     //Deletes the current photo
-    private fun deletePhoto(database: TimeLapseDatabase, project: Project, photoEntry: PhotoEntry) {
-        instance!!.diskIO().execute {
-            // Delete the photo from the file structure
-            FileUtils.deletePhoto(mExternalFilesDir, project, photoEntry)
-            // Delete the photo metadata in the database
-            database.photoDao().deletePhoto(photoEntry)
-        }
-        // Send to analytics
+    private suspend fun deletePhoto(photoEntry: PhotoEntry) {
+        detailsViewModel.deletePhoto(photoEntry)
         mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_delete_photo), null)
     }
 
 // Deletes the project and recursively deletes files from project folder
-    private fun deleteProject(database: TimeLapseDatabase, project: Project) { // Delete project from the database and photos from the file structure
-        instance!!.diskIO().execute {
-            val projectEntry = database.projectDao().loadProjectById(project.project_id)
-            // Delete the photos from the file structure
-            FileUtils.deleteProject(this@DetailsActivity, projectEntry)
-            val (_, schedule_time, interval_days) = database.projectScheduleDao().loadScheduleByProjectId(projectEntry!!.id)
-            // Delete the project from the database
-            //TODO delete project :: database.projectDao().deleteProject(projectEntry);
-            // If project had a schedule ensure widget and notification worker are updated
-            if (schedule_time != null && interval_days != null) {
-                NotificationUtils.scheduleNotificationWorker(this)
-                UpdateWidgetService.startActionUpdateWidgets(this)
-            }
+    private suspend fun deleteProject(project: Project) { // Delete project from the database and photos from the file structure
+        detailsViewModel.deleteProject(project)
+
+        if (project.schedule_time != null && project.interval_days != null) {
+            NotificationUtils.scheduleNotificationWorker(requireContext())
+            UpdateWidgetService.startActionUpdateWidgets(requireContext())
         }
+
         // Send to analytics
         val params = Bundle()
         params.putString("project_name", project.project_name)
@@ -628,19 +594,14 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     }
 
     // Gets the last photo from the set and sets it as the project thumbnail
-    private fun updateProjectThumbnail(database: TimeLapseDatabase, project: Project, photo: PhotoEntry) {
-        instance!!.diskIO().execute {
-            val coverPhotoEntry = CoverPhotoEntry(project.project_id, photo.id)
-            database.coverPhotoDao().insertPhoto(coverPhotoEntry)
-        }
+    private suspend fun updateProjectThumbnail(photoEntry: PhotoEntry) {
+        detailsViewModel.setCoverPhoto(photoEntry)
     }
 
-    // TODO (update) recall position after editing project
-//Edits the current project
+
+    //Edits the current project
     private fun editProject() {
-        val intent = Intent(this, NewProjectActivity::class.java)
-        intent.putExtra(Keys.PROJECT_ENTRY, mCurrentProject)
-        startActivity(intent)
+        // TODO handle editing project with dialog
     }
 
     private fun verifyPhotoDeletion() {
@@ -650,15 +611,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int ->
                     // If this photo is the last photo then set the new thumbnail to its previous
-                    if (mCurrentPhoto!!.equals(getLastPhoto())) {
-                        val newLast = mPhotos!![mPhotos!!.size() - 2]
-                        updateProjectThumbnail(mTimeLapseDatabase!!, mCurrentProject!!, newLast)
-                    }
-                    // Store the entry then nullify the current photo
-                    val photoToDelete = mCurrentPhoto!!
-                    mCurrentPhoto = null
-                    // Delete the photo
-                    deletePhoto(mTimeLapseDatabase!!, mCurrentProject!!, photoToDelete)
+                    detailsViewModel.deleteCurrentPhoto()
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
@@ -689,8 +642,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setMessage(R.string.double_verify_project_deletion)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int ->
-                    deleteProject(mTimeLapseDatabase!!, mCurrentProject!!)
-                    if (mProjectSchedule != null) NotificationUtils.scheduleNotificationWorker(this)
+                    detailsViewModel.deleteCurrentProject()
+                    NotificationUtils.scheduleNotificationWorker(requireContext())
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }

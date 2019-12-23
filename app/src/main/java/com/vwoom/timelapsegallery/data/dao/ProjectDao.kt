@@ -33,6 +33,10 @@ interface ProjectDao {
     @Delete
     suspend fun deleteProject(projectEntry: ProjectEntry)
 
+    // TODO test delete by project id
+    @Query ("DELETE FROM project WHERE project.id = :projectId")
+    suspend fun deleteProject(projectId: Long)
+
     @Query("DELETE FROM project")
     suspend fun deleteAllProjects()
 

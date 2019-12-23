@@ -10,7 +10,6 @@ import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.view.Photo
-import com.vwoom.timelapsegallery.gallery.GalleryAdapter
 import com.vwoom.timelapsegallery.utils.FileUtils
 import java.io.File
 
@@ -67,6 +66,15 @@ class Repository private constructor(
         return photos.get(photos.size-1)
     }
 
+    fun getPhoto(projectId: Long, photoId: Long) = photoDao.loadPhoto(projectId, photoId)
+
+    suspend fun setCoverPhoto(photoEntry: PhotoEntry) {
+        coverPhotoDao.insertPhoto(CoverPhotoEntry(photoEntry.project_id, photoEntry.id))
+    }
+
+
+    suspend fun deletePhoto(photoEntry: PhotoEntry){ photoDao.deletePhoto(photoEntry) }
+    suspend fun deleteProject(projectId: Long){ projectDao.deleteProject(projectId) }
 
     companion object {
         @Volatile private var instance: Repository? = null
