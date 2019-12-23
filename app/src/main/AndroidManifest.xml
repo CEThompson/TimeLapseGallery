@@ -61,10 +61,6 @@
             android:windowSoftInputMode="stateHidden" />
 
         <!-- Details Activity -->
-        <activity
-            android:name=".activities.DetailsActivity"
-            android:launchMode="singleTop"
-            android:parentActivityName=".activities.MainActivity" />
 
         <!-- Main Activity -->
 
