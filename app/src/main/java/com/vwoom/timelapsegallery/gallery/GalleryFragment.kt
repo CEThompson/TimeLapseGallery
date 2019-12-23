@@ -18,7 +18,6 @@ import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.Keys
-import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.fragment_gallery.view.*
 
 

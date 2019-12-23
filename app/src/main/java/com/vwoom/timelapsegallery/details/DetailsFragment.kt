@@ -21,10 +21,14 @@ import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +41,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.activities.AddPhotoActivity
 import com.vwoom.timelapsegallery.activities.NewProjectActivity
 import com.vwoom.timelapsegallery.data.AppExecutors.Companion.instance
@@ -46,12 +51,12 @@ import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.databinding.FragmentCameraBinding
+import com.vwoom.timelapsegallery.databinding.FragmentDetailsBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
-import com.vwoom.timelapsegallery.utils.FileUtils
-import com.vwoom.timelapsegallery.utils.Keys
-import com.vwoom.timelapsegallery.utils.PhotoUtils
-import com.vwoom.timelapsegallery.utils.TimeUtils
+import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
+import kotlinx.android.synthetic.main.fragment_details.view.*
 import java.io.File
 
 class DetailsFragment: Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler {
@@ -114,84 +119,62 @@ class DetailsFragment: Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler {
     private var mPlayHandler: Handler? = null
     private var mImageIsLoaded = false
 
+    private var mReturnPosition: Int? = null
+
     // Swipe listener for image navigation
     private var mOnSwipeTouchListener: OnSwipeTouchListener? = null
 
-    private val TAG = DetailsActivity::class.java.simpleName
+    private val TAG = DetailsFragment::class.java.simpleName
 
     private val REQUEST_ADD_PHOTO = 1
+
+    private val args: DetailsFragmentArgs by navArgs()
+
+    private val detailsViewModel: DetailsViewModel by viewModels {
+        InjectorUtils.provideDetailsViewModelFactory(requireActivity(), args.clickedProject)
+    }
 
     // Analytics
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val toolbar: Toolbar = findViewById<Toolbar>(R.id.details_activity_toolbar)
-        setSupportActionBar(toolbar)
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true)
-            getSupportActionBar().setDisplayShowHomeEnabled(true)
-        }
+        mCurrentProject = detailsViewModel.currentProject.value
+        mProjectSchedule = mCurrentProject.schedule_time
 
-        // Set the title of the activity
-        // Set the title of the activity
-        setTitle(resources.getString(R.string.project_details))
-
-        // Get the project information from the intent
-        // Get the project information from the intent
-        mCurrentProject = getIntent().getParcelableExtra(Keys.PROJECT_ENTRY)
-        mProjectSchedule = getIntent().getParcelableExtra(Keys.PROJECT_SCHEDULE_ENTRY)
-
-        // Get the database
-        // Get the database
-        mTimeLapseDatabase = getInstance(this)
-        mExternalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        mExternalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
         // Set up adapter and recycler view
-        // Set up adapter and recycler view
-        mDetailsAdapter = DetailsAdapter(this, this)
-        val linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        //linearLayoutManager.setStackFromEnd(true);
-        //linearLayoutManager.setStackFromEnd(true);
-        mDetailsRecyclerView!!.layoutManager = linearLayoutManager
-        mDetailsRecyclerView!!.adapter = mDetailsAdapter
+        mDetailsAdapter = DetailsAdapter(this, requireContext())
+        val linearLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+        mDetailsRecyclerView.layoutManager = linearLayoutManager
+        mDetailsRecyclerView.adapter = mDetailsAdapter
 
         // Set the listener to add a photo to the project
-        // Set the listener to add a photo to the project
-        mAddPhotoFab!!.setOnClickListener { v: View? ->
-            val addPhotoIntent = Intent(this@DetailsActivity, AddPhotoActivity::class.java)
-            val lastPhoto: PhotoEntry = getLastPhoto()
-            val lastPhotoPath = FileUtils.getPhotoUrl(mExternalFilesDir, mCurrentProject, lastPhoto)
-            // Send the path of the last photo and the project id
-            addPhotoIntent.putExtra(Keys.PHOTO_PATH, lastPhotoPath)
-            addPhotoIntent.putExtra(Keys.PROJECT_ENTRY, mCurrentProject)
-            // Start add photo activity for result
-            startActivityForResult(addPhotoIntent, REQUEST_ADD_PHOTO)
+        mAddPhotoFab?.setOnClickListener {
+            // TODO send info to camera fragment to add photo to current project
+            val action = DetailsFragmentDirections.actionDetailsFragmentToCameraFragment()
+            findNavController().navigate(action)
         }
 
         // Show the set of images in succession
-        // Show the set of images in succession
-        mPlayAsVideoFab!!.setOnClickListener { v: View? -> playSetOfImages() }
+        mPlayAsVideoFab?.setOnClickListener { playSetOfImages() }
 
         // Set a listener to display the image fullscreen
-        // Set a listener to display the image fullscreen
-        mFullscreenFab!!.setOnClickListener { v: View? -> if (!mPlaying) mFullscreenImageDialog!!.show() }
+        mFullscreenFab?.setOnClickListener { (!mPlaying) mFullscreenImageDialog.show() }
 
         // Set a swipe listener for the image
-        // Set a swipe listener for the image
-        mOnSwipeTouchListener = OnSwipeTouchListener(this)
-        mCurrentPhotoImageView!!.setOnTouchListener(mOnSwipeTouchListener)
+        mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
+        mCurrentPhotoImageView?.setOnTouchListener(mOnSwipeTouchListener)
 
-        if (getIntent() != null) {
-            mReturnPosition = getIntent().getIntExtra(Keys.TRANSITION_POSITION, 0)
-        }
+        mReturnPosition = args.transitionPosition
 
         // TODO (update) implement pinch zoom on fullscreen image
         // TODO (update) implement pinch zoom on fullscreen image
         initializeFullscreenImageDialog()
 
-        // If restoring state reload the selected photo
         // If restoring state reload the selected photo
         if (savedInstanceState != null) {
             mCurrentPhoto = savedInstanceState.getParcelable<Parcelable>(Keys.PHOTO_ENTRY)
@@ -208,20 +191,37 @@ class DetailsFragment: Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler {
         }
 
         // Initialize fab color
-        // Initialize fab color
-        mPlayAsVideoFab!!.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@DetailsActivity, R.color.colorGreen))
+        mPlayAsVideoFab!!.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
         mPlayAsVideoFab!!.rippleColor = resources.getColor(R.color.colorGreen)
 
         // Set the transition name for the image
         // Set the transition name for the image
-        val transitionName: String = mCurrentProject.getProject_id() + mCurrentProject.getProject_name()
+        val transitionName: String = mCurrentProject?.project_id + mCurrentProject?.project_name
         mCardView!!.transitionName = transitionName
 
         setupViewModel(savedInstanceState)
 
         // Prepare analytics
-        // Prepare analytics
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+        val binding = DataBindingUtil.inflate<FragmentDetailsBinding>(inflater, R.layout.fragment_details, container, false).apply {
+            // TODO determine if this apply block is necessary
+            //viewModel = cameraViewModel
+            lifecycleOwner = viewLifecycleOwner
+        }
+
+        val rootView = inflater.inflate(R.layout.fragment_details, container, false)
+        setHasOptionsMenu(true)
+        val toolbar = rootView.details_fragment_toolbar
+        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
+        toolbar.title = getString(R.string.project_details)
+        (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
+        // TODO set up navigation
+
+        return rootView
     }
 
     override fun onPause() {

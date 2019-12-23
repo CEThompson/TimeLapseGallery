@@ -6,12 +6,6 @@
     <!-- Welcome -->
     <string name="welcome">Welcome</string>
 
-    <!-- Activities -->
-    <string name="main_activity">Main Activity</string>
-    <string name="details_activity">Details Activity</string>
-    <string name="new_project_activity">New Project Activity</string>
-    <string name="add_photo_activity">Add Photo Activity</string>
-
     <!-- Tracking -->
     <string name="submit_project">Submit Project</string>
     <string name="submitted">Submitted</string>

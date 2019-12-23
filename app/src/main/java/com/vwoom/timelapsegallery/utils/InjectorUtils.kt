@@ -6,6 +6,8 @@ import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.details.CameraViewModelFactory
+import com.vwoom.timelapsegallery.details.DetailsViewModel
+import com.vwoom.timelapsegallery.details.DetailsViewModelFactory
 import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 
 object InjectorUtils {
@@ -21,6 +23,11 @@ object InjectorUtils {
     fun provideCameraViewModelFactory(context: Context, project: Project?): CameraViewModelFactory {
         val repository = getRepository(context)
         return CameraViewModelFactory(repository, project)
+    }
+
+    fun provideDetailsViewModelFactory(context: Context, project: Project): DetailsViewModelFactory {
+        val repository = getRepository(context)
+        return DetailsViewModelFactory(repository, project.project_id)
     }
 
     fun provideGalleryViewModel(context: Context): GalleryViewModel {
