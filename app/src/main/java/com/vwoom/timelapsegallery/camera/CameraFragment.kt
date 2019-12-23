@@ -64,6 +64,9 @@ class CameraFragment: Fragment(), LifecycleOwner {
                     activity as Activity, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
+        // TODO set up last project photo
+        // TODO set up photo verification?
+
         return binding.root
     }
 

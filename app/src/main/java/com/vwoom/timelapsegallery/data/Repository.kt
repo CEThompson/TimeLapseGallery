@@ -46,7 +46,7 @@ class Repository private constructor(
         Log.d("TimeLapseRepository", "$coverPhotoEntry")
         Log.d("TimeLapseRepository", "$projectScheduleEntry")
 
-        // TODO figure out how to handle blocking
+        // TODO set up a work manager to handle file operations
         FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
     }
 
@@ -55,11 +55,17 @@ class Repository private constructor(
         photoDao.insertPhoto(photoEntry)
     }
 
+
     fun getProjectViews() = projectDao.loadProjectViews()
 
     fun getProjectView(projectId: Long) = projectDao.loadProjectView(projectId)
 
     fun getPhotos(projectId: Long) = photoDao.loadAllPhotosByProjectId(projectId)
+
+    fun getLastPhotoInProject(projectId: Long): PhotoEntry {
+        val photos = photoDao.loadAllPhotosByProjectId_NonLiveData(projectId)
+        return photos.get(photos.size-1)
+    }
 
 
     companion object {
