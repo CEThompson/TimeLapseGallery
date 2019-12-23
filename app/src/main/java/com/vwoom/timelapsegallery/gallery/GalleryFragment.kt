@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Bundle
 import android.transition.TransitionInflater
 import android.util.Log
@@ -72,6 +73,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         val toolbar = rootView.gallery_fragment_toolbar
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar.title = getString(R.string.app_name)
+        (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
         return rootView
     }
 
