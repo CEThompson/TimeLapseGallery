@@ -50,7 +50,6 @@ import com.bumptech.glide.request.target.Target;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.vwoom.timelapsegallery.R;
-import com.vwoom.timelapsegallery.settings.SettingsActivity;
 import com.vwoom.timelapsegallery.details.DetailsAdapter;
 import com.vwoom.timelapsegallery.data.AppExecutors;
 import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry;
