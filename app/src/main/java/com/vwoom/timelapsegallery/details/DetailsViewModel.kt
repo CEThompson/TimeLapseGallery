@@ -48,10 +48,16 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
 
     fun setPhoto(photoEntry: PhotoEntry) {currentPhoto.value = photoEntry}
 
-    suspend fun setCoverPhoto(photoEntry: PhotoEntry) { repository.setCoverPhoto(photoEntry) }
+    fun setCoverPhoto(photoEntry: PhotoEntry) {
+        viewModelScope.launch {
+            repository.setCoverPhoto(photoEntry)
+        }
+    }
 
-    suspend fun deletePhoto(photoEntry: PhotoEntry){
-        repository.deletePhoto(photoEntry)
+    fun deletePhoto(photoEntry: PhotoEntry){
+        viewModelScope.launch {
+            repository.deletePhoto(photoEntry)
+        }
     }
 
     fun deleteCurrentPhoto(){
@@ -60,8 +66,10 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
         }
     }
 
-    suspend fun deleteProject(project: Project){
-        repository.deleteProject(project.project_id)
+    fun deleteProject(project: Project){
+        viewModelScope.launch {
+            repository.deleteProject(project.project_id)
+        }
     }
 
     fun deleteCurrentProject() {

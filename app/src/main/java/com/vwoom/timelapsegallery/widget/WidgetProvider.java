@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import com.vwoom.timelapsegallery.R;
+import com.vwoom.timelapsegallery.TimeLapseGalleryActivity;
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry;
 
 import java.util.List;
@@ -71,7 +72,8 @@ public class WidgetProvider extends AppWidgetProvider {
 
         views.setRemoteAdapter(R.id.widget_list_view, adapterIntent);
 
-        Intent appIntent = new Intent(context, DetailsActivity.class);
+        // TODO nav to detail fragment
+        Intent appIntent = new Intent(context, TimeLapseGalleryActivity.class);
 
         PendingIntent appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setPendingIntentTemplate(R.id.widget_list_view, appPendingIntent);

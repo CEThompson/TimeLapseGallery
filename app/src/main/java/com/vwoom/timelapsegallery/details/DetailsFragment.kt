@@ -35,10 +35,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
-import com.vwoom.timelapsegallery.activities.NewProjectActivity
-import com.vwoom.timelapsegallery.data.AppExecutors.Companion.instance
-import com.vwoom.timelapsegallery.data.TimeLapseDatabase
-import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.view.Project
@@ -49,7 +45,6 @@ import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import java.io.File
 
 class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler {
-
 
     lateinit var binding: FragmentDetailsBinding
 
@@ -77,7 +72,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     private var mImageIsLoaded = false
 
     // Swipe listener for image navigation
-    private var mOnSwipeTouchListener: OnSwipeTouchListener? = null
+    //private var mOnSwipeTouchListener: OnSwipeTouchListener? = null
 
     private val args: DetailsFragmentArgs by navArgs()
 
@@ -91,10 +86,26 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mCurrentProject = detailsViewModel.currentProject.value
-        mProjectSchedule = null
-
         mExternalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
+        // Prepare analytics
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+        // TODO determine if this apply block is necessary
+        binding = DataBindingUtil.inflate<FragmentDetailsBinding>(inflater, R.layout.fragment_details, container, false).apply {
+            //viewModel = cameraViewModel
+            lifecycleOwner = viewLifecycleOwner
+        }
+
+        // Set up toolbar
+        setHasOptionsMenu(true)
+        val toolbar = binding.detailsFragmentToolbar
+        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
+        toolbar.title = getString(R.string.project_details)
+        (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
 
         // Set up adapter and recycler view
         mDetailsAdapter = DetailsAdapter(this, requireContext())
@@ -111,18 +122,20 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         }
 
         // Show the set of images in succession
-        binding.playAsVideoFab.setOnClickListener { playSetOfImages() }
+        binding.playAsVideoFab.setOnClickListener {
+            //playSetOfImages()
+        }
 
         // Set a listener to display the image fullscreen
         binding.fullscreenFab.setOnClickListener { if (!mPlaying) mFullscreenImageDialog?.show() }
 
         // Set a swipe listener for the image
-        mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
-        binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // todo override on perform click
+        // TODO mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
+        // TODO binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // todo override on perform click
 
 
         // TODO (update) implement pinch zoom on fullscreen image
-        initializeFullscreenImageDialog()
+        // TODO initializeFullscreenImageDialog()
 
         // Initialize fab color
         binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
@@ -133,40 +146,17 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         val transitionName: String = "${mCurrentProject?.project_id} + ${mCurrentProject?.project_name}"
         binding.detailsCardContainer.transitionName = transitionName
 
-        setupViewModel(savedInstanceState)
-
-        // Prepare analytics
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        binding = DataBindingUtil.inflate<FragmentDetailsBinding>(inflater, R.layout.fragment_details, container, false).apply {
-            // TODO determine if this apply block is necessary
-            //viewModel = cameraViewModel
-            lifecycleOwner = viewLifecycleOwner
-        }
-
-        setHasOptionsMenu(true)
-        val toolbar = binding.detailsFragmentToolbar
-        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
-        toolbar.title = getString(R.string.project_details)
-        (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
-        // TODO set up navigation
-
+        // TODO setupViewModel(savedInstanceState)
         return binding.root
     }
-
-
-
 
 
     override fun onPause() {
         super.onPause()
         // If the activity stops while playing make sure to cancel runnables
-        if (mPlaying) stopPlaying()
+        // TODO handle playing
+        //if (mPlaying) stopPlaying()
     }
-
 
     // TODO handle return from camera fragment
     /*
@@ -198,6 +188,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         }
     }
     */
+
 
     private fun showPhotoInformation() {
         val photoInformationLayout: LinearLayout = binding.photoInformationLayout
@@ -249,24 +240,25 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             R.id.delete_photo -> {
                 // TODO handle photo deletion through viewmodel
                 if (mPhotos?.size === 1) {
-                    verifyLastPhotoDeletion()
+                    //verifyLastPhotoDeletion()
                 } else {
-                    verifyPhotoDeletion()
+                    //verifyPhotoDeletion()
                 }
                 true
             }
             R.id.delete_project -> {
-                verifyProjectDeletion()
+                //verifyProjectDeletion()
                 true
             }
             R.id.edit_project -> {
-                editProject()
+                //editProject()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
+    /*
     fun loadUi(photoEntry: PhotoEntry) { // Set the fullscreen image dialogue to the current photo
         if (!mPlaying) preloadFullscreenImage()
         // Notify the adapter
@@ -437,13 +429,13 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         }
         mPlayHandler!!.postDelayed(runnable, interval.toLong())
     }
+*/
 
-    override fun onClick(clickedPhoto: PhotoEntry?) {
-        mCurrentPhoto = clickedPhoto
-        mCurrentPlayPosition = mPhotos!!.indexOf(mCurrentPhoto)
-        loadUi(mCurrentPhoto!!)
+    override fun onClick(clickedPhoto: PhotoEntry) {
+        detailsViewModel.setPhoto(clickedPhoto)
     }
 
+/*
     fun initializeFullscreenImageDialog() {
         // Create the dialog
         mFullscreenImageDialog = Dialog(requireContext(), R.style.Theme_AppCompat_Light_NoActionBar_FullScreen)
@@ -525,6 +517,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         })
     }
 
+
     // Changes photo on swipe
     inner class OnSwipeTouchListener(ctx: Context?) : OnTouchListener {
         private val gestureDetector: GestureDetector
@@ -566,20 +559,23 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         }
     }
 
-    // Returns the last photo
 
+    // Returns the last photo
     private fun getLastPhoto(): PhotoEntry? {
         return mPhotos!![mPhotos!!.size - 1]
     }
 
+    */
+
+    /*
     //Deletes the current photo
-    private suspend fun deletePhoto(photoEntry: PhotoEntry) {
+    private fun deletePhoto(photoEntry: PhotoEntry) {
         detailsViewModel.deletePhoto(photoEntry)
         mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_delete_photo), null)
     }
 
-// Deletes the project and recursively deletes files from project folder
-    private suspend fun deleteProject(project: Project) { // Delete project from the database and photos from the file structure
+    // Deletes the project and recursively deletes files from project folder
+    private fun deleteProject(project: Project) { // Delete project from the database and photos from the file structure
         detailsViewModel.deleteProject(project)
 
         if (project.schedule_time != null && project.interval_days != null) {
@@ -594,10 +590,9 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     }
 
     // Gets the last photo from the set and sets it as the project thumbnail
-    private suspend fun updateProjectThumbnail(photoEntry: PhotoEntry) {
+    private fun updateProjectThumbnail(photoEntry: PhotoEntry) {
         detailsViewModel.setCoverPhoto(photoEntry)
     }
-
 
     //Edits the current project
     private fun editProject() {
@@ -647,5 +642,6 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
+    */
 
 }
