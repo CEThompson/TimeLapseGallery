@@ -97,7 +97,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         /* Observe projects */viewModel.projects.observe(this, Observer { projects: List<Project> ->
             mProjects = projects
             mGalleryAdapter?.setProjectData(projects)
-            mNewProjectFab?.show()
         })
     }
 

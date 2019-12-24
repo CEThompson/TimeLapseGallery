@@ -111,7 +111,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
             binding.projectImageGradientOverlay.visibility = View.INVISIBLE
         }
         // Set the transition name
-        val transitionName = currentProject.project_id.toString() + currentProject.project_name
+        val transitionName = currentProject.project_id.toString()
         binding.projectCardView.transitionName = transitionName
         // TODO set the transition name to the photo url
         binding.projectCardView.setTag(R.string.transition_tag, thumbnail_path)

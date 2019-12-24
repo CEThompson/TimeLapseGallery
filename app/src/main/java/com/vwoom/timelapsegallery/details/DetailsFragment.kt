@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
+import android.transition.TransitionInflater
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.OnTouchListener
@@ -92,6 +93,10 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
         // Prepare analytics
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+
+        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
+
+        postponeEnterTransition()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -143,7 +148,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorGreen)
 
         // Set the transition name for the image
-        val transitionName: String = "${mCurrentProject?.project_id} + ${mCurrentProject?.project_name}"
+        val transitionName: String = "${mCurrentProject?.project_id}"
         binding.detailsCardContainer.transitionName = transitionName
 
         setupViewModel()
@@ -331,6 +336,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                                 .listener(object : RequestListener<Drawable?> {
                                     override fun onLoadFailed(e: GlideException?, model: Any, target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
                                         //schedulePostponedTransition() TODO schedule transition?
+                                        startPostponedEnterTransition()
                                         val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
                                         toast.show()
                                         return false
@@ -338,6 +344,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
                                     override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
                                         //schedulePostponedTransition() TODO schedule transition?
+                                        startPostponedEnterTransition()
                                         binding.detailNextImage.visibility = View.INVISIBLE
                                         mImageIsLoaded = true
                                         return false
