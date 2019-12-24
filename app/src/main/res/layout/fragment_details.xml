@@ -64,12 +64,12 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_margin="@dimen/detail_margin"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintVertical_bias="0.5"
-                app:layout_constraintTop_toBottomOf="@+id/project_information_layout"
                 app:layout_constraintBottom_toTopOf="@+id/image_loading_progress"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@+id/play_as_video_fab"
+                app:layout_constraintVertical_bias="0.5">
 
                 <!-- Constraint layout used to dynamically resize the photo -->
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -82,84 +82,83 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:background="@color/imagePlaceholder"
-                        app:layout_constraintDimensionRatio="1:1"
                         android:contentDescription="@string/detail_current_image_content_description"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="1:1"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
                     <ImageView
                         android:id="@+id/detail_next_image"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:visibility="invisible"
                         android:background="@color/imagePlaceholder"
-                        app:layout_constraintDimensionRatio="1:1"
                         android:contentDescription="@string/detail_current_image_content_description"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="1:1"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
                     <!-- gradient overlay for image -->
                     <View
                         android:id="@+id/details_gradient_overlay"
-                        android:visibility="invisible"
                         android:layout_width="0dp"
                         android:layout_height="@dimen/gradient_overlay_detail_height"
                         android:background="@drawable/gradient_overlay_bottom_up"
+                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@+id/detail_current_image"
-                        app:layout_constraintStart_toStartOf="@id/detail_current_image"
                         app:layout_constraintEnd_toEndOf="@id/detail_current_image"
-                        />
+                        app:layout_constraintStart_toStartOf="@id/detail_current_image" />
                     <!-- Layout displaying the photo information -->
                     <LinearLayout
                         android:id="@+id/photo_information_layout"
-                        android:visibility="invisible"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/detail_margin"
                         android:orientation="vertical"
+                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@id/detail_current_image"
-                        app:layout_constraintStart_toStartOf="@id/detail_current_image"
-                        app:layout_constraintEnd_toEndOf="@id/detail_current_image">
+                        app:layout_constraintEnd_toEndOf="@id/detail_current_image"
+                        app:layout_constraintStart_toStartOf="@id/detail_current_image">
                         <!-- Displays the photo number as a fraction of the set -->
                         <TextView
                             android:id="@+id/details_photo_number_tv"
+                            style="@style/WhiteText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            tools:text="1/100"
-                            style="@style/WhiteText"
-                            android:textStyle="bold"/>
+                            android:textStyle="bold"
+                            tools:text="1/100" />
                         <!-- Displays the time the photo was taken -->
                         <TextView
                             android:id="@+id/details_photo_time_tv"
+                            style="@style/WhiteText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            tools:text="photo time"
-                            style="@style/WhiteText"
-                            />
+                            tools:text="photo time" />
                         <!-- Displays the date the photo was taken -->
                         <TextView
                             android:id="@+id/details_photo_date_tv"
+                            style="@style/WhiteText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            tools:text="photo date"
-                            style="@style/WhiteText"/>
+                            tools:text="photo date" />
                     </LinearLayout>
 
                     <!-- Fullscreen fab -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/fullscreen_fab"
-                        android:contentDescription="@string/fullscreen_fab_content_description"
-                        android:visibility="invisible"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fabSize="mini"
                         android:layout_margin="@dimen/detail_small_margin"
-                        app:backgroundTint="@color/darkImagePlaceHolder"
+                        android:contentDescription="@string/fullscreen_fab_content_description"
                         android:src="@drawable/ic_fullscreen_white_24dp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"/>
+                        android:visibility="invisible"
+                        app:backgroundTint="@color/darkImagePlaceHolder"
+                        app:fabSize="mini"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>

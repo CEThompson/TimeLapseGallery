@@ -196,7 +196,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/details_activity_toolbar"
+                android:id="@+id/details_fragment_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:theme="@style/AppToolbar"
