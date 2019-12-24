@@ -6,13 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.details.DetailsAdapter.DetailsAdapterViewHolder
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.databinding.DetailRecyclerviewItemBinding
+import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.FileUtils
+import kotlinx.android.synthetic.main.detail_recyclerview_item.view.*
 import java.io.File
 
 class DetailsAdapter(private val mClickHandler: DetailsAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<DetailsAdapterViewHolder>() {
@@ -22,14 +26,10 @@ class DetailsAdapter(private val mClickHandler: DetailsAdapterOnClickHandler, co
     private val mExternalFilesDir: File?
 
     interface DetailsAdapterOnClickHandler {
-        fun onClick(clickedPhoto: PhotoEntry?)
+        fun onClick(clickedPhoto: PhotoEntry)
     }
 
-    inner class DetailsAdapterViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
-        //@BindView(R.id.detail_thumbnail)
-        var mDetailThumbnail: ImageView? = null
-        //@BindView(R.id.selection_indicator)
-        var mSelectionIndicator: View? = null
+    inner class DetailsAdapterViewHolder(var binding: DetailRecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
@@ -39,34 +39,32 @@ class DetailsAdapter(private val mClickHandler: DetailsAdapterOnClickHandler, co
         }
 
         init {
-            //ButterKnife.bind(this, view)
-            view.setOnClickListener(this)
+            binding.root.setOnClickListener(this)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailsAdapterViewHolder {
-        val context = parent.context
-        val layoutIdForGridItem = R.layout.detail_recyclerview_item
-        val inflater = LayoutInflater.from(context)
+        val inflater = LayoutInflater.from(parent.context)
         val shouldAttachToParentImmediately = false
-        val view = inflater.inflate(layoutIdForGridItem, parent, shouldAttachToParentImmediately)
-        return DetailsAdapterViewHolder(view)
+        val binding = DetailRecyclerviewItemBinding.inflate(inflater, parent, shouldAttachToParentImmediately)
+        return DetailsAdapterViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: DetailsAdapterViewHolder, position: Int) {
+        val binding = holder.binding
         val context = holder.itemView.context
-        val currentPhoto = mPhotos!![position]
+        val currentPhoto = mPhotos?.get(position)
         val photo_path = FileUtils.getPhotoUrl(mExternalFilesDir, mProject, currentPhoto)
         val f = File(photo_path)
         // TODO (update) dynamically resize detail view
         Glide.with(context)
                 .load(f)
                 .centerCrop()
-                .into(holder.mDetailThumbnail!!)
+                .into(binding.detailThumbnail)
         if (mPhotos!![position] === mCurrentPhoto) {
-            holder.mSelectionIndicator!!.visibility = View.VISIBLE
+            binding.selectionIndicator.visibility = View.VISIBLE
         } else {
-            holder.mSelectionIndicator!!.visibility = View.INVISIBLE
+            binding.selectionIndicator.visibility = View.INVISIBLE
         }
     }
 

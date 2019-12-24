@@ -29,20 +29,13 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
         fun onClick(clickedProject: Project, sharedElement: View, transitionName: String, position: Int)
     }
 
-    inner class GalleryAdapterViewHolder(binding: GalleryRecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
-
-        var mProjectImageView = binding.projectImage
-        var mConstraintLayout = binding.projectRecyclerviewConstraintLayout
-        var mScheduleIndicator = binding.scheduleIndicator
-        var mNextScheduleString = binding.nextSubmissionDayCountdownTextview
-        var mCardView = binding.projectCardView
-        var mGradientOverlay = binding.projectImageGradientOverlay
+    inner class GalleryAdapterViewHolder(var binding: GalleryRecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
             val clickedProject = mProjectData!![adapterPosition]
-            val transitionName = mCardView!!.transitionName
-            mClickHandler.onClick(clickedProject, mCardView!!, transitionName, adapterPosition)
+            val transitionName = binding.projectCardView.transitionName
+            mClickHandler.onClick(clickedProject, binding.projectCardView, transitionName, adapterPosition)
         }
 
         init {
@@ -64,6 +57,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
 
     override fun onBindViewHolder(holder: GalleryAdapterViewHolder, position: Int) { // Get project information
         val currentProject = mProjectData!![position]
+        val binding = holder.binding
 
         // TODO remove these logs
         // Logs for project information
@@ -87,9 +81,9 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
         Log.d(TAG, "thumbnail_path is $thumbnail_path")
         // Set the constraint ratio
         val ratio = PhotoUtils.getAspectRatioFromImagePath(thumbnail_path)
-        constraintSet!!.clone(holder.mConstraintLayout)
-        constraintSet.setDimensionRatio(holder.mProjectImageView!!.id, ratio)
-        constraintSet.applyTo(holder.mConstraintLayout)
+        constraintSet!!.clone(binding.projectRecyclerviewConstraintLayout)
+        constraintSet.setDimensionRatio(binding.projectImage.id, ratio)
+        constraintSet.applyTo(binding.projectRecyclerviewConstraintLayout)
         // Display schedule information
         // TODO test schedule information
         val next = currentProject.schedule_time
@@ -106,26 +100,26 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
             // Handle projects scheduled for today
             nextSchedule = if (DateUtils.isToday(next) || System.currentTimeMillis() > next) TimeUtils.getTimeFromTimestamp(next) else if (daysUntilPhoto == 1) holder.itemView.context.getString(R.string.tomorrow) else holder.itemView.context.getString(R.string.number_of_days, daysUntilPhoto)
             // Set fields
-            holder.mNextScheduleString!!.text = nextSchedule
+            binding.nextSubmissionDayCountdownTextview.text = nextSchedule
             // Set visibility
-            holder.mScheduleIndicator!!.visibility = View.VISIBLE
-            holder.mNextScheduleString!!.visibility = View.VISIBLE
-            holder.mGradientOverlay!!.visibility = View.VISIBLE
+            binding.scheduleIndicator.visibility = View.VISIBLE
+            binding.nextSubmissionDayCountdownTextview.visibility = View.VISIBLE
+            binding.projectImageGradientOverlay.visibility = View.VISIBLE
         } else {
-            holder.mScheduleIndicator!!.visibility = View.INVISIBLE
-            holder.mNextScheduleString!!.visibility = View.INVISIBLE
-            holder.mGradientOverlay!!.visibility = View.INVISIBLE
+            binding.scheduleIndicator.visibility = View.INVISIBLE
+            binding.nextSubmissionDayCountdownTextview.visibility = View.INVISIBLE
+            binding.projectImageGradientOverlay.visibility = View.INVISIBLE
         }
         // Set the transition name
         val transitionName = currentProject.project_id.toString() + currentProject.project_name
-        holder.mCardView!!.transitionName = transitionName
+        binding.projectCardView.transitionName = transitionName
         // TODO set the transition name to the photo url
-        holder.mCardView!!.setTag(R.string.transition_tag, thumbnail_path)
+        binding.projectCardView.setTag(R.string.transition_tag, thumbnail_path)
         // Load the image
         val f = File(thumbnail_path)
         Glide.with(holder.itemView.context)
                 .load(f)
-                .into(holder.mProjectImageView!!)
+                .into(binding.projectImage)
     }
 
     override fun getItemCount(): Int {
