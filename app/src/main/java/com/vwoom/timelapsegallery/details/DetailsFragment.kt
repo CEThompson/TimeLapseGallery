@@ -149,6 +149,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
         setupViewModel()
 
+        showPhotoInformation()
+        
         return binding.root
     }
 
