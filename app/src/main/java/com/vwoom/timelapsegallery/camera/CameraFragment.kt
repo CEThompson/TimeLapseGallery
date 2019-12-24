@@ -21,6 +21,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.FragmentCameraBinding
 import com.vwoom.timelapsegallery.details.CameraViewModel
@@ -65,11 +66,30 @@ class CameraFragment: Fragment(), LifecycleOwner {
         }
 
         // TODO set up last project photo
+        if (cameraViewModel.photo != null){
+            val file = File(cameraViewModel.photo?.photo_url!!)
+            Glide.with(requireContext())
+                    .load(file).into(binding.previousPhoto)
+        }
+
+        binding.quickCompareFab.setOnTouchListener { v, event ->
+            when (event.action){
+                MotionEvent.ACTION_DOWN -> {
+                    binding.previousPhoto.visibility = View.VISIBLE
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    binding.previousPhoto.visibility = View.INVISIBLE
+                    true
+                }
+                else -> false
+            }
+        }
+
         // TODO set up photo verification?
 
         return binding.root
     }
-
 
     private fun startCamera() {
         var metrics = DisplayMetrics().also{viewFinder.display.getRealMetrics(it)}

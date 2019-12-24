@@ -10,7 +10,7 @@ import java.io.File
 
 class CameraViewModel(
         private val repository: Repository,
-        private val photo: Photo?
+        val photo: Photo?
 ) : ViewModel() {
     //val photos: LiveData<List<PhotoEntry>> = repository.getPhotos(projectId)
     //val currentProject: LiveData<Project> = repository.getProjectView(projectId)
