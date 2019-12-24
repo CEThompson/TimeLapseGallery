@@ -61,10 +61,7 @@ class Repository private constructor(
 
     fun getPhotos(projectId: Long) = photoDao.loadAllPhotosByProjectId(projectId)
 
-    fun getLastPhotoInProject(projectId: Long): PhotoEntry {
-        val photos = photoDao.loadAllPhotosByProjectId_NonLiveData(projectId)
-        return photos.get(photos.size-1)
-    }
+    fun getLastPhotoInProject(projectId: Long) = photoDao.getLastPhoto(projectId)
 
     fun getPhoto(projectId: Long, photoId: Long) = photoDao.loadPhoto(projectId, photoId)
 

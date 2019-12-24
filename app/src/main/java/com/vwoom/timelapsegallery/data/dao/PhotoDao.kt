@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.data.dao
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 

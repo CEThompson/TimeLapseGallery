@@ -12,11 +12,11 @@ import kotlinx.coroutines.launch
 class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel() {
     val photos: LiveData<List<PhotoEntry>> = repository.getPhotos(projectId)
     val currentProject: LiveData<Project> = repository.getProjectView(projectId)
-    val currentPhoto: MutableLiveData<PhotoEntry> = MutableLiveData(repository.getLastPhotoInProject(projectId))
+    val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
 
 
-    var isPlaying: Boolean = false
-    var photoPosition: Int = photos.value!!.size
+    //var isPlaying: Boolean = false
+    //var photoPosition: Int = photos.value!!.size
 
     fun nextPhoto(){
         // TODO set current photo to next here

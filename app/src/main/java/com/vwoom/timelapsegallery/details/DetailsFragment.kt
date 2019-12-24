@@ -72,7 +72,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     private var mImageIsLoaded = false
 
     // Swipe listener for image navigation
-    //private var mOnSwipeTouchListener: OnSwipeTouchListener? = null
+    private var mOnSwipeTouchListener: OnSwipeTouchListener? = null
 
     private val args: DetailsFragmentArgs by navArgs()
 
@@ -85,6 +85,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        mCurrentProject = args.clickedProject
 
         mExternalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
@@ -130,23 +132,23 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         binding.fullscreenFab.setOnClickListener { if (!mPlaying) mFullscreenImageDialog?.show() }
 
         // Set a swipe listener for the image
-        // TODO mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
-        // TODO binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // todo override on perform click
+        mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
+        binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // todo override on perform click
 
 
         // TODO (update) implement pinch zoom on fullscreen image
-        // TODO initializeFullscreenImageDialog()
+        initializeFullscreenImageDialog()
 
         // Initialize fab color
         binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
         binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorGreen)
 
         // Set the transition name for the image
-        // Set the transition name for the image
         val transitionName: String = "${mCurrentProject?.project_id} + ${mCurrentProject?.project_name}"
         binding.detailsCardContainer.transitionName = transitionName
 
-        // TODO setupViewModel(savedInstanceState)
+        setupViewModel()
+
         return binding.root
     }
 
@@ -258,11 +260,11 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         }
     }
 
-    /*
+
     fun loadUi(photoEntry: PhotoEntry) { // Set the fullscreen image dialogue to the current photo
         if (!mPlaying) preloadFullscreenImage()
         // Notify the adapter
-        mDetailsAdapter!!.setCurrentPhoto(photoEntry)
+        mDetailsAdapter?.setCurrentPhoto(photoEntry)
         // Load the current image
         loadImage(FileUtils.getPhotoUrl(mExternalFilesDir, mCurrentProject, photoEntry))
         // Get info for the current photo
@@ -347,6 +349,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .into(binding.detailNextImage)
     }
 
+    /*
     // Loads the set of images concurrently
     private fun playSetOfImages() { // Lazy Initialize handler
         if (mPlayHandler == null) mPlayHandler = Handler()
@@ -435,7 +438,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         detailsViewModel.setPhoto(clickedPhoto)
     }
 
-/*
+
     fun initializeFullscreenImageDialog() {
         // Create the dialog
         mFullscreenImageDialog = Dialog(requireContext(), R.style.Theme_AppCompat_Light_NoActionBar_FullScreen)
@@ -467,6 +470,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     // TODO (update) implement dual loading solution for smooth transition between fullscreen images
     // Pre loads the selected image into the hidden dialogue so that display appears immediate
     private fun preloadFullscreenImage() {
+        if (mCurrentPhoto == null) return
         val path = FileUtils.getPhotoUrl(mExternalFilesDir, mCurrentProject, mCurrentPhoto)
         val current = File(path)
         Glide.with(this)
@@ -475,7 +479,21 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     }
 
     // Binds project and photos to database
-    private fun setupViewModel(savedInstanceState: Bundle?) { //DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getProject_id());
+    private fun setupViewModel() { //DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getProject_id());
+
+        // Observe the current selected project
+        detailsViewModel.currentProject.observe(this, Observer { currentProject: Project ->
+            mCurrentProject = currentProject
+            binding.detailsProjectNameTextView.setText(mCurrentProject?.project_name)
+        })
+
+        // Load the ui based on the current photo
+        detailsViewModel.currentPhoto.observe(this, Observer { currentPhoto: PhotoEntry? ->
+            mCurrentPhoto = currentPhoto
+            if (currentPhoto != null) {
+                loadUi(currentPhoto)
+            }
+        })
 
         // Observe the list of photos
         detailsViewModel.photos.observe(this, Observer<List<PhotoEntry>> { photoEntries: List<PhotoEntry> ->
@@ -486,13 +504,10 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             mDetailsAdapter?.setPhotoData(mPhotos, mCurrentProject)
 
             // Set current photo to last if none has been selected
-            if (savedInstanceState == null || mCurrentPhoto == null) mCurrentPhoto = getLastPhoto()
+            //if (mCurrentPhoto == null) mCurrentPhoto = getLastPhoto()
 
             // Restore the play position
             mCurrentPlayPosition = mPhotos?.indexOf(mCurrentPhoto)
-
-            // Load the ui based on the current photo
-            loadUi(mCurrentPhoto!!)
 
             // Set the date of the project based on the first photo entry
             val firstTimestamp = mPhotos?.get(0)?.timestamp
@@ -503,17 +518,12 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
             // Set max for progress bar
             binding.imageLoadingProgress.max = mPhotos!!.size - 1
-        })
 
-        // Load the ui based on the current photo
-        detailsViewModel.currentPhoto.observe(this, Observer { currentPhoto: PhotoEntry ->
-            loadUi(currentPhoto)
-        })
-
-        // Observe the current selected project
-        detailsViewModel.currentProject.observe(this, Observer { currentProject: Project ->
-            mCurrentProject = currentProject
-            binding.detailsProjectNameTextView.setText(mCurrentProject?.project_name)
+            // If current isn't set, set it to last
+            if (detailsViewModel.currentPhoto.value == null) {
+                mCurrentPhoto = mPhotos!!.get(mPhotos!!.size-1)
+                detailsViewModel.currentPhoto.value = mCurrentPhoto
+            }
         })
     }
 
@@ -558,14 +568,6 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             gestureDetector = GestureDetector(ctx, GestureListener())
         }
     }
-
-
-    // Returns the last photo
-    private fun getLastPhoto(): PhotoEntry? {
-        return mPhotos!![mPhotos!!.size - 1]
-    }
-
-    */
 
     /*
     //Deletes the current photo
