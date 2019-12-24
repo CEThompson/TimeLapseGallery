@@ -106,7 +106,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         setHasOptionsMenu(true)
         val toolbar = binding.detailsFragmentToolbar
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
-        toolbar.title = getString(R.string.project_details)
+        toolbar?.title = getString(R.string.project_details)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
 
         // Set up adapter and recycler view
@@ -487,14 +487,6 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             binding.detailsProjectNameTextView.setText(mCurrentProject?.project_name)
         })
 
-        // Load the ui based on the current photo
-        detailsViewModel.currentPhoto.observe(this, Observer { currentPhoto: PhotoEntry? ->
-            mCurrentPhoto = currentPhoto
-            if (currentPhoto != null) {
-                loadUi(currentPhoto)
-            }
-        })
-
         // Observe the list of photos
         detailsViewModel.photos.observe(this, Observer<List<PhotoEntry>> { photoEntries: List<PhotoEntry> ->
             // Save the list of photos
@@ -523,6 +515,14 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             if (detailsViewModel.currentPhoto.value == null) {
                 mCurrentPhoto = mPhotos!!.get(mPhotos!!.size-1)
                 detailsViewModel.currentPhoto.value = mCurrentPhoto
+            }
+        })
+
+        // Load the ui based on the current photo
+        detailsViewModel.currentPhoto.observe(this, Observer { currentPhoto: PhotoEntry? ->
+            mCurrentPhoto = currentPhoto
+            if (currentPhoto != null) {
+                loadUi(currentPhoto)
             }
         })
     }
