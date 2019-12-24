@@ -6,17 +6,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vwoom.timelapsegallery.data.Repository
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
+import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.utils.FileUtils
 import kotlinx.coroutines.launch
+import java.io.File
 
 class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel() {
     val photos: LiveData<List<PhotoEntry>> = repository.getPhotos(projectId)
     val currentProject: LiveData<Project> = repository.getProjectView(projectId)
     val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
 
-
     //var isPlaying: Boolean = false
     //var photoPosition: Int = photos.value!!.size
+
+    var lastPhoto: Photo? = null
+
+    fun setLastPhotoByEntry(externalFilesDir: File, project: Project, entry: PhotoEntry){
+        val url = FileUtils.getPhotoUrl(externalFilesDir, project, entry)
+        lastPhoto = Photo(entry.project_id, entry.id, entry.timestamp, url)
+    }
 
     fun nextPhoto(){
         // TODO set current photo to next here

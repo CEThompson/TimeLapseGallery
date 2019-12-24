@@ -54,7 +54,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Set up navigation to add new projects
         mNewProjectFab?.setOnClickListener { v: View? ->
-            val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment()
+            val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null)
 
             // TODO fix extras of shared elements
             val extras = FragmentNavigatorExtras(

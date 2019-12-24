@@ -118,8 +118,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
         // Set the listener to add a photo to the project
         binding.addPhotoFab.setOnClickListener {
-            // TODO send info to camera fragment to add photo to current project
-            val action = DetailsFragmentDirections.actionDetailsFragmentToCameraFragment()
+            val action = DetailsFragmentDirections.actionDetailsFragmentToCameraFragment(detailsViewModel.lastPhoto)
             findNavController().navigate(action)
         }
 
@@ -150,7 +149,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         setupViewModel()
 
         showPhotoInformation()
-        
+
         return binding.root
     }
 
@@ -493,6 +492,12 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         detailsViewModel.photos.observe(this, Observer<List<PhotoEntry>> { photoEntries: List<PhotoEntry> ->
             // Save the list of photos
             mPhotos = photoEntries
+
+            // convert the last photoentry in mPhotos into a photo abstraction and store in viewmodel to send when the add photo fab is clicked
+            if (mPhotos != null && mPhotos?.size != 0){
+                val lastPhotoEntry: PhotoEntry = mPhotos?.get(mPhotos!!.size-1)!!
+                detailsViewModel.setLastPhotoByEntry(mExternalFilesDir!!, mCurrentProject!!, lastPhotoEntry)
+            }
 
             // Send the photos to the adapter
             mDetailsAdapter?.setPhotoData(mPhotos, mCurrentProject)
