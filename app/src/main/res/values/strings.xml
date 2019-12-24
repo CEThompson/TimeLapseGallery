@@ -83,6 +83,7 @@
     <string name="number_of_days">In %1$d Days</string>
     <string name="timespan">%1$s - %2$s</string>
     <string name="next">Next photo: %1$s at %2$s</string>
+    <string name="project_identification">%1$d %2$s</string>
 
     <string name="transition_tag" translatable="false">transition tag</string>
     <string name="default_aspect_ratio" translatable="false">1:1</string>

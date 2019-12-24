@@ -480,12 +480,19 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     }
 
     // Binds project and photos to database
-    private fun setupViewModel() { //DetailsViewModelFactory factory = new DetailsViewModelFactory(mTimeLapseDatabase, mCurrentProject.getProject_id());
+    private fun setupViewModel() {
 
         // Observe the current selected project
         detailsViewModel.currentProject.observe(this, Observer { currentProject: Project ->
             mCurrentProject = currentProject
-            binding.detailsProjectNameTextView.setText(mCurrentProject?.project_name)
+
+            val name = mCurrentProject?.project_name
+            if (name == null)
+                binding.detailsProjectNameTextView.setText(mCurrentProject?.project_id.toString())
+            else {
+                val projectIdentification = getString(R.string.project_identification, mCurrentProject?.project_id, mCurrentProject?.project_name)
+                binding.detailsProjectNameTextView.setText(projectIdentification)
+            }
         })
 
         // Observe the list of photos
