@@ -35,7 +35,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val galleryRecyclerView = view.gallery_recycler_view
+
         mNewProjectFab = view.add_project_FAB
 
         // Increase columns for horizontal orientation
@@ -47,10 +47,18 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Set up the recycler view
         val gridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
 
-        galleryRecyclerView.layoutManager = gridLayoutManager
-        galleryRecyclerView.setHasFixedSize(false) // adjusting views at runtime
-        galleryRecyclerView.adapter = mGalleryAdapter
-
+        val galleryRecyclerView = view.gallery_recycler_view
+        galleryRecyclerView.apply {
+            layoutManager = gridLayoutManager
+            setHasFixedSize(false)
+            adapter = mGalleryAdapter
+            postponeEnterTransition()
+            viewTreeObserver.addOnPreDrawListener {
+                startPostponedEnterTransition()
+                true
+            }
+        }
+        
         // Set up navigation to add new projects
         mNewProjectFab?.setOnClickListener { v: View? ->
             val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null)
