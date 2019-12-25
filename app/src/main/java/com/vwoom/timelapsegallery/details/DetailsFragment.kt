@@ -148,8 +148,10 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorGreen)
 
         // Set the transition name for the image
-        val transitionName: String = "${mCurrentProject?.project_id}"
-        binding.detailsCardContainer.transitionName = transitionName
+        val imageTransitionName= "${mCurrentProject?.project_id}"
+        val cardTransitionName = imageTransitionName + "card"
+        binding.detailCurrentImage.transitionName = imageTransitionName
+        binding.detailsCardContainer.transitionName = cardTransitionName
 
         setupViewModel()
 

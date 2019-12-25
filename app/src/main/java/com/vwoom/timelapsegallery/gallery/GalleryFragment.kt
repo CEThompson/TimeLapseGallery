@@ -16,6 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.Keys
 import kotlinx.android.synthetic.main.fragment_gallery.view.*
@@ -100,11 +101,19 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         })
     }
 
-    override fun onClick(clickedProject: Project, sharedElement: View, transitionName: String, position: Int) {
+    override fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int) {
+        val imageTransitionName = clickedProject.project_id.toString()
+        val cardTransitionName = imageTransitionName + "card"
+
+        // Set transition targets
+        binding.projectImage.transitionName = imageTransitionName
+        binding.projectCardView.transitionName = cardTransitionName
+
         val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProject, position)
         val extras = FragmentNavigatorExtras(
                 mNewProjectFab as View to Keys.ADD_FAB_TRANSITION_NAME,
-                sharedElement to transitionName
+                binding.projectImage to imageTransitionName,
+                binding.projectCardView to cardTransitionName
         )
         findNavController().navigate(action, extras)
     }

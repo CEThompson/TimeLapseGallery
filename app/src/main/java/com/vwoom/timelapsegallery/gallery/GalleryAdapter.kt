@@ -26,7 +26,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
     private val mExternalFilesDir: File?
 
     interface GalleryAdapterOnClickHandler {
-        fun onClick(clickedProject: Project, sharedElement: View, transitionName: String, position: Int)
+        fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int)
     }
 
     inner class GalleryAdapterViewHolder(var binding: GalleryRecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
@@ -34,8 +34,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
             val clickedProject = mProjectData!![adapterPosition]
-            val transitionName = binding.projectCardView.transitionName
-            mClickHandler.onClick(clickedProject, binding.projectCardView, transitionName, adapterPosition)
+            mClickHandler.onClick(clickedProject, binding, adapterPosition)
         }
 
         init {
@@ -110,11 +109,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
             binding.nextSubmissionDayCountdownTextview.visibility = View.INVISIBLE
             binding.projectImageGradientOverlay.visibility = View.INVISIBLE
         }
-        // Set the transition name
-        val transitionName = currentProject.project_id.toString()
-        binding.projectCardView.transitionName = transitionName
-        // TODO set the transition name to the photo url
-        binding.projectCardView.setTag(R.string.transition_tag, thumbnail_path)
+
         // Load the image
         val f = File(thumbnail_path)
         Glide.with(holder.itemView.context)
