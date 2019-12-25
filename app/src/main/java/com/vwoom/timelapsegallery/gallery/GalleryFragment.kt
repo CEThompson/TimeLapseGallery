@@ -38,7 +38,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mNewProjectFab = view.add_project_FAB
 
         // TODO implement shared element transition
-        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
+        sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
 
         // Increase columns for horizontal orientation
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) mNumberOfColumns = 6
@@ -102,18 +102,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     override fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int) {
-        val imageTransitionName = clickedProject.project_id.toString()
-        val cardTransitionName = imageTransitionName + "card"
-
-        // Set transition targets
-        binding.projectImage.transitionName = imageTransitionName
-        binding.projectCardView.transitionName = cardTransitionName
-
         val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProject, position)
         val extras = FragmentNavigatorExtras(
                 mNewProjectFab as View to Keys.ADD_FAB_TRANSITION_NAME,
-                binding.projectImage to imageTransitionName,
-                binding.projectCardView to cardTransitionName
+                binding.projectImage to binding.projectImage.transitionName,
+                binding.projectCardView to binding.projectCardView.transitionName
         )
         findNavController().navigate(action, extras)
     }

@@ -110,6 +110,12 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
             binding.projectImageGradientOverlay.visibility = View.INVISIBLE
         }
 
+        // Set transition targets
+        val imageTransitionName = currentProject.project_id.toString()
+        val cardTransitionName = imageTransitionName + "card"
+        binding.projectImage.transitionName = imageTransitionName
+        binding.projectCardView.transitionName = cardTransitionName
+
         // Load the image
         val f = File(thumbnail_path)
         Glide.with(holder.itemView.context)
