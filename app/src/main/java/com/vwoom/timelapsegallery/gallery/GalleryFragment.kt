@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -74,6 +75,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar.title = getString(R.string.app_name)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
+        // TODO: determine if setting up action bar with nav contoller is worth it
+        //  (activity as TimeLapseGalleryActivity).setupActionBarWithNavController(findNavController())
         return rootView
     }
 

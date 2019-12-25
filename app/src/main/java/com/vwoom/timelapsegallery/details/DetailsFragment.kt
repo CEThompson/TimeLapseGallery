@@ -112,7 +112,10 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         val toolbar = binding.detailsFragmentToolbar
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar?.title = getString(R.string.project_details)
-        (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
+        (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
 
         // Set up adapter and recycler view
         mDetailsAdapter = DetailsAdapter(this, requireContext())
