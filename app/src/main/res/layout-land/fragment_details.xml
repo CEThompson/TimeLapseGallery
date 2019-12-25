@@ -208,7 +208,7 @@
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_photo_fab"
             android:contentDescription="@string/add_photo_fab_content_description"
-            android:transitionName="add_fab"
+            android:transitionName="@string/key_add_transition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/fab_detail_margin_bottom"

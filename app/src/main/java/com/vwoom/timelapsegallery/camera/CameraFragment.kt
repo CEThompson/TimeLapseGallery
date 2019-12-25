@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.graphics.Matrix
 import android.os.Bundle
 import android.os.Environment
+import android.transition.TransitionInflater
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Rational
@@ -87,6 +88,8 @@ class CameraFragment: Fragment(), LifecycleOwner {
         }
 
         // TODO set up photo verification?
+        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
+        sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
 
         return binding.root
     }

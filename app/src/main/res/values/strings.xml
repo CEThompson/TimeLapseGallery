@@ -198,6 +198,6 @@
     <string name="key_ads_disabled" translatable="false">ads_disabled</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="key_add_transition" translatable="false">add</string>
 
 </resources>
