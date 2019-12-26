@@ -23,6 +23,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.FragmentCameraBinding
 import com.vwoom.timelapsegallery.details.CameraViewModel
@@ -31,6 +32,8 @@ import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.android.synthetic.main.fragment_camera.*
 import java.io.File
 import java.util.concurrent.Executors
+
+// TODO hunt down memory leak
 
 // Arbitrary number to keep track of permission request
 private const val REQUEST_CODE_PERMISSIONS = 10
@@ -48,6 +51,10 @@ class CameraFragment: Fragment(), LifecycleOwner {
     private val cameraViewModel: CameraViewModel by viewModels {
         InjectorUtils.provideCameraViewModelFactory(requireActivity(), args.photo)
     }
+
+    private var mTakePictureFab: FloatingActionButton? = null
+
+    private var mPreview: Preview? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = DataBindingUtil.inflate<FragmentCameraBinding>(inflater, R.layout.fragment_camera, container, false).apply {
@@ -94,6 +101,13 @@ class CameraFragment: Fragment(), LifecycleOwner {
         return binding.root
     }
 
+    override fun onStop() {
+        super.onStop()
+        mPreview?.removePreviewOutputListener()
+    }
+
+
+
     private fun startCamera() {
         var metrics = DisplayMetrics().also{viewFinder.display.getRealMetrics(it)}
         val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
@@ -110,8 +124,8 @@ class CameraFragment: Fragment(), LifecycleOwner {
             setTargetRotation(activity!!.windowManager.defaultDisplay.rotation)
         }.build()
 
-        val preview = Preview(previewConfig)
-        preview.setOnPreviewOutputUpdateListener {
+        mPreview = Preview(previewConfig)
+        mPreview?.setOnPreviewOutputUpdateListener {
             // Get all dimensions
             metrics = DisplayMetrics().also { viewFinder.display.getRealMetrics(it) }
             val previewWidth = metrics.widthPixels
@@ -153,7 +167,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
                 }.build()
 
         val imageCapture = ImageCapture(imageCaptureConfig)
-        activity?.take_picture_fab?.setOnClickListener {
+        mTakePictureFab?.setOnClickListener {
             // TODO handle external files directory better, perhaps as a companion object?
             val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
             val file = FileUtils.createTemporaryImageFile(externalFilesDir)
@@ -178,7 +192,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
 
         }
 
-        CameraX.bindToLifecycle(this, preview, imageCapture)
+        CameraX.bindToLifecycle(this, mPreview, imageCapture)
     }
 
     override fun onRequestPermissionsResult(

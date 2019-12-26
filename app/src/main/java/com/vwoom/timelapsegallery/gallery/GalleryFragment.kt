@@ -91,6 +91,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar.title = getString(R.string.app_name)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
+        // TODO: Hunt down toolbar leaks
         // TODO: determine if setting up action bar with nav contoller is worth it
         //  (activity as TimeLapseGalleryActivity).setupActionBarWithNavController(findNavController())
         return rootView
