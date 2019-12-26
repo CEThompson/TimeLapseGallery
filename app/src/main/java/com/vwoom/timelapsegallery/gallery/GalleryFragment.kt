@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -30,9 +31,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mGalleryAdapter: GalleryAdapter? = null
     private var mProjects: List<Project>? = null
 
+    private lateinit var recycler: RecyclerView
+
     private var mNumberOfColumns = 3
     private val TAG = GalleryFragment::class.java.simpleName
-
+    
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -53,12 +56,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             setHasFixedSize(false)
             adapter = mGalleryAdapter
             postponeEnterTransition()
-            viewTreeObserver.addOnPreDrawListener {
-                startPostponedEnterTransition()
-                true
-            }
+            viewTreeObserver.addOnPreDrawListener(object: ViewTreeObserver.OnPreDrawListener{
+                override fun onPreDraw(): Boolean {
+                    startPostponedEnterTransition()
+                    viewTreeObserver.removeOnPreDrawListener(this)
+                    return true
+                }
+            })
         }
-        
+
         // Set up navigation to add new projects
         mNewProjectFab?.setOnClickListener { v: View? ->
             val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null)
@@ -70,6 +76,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             findNavController().navigate(action, extras)
         }
         setupViewModel()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mNewProjectFab?.setOnClickListener(null)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

@@ -100,6 +100,11 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         postponeEnterTransition()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.detailsFragmentToolbar.setNavigationOnClickListener(null)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         // TODO determine if this apply block is necessary
