@@ -65,6 +65,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
         }
 
         viewFinder = binding.viewFinder
+        mTakePictureFab = binding.takePictureFab
 
         // Request camera permissions
         if (allPermissionsGranted()) {
@@ -172,7 +173,6 @@ class CameraFragment: Fragment(), LifecycleOwner {
             // TODO handle external files directory better, perhaps as a companion object?
             val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
             val file = FileUtils.createTemporaryImageFile(externalFilesDir)
-
             imageCapture.takePicture(file, executor,
                     object: ImageCapture.OnImageSavedListener{
                         override fun onError(
@@ -180,8 +180,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
                                 message: String,
                                 cause: Throwable?) {
                             viewFinder.post{ Toast.makeText(context, "Capture failed: $message", Toast.LENGTH_LONG).show()}
-                            // TODO error log
-                            Log.e("Camera Activity", "Capture Failed: $message")
+                            Log.e(TAG, "Capture Failed: $message")
                         }
 
                         override fun onImageSaved(file: File) {
