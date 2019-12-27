@@ -22,7 +22,7 @@
                 android:id="@+id/project_image"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:background="@color/imagePlaceholder"
+                android:background="@color/darkImagePlaceHolder"
                 android:contentDescription="@string/project_image_content_description"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
