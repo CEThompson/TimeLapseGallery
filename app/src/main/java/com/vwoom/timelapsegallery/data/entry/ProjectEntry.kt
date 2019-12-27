@@ -7,7 +7,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "project")
 data class ProjectEntry(
         var project_name: String?,
-        var cover_set_by_user: Int = 0) {
+        var cover_set_by_user: Int = 0)
+// TODO remove cover set by user
+{
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 
