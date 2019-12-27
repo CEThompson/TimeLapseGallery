@@ -34,6 +34,7 @@ import java.io.File
 import java.util.concurrent.Executors
 
 // TODO hunt down memory leak
+// TODO: Fix camera does not start after request permission
 
 // Arbitrary number to keep track of permission request
 private const val REQUEST_CODE_PERMISSIONS = 10
