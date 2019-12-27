@@ -20,9 +20,9 @@ object InjectorUtils {
                 TimeLapseDatabase.getInstance(context.applicationContext).projectScheduleDao())
     }
 
-    fun provideCameraViewModelFactory(context: Context, photo: Photo?): CameraViewModelFactory {
+    fun provideCameraViewModelFactory(context: Context, photo: Photo?, project: Project?): CameraViewModelFactory {
         val repository = getRepository(context)
-        return CameraViewModelFactory(repository, photo)
+        return CameraViewModelFactory(repository, photo, project)
     }
 
     fun provideDetailsViewModelFactory(context: Context, project: Project): DetailsViewModelFactory {

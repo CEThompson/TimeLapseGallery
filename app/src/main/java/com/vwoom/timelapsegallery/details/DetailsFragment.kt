@@ -125,14 +125,16 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
         // Set up adapter and recycler view
         mDetailsAdapter = DetailsAdapter(this, requireContext())
-        val linearLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        val linearLayoutManager
+                = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
         binding.detailsRecyclerview.layoutManager = linearLayoutManager
         binding.detailsRecyclerview.adapter = mDetailsAdapter
 
         // Set the listener to add a photo to the project
         binding.addPhotoFab.setOnClickListener {
-            val action = DetailsFragmentDirections.actionDetailsFragmentToCameraFragment(detailsViewModel.lastPhoto)
+            val action = DetailsFragmentDirections
+                    .actionDetailsFragmentToCameraFragment(detailsViewModel.lastPhoto, mCurrentProject)
             findNavController().navigate(action)
         }
 

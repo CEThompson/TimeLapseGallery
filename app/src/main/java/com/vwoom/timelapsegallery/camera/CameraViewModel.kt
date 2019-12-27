@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vwoom.timelapsegallery.data.Repository
 import com.vwoom.timelapsegallery.data.view.Photo
+import com.vwoom.timelapsegallery.data.view.Project
 import kotlinx.coroutines.launch
 import java.io.File
 
 class CameraViewModel(
         private val repository: Repository,
-        val photo: Photo?
+        val photo: Photo?,
+        val project: Project?
 ) : ViewModel() {
 
     var resultPhoto: Photo? = null
@@ -20,7 +22,7 @@ class CameraViewModel(
             if (photo == null) repository.newProject(file, externalFilesDir)
             // Otherwise add photo to project
             else {
-                repository.addPhotoToProject(file, externalFilesDir, photo.project_id)
+                repository.addPhotoToProject(file, externalFilesDir, project!!)
             }
         }
     }

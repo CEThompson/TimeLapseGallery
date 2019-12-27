@@ -55,6 +55,10 @@
             android:name="photo"
             app:argType="com.vwoom.timelapsegallery.data.view.Photo"
             app:nullable="true" />
+        <argument
+            android:name="project"
+            app:argType="com.vwoom.timelapsegallery.data.view.Project"
+            app:nullable="true" />
     </fragment>
 
 </navigation>

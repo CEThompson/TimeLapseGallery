@@ -50,15 +50,13 @@ class Repository private constructor(
         FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
     }
 
-    suspend fun addPhotoToProject(file: File, externalFilesDir: File, projectId: Long){
+    suspend fun addPhotoToProject(file: File, externalFilesDir: File, project: Project){
         val timestamp = System.currentTimeMillis()
-        val photoEntry = PhotoEntry(projectId, timestamp)
-        val projectEntry = projectDao.loadProjectById(projectId)
+        val photoEntry = PhotoEntry(project.project_id, timestamp)
         photoDao.insertPhoto(photoEntry)
         // TODO set up a work manager to handle file operations
-        FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
+        FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, project, timestamp)
     }
-
 
     fun getProjectViews() = projectDao.loadProjectViews()
 

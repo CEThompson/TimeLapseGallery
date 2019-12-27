@@ -37,6 +37,16 @@ public final class FileUtils {
         return new File(projectDir, imageFileName);
     }
 
+    private static File createImageFileForProject(File storageDirectory, Project project, long timestamp) {
+        // Create an image file name from the current timestamp
+        String imageFileName = timestamp + ".jpg";
+        File projectDir = getProjectFolder(storageDirectory, project);
+
+        if (!projectDir.exists()) projectDir.mkdirs();
+
+        return new File(projectDir, imageFileName);
+    }
+
     private static File getProjectFolder(File externalFilesDir, ProjectEntry project){
         //File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         String projectPath = getProjectDirectoryPath(project);
@@ -110,6 +120,23 @@ public final class FileUtils {
             long timestamp) throws IOException {
         // Create the permanent file for the photo
         File finalFile = createImageFileForProject(externalFilesDir, currentProject, timestamp);
+        // Create tempfile from previous path
+        File tempFile = new File(tempPath);
+        // Copy file to new destination
+        copy(tempFile, finalFile);
+        // Remove temporary file
+        tempFile.delete();
+
+        return finalFile;
+    }
+
+    public static File createFinalFileFromTemp(
+            File externalFilesDir,
+            String tempPath,
+            Project project,
+            long timestamp) throws IOException {
+        // Create the permanent file for the photo
+        File finalFile = createImageFileForProject(externalFilesDir, project, timestamp);
         // Create tempfile from previous path
         File tempFile = new File(tempPath);
         // Copy file to new destination
