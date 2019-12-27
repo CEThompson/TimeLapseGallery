@@ -71,8 +71,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
         if (allPermissionsGranted()) {
             viewFinder.post { startCamera() }
         } else {
-            ActivityCompat.requestPermissions(
-                    activity as Activity, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+            requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
         // TODO set up last project photo
@@ -201,7 +200,10 @@ class CameraFragment: Fragment(), LifecycleOwner {
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS){
             if (allPermissionsGranted()){
-                viewFinder.post { startCamera() }
+                viewFinder.post {
+                    Toast.makeText(this.requireContext(), "Permissions granted, firing up the camera.", Toast.LENGTH_SHORT).show()
+                    startCamera()
+                }
             } else {
                 Toast.makeText(this.requireContext(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
             }
