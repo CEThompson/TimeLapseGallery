@@ -186,6 +186,8 @@ class CameraFragment: Fragment(), LifecycleOwner {
                         override fun onImageSaved(file: File) {
                             viewFinder.post{ Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show()}
                             cameraViewModel.handleFile(file, externalFilesDir)
+                            // TODO create job to handle adding a new project or handle adding a photo to a project
+                            // TODO navigate back on job finish
                             //findNavController().popBackStack()
                         }
                     })
