@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.details
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,6 +39,15 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
         mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto)
         loadUi(mCurrentPhoto)
          */
+
+        if (photos.value == null || photos.value!!.size <= 1) return
+        if (currentPhoto.value == null) return
+
+        val index: Int = photos.value!!.indexOf(currentPhoto.value!!)
+
+        if (index == photos.value!!.size - 1) return
+
+        currentPhoto.value = photos.value!!.get(index+1)
     }
 
     fun previousPhoto(){
@@ -51,11 +61,23 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
         mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto)
         loadUi(mCurrentPhoto)
          */
+
+        if (photos.value == null || photos.value!!.size <= 0) return
+        if (currentPhoto.value == null) return
+
+        val index: Int = photos.value!!.indexOf(currentPhoto.value!!)
+
+        if (index == 0) return
+
+        currentPhoto.value = photos.value!!.get(index-1)
+
     }
 
 
 
-    fun setPhoto(photoEntry: PhotoEntry) {currentPhoto.value = photoEntry}
+    fun setPhoto(photoEntry: PhotoEntry) {
+        currentPhoto.value = photoEntry
+    }
 
     fun setCoverPhoto(photoEntry: PhotoEntry) {
         viewModelScope.launch {
