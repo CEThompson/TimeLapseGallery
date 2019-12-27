@@ -10,6 +10,7 @@ import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.view.Photo
+import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
 import java.io.File
 
@@ -49,9 +50,13 @@ class Repository private constructor(
         FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
     }
 
-    suspend fun addPhotoToProject(photo: Photo){
-        val photoEntry = PhotoEntry(photo.project_id, photo.photo_timestamp)
+    suspend fun addPhotoToProject(file: File, externalFilesDir: File, projectId: Long){
+        val timestamp = System.currentTimeMillis()
+        val photoEntry = PhotoEntry(projectId, timestamp)
+        val projectEntry = projectDao.loadProjectById(projectId)
         photoDao.insertPhoto(photoEntry)
+        // TODO set up a work manager to handle file operations
+        FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
     }
 
 
