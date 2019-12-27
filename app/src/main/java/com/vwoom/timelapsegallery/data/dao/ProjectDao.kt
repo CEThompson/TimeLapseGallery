@@ -19,7 +19,7 @@ interface ProjectDao {
     fun loadAllScheduledProjects(): List<ProjectEntry>
 
     @Query("SELECT * FROM project WHERE id = :id")
-    fun loadProjectById(id: Long): ProjectEntry?
+    suspend fun loadProjectById(id: Long): ProjectEntry?
 
     @Query("SELECT * FROM project WHERE id = :id")
     fun loadLiveDataProjectById(id: Long): LiveData<ProjectEntry>
