@@ -53,7 +53,11 @@ class Repository private constructor(
     suspend fun addPhotoToProject(file: File, externalFilesDir: File, project: Project){
         val timestamp = System.currentTimeMillis()
         val photoEntry = PhotoEntry(project.project_id, timestamp)
-        photoDao.insertPhoto(photoEntry)
+        val photoId = photoDao.insertPhoto(photoEntry)
+
+        val coverPhotoEntry = CoverPhotoEntry(project.project_id, photoId)
+        coverPhotoDao.insertPhoto(coverPhotoEntry)
+
         // TODO set up a work manager to handle file operations
         FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, project, timestamp)
     }
