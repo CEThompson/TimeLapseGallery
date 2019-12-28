@@ -68,8 +68,6 @@ class Repository private constructor(
 
     fun getPhotos(projectId: Long) = photoDao.loadAllPhotosByProjectId(projectId)
 
-    fun getLastPhotoInProject(projectId: Long) = photoDao.getLastPhoto(projectId)
-
     fun getPhoto(projectId: Long, photoId: Long) = photoDao.loadPhoto(projectId, photoId)
 
     suspend fun setCoverPhoto(photoEntry: PhotoEntry) {

@@ -14,12 +14,17 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.notification.NotificationUtils
+import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils
+import kotlinx.coroutines.launch
 
 class SettingsFragment : PreferenceFragmentCompat() {
     var prefs: SharedPreferences? = null
@@ -37,11 +42,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
     var mShowingVerifySyncDialog: Boolean? = null
     var mResponse: String? = null
 
+    private lateinit var settingsViewModel: SettingsViewModel
+
     /* Analytics */
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        settingsViewModel = InjectorUtils.provideSettingsViewModel(requireActivity())
 
         // TODO handle database sync in coroutine or work manager
 
@@ -169,6 +178,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     // Execute the sync in the background
                     // TODO execute database sync with coroutine or work manager
                     // executeDatabaseSync()
+                    if (ProjectUtils.validateFileStructure(requireContext()) == getString(R.string.valid_file_structure)){
+                        settingsViewModel.viewModelScope.launch {
+                            ProjectUtils.importProjects(requireContext())
+                        }
+                    }
                     mShowingVerifySyncDialog = false
                 }
                 .setNegativeButton(R.string.cancel){_,_ -> mShowingVerifySyncDialog = false}

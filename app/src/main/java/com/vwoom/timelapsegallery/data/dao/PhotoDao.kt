@@ -17,7 +17,7 @@ interface PhotoDao {
     fun loadPhoto(project_id: Long, photo_id: Long): PhotoEntry
 
     @Query("SELECT * FROM photo WHERE project_id = :project_id ORDER BY timestamp DESC LIMIT 1")
-    fun getLastPhoto(project_id: Long): PhotoEntry
+    suspend fun getLastPhoto(project_id: Long): PhotoEntry
 
     @Insert
     suspend fun insertPhoto(photoEntry: PhotoEntry): Long
