@@ -1,15 +1,11 @@
 package com.vwoom.timelapsegallery.details
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
 import android.transition.TransitionInflater
 import android.util.Log
 import android.view.*
@@ -42,9 +38,7 @@ import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentDetailsBinding
-import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
-import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -74,7 +68,6 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
     // For playing timelapse
     private var mPlaying = false
-    private var mPlayHandler: Handler? = null
     private var mImageIsLoaded = false
 
     // Swipe listener for image navigation
@@ -379,6 +372,12 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
     // Loads the set of images concurrently
     private fun playSetOfImages() { // Lazy Initialize handler
+        if (mPlaying) {
+            stopPlaying()
+            mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
+            return
+        }
+
         mCurrentPlayPosition = mPhotos!!.indexOf(mCurrentPhoto)
 
         // If not enough photos give user feedback
@@ -388,51 +387,44 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                     .show()
             return
         }
-        // If already playing cancel
-        if (mPlaying) {
-            stopPlaying()
-            // Track stop event
-            mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
-        } else {
-            binding.fullscreenFab.hide()
-            // Set color of play fab
-            binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
-            binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorRedAccent)
-            // Set paying true
-            mPlaying = true
-            // Handle UI
-            binding.playAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp)
 
-            // Schedule the runnable for a certain number of ms from now
-            val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), "50")
-            val playbackInterval = playbackIntervalSharedPref!!.toLong()
+        binding.fullscreenFab.hide()
+        // Set color of play fab
+        binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
+        binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorRedAccent)
+        // Set paying true
+        mPlaying = true
+        // Handle UI
+        binding.playAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp)
 
-            // If the play position / current photo is at the end, start from the beginning
-            if (mCurrentPlayPosition == mPhotos!!.size - 1) {
-                mCurrentPlayPosition = 0
-                detailsViewModel.setPhoto(mPhotos!![0])
-            }
+        // Schedule the runnable for a certain number of ms from now
+        val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), "50")
+        val playbackInterval = playbackIntervalSharedPref!!.toLong()
 
-            // Otherwise start from wherever it is at
-            binding.imageLoadingProgress.progress = mCurrentPlayPosition!!
-            scheduleLoadPhoto(mCurrentPlayPosition!!, playbackInterval) // Recursively loads the rest of set from beginning
-
-            // Track play button interaction
-            mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_play_time_lapse), null)
+        // If the play position / current photo is at the end, start from the beginning
+        if (mCurrentPlayPosition == mPhotos!!.size - 1) {
+            mCurrentPlayPosition = 0
+            detailsViewModel.setPhoto(mPhotos!![0])
         }
+
+        // Otherwise start from wherever it is at
+        binding.imageLoadingProgress.progress = mCurrentPlayPosition!!
+        scheduleLoadPhoto(mCurrentPlayPosition!!, playbackInterval) // Recursively loads the rest of set from beginning
+
+        // Track play button interaction
+        mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_play_time_lapse), null)
+
     }
 
     // Resets the UI & handles state after playing
     private fun stopPlaying() { // Set color of play fab
+        playJob?.cancel()
+        mPlaying = false
+
         binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
         binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorGreen)
-        // Set playing false and cancel runnable
-        mPlaying = false
-        mPlayHandler!!.removeCallbacksAndMessages(null)
         binding.playAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp)
-        // Set current photo to position set from playing
-        mCurrentPhoto = mPhotos!!.get(mCurrentPlayPosition!!)
         binding.fullscreenFab.show()
     }
 
