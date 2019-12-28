@@ -18,7 +18,7 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
     val currentProject: LiveData<Project> = repository.getProjectView(projectId)
     val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
 
-    //var isPlaying: Boolean = false
+    var isPlaying: Boolean = false
     //var photoPosition: Int = photos.value!!.size
 
     var lastPhoto: Photo? = null
@@ -29,17 +29,8 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
     }
 
     fun nextPhoto(){
-        // TODO set current photo to next here
-        /*
-        if (mPlaying) return
-        // Otherwise adjust the current photo to the next
-        val currentIndex: Int = mPhotos.indexOf(mCurrentPhoto)
-        if (currentIndex == 0) return
-        mCurrentPhoto = mPhotos.get(currentIndex - 1)
-        mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto)
-        loadUi(mCurrentPhoto)
-         */
 
+        if (isPlaying) return
         if (photos.value == null || photos.value!!.size <= 1) return
         if (currentPhoto.value == null) return
 
@@ -51,17 +42,7 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
     }
 
     fun previousPhoto(){
-        // TODO set previous photo here
-        /*
-        if (mPlaying) return
-        // Otherwise adjust the current photo to the previous
-        val currentIndex: Int = mPhotos.indexOf(mCurrentPhoto)
-        if (currentIndex == mPhotos.size() - 1) return
-        mCurrentPhoto = mPhotos.get(currentIndex + 1)
-        mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto)
-        loadUi(mCurrentPhoto)
-         */
-
+        if (isPlaying) return
         if (photos.value == null || photos.value!!.size <= 0) return
         if (currentPhoto.value == null) return
 
@@ -71,6 +52,17 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
 
         currentPhoto.value = photos.value!!.get(index-1)
 
+    }
+
+    fun currentIsLast(): Boolean {
+        if (photos.value == null) return false
+        if (currentPhoto.value == null) return false
+
+        val listOfPhotos: List<PhotoEntry> = photos.value!!
+        val size = listOfPhotos.size
+
+        if (listOfPhotos.indexOf(currentPhoto.value!!) == size -1) return true
+        return false
     }
 
 

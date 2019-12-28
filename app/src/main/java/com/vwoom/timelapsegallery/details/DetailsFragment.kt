@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.transition.TransitionInflater
+import android.util.Log
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.OnTouchListener
@@ -22,6 +23,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
@@ -43,6 +45,9 @@ import com.vwoom.timelapsegallery.databinding.FragmentDetailsBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 
 class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler {
@@ -140,7 +145,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
         // Show the set of images in succession
         binding.playAsVideoFab.setOnClickListener {
-            //playSetOfImages()
+            playSetOfImages()
         }
 
         // Set a listener to display the image fullscreen
@@ -174,6 +179,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
     override fun onPause() {
         super.onPause()
+        playJob?.cancel()
         // If the activity stops while playing make sure to cancel runnables
         // TODO handle playing
         //if (mPlaying) stopPlaying()
@@ -370,11 +376,11 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .into(binding.detailNextImage)
     }
 
-    /*
+
     // Loads the set of images concurrently
     private fun playSetOfImages() { // Lazy Initialize handler
-        if (mPlayHandler == null) mPlayHandler = Handler()
-        if (mCurrentPlayPosition == null) mCurrentPlayPosition = mPhotos!!.indexOf(mCurrentPhoto)
+        mCurrentPlayPosition = mPhotos!!.indexOf(mCurrentPhoto)
+
         // If not enough photos give user feedback
         if (mPhotos!!.size <= 1) {
             Snackbar.make(binding.detailsCoordinatorLayout, R.string.add_more_photos,
@@ -385,8 +391,6 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         // If already playing cancel
         if (mPlaying) {
             stopPlaying()
-            // Handle UI
-            loadUi(mCurrentPhoto!!)
             // Track stop event
             mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
         } else {
@@ -398,17 +402,21 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             mPlaying = true
             // Handle UI
             binding.playAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp)
+
             // Schedule the runnable for a certain number of ms from now
             val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
             val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), "50")
-            val playbackInterval = playbackIntervalSharedPref!!.toInt()
+            val playbackInterval = playbackIntervalSharedPref!!.toLong()
+
             // If the play position / current photo is at the end, start from the beginning
             if (mCurrentPlayPosition == mPhotos!!.size - 1) {
                 mCurrentPlayPosition = 0
-            } // Otherwise start from wherever it is at
-            loadUi(mPhotos!![mCurrentPlayPosition!!])
+            }
+
+            // Otherwise start from wherever it is at
             binding.imageLoadingProgress.progress = mCurrentPlayPosition!!
             scheduleLoadPhoto(mCurrentPlayPosition!!, playbackInterval) // Recursively loads the rest of set from beginning
+
             // Track play button interaction
             mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_play_time_lapse), null)
         }
@@ -423,37 +431,40 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         mPlayHandler!!.removeCallbacksAndMessages(null)
         binding.playAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp)
         // Set current photo to position set from playing
-        mCurrentPhoto = mPhotos!![mCurrentPlayPosition!!]
+        mCurrentPhoto = mPhotos!!.get(mCurrentPlayPosition!!)
         binding.fullscreenFab.show()
     }
 
+    var playJob: Job? = null
+
     // TODO convert these runnables into coroutine chain?
-    private fun scheduleLoadPhoto(position: Int, interval: Int) {
+    private fun scheduleLoadPhoto(position: Int, interval: Long) {
+        Log.e("DetailsFragment", "schedule loading position $position")
+        if (position < 0 || position >= mPhotos!!.size) {
+            mPlaying = false
+            binding.playAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp)
+            //mCurrentPhoto = mPhotos!![mPhotos!!.size-1]
+            binding.imageLoadingProgress.progress = position
+            binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
+            binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorGreen)
+            binding.fullscreenFab.show()
+            return
+        }
+
         mCurrentPlayPosition = position
-        val runnable = label@ Runnable {
-            // If the position is final position clean up
-            if (position == mPhotos!!.size - 1) {
-                mPlaying = false
-                binding.playAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp)
-                mCurrentPhoto = mPhotos!![position]
-                binding.imageLoadingProgress.progress = position
-                binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-                binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorGreen)
-                binding.fullscreenFab.show()
-                return@label
-            }
+
+        playJob = detailsViewModel.viewModelScope.launch {
+            delay(interval)
             // If image is loaded load the next photo
             if (mImageIsLoaded) {
-                loadUi(mPhotos!![position + 1])
+                detailsViewModel.nextPhoto()
                 binding.imageLoadingProgress.progress = position + 1
                 scheduleLoadPhoto(position + 1, interval)
             } else {
                 scheduleLoadPhoto(position, interval)
             }
         }
-        mPlayHandler!!.postDelayed(runnable, interval.toLong())
     }
-*/
 
     override fun onClick(clickedPhoto: PhotoEntry) {
         detailsViewModel.setPhoto(clickedPhoto)
@@ -595,8 +606,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 return result
             }
         }
-        fun onSwipeRight() = detailsViewModel.nextPhoto()
-        fun onSwipeLeft() = detailsViewModel.previousPhoto()
+        fun onSwipeRight() = detailsViewModel.previousPhoto()
+        fun onSwipeLeft() = detailsViewModel.nextPhoto()
 
         init {
             gestureDetector = GestureDetector(ctx, GestureListener())
