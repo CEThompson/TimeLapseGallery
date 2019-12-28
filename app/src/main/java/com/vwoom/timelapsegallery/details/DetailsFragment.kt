@@ -411,6 +411,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             // If the play position / current photo is at the end, start from the beginning
             if (mCurrentPlayPosition == mPhotos!!.size - 1) {
                 mCurrentPlayPosition = 0
+                detailsViewModel.setPhoto(mPhotos!![0])
             }
 
             // Otherwise start from wherever it is at
@@ -443,7 +444,6 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         if (position < 0 || position >= mPhotos!!.size) {
             mPlaying = false
             binding.playAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp)
-            //mCurrentPhoto = mPhotos!![mPhotos!!.size-1]
             binding.imageLoadingProgress.progress = position
             binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
             binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorGreen)
