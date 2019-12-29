@@ -284,7 +284,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         // Notify the adapter
         mDetailsAdapter?.setCurrentPhoto(photoEntry)
         // Load the current image
-        loadImage(FileUtils.getPhotoUrl(mExternalFilesDir, mCurrentProject, photoEntry))
+        loadImage(FileUtils.getPhotoUrl(mExternalFilesDir!!, mCurrentProject!!, photoEntry))
         // Get info for the current photo
         val timestamp = photoEntry.timestamp
         val photoNumber = mPhotos!!.indexOf(photoEntry) + 1
@@ -495,7 +495,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     // Pre loads the selected image into the hidden dialogue so that display appears immediate
     private fun preloadFullscreenImage() {
         if (mCurrentPhoto == null) return
-        val path = FileUtils.getPhotoUrl(mExternalFilesDir, mCurrentProject, mCurrentPhoto)
+        val path = FileUtils.getPhotoUrl(mExternalFilesDir!!, mCurrentProject!!, mCurrentPhoto!!)
         val current = File(path)
         Glide.with(this)
                 .load(current)
