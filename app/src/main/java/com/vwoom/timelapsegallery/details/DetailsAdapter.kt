@@ -54,7 +54,7 @@ class DetailsAdapter(private val mClickHandler: DetailsAdapterOnClickHandler, co
         val binding = holder.binding
         val context = holder.itemView.context
         val currentPhoto = mPhotos?.get(position)
-        val photo_path = FileUtils.getPhotoUrl(mExternalFilesDir, mProject, currentPhoto)
+        val photo_path = FileUtils.getPhotoUrl(mExternalFilesDir!!, mProject!!, currentPhoto!!)
         val f = File(photo_path)
         // TODO (update) dynamically resize detail view
         Glide.with(context)

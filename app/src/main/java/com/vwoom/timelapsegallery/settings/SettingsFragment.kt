@@ -122,7 +122,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
             // If the user changes the notifications enabled preference trigger the notification worker to update any alarms
             if (key.equals(this.getString(R.string.key_notifications_enabled))) {
-                NotificationUtils.scheduleNotificationWorker(activity);
+                NotificationUtils.scheduleNotificationWorker(requireContext());
 
                 // Log notifications
                 val notificationsEnabled = prefs.getBoolean(activity?.getString(R.string.key_notifications_enabled), true)
@@ -132,7 +132,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
             // Same for notification time
             if (key.equals(this.getString(R.string.key_notification_time))) {
-                NotificationUtils.scheduleNotificationWorker(activity)
+                NotificationUtils.scheduleNotificationWorker(requireContext())
 
                 // Log notification time selection
                 val notificationTime = prefs.getString(activity?.getString(R.string.key_notification_time), "7")

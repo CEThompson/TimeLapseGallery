@@ -69,7 +69,7 @@ object NotificationUtils {
                     NotificationManager.IMPORTANCE_DEFAULT)
             channel.description = CHANNEL_DESCRIPTION
             val notificationManager = context.getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(channel)
+            notificationManager?.createNotificationChannel(channel)
         }
     }
 
@@ -91,7 +91,7 @@ object NotificationUtils {
 
     /* Cancels any previous notification workers and schedules a new periodic notification worker.
     * The notification workers checks each day to set a notification for tomorrow. */
-    fun scheduleNotificationWorker(context: Context?) {
+    fun scheduleNotificationWorker(context: Context) {
         WorkManager.getInstance(context!!).cancelAllWorkByTag(NotificationWorker.TAG)
         Log.d(TAG, "Notification Tracker: Creating and enqueuing work reqeust")
         val constraints = Constraints.Builder()
@@ -105,10 +105,10 @@ object NotificationUtils {
     }
 
     /* Cancels alarms AND cancels any notification workers*/
-    fun cancelNotificationWorker(context: Context?) {
+    fun cancelNotificationWorker(context: Context) {
         Log.d(TAG, "Notification Tracker: Canceling notifications")
         val notificationAlarm = NotificationAlarm()
         notificationAlarm.cancelAlarms(context)
-        WorkManager.getInstance(context!!).cancelAllWorkByTag(TAG)
+        WorkManager.getInstance(context).cancelAllWorkByTag(TAG)
     }
 }

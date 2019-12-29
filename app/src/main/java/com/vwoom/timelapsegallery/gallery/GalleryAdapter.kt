@@ -76,7 +76,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
         Log.d(TAG, "cover photo timestamp is " + cover_photo_timestamp)
 
         // TODO test photo url from hashmap
-        val thumbnail_path = FileUtils.getCoverPhotoUrl(mExternalFilesDir, currentProject)
+        val thumbnail_path = FileUtils.getCoverPhotoUrl(mExternalFilesDir!!, currentProject)
         Log.d(TAG, "thumbnail_path is $thumbnail_path")
         // Set the constraint ratio
         val ratio = PhotoUtils.getAspectRatioFromImagePath(thumbnail_path)
