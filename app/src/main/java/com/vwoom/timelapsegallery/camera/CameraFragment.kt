@@ -34,6 +34,8 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
+// TODO camera x is somehow leaking: hunt it down
+
 class CameraFragment: Fragment(), LifecycleOwner {
 
     private val executor = Executors.newSingleThreadExecutor()
