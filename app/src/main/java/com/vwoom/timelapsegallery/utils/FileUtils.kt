@@ -50,9 +50,9 @@ object FileUtils {
                 val url = child.absolutePath
                 val filename = url.substring(url.lastIndexOf("/") + 1)
                 // Split the filename at the extension
-                val filenameParts = filename.split("\\.").toTypedArray()
+                val filenameParts = filename.split(".").toTypedArray()
                 val extension = filenameParts[1]
-                println("FileUtilsTest " + Arrays.toString(filenameParts))
+
                 if (extension == "txt") continue  // If the child is a text file skip it
                 // This regex matches and replaces (removes) the file extension
 // long timestamp = Long.valueOf(filename.replaceFirst("[.][^.]+$",""));
@@ -63,7 +63,6 @@ object FileUtils {
         } else return null
         // Sort the photo entries by timestamp
         photos.sortBy { it.timestamp }
-        // TODO test timestamp sort
         return photos
     }
 
