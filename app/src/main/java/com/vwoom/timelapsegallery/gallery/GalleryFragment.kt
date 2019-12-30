@@ -65,7 +65,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Set up the adapter for the recycler view
         mGalleryAdapter = GalleryAdapter(this, this.requireContext())
-        Log.d(TAG, "mProjectsAdapter is null: ${mGalleryAdapter == null}")
+
         // Set up the recycler view
         val gridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
 
