@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.transition.TransitionInflater
 import android.util.Log
 import android.view.*
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -18,28 +19,46 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.databinding.FragmentDetailsBinding
+import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.Keys
+import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.android.synthetic.main.fragment_gallery.view.*
 
 
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     var mNewProjectFab: FloatingActionButton? = null
-
     private var mGalleryAdapter: GalleryAdapter? = null
     private var mProjects: List<Project>? = null
 
-    private lateinit var recycler: RecyclerView
 
-    private var mNumberOfColumns = 3
-    private val TAG = GalleryFragment::class.java.simpleName
-    
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mNewProjectFab = null
+        mGalleryAdapter = null
+    }
 
-        mNewProjectFab = view.add_project_FAB
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+
+        val binding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
+            lifecycleOwner = viewLifecycleOwner
+        }
+
+        mNewProjectFab = binding.addProjectFAB
+
+        // Set up options menu
+        setHasOptionsMenu(true)
+        val toolbar = binding.galleryFragmentToolbar
+        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
+        toolbar.title = getString(R.string.app_name)
+        (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
+        // TODO: Hunt down toolbar leaks
+        // TODO: determine if setting up action bar with nav contoller is worth it
+        //  (activity as TimeLapseGalleryActivity).setupActionBarWithNavController(findNavController())
 
         // Increase columns for horizontal orientation
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) mNumberOfColumns = 6
@@ -50,7 +69,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Set up the recycler view
         val gridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
 
-        val galleryRecyclerView = view.gallery_recycler_view
+        val galleryRecyclerView = binding.galleryRecyclerView
         galleryRecyclerView.apply {
             layoutManager = gridLayoutManager
             setHasFixedSize(false)
@@ -76,25 +95,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             findNavController().navigate(action, extras)
         }
         setupViewModel()
-    }
 
-    override fun onStop() {
-        super.onStop()
-        mNewProjectFab?.setOnClickListener(null)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        setHasOptionsMenu(true)
-        val rootView = inflater.inflate(R.layout.fragment_gallery, container, false)
-        val toolbar = rootView.gallery_fragment_toolbar
-        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
-        toolbar.title = getString(R.string.app_name)
-        (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
-        // TODO: Hunt down toolbar leaks
-        // TODO: determine if setting up action bar with nav contoller is worth it
-        //  (activity as TimeLapseGalleryActivity).setupActionBarWithNavController(findNavController())
-        return rootView
+        return binding.root
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -131,4 +133,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         findNavController().navigate(action, extras)
     }
 
+    companion object {
+        private var mNumberOfColumns = 3
+        private val TAG = GalleryFragment::class.java.simpleName
+    }
 }
