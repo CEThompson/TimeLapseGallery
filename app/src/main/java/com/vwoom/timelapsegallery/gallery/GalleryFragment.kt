@@ -41,6 +41,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mGalleryAdapter = null
     }
 
+    override fun onStop() {
+        super.onStop()
+        (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
@@ -62,6 +67,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Increase columns for horizontal orientation
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) mNumberOfColumns = 6
+        else mNumberOfColumns = 3
 
         // Set up the adapter for the recycler view
         mGalleryAdapter = GalleryAdapter(this, this.requireContext())
