@@ -197,7 +197,7 @@
     <string name="key_sync_allowed" translatable="false">sync_allowed</string>
     <string name="key_ads_disabled" translatable="false">ads_disabled</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: convert all keys to string resources -->
     <string name="key_add_transition" translatable="false">add</string>
 
 </resources>
