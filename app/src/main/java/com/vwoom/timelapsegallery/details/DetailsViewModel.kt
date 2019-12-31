@@ -75,15 +75,9 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
         }
     }
 
-    fun deletePhoto(photoEntry: PhotoEntry){
+    fun deleteCurrentPhoto(externalFilesDir: File){
         viewModelScope.launch {
-            repository.deletePhoto(photoEntry)
-        }
-    }
-
-    fun deleteCurrentPhoto(){
-        viewModelScope.launch {
-            repository.deletePhoto(currentPhoto.value!!)
+            repository.deletePhoto(externalFilesDir, currentPhoto.value!!)
         }
     }
 

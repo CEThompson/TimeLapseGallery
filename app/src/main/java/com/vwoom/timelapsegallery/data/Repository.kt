@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.data
 
 import android.util.Log
+import androidx.room.util.FileUtil
 import com.vwoom.timelapsegallery.data.dao.CoverPhotoDao
 import com.vwoom.timelapsegallery.data.dao.PhotoDao
 import com.vwoom.timelapsegallery.data.dao.ProjectDao
@@ -75,7 +76,11 @@ class Repository private constructor(
     }
 
 
-    suspend fun deletePhoto(photoEntry: PhotoEntry){ photoDao.deletePhoto(photoEntry) }
+    suspend fun deletePhoto(externalFilesDir: File, photoEntry: PhotoEntry){
+        val projectEntry = projectDao.loadProjectById(photoEntry.id)
+        FileUtils.deletePhoto(externalFilesDir, projectEntry, photoEntry)
+        photoDao.deletePhoto(photoEntry)
+    }
 
     suspend fun deleteProject(externalFilesDir: File, projectId: Long){
         val projectEntry = projectDao.loadProjectById(projectId)
