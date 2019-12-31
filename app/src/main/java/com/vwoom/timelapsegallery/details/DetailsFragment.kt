@@ -532,17 +532,21 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             // Save the list of photos
             mPhotos = photoEntries
 
-            // convert the last photoentry in mPhotos into a photo abstraction and store in viewmodel to send when the add photo fab is clicked
+            // Set the last photo whenever the list of photos changes
             if (mPhotos != null && mPhotos?.size != 0){
                 val lastPhotoEntry: PhotoEntry = mPhotos?.get(mPhotos!!.size-1)!!
+
+                // If the last photo in the set changes update to the current photo
+                if (lastPhotoEntry.id != detailsViewModel.lastPhoto?.photo_id) {
+                    detailsViewModel.currentPhoto.value = lastPhotoEntry
+                }
+
+                // Set the last photo
                 detailsViewModel.setLastPhotoByEntry(mExternalFilesDir!!, mCurrentProject!!, lastPhotoEntry)
             }
 
             // Send the photos to the adapter
             mDetailsAdapter?.setPhotoData(mPhotos, mCurrentProject)
-
-            // Set current photo to last if none has been selected
-            //if (mCurrentPhoto == null) mCurrentPhoto = getLastPhoto()
 
             // Restore the play position
             mCurrentPlayPosition = mPhotos?.indexOf(mCurrentPhoto)
@@ -557,7 +561,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             // Set max for progress bar
             binding.imageLoadingProgress.max = mPhotos!!.size - 1
 
-            // If current isn't set, set it to last
+            // If current photo isn't set, set it to the last photo
             if (detailsViewModel.currentPhoto.value == null) {
                 mCurrentPhoto = mPhotos!!.get(mPhotos!!.size-1)
                 detailsViewModel.currentPhoto.value = mCurrentPhoto
