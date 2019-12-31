@@ -637,7 +637,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int ->
                     // If this photo is the last photo then set the new thumbnail to its previous
-                    detailsViewModel.deleteCurrentPhoto()
+                    detailsViewModel.deleteCurrentPhoto(mExternalFilesDir!!)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
