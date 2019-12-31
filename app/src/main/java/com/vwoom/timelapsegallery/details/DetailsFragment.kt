@@ -136,6 +136,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
         // Set the listener to add a photo to the project
         binding.addPhotoFab.setOnClickListener {
+            // TODO: Determine if there is a better way to handle leaking toolbar references
+            (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
             val action = DetailsFragmentDirections
                     .actionDetailsFragmentToCameraFragment(detailsViewModel.lastPhoto, mCurrentProject)
             findNavController().navigate(action)
@@ -258,6 +260,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.settings -> {
+                // TODO: Determine if there is a better way to handle leaking toolbar references
+                (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
                 val action = DetailsFragmentDirections.actionDetailsFragmentToSettingsFragment()
                 findNavController().navigate(action)
                 true
