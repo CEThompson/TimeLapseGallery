@@ -1,7 +1,9 @@
 package com.vwoom.timelapsegallery.details
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -38,6 +40,7 @@ import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentDetailsBinding
+import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -268,10 +271,10 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             }
             R.id.delete_photo -> {
                 // TODO handle photo deletion through viewmodel
-                if (mPhotos?.size === 1) {
-                    //verifyLastPhotoDeletion()
+                if (mPhotos?.size == 1) {
+                    verifyLastPhotoDeletion()
                 } else {
-                    //verifyPhotoDeletion()
+                    verifyPhotoDeletion()
                 }
                 true
             }
@@ -577,7 +580,6 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         })
     }
 
-
     // Changes photo on swipe
     inner class OnSwipeTouchListener(ctx: Context?) : OnTouchListener {
         private val gestureDetector: GestureDetector
@@ -620,12 +622,6 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     }
 
     /*
-    //Deletes the current photo
-    private fun deletePhoto(photoEntry: PhotoEntry) {
-        detailsViewModel.deletePhoto(photoEntry)
-        mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_delete_photo), null)
-    }
-
     // Deletes the project and recursively deletes files from project folder
     private fun deleteProject(project: Project) { // Delete project from the database and photos from the file structure
         detailsViewModel.deleteProject(project)
@@ -641,16 +637,12 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_delete_project), null)
     }
 
-    // Gets the last photo from the set and sets it as the project thumbnail
-    private fun updateProjectThumbnail(photoEntry: PhotoEntry) {
-        detailsViewModel.setCoverPhoto(photoEntry)
-    }
-
     //Edits the current project
     private fun editProject() {
         // TODO handle editing project with dialog
     }
 
+*/
     private fun verifyPhotoDeletion() {
         AlertDialog.Builder(requireContext())
                 .setTitle(R.string.delete_photo)
@@ -668,7 +660,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setTitle(R.string.delete_photo)
                 .setMessage(R.string.verify_delete_last_photo)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int -> verifyProjectDeletion() }
+                .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int ->
+                    verifyProjectDeletion() }
                 .setNegativeButton(android.R.string.no, null).show()
     }
 
@@ -678,7 +671,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setTitle(R.string.delete_project)
                 .setMessage(R.string.verify_delete_project)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int -> doubleVerifyProjectDeletion() }
+                .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int ->
+                    doubleVerifyProjectDeletion() }
                 .setNegativeButton(android.R.string.no, null).show()
     }
 
@@ -694,6 +688,4 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
-    */
-
 }
