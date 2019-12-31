@@ -105,6 +105,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
     override fun onDestroy() {
         super.onDestroy()
+        // TODO rotation in camera fragment launched from details causes crash linking to this binding: figure this out
         binding.detailsFragmentToolbar.setNavigationOnClickListener(null)
     }
 
