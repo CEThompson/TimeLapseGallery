@@ -98,6 +98,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
         sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
 
+        enterTransition = TransitionInflater.from(context).inflateTransition(R.transition.details_enter_transition)
+
         postponeEnterTransition()
     }
 
