@@ -18,46 +18,48 @@
             <!-- FAB to compile a video from the images -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/play_as_video_fab"
-                android:contentDescription="@string/play_as_video_fab_content_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/fab_margin"
-                app:borderWidth="0dp"
+                android:contentDescription="@string/play_as_video_fab_content_description"
                 android:src="@drawable/ic_play_arrow_white_24dp"
+                app:borderWidth="0dp"
                 app:fabSize="normal"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Layout containing project information -->
-            <LinearLayout
-                android:id="@+id/project_information_layout"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/project_information_cardview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/fab_size"
-                android:orientation="vertical"
                 android:layout_margin="@dimen/detail_margin"
+                android:minHeight="@dimen/fab_size"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:id="@+id/details_project_name_text_view"
+                <LinearLayout
+                    android:id="@+id/project_information_layout"
+                    android:padding="@dimen/detail_margin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:textStyle="bold"
-                    tools:text="project name" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/details_project_timespan_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="@+id/details_project_name_text_view"
-                    app:layout_constraintTop_toBottomOf="@+id/details_project_name_text_view"
-                    tools:text="7/7/19 - 8/8/20" />
+                    <TextView
+                        android:id="@+id/details_project_name_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        tools:text="project name" />
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/details_project_timespan_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="7/7/19 - 8/8/20" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <!-- Photo Layout -->
             <androidx.cardview.widget.CardView
@@ -168,26 +170,25 @@
             <ProgressBar
                 android:id="@+id/image_loading_progress"
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_marginEnd="@dimen/fab_size_plus_padding"
-                android:layout_marginStart="@dimen/detail_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/detail_margin"
+                android:layout_marginEnd="@dimen/fab_size_plus_padding"
                 app:layout_constraintBottom_toTopOf="@+id/details_recyclerview"
-                app:layout_constraintStart_toStartOf="@+id/details_recyclerview"
-                app:layout_constraintEnd_toStartOf="@+id/details_recyclerview"/>
+                app:layout_constraintEnd_toStartOf="@+id/details_recyclerview"
+                app:layout_constraintStart_toStartOf="@+id/details_recyclerview" />
 
             <!-- Recycler view showing the photos in the project -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/details_recyclerview"
-                android:contentDescription="@string/details_recyclerview_content_description"
-                android:paddingEnd="@dimen/fab_size_plus_padding"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/detail_recyclerview_height"
                 android:background="@color/colorPrimaryDark"
-                app:layout_constraintStart_toStartOf="parent"
+                android:contentDescription="@string/details_recyclerview_content_description"
+                android:paddingEnd="@dimen/fab_size_plus_padding"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                />
+                app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -195,27 +196,27 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/details_fragment_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/AppToolbar"
-                android:minHeight="?attr/actionBarSize"/>
+                android:minHeight="?attr/actionBarSize"
+                android:theme="@style/AppToolbar" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <!-- FAB to add a new photo -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_photo_fab"
-            android:contentDescription="@string/add_photo_fab_content_description"
-            android:transitionName="@string/key_add_transition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/fab_detail_margin_bottom"
-            android:layout_marginEnd="@dimen/fab_margin"
-            android:src="@drawable/ic_add_white_24dp"
-            app:fabSize="normal"
             android:layout_gravity="bottom|end"
-            />
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_detail_margin_bottom"
+            android:contentDescription="@string/add_photo_fab_content_description"
+            android:src="@drawable/ic_add_white_24dp"
+            android:transitionName="@string/key_add_transition"
+            app:fabSize="normal" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
