@@ -59,8 +59,10 @@ class Repository private constructor(
         val coverPhotoEntry = CoverPhotoEntry(project.project_id, photoId)
         coverPhotoDao.insertPhoto(coverPhotoEntry)
 
+        val projectEntry = projectDao.loadProjectById(project.project_id)
+
         // TODO set up a work manager to handle file operations
-        FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, project, timestamp)
+        FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
     }
 
     fun getProjectViews() = projectDao.loadProjectViews()
@@ -77,7 +79,7 @@ class Repository private constructor(
 
 
     suspend fun deletePhoto(externalFilesDir: File, photoEntry: PhotoEntry){
-        val projectEntry = projectDao.loadProjectById(photoEntry.id)
+        val projectEntry = projectDao.loadProjectById(photoEntry.project_id)
         FileUtils.deletePhoto(externalFilesDir, projectEntry, photoEntry)
         photoDao.deletePhoto(photoEntry)
     }

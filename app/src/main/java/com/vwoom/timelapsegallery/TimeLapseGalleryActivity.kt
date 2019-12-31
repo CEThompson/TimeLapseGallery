@@ -1,7 +1,7 @@
 package com.vwoom.timelapsegallery
 
 import android.os.Bundle
-import android.util.Log
+import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.initialization.InitializationStatus
@@ -21,7 +21,6 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
     /* Ensure deletion of temporary photo files */
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("deletion check", "onStop newProjectActivity firing")
-        FileUtils.deleteTempFiles(this) // Make sure to clean up temporary files
+        FileUtils.deleteTempFiles(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES))
     }
 }
