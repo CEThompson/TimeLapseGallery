@@ -138,7 +138,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         binding.addPhotoFab.setOnClickListener {
             // TODO: Determine if there is a better way to handle leaking toolbar references
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
-            val action = DetailsFragmentDirections
+            val action = DetailsFragmentDirectionsmen
                     .actionDetailsFragmentToCameraFragment(detailsViewModel.lastPhoto, mCurrentProject)
             findNavController().navigate(action)
         }
