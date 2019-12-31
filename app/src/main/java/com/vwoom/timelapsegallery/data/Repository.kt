@@ -76,7 +76,14 @@ class Repository private constructor(
 
 
     suspend fun deletePhoto(photoEntry: PhotoEntry){ photoDao.deletePhoto(photoEntry) }
-    suspend fun deleteProject(projectId: Long){ projectDao.deleteProject(projectId) }
+
+    suspend fun deleteProject(externalFilesDir: File, projectId: Long){
+        val projectEntry = projectDao.loadProjectById(projectId)
+        // Delete files first since there is a listener on the project
+        FileUtils.deleteProject(externalFilesDir, projectEntry)
+        // Now remove reference from the database
+        projectDao.deleteProject(projectEntry)
+    }
 
     companion object {
         @Volatile private var instance: Repository? = null

@@ -42,6 +42,7 @@ import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentDetailsBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
+import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -279,7 +280,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 true
             }
             R.id.delete_project -> {
-                //verifyProjectDeletion()
+                verifyProjectDeletion()
                 true
             }
             R.id.edit_project -> {
@@ -544,6 +545,9 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                     detailsViewModel.currentPhoto.value = lastPhotoEntry
                 }
 
+                // Set the cover photo to the last in the set
+                detailsViewModel.setCoverPhoto(lastPhotoEntry)
+
                 // Set the last photo
                 detailsViewModel.setLastPhotoByEntry(mExternalFilesDir!!, mCurrentProject!!, lastPhotoEntry)
             }
@@ -621,28 +625,11 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         }
     }
 
-    /*
-    // Deletes the project and recursively deletes files from project folder
-    private fun deleteProject(project: Project) { // Delete project from the database and photos from the file structure
-        detailsViewModel.deleteProject(project)
-
-        if (project.schedule_time != null && project.interval_days != null) {
-            NotificationUtils.scheduleNotificationWorker(requireContext())
-            UpdateWidgetService.startActionUpdateWidgets(requireContext())
-        }
-
-        // Send to analytics
-        val params = Bundle()
-        params.putString("project_name", project.project_name)
-        mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_delete_project), null)
-    }
-
     //Edits the current project
     private fun editProject() {
         // TODO handle editing project with dialog
     }
 
-*/
     private fun verifyPhotoDeletion() {
         AlertDialog.Builder(requireContext())
                 .setTitle(R.string.delete_photo)
@@ -683,8 +670,13 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setMessage(R.string.double_verify_project_deletion)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int ->
-                    detailsViewModel.deleteCurrentProject()
-                    NotificationUtils.scheduleNotificationWorker(requireContext())
+                    detailsViewModel.deleteCurrentProject(mExternalFilesDir!!)
+                    // If current project had a schedule remove the notification and update widgets
+                    if (mCurrentProject?.schedule_time != null && mCurrentProject?.interval_days != null) {
+                        NotificationUtils.scheduleNotificationWorker(requireContext())
+                        UpdateWidgetService.startActionUpdateWidgets(requireContext())
+                    }
+                    findNavController().popBackStack()
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }

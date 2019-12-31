@@ -170,10 +170,9 @@ object FileUtils {
     }
 
     /* Delete project directory and files within project directory */
-    fun deleteProject(context: Context, projectEntry: ProjectEntry) {
+    fun deleteProject(externalFilesDir: File, projectEntry: ProjectEntry) {
         val projectDirectoryPath = getProjectDirectoryPath(projectEntry)
-        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val projectDirectory = File(storageDir, projectDirectoryPath)
+        val projectDirectory = File(externalFilesDir, projectDirectoryPath)
         deleteRecursive(projectDirectory)
     }
 

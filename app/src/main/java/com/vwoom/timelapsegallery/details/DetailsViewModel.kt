@@ -65,8 +65,6 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
         return false
     }
 
-
-
     fun setPhoto(photoEntry: PhotoEntry) {
         currentPhoto.value = photoEntry
     }
@@ -89,15 +87,9 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
         }
     }
 
-    fun deleteProject(project: Project){
+    fun deleteCurrentProject(externalFilesDir: File) {
         viewModelScope.launch {
-            repository.deleteProject(project.project_id)
-        }
-    }
-
-    fun deleteCurrentProject() {
-        viewModelScope.launch {
-            repository.deleteProject(currentProject?.value?.project_id!!)
+            repository.deleteProject(externalFilesDir, currentProject?.value?.project_id!!)
         }
     }
 }
