@@ -91,12 +91,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             // Note: navigating from gallery to detail results in activity leaking toolbar as reference
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
             val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null,null)
-
-            // TODO fix extras of shared elements
-            val extras = FragmentNavigatorExtras(
-                    mNewProjectFab as View to getString(R.string.key_add_transition)
-            )
-            findNavController().navigate(action, extras)
+            findNavController().navigate(action)
         }
         setupViewModel()
 

@@ -34,6 +34,7 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
 // TODO camera x is somehow leaking: hunt it down
+// TODO handle photo verification and completion
 
 class CameraFragment: Fragment(), LifecycleOwner {
 
@@ -94,11 +95,6 @@ class CameraFragment: Fragment(), LifecycleOwner {
                 else -> false
             }
         }
-
-        // TODO set up photo verification?
-        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
-        sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
-
         return binding.root
     }
 
