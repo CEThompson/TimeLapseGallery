@@ -53,18 +53,7 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
         currentPhoto.value = photos.value!!.get(index-1)
 
     }
-
-    fun currentIsLast(): Boolean {
-        if (photos.value == null) return false
-        if (currentPhoto.value == null) return false
-
-        val listOfPhotos: List<PhotoEntry> = photos.value!!
-        val size = listOfPhotos.size
-
-        if (listOfPhotos.indexOf(currentPhoto.value!!) == size -1) return true
-        return false
-    }
-
+    
     fun setPhoto(photoEntry: PhotoEntry) {
         currentPhoto.value = photoEntry
     }
