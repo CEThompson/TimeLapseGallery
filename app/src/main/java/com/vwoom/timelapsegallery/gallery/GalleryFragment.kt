@@ -41,11 +41,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mGalleryAdapter = null
     }
 
-    override fun onStop() {
-        super.onStop()
-        (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
@@ -92,6 +87,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Set up navigation to add new projects
         mNewProjectFab?.setOnClickListener { v: View? ->
+            // TODO: Determine if there is a better way to handle leaking toolbar references
+            // Note: navigating from gallery to detail results in activity leaking toolbar as reference
+            (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
             val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null,null)
 
             // TODO fix extras of shared elements
@@ -113,6 +111,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId){
             R.id.settings_option -> {
+                // TODO: Determine if there is a better way to handle leaking toolbar references
+                (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
                 val action = GalleryFragmentDirections.actionGalleryFragmentToSettingsFragment()
                 findNavController().navigate(action)
                 true
