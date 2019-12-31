@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.details
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,7 +18,6 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
     val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
 
     var isPlaying: Boolean = false
-    //var photoPosition: Int = photos.value!!.size
 
     var lastPhoto: Photo? = null
 
@@ -53,7 +51,7 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
         currentPhoto.value = photos.value!!.get(index-1)
 
     }
-    
+
     fun setPhoto(photoEntry: PhotoEntry) {
         currentPhoto.value = photoEntry
     }
