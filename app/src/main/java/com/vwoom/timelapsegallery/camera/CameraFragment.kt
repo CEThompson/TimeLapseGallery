@@ -13,7 +13,6 @@ import android.view.*
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
@@ -59,7 +58,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<FragmentCameraBinding>(inflater, R.layout.fragment_camera, container, false).apply {
+        val binding = FragmentCameraBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
 
