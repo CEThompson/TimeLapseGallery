@@ -72,7 +72,8 @@ class CameraFragment: Fragment(), LifecycleOwner {
             requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-        // TODO set up last project photo
+        // Loads the last photo from the project into the compare view
+        // If a project has been passed as a parameter
         if (cameraViewModel.photo != null){
             val file = File(cameraViewModel.photo?.photo_url!!)
             Glide.with(requireContext())
