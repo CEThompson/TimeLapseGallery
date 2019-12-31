@@ -41,12 +41,7 @@ class Repository private constructor(
         val projectScheduleEntry = ProjectScheduleEntry(project_id, null, null)
         coverPhotoDao.insertPhoto(coverPhotoEntry)
         projectScheduleDao.insertProjectSchedule(projectScheduleEntry)
-        
-        Log.d("TimeLapseRepository", "$projectEntry")
-        Log.d("TimeLapseRepository", "$photoEntry")
-        Log.d("TimeLapseRepository", "$coverPhotoEntry")
-        Log.d("TimeLapseRepository", "$projectScheduleEntry")
-
+    
         // TODO set up a work manager to handle file operations
         FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
     }
@@ -71,12 +66,9 @@ class Repository private constructor(
 
     fun getPhotos(projectId: Long) = photoDao.loadAllPhotosByProjectId(projectId)
 
-    fun getPhoto(projectId: Long, photoId: Long) = photoDao.loadPhoto(projectId, photoId)
-
     suspend fun setCoverPhoto(photoEntry: PhotoEntry) {
         coverPhotoDao.insertPhoto(CoverPhotoEntry(photoEntry.project_id, photoEntry.id))
     }
-
 
     suspend fun deletePhoto(externalFilesDir: File, photoEntry: PhotoEntry){
         val projectEntry = projectDao.loadProjectById(photoEntry.project_id)
@@ -107,7 +99,5 @@ class Repository private constructor(
                             coverPhotoDao,
                             projectScheduleDao).also { instance = it }
                 }
-
     }
-
 }
