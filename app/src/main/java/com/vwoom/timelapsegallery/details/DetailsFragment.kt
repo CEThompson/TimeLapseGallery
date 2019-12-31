@@ -103,6 +103,11 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         binding.detailsFragmentToolbar.setNavigationOnClickListener(null)
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (mFullscreenImageDialog?.isShowing == true) mFullscreenImageDialog?.dismiss()
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         // TODO determine if this apply block is necessary
