@@ -79,6 +79,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
                     .load(file).into(binding.previousPhoto)
         }
 
+        // TODO: Override perform click for ontouch listener
         binding.quickCompareFab.setOnTouchListener { v, event ->
             when (event.action){
                 MotionEvent.ACTION_DOWN -> {
