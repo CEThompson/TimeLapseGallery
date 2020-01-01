@@ -13,10 +13,6 @@ import com.vwoom.timelapsegallery.notification.NotificationUtils.convertDayOfYea
 import com.vwoom.timelapsegallery.notification.NotificationUtils.notifyUserOfScheduledProjects
 import java.util.*
 
-const val REQUEST_CODE = "request_code"
-private const val applicationId = BuildConfig.APPLICATION_ID
-const val CREATE_NOTIFICATION_AUTHORITY = "$applicationId.CREATE_NOTIFICATION"
-
 class NotificationAlarm : BroadcastReceiver() {
     /* This receives the pending intent broadcast and creates the notification */
     override fun onReceive(context: Context, intent: Intent) {
@@ -86,5 +82,8 @@ class NotificationAlarm : BroadcastReceiver() {
 
     companion object {
         private val TAG = NotificationAlarm::class.java.simpleName
+        private const val REQUEST_CODE = "request_code"
+        private const val applicationId = BuildConfig.APPLICATION_ID
+        private const val CREATE_NOTIFICATION_AUTHORITY = "$applicationId.CREATE_NOTIFICATION"
     }
 }
