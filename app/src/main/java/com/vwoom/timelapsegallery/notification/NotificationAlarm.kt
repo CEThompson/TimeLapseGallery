@@ -7,11 +7,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
 import android.util.Log
+import com.vwoom.timelapsegallery.BuildConfig
 import com.vwoom.timelapsegallery.notification.NotificationUtils.clearPreviousNotifications
 import com.vwoom.timelapsegallery.notification.NotificationUtils.convertDayOfYearToNotificationTime
 import com.vwoom.timelapsegallery.notification.NotificationUtils.notifyUserOfScheduledProjects
-import com.vwoom.timelapsegallery.utils.Keys
 import java.util.*
+
+const val REQUEST_CODE = "request_code"
+private const val applicationId = BuildConfig.APPLICATION_ID
+const val CREATE_NOTIFICATION_AUTHORITY = "$applicationId.CREATE_NOTIFICATION"
 
 class NotificationAlarm : BroadcastReceiver() {
     /* This receives the pending intent broadcast and creates the notification */
@@ -23,7 +27,7 @@ class NotificationAlarm : BroadcastReceiver() {
         val timeout: Long = 1000 // release wakelock after 1 second
         w1.acquire(timeout)
         // Get the request code
-        val requestCode = intent.getIntExtra(Keys.REQUEST_CODE, 0)
+        val requestCode = intent.getIntExtra(REQUEST_CODE, 0)
         Log.d(TAG, "Notification Tracker: Request code is $requestCode")
         Log.d(TAG, "Notification Tracker: Action type is " + intent.action)
         // Clear any previous notifications that are unused
@@ -45,8 +49,8 @@ class NotificationAlarm : BroadcastReceiver() {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         // Create the intent
         val intent = Intent(context, NotificationAlarm::class.java)
-        intent.putExtra(Keys.REQUEST_CODE, requestCode)
-        intent.action = Keys.CREATE_NOTIFICATION_AUTHORITY + requestCode
+        intent.putExtra(REQUEST_CODE, requestCode)
+        intent.action = CREATE_NOTIFICATION_AUTHORITY + requestCode
         val pendingIntent = PendingIntent
                 .getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         // Convert tomorrow into a timestamp at a set notification time
@@ -62,7 +66,7 @@ class NotificationAlarm : BroadcastReceiver() {
         // Create the intent
         val intent = Intent(context, NotificationAlarm::class.java)
         // Note: intent action is modified by project id same as above
-        intent.action = Keys.CREATE_NOTIFICATION_AUTHORITY + dayOfYear
+        intent.action = CREATE_NOTIFICATION_AUTHORITY + dayOfYear
         // Create the pending intent identified by both request code and intent
         val sender = PendingIntent.getBroadcast(context, dayOfYear, intent, 0)
         // Now cancel the alarm

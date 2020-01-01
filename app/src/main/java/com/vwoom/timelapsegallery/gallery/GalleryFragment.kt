@@ -1,31 +1,21 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.os.Bundle
-import android.transition.TransitionInflater
-import android.util.Log
 import android.view.*
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.view.Project
-import com.vwoom.timelapsegallery.databinding.FragmentDetailsBinding
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
-import com.vwoom.timelapsegallery.utils.Keys
-import kotlinx.android.synthetic.main.fragment_gallery.*
-import kotlinx.android.synthetic.main.fragment_gallery.view.*
 
 
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {

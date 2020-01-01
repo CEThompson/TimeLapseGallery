@@ -15,8 +15,6 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
-import com.vwoom.timelapsegallery.notification.NotificationWorker
-import com.vwoom.timelapsegallery.utils.Keys
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -34,7 +32,6 @@ object NotificationUtils {
         // Create the pending intent to take the user to the relevant project on click
         val intent = Intent(context, TimeLapseGalleryActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        intent.putExtra(Keys.PROJECT_FILTER_BY_SCHEDULED_TODAY, true)
         val pendingIntent = PendingIntent.getActivity(context, requestCode, intent, 0)
         // Create the notification
         val builder = NotificationCompat.Builder(context, PROJECT_NOTIFICATION_CHANNEL_ID)
