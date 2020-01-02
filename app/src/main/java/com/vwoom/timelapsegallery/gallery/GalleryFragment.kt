@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.gallery
 
+import android.app.Dialog
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
@@ -21,7 +22,8 @@ import com.vwoom.timelapsegallery.utils.InjectorUtils
 
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
-    var mNewProjectFab: FloatingActionButton? = null
+    private var mNewProjectFab: FloatingActionButton? = null
+    private var mFilterDialog: Dialog? = null
     private var mGalleryAdapter: GalleryAdapter? = null
     private var mProjects: List<Project>? = null
 
@@ -81,6 +83,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null,null)
             findNavController().navigate(action)
         }
+
+        initializeFilterDialog()
+
         setupViewModel()
 
         return binding.root
@@ -102,10 +107,16 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
             R.id.filter_option -> {
                 // TODO open dialoge to filter projects here
+                mFilterDialog?.show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun initializeFilterDialog(){
+        mFilterDialog = Dialog(requireContext())
+        mFilterDialog?.setContentView(R.layout.dialog_filter)
     }
 
     private fun setupViewModel() {
