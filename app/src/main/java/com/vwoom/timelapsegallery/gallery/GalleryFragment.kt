@@ -16,12 +16,13 @@ import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 
+// TODO add search option?
+
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     var mNewProjectFab: FloatingActionButton? = null
     private var mGalleryAdapter: GalleryAdapter? = null
     private var mProjects: List<Project>? = null
-
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -31,7 +32,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
         val binding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
