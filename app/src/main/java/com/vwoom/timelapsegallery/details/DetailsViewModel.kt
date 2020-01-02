@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vwoom.timelapsegallery.data.Repository
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
+import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
@@ -14,6 +16,8 @@ import java.io.File
 
 class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel() {
     val photos: LiveData<List<PhotoEntry>> = repository.getPhotos(projectId)
+    val tags: LiveData<List<ProjectTagEntry>> = repository.getProjectTags(projectId)
+
     val currentProject: LiveData<Project> = repository.getProjectView(projectId)
     val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
 
@@ -27,15 +31,11 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
     }
 
     fun nextPhoto(){
-
         if (isPlaying) return
         if (photos.value == null || photos.value!!.size <= 1) return
         if (currentPhoto.value == null) return
-
         val index: Int = photos.value!!.indexOf(currentPhoto.value!!)
-
         if (index == photos.value!!.size - 1) return
-
         currentPhoto.value = photos.value!!.get(index+1)
     }
 
@@ -43,11 +43,8 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
         if (isPlaying) return
         if (photos.value == null || photos.value!!.size <= 0) return
         if (currentPhoto.value == null) return
-
         val index: Int = photos.value!!.indexOf(currentPhoto.value!!)
-
         if (index == 0) return
-
         currentPhoto.value = photos.value!!.get(index-1)
 
     }
@@ -60,6 +57,10 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
         viewModelScope.launch {
             repository.setCoverPhoto(photoEntry)
         }
+    }
+
+    fun getTags(projectTags: List<ProjectTagEntry>): List<TagEntry>{
+        return repository.getTagsFromProjectTags(projectTags)
     }
 
     fun deleteCurrentPhoto(externalFilesDir: File){

@@ -37,6 +37,8 @@ import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
+import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentDetailsBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
@@ -58,6 +60,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
     // Photo and project Information
     private var mPhotos: List<PhotoEntry>? = null
+    private var mTags: List<TagEntry>? = null
     private var mCurrentPhoto: PhotoEntry? = null
     private var mCurrentPlayPosition: Int? = null
     private var mCurrentProject: Project? = null
@@ -582,6 +585,11 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             if (currentPhoto != null) {
                 loadUi(currentPhoto)
             }
+        })
+
+        detailsViewModel.tags.observe(this, Observer<List<ProjectTagEntry>> { tagEntries: List<ProjectTagEntry> ->
+            mTags = detailsViewModel.getTags(tagEntries)
+            // TODO implement and update tag UI
         })
     }
 

@@ -2,14 +2,8 @@ package com.vwoom.timelapsegallery.data
 
 import android.util.Log
 import androidx.room.util.FileUtil
-import com.vwoom.timelapsegallery.data.dao.CoverPhotoDao
-import com.vwoom.timelapsegallery.data.dao.PhotoDao
-import com.vwoom.timelapsegallery.data.dao.ProjectDao
-import com.vwoom.timelapsegallery.data.dao.ProjectScheduleDao
-import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
-import com.vwoom.timelapsegallery.data.entry.PhotoEntry
-import com.vwoom.timelapsegallery.data.entry.ProjectEntry
-import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
+import com.vwoom.timelapsegallery.data.dao.*
+import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
@@ -19,7 +13,9 @@ class Repository private constructor(
         private val projectDao: ProjectDao,
         private val photoDao: PhotoDao,
         private val coverPhotoDao: CoverPhotoDao,
-        private val projectScheduleDao: ProjectScheduleDao) {
+        private val projectScheduleDao: ProjectScheduleDao,
+        private val projectTagDao: ProjectTagDao,
+        private val tagDao: TagDao) {
 
     suspend fun newProject(file: File, externalFilesDir: File){
         // Create database entries
@@ -64,6 +60,17 @@ class Repository private constructor(
 
     fun getProjectView(projectId: Long) = projectDao.loadProjectView(projectId)
 
+    fun getProjectTags(projectId: Long) = projectTagDao.loadTagsByProjectId(projectId)
+
+    fun getTagsFromProjectTags(projectTags: List<ProjectTagEntry>): List<TagEntry> {
+        val tags = arrayListOf<TagEntry>()
+        for (projectTag in projectTags){
+            val currentTag = tagDao.loadTagById(projectTag.tag_id)
+            tags.add(currentTag)
+        }
+        return tags
+    }
+
     fun getPhotos(projectId: Long) = photoDao.loadAllPhotosByProjectId(projectId)
 
     suspend fun setCoverPhoto(photoEntry: PhotoEntry) {
@@ -91,13 +98,17 @@ class Repository private constructor(
                 projectDao: ProjectDao,
                 photoDao: PhotoDao,
                 coverPhotoDao: CoverPhotoDao,
-                projectScheduleDao: ProjectScheduleDao) =
+                projectScheduleDao: ProjectScheduleDao,
+                projectTagDao: ProjectTagDao,
+                tagDao: TagDao) =
                 instance ?: synchronized(this) {
                     instance ?: Repository(
                             projectDao,
                             photoDao,
                             coverPhotoDao,
-                            projectScheduleDao).also { instance = it }
+                            projectScheduleDao,
+                            projectTagDao,
+                            tagDao).also { instance = it }
                 }
     }
 }
