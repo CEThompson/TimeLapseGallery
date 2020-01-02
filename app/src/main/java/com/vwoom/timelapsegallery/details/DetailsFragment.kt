@@ -688,4 +688,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
+
+    companion object {
+        private val TAG = DetailsFragment::class.java.simpleName
+    }
 }
