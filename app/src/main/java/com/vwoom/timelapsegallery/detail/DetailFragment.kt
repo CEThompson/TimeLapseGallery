@@ -39,7 +39,7 @@ import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
-import com.vwoom.timelapsegallery.databinding.FragmentDetailsBinding
+import com.vwoom.timelapsegallery.databinding.FragmentDetailBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
@@ -54,7 +54,7 @@ import java.io.File
 
 class DetailFragment : Fragment(), DetailAdapter.DetailsAdapterOnClickHandler {
 
-    lateinit var binding: FragmentDetailsBinding
+    lateinit var binding: FragmentDetailBinding
 
     private var mDetailAdapter: DetailAdapter? = null
 
@@ -84,7 +84,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailsAdapterOnClickHandler {
     // Swipe listener for image navigation
     private var mOnSwipeTouchListener: OnSwipeTouchListener? = null
 
-    private val args: DetailsFragmentArgs by navArgs()
+    private val args: DetailFragmentArgs by navArgs()
 
     private val detailViewModel: DetailViewModel by viewModels {
         InjectorUtils.provideDetailsViewModelFactory(requireActivity(), args.clickedProject)
@@ -120,7 +120,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailsAdapterOnClickHandler {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         // TODO determine if this apply block is necessary
-        binding = FragmentDetailsBinding.inflate(inflater, container, false).apply {
+        binding = FragmentDetailBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
 
@@ -146,7 +146,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailsAdapterOnClickHandler {
         binding.addPhotoFab.setOnClickListener {
             // TODO: Determine if there is a better way to handle leaking toolbar references
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
-            val action = DetailsFragmentDirections
+            val action = DetailFragmentDirections
                     .actionDetailsFragmentToCameraFragment(detailViewModel.lastPhoto, mCurrentProject)
             findNavController().navigate(action)
         }
