@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.details
+package com.vwoom.timelapsegallery.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,7 +14,7 @@ import com.vwoom.timelapsegallery.utils.FileUtils
 import kotlinx.coroutines.launch
 import java.io.File
 
-class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel() {
+class DetailViewModel(val repository: Repository, projectId: Long) : ViewModel() {
     val photos: LiveData<List<PhotoEntry>> = repository.getPhotos(projectId)
     val tags: LiveData<List<ProjectTagEntry>> = repository.getProjectTags(projectId)
 

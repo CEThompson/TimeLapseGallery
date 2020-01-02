@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.details
+package com.vwoom.timelapsegallery.detail
 
 import android.content.Context
 import android.os.Environment
@@ -7,14 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.vwoom.timelapsegallery.details.DetailsAdapter.DetailsAdapterViewHolder
+import com.vwoom.timelapsegallery.detail.DetailAdapter.DetailsAdapterViewHolder
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.DetailRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.FileUtils
 import java.io.File
 
-class DetailsAdapter(private val mClickHandler: DetailsAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<DetailsAdapterViewHolder>() {
+class DetailAdapter(private val mClickHandler: DetailsAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<DetailsAdapterViewHolder>() {
     private var mPhotos: List<PhotoEntry>? = null
     private var mProject: Project? = null
     private var mCurrentPhoto: PhotoEntry? = null
@@ -79,7 +79,7 @@ class DetailsAdapter(private val mClickHandler: DetailsAdapterOnClickHandler, co
     }
 
     companion object {
-        private val TAG = DetailsAdapter::class.java.simpleName
+        private val TAG = DetailAdapter::class.java.simpleName
     }
 
     init {

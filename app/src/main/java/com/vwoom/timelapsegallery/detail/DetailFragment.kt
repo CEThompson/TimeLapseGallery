@@ -1,9 +1,8 @@
-package com.vwoom.timelapsegallery.details
+package com.vwoom.timelapsegallery.detail
 
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -53,11 +52,11 @@ import java.io.File
 // TODO implement project editing (icon = pencil, if room)
 // TODO implement sharing (icon = share)
 
-class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler {
+class DetailFragment : Fragment(), DetailAdapter.DetailsAdapterOnClickHandler {
 
     lateinit var binding: FragmentDetailsBinding
 
-    private var mDetailsAdapter: DetailsAdapter? = null
+    private var mDetailAdapter: DetailAdapter? = null
 
     // Database
     private var mExternalFilesDir: File? = null
@@ -87,7 +86,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
     private val args: DetailsFragmentArgs by navArgs()
 
-    private val detailsViewModel: DetailsViewModel by viewModels {
+    private val detailViewModel: DetailViewModel by viewModels {
         InjectorUtils.provideDetailsViewModelFactory(requireActivity(), args.clickedProject)
     }
 
@@ -136,19 +135,19 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         }
 
         // Set up adapter and recycler view
-        mDetailsAdapter = DetailsAdapter(this, requireContext())
+        mDetailAdapter = DetailAdapter(this, requireContext())
         val linearLayoutManager
                 = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
         binding.detailsRecyclerview.layoutManager = linearLayoutManager
-        binding.detailsRecyclerview.adapter = mDetailsAdapter
+        binding.detailsRecyclerview.adapter = mDetailAdapter
 
         // Set the listener to add a photo to the project
         binding.addPhotoFab.setOnClickListener {
             // TODO: Determine if there is a better way to handle leaking toolbar references
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
             val action = DetailsFragmentDirections
-                    .actionDetailsFragmentToCameraFragment(detailsViewModel.lastPhoto, mCurrentProject)
+                    .actionDetailsFragmentToCameraFragment(detailViewModel.lastPhoto, mCurrentProject)
             findNavController().navigate(action)
         }
 
@@ -294,7 +293,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     fun loadUi(photoEntry: PhotoEntry) { // Set the fullscreen image dialogue to the current photo
         if (!mPlaying) preloadFullscreenImage()
         // Notify the adapter
-        mDetailsAdapter?.setCurrentPhoto(photoEntry)
+        mDetailAdapter?.setCurrentPhoto(photoEntry)
         // Load the current image
         loadImage(FileUtils.getPhotoUrl(mExternalFilesDir!!, mCurrentProject!!, photoEntry))
         // Get info for the current photo
@@ -417,7 +416,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         // If the play position / current photo is at the end, start from the beginning
         if (mCurrentPlayPosition == mPhotos!!.size - 1) {
             mCurrentPlayPosition = 0
-            detailsViewModel.setPhoto(mPhotos!![0])
+            detailViewModel.setPhoto(mPhotos!![0])
         }
 
         // Otherwise start from wherever it is at
@@ -457,11 +456,11 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
         mCurrentPlayPosition = position
 
-        playJob = detailsViewModel.viewModelScope.launch {
+        playJob = detailViewModel.viewModelScope.launch {
             delay(interval)
             // If image is loaded load the next photo
             if (mImageIsLoaded) {
-                detailsViewModel.nextPhoto()
+                detailViewModel.nextPhoto()
                 binding.imageLoadingProgress.progress = position + 1
                 scheduleLoadPhoto(position + 1, interval)
             } else {
@@ -471,7 +470,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     }
 
     override fun onClick(clickedPhoto: PhotoEntry) {
-        detailsViewModel.setPhoto(clickedPhoto)
+        detailViewModel.setPhoto(clickedPhoto)
     }
 
     fun initializeEditDialog(){
@@ -522,7 +521,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     private fun setupViewModel() {
 
         // Observe the current selected project
-        detailsViewModel.currentProject.observe(this, Observer { currentProject: Project ->
+        detailViewModel.currentProject.observe(this, Observer { currentProject: Project ->
             mCurrentProject = currentProject
 
             val name = mCurrentProject?.project_name
@@ -535,7 +534,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         })
 
         // Observe the list of photos
-        detailsViewModel.photos.observe(this, Observer<List<PhotoEntry>> { photoEntries: List<PhotoEntry> ->
+        detailViewModel.photos.observe(this, Observer<List<PhotoEntry>> { photoEntries: List<PhotoEntry> ->
             // Save the list of photos
             mPhotos = photoEntries
 
@@ -544,19 +543,19 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 val lastPhotoEntry: PhotoEntry = mPhotos?.get(mPhotos!!.size-1)!!
 
                 // If the last photo in the set changes update to the current photo
-                if (lastPhotoEntry.id != detailsViewModel.lastPhoto?.photo_id) {
-                    detailsViewModel.currentPhoto.value = lastPhotoEntry
+                if (lastPhotoEntry.id != detailViewModel.lastPhoto?.photo_id) {
+                    detailViewModel.currentPhoto.value = lastPhotoEntry
                 }
 
                 // Set the cover photo to the last in the set
-                detailsViewModel.setCoverPhoto(lastPhotoEntry)
+                detailViewModel.setCoverPhoto(lastPhotoEntry)
 
                 // Set the last photo
-                detailsViewModel.setLastPhotoByEntry(mExternalFilesDir!!, mCurrentProject!!, lastPhotoEntry)
+                detailViewModel.setLastPhotoByEntry(mExternalFilesDir!!, mCurrentProject!!, lastPhotoEntry)
             }
 
             // Send the photos to the adapter
-            mDetailsAdapter?.setPhotoData(mPhotos, mCurrentProject)
+            mDetailAdapter?.setPhotoData(mPhotos, mCurrentProject)
 
             // Restore the play position
             mCurrentPlayPosition = mPhotos?.indexOf(mCurrentPhoto)
@@ -572,22 +571,22 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             binding.imageLoadingProgress.max = mPhotos!!.size - 1
 
             // If current photo isn't set, set it to the last photo
-            if (detailsViewModel.currentPhoto.value == null) {
+            if (detailViewModel.currentPhoto.value == null) {
                 mCurrentPhoto = mPhotos!!.get(mPhotos!!.size-1)
-                detailsViewModel.currentPhoto.value = mCurrentPhoto
+                detailViewModel.currentPhoto.value = mCurrentPhoto
             }
         })
 
         // Load the ui based on the current photo
-        detailsViewModel.currentPhoto.observe(this, Observer { currentPhoto: PhotoEntry? ->
+        detailViewModel.currentPhoto.observe(this, Observer { currentPhoto: PhotoEntry? ->
             mCurrentPhoto = currentPhoto
             if (currentPhoto != null) {
                 loadUi(currentPhoto)
             }
         })
 
-        detailsViewModel.tags.observe(this, Observer<List<ProjectTagEntry>> { tagEntries: List<ProjectTagEntry> ->
-            mTags = detailsViewModel.getTags(tagEntries)
+        detailViewModel.tags.observe(this, Observer<List<ProjectTagEntry>> { tagEntries: List<ProjectTagEntry> ->
+            mTags = detailViewModel.getTags(tagEntries)
             // TODO implement and update tag UI
         })
     }
@@ -625,8 +624,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 return result
             }
         }
-        fun onSwipeRight() = detailsViewModel.previousPhoto()
-        fun onSwipeLeft() = detailsViewModel.nextPhoto()
+        fun onSwipeRight() = detailViewModel.previousPhoto()
+        fun onSwipeLeft() = detailViewModel.nextPhoto()
 
         init {
             gestureDetector = GestureDetector(ctx, GestureListener())
@@ -645,7 +644,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     // If this photo is the last photo then set the new thumbnail to its previous
-                    detailsViewModel.deleteCurrentPhoto(mExternalFilesDir!!)
+                    detailViewModel.deleteCurrentPhoto(mExternalFilesDir!!)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
@@ -678,7 +677,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setMessage(R.string.double_verify_project_deletion)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    detailsViewModel.deleteCurrentProject(mExternalFilesDir!!)
+                    detailViewModel.deleteCurrentProject(mExternalFilesDir!!)
                     // If current project had a schedule remove the notification and update widgets
                     if (mCurrentProject?.schedule_time != null && mCurrentProject?.interval_days != null) {
                         NotificationUtils.scheduleNotificationWorker(requireContext())
@@ -690,6 +689,6 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     }
 
     companion object {
-        private val TAG = DetailsFragment::class.java.simpleName
+        private val TAG = DetailFragment::class.java.simpleName
     }
 }

@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.graphics.Matrix
 import android.os.Bundle
 import android.os.Environment
-import android.transition.TransitionInflater
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Size
@@ -19,9 +18,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.FragmentCameraBinding
-import com.vwoom.timelapsegallery.details.CameraViewModel
+import com.vwoom.timelapsegallery.detail.CameraViewModel
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import java.io.File

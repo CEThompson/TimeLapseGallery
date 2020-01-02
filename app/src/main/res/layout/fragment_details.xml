@@ -7,7 +7,7 @@
         android:id="@+id/details_coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.vwoom.timelapsegallery.details.DetailsFragment">
+        tools:context="com.vwoom.timelapsegallery.detail.DetailFragment">
 
         <!-- Layout containing details for the project -->
         <androidx.constraintlayout.widget.ConstraintLayout
