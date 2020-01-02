@@ -4,6 +4,8 @@ import android.app.Dialog
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
+import android.widget.CheckBox
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -130,7 +132,18 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         viewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
             // TODO update tags here
+            setFilterDialogTags(tags)
         })
+    }
+
+    private fun setFilterDialogTags(tags: List<TagEntry>){
+        val tagLayout = mFilterDialog?.findViewById<LinearLayout>(R.id.dialog_filter_tags_layout)
+        tagLayout?.removeAllViews()
+        for (tag in tags){
+            val tagCheckBox: CheckBox = CheckBox(requireContext())
+            tagCheckBox.text = tag.tag
+            tagLayout?.addView(tagCheckBox)
+        }
     }
 
     override fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int) {
