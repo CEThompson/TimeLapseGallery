@@ -261,7 +261,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailsAdapterOnClickHandler {
      */
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.details_fragment_menu, menu)
+        inflater.inflate(R.menu.detail_fragment_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
