@@ -106,15 +106,10 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         postponeEnterTransition()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        // TODO rotation in camera fragment launched from details causes crash linking to this binding: figure this out
-        binding.detailsFragmentToolbar.setNavigationOnClickListener(null)
-    }
-
     override fun onStop() {
         super.onStop()
         if (mFullscreenImageDialog?.isShowing == true) mFullscreenImageDialog?.dismiss()
+        binding.detailsFragmentToolbar.setNavigationOnClickListener(null)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
