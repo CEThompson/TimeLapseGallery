@@ -20,8 +20,6 @@ import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 
 // TODO add search option?
-// TODO return transition stopped working: figure out why
-
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private var mFilterDialog: Dialog? = null
@@ -35,6 +33,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mGalleryAdapter = null
     }
 
+    // TODO return transition works, but not adapter does not update appropriately: figure this out
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         if (::mBinding.isInitialized) return mBinding.root
