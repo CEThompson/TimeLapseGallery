@@ -85,6 +85,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             findNavController().navigate(action)
         }
 
+        // TODO convert dialog initializations to lazy?
         initializeFilterDialog()
 
         setupViewModel()
@@ -129,7 +130,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mProjects = projects
             mGalleryAdapter?.setProjectData(projects)
         })
-        
+
         viewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
             // TODO update tags here
             setFilterDialogTags(tags)
