@@ -32,6 +32,6 @@
         android:layout_margin="@dimen/detail_small_margin"
         app:backgroundTint="@color/darkImagePlaceHolder"
         android:src="@drawable/ic_fullscreen_exit_white_24dp"
-        android:layout_gravity="top|end"/>
+        android:layout_gravity="bottom|end"/>
 
 </FrameLayout>
