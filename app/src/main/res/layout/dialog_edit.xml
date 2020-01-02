@@ -39,6 +39,14 @@
             android:gravity="center_vertical"
             android:paddingEnd="@dimen/detail_margin"
             android:text="Schedule:" />
+        <TextView
+            android:id="@+id/dialog_edit_schedule_textview_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/detail_margin"
+            android:textStyle="italic"
+            tools:text="none" />
     </LinearLayout>
 
     <!-- Tags -->
@@ -58,7 +66,7 @@
             app:layout_constraintVertical_bias=".5" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/dialog_edit_add_tag"
+            android:id="@+id/dialog_edit_add_tag_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
@@ -68,6 +76,7 @@
 
     <!-- Submit Edit FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/dialog_edit_submit_edit_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"

@@ -10,10 +10,13 @@ interface TagDao {
     fun loadAllTags(): LiveData<List<TagEntry>>
 
     @Query("SELECT * FROM tag WHERE id = :id")
-    fun loadTagById(id: Long): TagEntry
+    suspend fun loadTagById(id: Long): TagEntry
+
+    @Query("SELECT * FROM tag WHERE tag = :text")
+    suspend fun loadTagByText(text: String): TagEntry?
 
     @Insert
-    fun insertTag(tagEntry: TagEntry)
+    suspend fun insertTag(tagEntry: TagEntry): Long
 
     @Delete
     fun deleteTag(tagEntry: TagEntry)

@@ -10,7 +10,7 @@ interface ProjectTagDao {
     fun loadTagsByProjectId(projectId: Long): LiveData<List<ProjectTagEntry>>
 
     @Insert
-    fun insertProjectTag(projectTagEntry: ProjectTagEntry)
+    suspend fun insertProjectTag(projectTagEntry: ProjectTagEntry)
 
     @Delete
     fun deleteProjectTag(projectTagEntry: ProjectTagEntry)

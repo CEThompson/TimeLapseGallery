@@ -31,7 +31,6 @@ class Repository private constructor(
         val photo_id = photoDao.insertPhoto(photoEntry)
         photoEntry.id = photo_id
 
-
         // Create cover photo and schedule then insert
         val coverPhotoEntry = CoverPhotoEntry(project_id, photo_id)
         val projectScheduleEntry = ProjectScheduleEntry(project_id, null, null)
@@ -56,6 +55,17 @@ class Repository private constructor(
         FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
     }
 
+    suspend fun addTagToProject(tagText: String, project: Project){
+        var tagEntry: TagEntry? = tagDao.loadTagByText(tagText)
+
+        // If tag does not exist create a new entry
+        if (tagEntry == null) tagEntry = TagEntry(tagText)
+
+        val tagId = tagDao.insertTag(tagEntry)
+        val projectTagEntry = ProjectTagEntry(project.project_id, tagId)
+        projectTagDao.insertProjectTag(projectTagEntry)
+    }
+
     fun getProjectViews() = projectDao.loadProjectViews()
 
     fun getProjectView(projectId: Long) = projectDao.loadProjectView(projectId)
@@ -64,7 +74,7 @@ class Repository private constructor(
 
     fun getTags() = tagDao.loadAllTags()
 
-    fun getTagsFromProjectTags(projectTags: List<ProjectTagEntry>): List<TagEntry> {
+    suspend fun getTagsFromProjectTags(projectTags: List<ProjectTagEntry>): List<TagEntry> {
         val tags = arrayListOf<TagEntry>()
         for (projectTag in projectTags){
             val currentTag = tagDao.loadTagById(projectTag.tag_id)

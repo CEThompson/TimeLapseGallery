@@ -7,6 +7,7 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
+import android.text.InputType
 import android.transition.TransitionInflater
 import android.util.Log
 import android.view.*
@@ -46,6 +47,7 @@ import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.w3c.dom.Text
 import java.io.File
 
 // TODO add schedule option (icon = date range, in overflow and with fab?)
@@ -190,9 +192,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onPause() {
         super.onPause()
         playJob?.cancel()
-        // If the activity stops while playing make sure to cancel runnables
-        // TODO handle playing
-        //if (mPlaying) stopPlaying()
+        tagJob?.cancel()
     }
 
     // TODO handle return from camera fragment
@@ -441,6 +441,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     var playJob: Job? = null
+    var tagJob: Job? = null
 
     // TODO convert these runnables into coroutine chain?
     private fun scheduleLoadPhoto(position: Int, interval: Long) {
@@ -477,6 +478,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     fun initializeEditDialog(){
         mEditDialog = Dialog(requireContext())
         mEditDialog?.setContentView(R.layout.dialog_edit)
+
+        val addTagFab = mEditDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_add_tag_fab)
+        addTagFab?.setOnClickListener {
+            addTag()
+        }
+
+        val submitEditFab = mEditDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_submit_edit_fab)
+        submitEditFab?.setOnClickListener {
+            editProject()
+        }
     }
 
     fun initializeFullscreenImageDialog() {
@@ -535,6 +546,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
             val nameEdit = mEditDialog?.findViewById<EditText>(R.id.edit_name)
             nameEdit?.setText(currentProject.project_name)
+
+            if (currentProject.schedule_time == null) {
+                mEditDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = "None"
+            } else {
+                mEditDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)
+                        ?.text = TimeUtils.getDateFromTimestamp(currentProject.schedule_time)
+            }
+
         })
 
         // Observe the list of photos
@@ -589,9 +608,19 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             }
         })
 
+        // Observe the tags
         detailViewModel.tags.observe(this, Observer<List<ProjectTagEntry>> { tagEntries: List<ProjectTagEntry> ->
-            mTags = detailViewModel.getTags(tagEntries)
-            // TODO implement and update tag UI
+            tagJob = detailViewModel.viewModelScope.launch {
+                mTags = detailViewModel.getTags(tagEntries)
+
+                val tagLayout = mEditDialog?.findViewById<LinearLayout>(R.id.dialog_edit_tags_layout)
+
+                for (tag in mTags!!){
+                    val textView: TextView = TextView(requireContext())
+                    textView.text = tag.tag
+                    tagLayout?.addView(textView)
+                }
+            }
         })
     }
 
@@ -634,6 +663,19 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         init {
             gestureDetector = GestureDetector(ctx, GestureListener())
         }
+    }
+
+    private fun addTag(){
+        val input: EditText = EditText(requireContext())
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        AlertDialog.Builder(requireContext())
+                .setTitle("Add Tag")
+                .setView(input)
+                .setPositiveButton(android.R.string.yes) { _, _: Int ->
+                    val tagText = input.text.toString()
+                    detailViewModel.addTag(tagText, mCurrentProject!!)
+                }
+                .setNegativeButton(android.R.string.no, null).show()
     }
 
     //Edits the current project

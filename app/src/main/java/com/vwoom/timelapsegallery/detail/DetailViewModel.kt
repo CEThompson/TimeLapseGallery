@@ -11,7 +11,10 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 class DetailViewModel(val repository: Repository, projectId: Long) : ViewModel() {
@@ -59,8 +62,14 @@ class DetailViewModel(val repository: Repository, projectId: Long) : ViewModel()
         }
     }
 
-    fun getTags(projectTags: List<ProjectTagEntry>): List<TagEntry>{
-        return repository.getTagsFromProjectTags(projectTags)
+    fun addTag(tagText: String, project: Project){
+        viewModelScope.launch {
+            repository.addTagToProject(tagText, project)
+        }
+    }
+
+    fun getTags(projectTags: List<ProjectTagEntry>): List<TagEntry> = runBlocking {
+        repository.getTagsFromProjectTags(projectTags)
     }
 
     fun deleteCurrentPhoto(externalFilesDir: File){
