@@ -95,6 +95,9 @@ class CameraFragment: Fragment(), LifecycleOwner {
                 else -> false
             }
         }
+
+        if (args.photo == null) binding.quickCompareFab.hide()
+
         return binding.root
     }
 
