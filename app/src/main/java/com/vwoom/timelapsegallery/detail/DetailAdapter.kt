@@ -7,24 +7,24 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.vwoom.timelapsegallery.detail.DetailAdapter.DetailsAdapterViewHolder
+import com.vwoom.timelapsegallery.detail.DetailAdapter.DetailAdapterViewHolder
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.DetailRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.FileUtils
 import java.io.File
 
-class DetailAdapter(private val mClickHandler: DetailsAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<DetailsAdapterViewHolder>() {
+class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<DetailAdapterViewHolder>() {
     private var mPhotos: List<PhotoEntry>? = null
     private var mProject: Project? = null
     private var mCurrentPhoto: PhotoEntry? = null
     private val mExternalFilesDir: File?
 
-    interface DetailsAdapterOnClickHandler {
+    interface DetailAdapterOnClickHandler {
         fun onClick(clickedPhoto: PhotoEntry)
     }
 
-    inner class DetailsAdapterViewHolder(var binding: DetailRecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+    inner class DetailAdapterViewHolder(var binding: DetailRecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
@@ -38,14 +38,14 @@ class DetailAdapter(private val mClickHandler: DetailsAdapterOnClickHandler, con
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailsAdapterViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailAdapterViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val shouldAttachToParentImmediately = false
         val binding = DetailRecyclerviewItemBinding.inflate(inflater, parent, shouldAttachToParentImmediately)
-        return DetailsAdapterViewHolder(binding)
+        return DetailAdapterViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: DetailsAdapterViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: DetailAdapterViewHolder, position: Int) {
         val binding = holder.binding
         val context = holder.itemView.context
         val currentPhoto = mPhotos?.get(position)

@@ -52,7 +52,7 @@ import java.io.File
 // TODO implement project editing (icon = pencil, if room)
 // TODO implement sharing (icon = share)
 
-class DetailFragment : Fragment(), DetailAdapter.DetailsAdapterOnClickHandler {
+class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     lateinit var binding: FragmentDetailBinding
 
