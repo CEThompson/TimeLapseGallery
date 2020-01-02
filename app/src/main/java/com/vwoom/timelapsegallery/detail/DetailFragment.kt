@@ -531,6 +531,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailsAdapterOnClickHandler {
                 val projectIdentification = getString(R.string.project_identification, mCurrentProject?.project_id, mCurrentProject?.project_name)
                 binding.detailsProjectNameTextView.setText(projectIdentification)
             }
+
+            val nameEdit = mEditDialog?.findViewById<EditText>(R.id.edit_name)
+            nameEdit?.setText(currentProject.project_name)
         })
 
         // Observe the list of photos
