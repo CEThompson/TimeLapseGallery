@@ -71,7 +71,7 @@ class DetailsViewModel(val repository: Repository, projectId: Long) : ViewModel(
 
     fun deleteCurrentProject(externalFilesDir: File) {
         viewModelScope.launch {
-            repository.deleteProject(externalFilesDir, currentProject?.value?.project_id!!)
+            repository.deleteProject(externalFilesDir, currentProject.value?.project_id!!)
         }
     }
 }

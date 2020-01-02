@@ -128,7 +128,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         setHasOptionsMenu(true)
         val toolbar = binding.detailsFragmentToolbar
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
-        toolbar?.title = getString(R.string.project_details)
+        toolbar.title = getString(R.string.project_details)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
@@ -169,7 +169,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
         // Initialize fab color
         binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-        binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorGreen)
+        binding.playAsVideoFab.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
 
         // Set the transition name for the image
         val imageTransitionName= "${mCurrentProject?.project_id}"
@@ -323,7 +323,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     private fun loadImage(imagePath: String) {
         mImageIsLoaded = false
         // Get photo info
-        val ratio = PhotoUtils.getAspectRatioFromImagePath(imagePath) ?: return
+        val ratio = PhotoUtils.getAspectRatioFromImagePath(imagePath)
         val isImageLandscape = PhotoUtils.isLandscape(imagePath)
         // Set cardview constraints depending upon if photo is landscape or portrait
         val layoutParams = binding.detailsCardContainer.layoutParams
@@ -408,7 +408,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         binding.fullscreenFab.hide()
         // Set color of play fab
         binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
-        binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorRedAccent)
+        binding.playAsVideoFab.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
         // Set paying true
         mPlaying = true
         // Handle UI
@@ -440,7 +440,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         mPlaying = false
 
         binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-        binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorGreen)
+        binding.playAsVideoFab.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
         binding.playAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp)
         binding.fullscreenFab.show()
     }
@@ -455,7 +455,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             binding.playAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp)
             binding.imageLoadingProgress.progress = position
             binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-            binding.playAsVideoFab.rippleColor = resources.getColor(R.color.colorGreen)
+            binding.playAsVideoFab.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
             binding.fullscreenFab.show()
             return
         }
@@ -493,10 +493,10 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         val mFullscreenBackFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_back_fab)
 
         // Display the dialog on clicking the image
-        mFullscreenBackFab?.setOnClickListener { v: View? -> mFullscreenImageDialog?.dismiss() }
-        mFullscreenExitFab?.setOnClickListener { v: View? -> mFullscreenImageDialog?.dismiss() }
+        mFullscreenBackFab?.setOnClickListener { mFullscreenImageDialog?.dismiss() }
+        mFullscreenExitFab?.setOnClickListener { mFullscreenImageDialog?.dismiss() }
 
-        mFullscreenImageDialog?.setOnKeyListener { dialogInterface, keyCode, event ->
+        mFullscreenImageDialog?.setOnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_BACK) mFullscreenImageDialog?.dismiss()
             true
         }
@@ -644,7 +644,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setTitle(R.string.delete_photo)
                 .setMessage(R.string.verify_delete_photo)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int ->
+                .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     // If this photo is the last photo then set the new thumbnail to its previous
                     detailsViewModel.deleteCurrentPhoto(mExternalFilesDir!!)
                 }
@@ -656,7 +656,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setTitle(R.string.delete_photo)
                 .setMessage(R.string.verify_delete_last_photo)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int ->
+                .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     verifyProjectDeletion() }
                 .setNegativeButton(android.R.string.no, null).show()
     }
@@ -667,7 +667,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setTitle(R.string.delete_project)
                 .setMessage(R.string.verify_delete_project)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int ->
+                .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     doubleVerifyProjectDeletion() }
                 .setNegativeButton(android.R.string.no, null).show()
     }
@@ -678,7 +678,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 .setTitle(R.string.delete_project)
                 .setMessage(R.string.double_verify_project_deletion)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { dialogInterface: DialogInterface?, i: Int ->
+                .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     detailsViewModel.deleteCurrentProject(mExternalFilesDir!!)
                     // If current project had a schedule remove the notification and update widgets
                     if (mCurrentProject?.schedule_time != null && mCurrentProject?.interval_days != null) {

@@ -27,13 +27,13 @@ object TimeUtils {
     /* Derives the next scheduled submission from a project timestamp */
     @JvmStatic
     fun getNextScheduledSubmission(timestamp: Long, schedule: Int): Long {
-        var timestamp = timestamp
+        var localTimestamp = timestamp
         val scheduleInterval = getTimeIntervalFromSchedule(schedule)
         // prevent an infinite loop, if returned timestamp is less than system time a notification will ping immediately
-        if (scheduleInterval < DAY_IN_MILLISECONDS) return timestamp
-        while (timestamp < System.currentTimeMillis()) timestamp += scheduleInterval
-        if (DateUtils.isToday(timestamp)) timestamp += scheduleInterval
-        return timestamp
+        if (scheduleInterval < DAY_IN_MILLISECONDS) return localTimestamp
+        while (localTimestamp < System.currentTimeMillis()) localTimestamp += scheduleInterval
+        if (DateUtils.isToday(localTimestamp)) localTimestamp += scheduleInterval
+        return localTimestamp
     }
 
     /* Gets the schedule int identification from the selected spinner item */

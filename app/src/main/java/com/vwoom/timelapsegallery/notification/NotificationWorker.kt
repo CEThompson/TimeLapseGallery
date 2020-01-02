@@ -38,7 +38,7 @@ class NotificationWorker(
                         .projectScheduleDao()
                         .loadScheduleByProjectId(scheduledProject.id)
                 Log.d(TAG, "Notification Tracker: Processing alarm for project named " + scheduledProject.project_name)
-                if (schedule == null) break
+
                 val nextSubmissionTime = schedule.schedule_time!!
                 val dayInterval = schedule.interval_days!!.toLong()
                 // Schedule a notification for tomorrow

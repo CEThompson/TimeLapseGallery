@@ -89,7 +89,7 @@ object NotificationUtils {
     /* Cancels any previous notification workers and schedules a new periodic notification worker.
     * The notification workers checks each day to set a notification for tomorrow. */
     fun scheduleNotificationWorker(context: Context) {
-        WorkManager.getInstance(context!!).cancelAllWorkByTag(NotificationWorker.TAG)
+        WorkManager.getInstance(context).cancelAllWorkByTag(NotificationWorker.TAG)
         Log.d(TAG, "Notification Tracker: Creating and enqueuing work reqeust")
         val constraints = Constraints.Builder()
                 .setRequiresBatteryNotLow(true)

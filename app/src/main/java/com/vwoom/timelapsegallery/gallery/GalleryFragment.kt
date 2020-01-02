@@ -73,7 +73,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // Set up navigation to add new projects
-        mNewProjectFab?.setOnClickListener { v: View? ->
+        mNewProjectFab?.setOnClickListener {
             // TODO: Determine if there is a better way to handle leaking toolbar references
             // Note: navigating from gallery to detail results in activity leaking toolbar as reference
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
