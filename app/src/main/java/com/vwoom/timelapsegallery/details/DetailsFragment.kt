@@ -70,6 +70,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
     private var mFullscreenImageDialog: Dialog? = null
     private var mFullscreenImage: ImageView? = null
 
+    private var mEditDialog: Dialog? = null
+
     private val KEY_DIALOG = "fullscreen_dialog"
 
     // For playing timelapse
@@ -161,6 +163,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
         // TODO (update) implement pinch zoom on fullscreen image
         initializeFullscreenImageDialog()
+        initializeEditDialog()
 
         // Initialize fab color
         binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
@@ -283,7 +286,7 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
                 true
             }
             R.id.edit_project -> {
-                //editProject()
+                mEditDialog?.show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -474,6 +477,10 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
         detailsViewModel.setPhoto(clickedPhoto)
     }
 
+    fun initializeEditDialog(){
+        mEditDialog = Dialog(requireContext())
+        mEditDialog?.setContentView(R.layout.edit_dialog)
+    }
 
     fun initializeFullscreenImageDialog() {
         // Create the dialog
