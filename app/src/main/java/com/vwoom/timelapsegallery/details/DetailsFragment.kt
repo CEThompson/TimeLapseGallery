@@ -49,6 +49,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
+// TODO add schedule option (icon = date range, in overflow and with fab?)
+// TODO implement project editing (icon = pencil, if room)
+// TODO implement sharing (icon = share)
+
 class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler {
 
     lateinit var binding: FragmentDetailsBinding
