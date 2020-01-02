@@ -85,7 +85,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             findNavController().navigate(action)
         }
 
-        //initializeFilterDialog()
+        initializeFilterDialog()
 
         setupViewModel()
 
@@ -129,12 +129,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mProjects = projects
             mGalleryAdapter?.setProjectData(projects)
         })
-
-        /*
+        
         viewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
             // TODO update tags here
             setFilterDialogTags(tags)
-        })*/
+        })
     }
 
     private fun setFilterDialogTags(tags: List<TagEntry>){
