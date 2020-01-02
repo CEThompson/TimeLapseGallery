@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/filter_option"
+        android:title="@string/filter"
+        app:showAsAction="never"/>
+
     <item android:id="@+id/settings_option"
         android:title="@string/title_activity_settings"
         app:showAsAction="never"/>
-    <!--
-    <item android:id="@+id/notification_toggle"
-        android:title="@string/disable_notifications"
-        app:showAsAction="never"/>
-        -->
+
 </menu>

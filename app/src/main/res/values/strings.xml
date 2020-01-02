@@ -3,8 +3,7 @@
     <string name="app_name">Time Lapse Gallery</string>
     <string name="project_details">Project Details</string>
 
-    <!-- Welcome -->
-    <string name="welcome">Welcome</string>
+    <string name="filter">Filter</string>
 
     <!-- Tracking -->
     <string name="submit_project">Submit Project</string>

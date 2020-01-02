@@ -99,6 +99,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 findNavController().navigate(action)
                 true
             }
+            R.id.filter_option -> {
+                // TODO open dialoge to filter projects here
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
