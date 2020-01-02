@@ -475,7 +475,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailsAdapterOnClickHandler {
 
     fun initializeEditDialog(){
         mEditDialog = Dialog(requireContext())
-        mEditDialog?.setContentView(R.layout.edit_dialog)
+        mEditDialog?.setContentView(R.layout.dialog_edit)
     }
 
     fun initializeFullscreenImageDialog() {

@@ -197,7 +197,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         mSyncDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         // Set the dialog
         mSyncDialog?.setCancelable(false)
-        mSyncDialog?.setContentView(R.layout.sync_dialog)
+        mSyncDialog?.setContentView(R.layout.dialog_sync)
 
         // Set up the button
         val button = mSyncDialog?.findViewById(R.id.sync_verification_button) as androidx.appcompat.widget.AppCompatButton
