@@ -1,12 +1,13 @@
 package com.vwoom.timelapsegallery.data.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 
 @Dao
 interface TagDao {
     @Query("SELECT * FROM tag")
-    fun loadAllTags(): List<TagEntry>
+    fun loadAllTags(): LiveData<List<TagEntry>>
 
     @Query("SELECT * FROM tag WHERE id = :id")
     fun loadTagById(id: Long): TagEntry

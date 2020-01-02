@@ -62,6 +62,8 @@ class Repository private constructor(
 
     fun getProjectTags(projectId: Long) = projectTagDao.loadTagsByProjectId(projectId)
 
+    fun getTags() = tagDao.loadAllTags()
+
     fun getTagsFromProjectTags(projectTags: List<ProjectTagEntry>): List<TagEntry> {
         val tags = arrayListOf<TagEntry>()
         for (projectTag in projectTags){

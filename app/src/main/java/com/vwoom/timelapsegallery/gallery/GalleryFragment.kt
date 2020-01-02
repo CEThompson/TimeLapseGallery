@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
+import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
@@ -109,9 +110,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     private fun setupViewModel() {
         val viewModel = InjectorUtils.provideGalleryViewModel(requireContext())
-        /* Observe projects */viewModel.projects.observe(this, Observer { projects: List<Project> ->
+
+        // Observe projects
+        viewModel.projects.observe(this, Observer { projects: List<Project> ->
             mProjects = projects
             mGalleryAdapter?.setProjectData(projects)
+        })
+
+        viewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
+            // TODO update tags here
         })
     }
 
