@@ -25,7 +25,7 @@
         android:id="@+id/detailsFragment"
         android:name="com.vwoom.timelapsegallery.detail.DetailFragment"
         android:label="fragment_details"
-        tools:layout="@layout/fragment_details">
+        tools:layout="@layout/fragment_detail">
         <action
             android:id="@+id/action_detailsFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
