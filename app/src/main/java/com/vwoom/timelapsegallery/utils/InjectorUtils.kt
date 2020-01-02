@@ -18,7 +18,10 @@ object InjectorUtils {
                 TimeLapseDatabase.getInstance(context.applicationContext).projectDao(),
                 TimeLapseDatabase.getInstance(context.applicationContext).photoDao(),
                 TimeLapseDatabase.getInstance(context.applicationContext).coverPhotoDao(),
-                TimeLapseDatabase.getInstance(context.applicationContext).projectScheduleDao())
+                TimeLapseDatabase.getInstance(context.applicationContext).projectScheduleDao(),
+                TimeLapseDatabase.getInstance(context.applicationContext).projectTagDao(),
+                TimeLapseDatabase.getInstance(context.applicationContext).tagDao()
+                )
     }
 
     fun provideCameraViewModelFactory(context: Context, photo: Photo?, project: Project?): CameraViewModelFactory {
