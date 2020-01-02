@@ -269,11 +269,8 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.settings -> {
-                // TODO: Determine if there is a better way to handle leaking toolbar references
-                (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
-                val action = DetailsFragmentDirections.actionDetailsFragmentToSettingsFragment()
-                findNavController().navigate(action)
+            R.id.edit_project -> {
+                mEditDialog?.show()
                 true
             }
             R.id.delete_photo -> {
@@ -287,10 +284,6 @@ class DetailsFragment : Fragment(), DetailsAdapter.DetailsAdapterOnClickHandler 
             }
             R.id.delete_project -> {
                 verifyProjectDeletion()
-                true
-            }
-            R.id.edit_project -> {
-                mEditDialog?.show()
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -2,16 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/settings"
-        android:title="@string/title_activity_settings"
+    <item android:id="@+id/edit_project"
+        android:title="@string/edit_project"
         app:showAsAction="never"/>
 
     <item android:id="@+id/delete_photo"
         android:title="@string/delete_photo"
-        app:showAsAction="never"/>
-
-    <item android:id="@+id/edit_project"
-        android:title="@string/edit_project"
         app:showAsAction="never"/>
 
     <item android:id="@+id/delete_project"

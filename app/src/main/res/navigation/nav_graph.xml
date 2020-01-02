@@ -29,9 +29,6 @@
         <action
             android:id="@+id/action_detailsFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
-        <action
-            android:id="@+id/action_detailsFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
         <argument
             android:name="clickedProject"
             app:argType="com.vwoom.timelapsegallery.data.view.Project" />
