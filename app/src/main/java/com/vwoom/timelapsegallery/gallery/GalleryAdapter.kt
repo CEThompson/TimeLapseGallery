@@ -115,6 +115,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
         val cardTransitionName = imageTransitionName + "card"
         binding.projectImage.transitionName = imageTransitionName
         binding.projectCardView.transitionName = cardTransitionName
+        Log.d(TAG, "tracking transition: gallery adapter $imageTransitionName & $cardTransitionName")
 
         // Load the image
         val f = File(thumbnail_path)

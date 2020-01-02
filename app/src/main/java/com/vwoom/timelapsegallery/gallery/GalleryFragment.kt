@@ -11,7 +11,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.TagEntry
@@ -21,36 +20,36 @@ import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 
 // TODO add search option?
-// TODO return transition stopped working, figure out why
+// TODO return transition stopped working: figure out why
 
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
-    private var mNewProjectFab: FloatingActionButton? = null
     private var mFilterDialog: Dialog? = null
     private var mGalleryAdapter: GalleryAdapter? = null
     private var mProjects: List<Project>? = null
 
+    private lateinit var mBinding: FragmentGalleryBinding
+
     override fun onDestroyView() {
         super.onDestroyView()
-        mNewProjectFab = null
         mGalleryAdapter = null
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val binding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
+        if (::mBinding.isInitialized) return mBinding.root
+
+        mBinding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
 
-        mNewProjectFab = binding.addProjectFAB
-
         // Set up options menu
         setHasOptionsMenu(true)
-        val toolbar = binding.galleryFragmentToolbar
+        val toolbar = mBinding.galleryFragmentToolbar
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar.title = getString(R.string.app_name)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
-        // TODO: determine if setting up action bar with nav contoller is worth it
+        // TqODO: determine if setting up action bar with nav contoller is worth it
         //  (activity as TimeLapseGalleryActivity).setupActionBarWithNavController(findNavController())
 
         // Increase columns for horizontal orientation
@@ -62,8 +61,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Set up the recycler view
         val gridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
-
-        val galleryRecyclerView = binding.galleryRecyclerView
+        val galleryRecyclerView = mBinding.galleryRecyclerView
         galleryRecyclerView.apply {
             layoutManager = gridLayoutManager
             setHasFixedSize(false)
@@ -79,7 +77,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // Set up navigation to add new projects
-        mNewProjectFab?.setOnClickListener {
+        mBinding.addProjectFAB.setOnClickListener {
             // TODO: Determine if there is a better way to handle leaking toolbar references
             // Note: navigating from gallery to detail results in activity leaking toolbar as reference
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
@@ -87,12 +85,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             findNavController().navigate(action)
         }
 
-        initializeFilterDialog()
+        //initializeFilterDialog()
 
         setupViewModel()
 
-        return binding.root
+        return mBinding.root
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.gallery_fragment_menu, menu)
@@ -131,10 +130,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mGalleryAdapter?.setProjectData(projects)
         })
 
+        /*
         viewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
             // TODO update tags here
             setFilterDialogTags(tags)
-        })
+        })*/
     }
 
     private fun setFilterDialogTags(tags: List<TagEntry>){
@@ -150,7 +150,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     override fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int) {
         val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProject, position)
         val extras = FragmentNavigatorExtras(
-                mNewProjectFab as View to getString(R.string.key_add_transition),
+                mBinding.addProjectFAB as View to getString(R.string.key_add_transition),
                 binding.projectImage to binding.projectImage.transitionName,
                 binding.projectCardView to binding.projectCardView.transitionName
         )

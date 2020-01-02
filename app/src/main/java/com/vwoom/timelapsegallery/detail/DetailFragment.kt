@@ -177,6 +177,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val cardTransitionName = imageTransitionName + "card"
         binding.detailCurrentImage.transitionName = imageTransitionName
         binding.detailsCardContainer.transitionName = cardTransitionName
+        Log.d(TAG, "tracking transition: detail fragment $imageTransitionName & $cardTransitionName")
 
         setupViewModel()
 
