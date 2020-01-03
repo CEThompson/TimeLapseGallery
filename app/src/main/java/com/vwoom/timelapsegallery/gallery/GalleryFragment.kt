@@ -44,6 +44,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mGalleryAdapter = null
     }
 
+    override fun onPause() {
+        super.onPause()
+        mFilterDialog?.dismiss()
+    }
+
     // TODO return transition works, but adapter does not update appropriately: figure this out
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -125,12 +130,17 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mFilterDialog = Dialog(requireContext())
         mFilterDialog?.setContentView(R.layout.dialog_filter)
 
-        val filterFab = mFilterDialog?.findViewById<FloatingActionButton>(R.id.filter_fab)
+        val filterCancelFab = mFilterDialog?.findViewById<FloatingActionButton>(R.id.filter_cancel_fab)
+        val filterSubmitFab = mFilterDialog?.findViewById<FloatingActionButton>(R.id.filter_fab)
 
-        filterFab?.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
+        // Set colors
+        filterSubmitFab?.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
+        filterCancelFab?.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorSubtleRedAccent))
 
-        filterFab?.setOnClickListener{
+
+        filterSubmitFab?.setOnClickListener{
             mGalleryViewModel.setFilter(mFilterTags)
             mGalleryViewModel.viewModelScope.launch {
                 val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
@@ -138,6 +148,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
             mFilterDialog?.dismiss()
         }
+
+        filterCancelFab?.setOnClickListener {
+            mFilterDialog?.dismiss()
+        }
+
     }
 
     private fun setupViewModel() {
