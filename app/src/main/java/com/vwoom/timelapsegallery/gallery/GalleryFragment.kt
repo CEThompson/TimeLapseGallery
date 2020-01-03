@@ -1,12 +1,14 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.app.Dialog
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.CheckBox
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -121,7 +123,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mFilterDialog = Dialog(requireContext())
         mFilterDialog?.setContentView(R.layout.dialog_filter)
 
-        mFilterDialog?.findViewById<FloatingActionButton>(R.id.filter_fab)?.setOnClickListener{
+        val filterFab = mFilterDialog?.findViewById<FloatingActionButton>(R.id.filter_fab)
+
+        filterFab?.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
+
+        filterFab?.setOnClickListener{
             mGalleryViewModel.setFilter(mFilterTags)
             Log.d("tagfilter", "setting filter $mFilterTags")
             mGalleryViewModel.viewModelScope.launch {
