@@ -4,6 +4,7 @@
     <string name="project_details">Project Details</string>
 
     <string name="filter">Filter</string>
+    <string name="search">Search</string>
 
     <!-- Tracking -->
     <string name="submit_project">Submit Project</string>

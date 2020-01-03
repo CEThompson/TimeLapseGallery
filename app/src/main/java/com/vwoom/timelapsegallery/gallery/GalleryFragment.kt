@@ -26,7 +26,6 @@ import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.coroutines.launch
 
-// TODO add search option?
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private var mFilterDialog: Dialog? = null
@@ -103,6 +102,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId){
+            R.id.search_option -> {
+                // TODO implement search
+                true
+            }
             R.id.settings_option -> {
                 // TODO: Determine if there is a better way to handle leaking toolbar references
                 (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
