@@ -8,6 +8,10 @@
 
     <string name="schedule_label">Schedule: </string>
     <string name="tags_label">Tags: </string>
+    <string name="project_name_label">Project Name: </string>
+
+    <string name="filter_by_tag">filter by tag</string>
+    <string name="filter_by_schedule">filter by schedule</string>
 
     <!-- Tracking -->
     <string name="submit_project">Submit Project</string>

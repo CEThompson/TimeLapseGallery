@@ -4,95 +4,100 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="@dimen/detail_margin"
+    android:layout_margin="@dimen/large"
     android:orientation="vertical">
 
     <!-- Project name edit text -->
-    <LinearLayout
-        android:id="@+id/dialog_edit_project_name_layout"
+    <TextView
+        android:id="@+id/dialog_edit_project_name_textview"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
+        android:text="@string/project_name_label"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-        <TextView
-            android:id="@+id/dialog_edit_project_name_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingEnd="@dimen/detail_margin"
-            android:text="Project Name:" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/edit_name"/>
 
-        <EditText
-            android:id="@+id/edit_name"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            tools:text="project name" />
-        </LinearLayout>
+    <EditText
+        android:id="@+id/edit_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:hint="@string/project_name"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/dialog_edit_project_name_textview"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="project name" />
 
-    <!-- schedule -->
+    <!-- Schedule -->
     <TextView
         android:id="@+id/dialog_edit_schedule_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:gravity="center_vertical"
-        android:paddingEnd="@dimen/detail_margin"
         android:text="@string/schedule_label"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_edit_project_name_layout"/>
+        app:layout_constraintTop_toBottomOf="@id/dialog_edit_project_name_textview" />
+
     <TextView
         android:id="@+id/dialog_edit_schedule_textview_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:gravity="center_vertical"
-        android:paddingEnd="@dimen/detail_margin"
         android:textStyle="italic"
-        tools:text="none"
         app:layout_constraintStart_toEndOf="@id/dialog_edit_schedule_textview"
-        app:layout_constraintTop_toTopOf="@id/dialog_edit_schedule_textview"/>
+        app:layout_constraintTop_toTopOf="@id/dialog_edit_schedule_textview"
+        tools:text="none" />
 
     <TextView
         android:id="@+id/dialog_edit_tags_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:gravity="center_vertical"
-        android:paddingEnd="@dimen/detail_margin"
         android:text="@string/tags_label"
-        app:layout_constraintVertical_bias=".5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_edit_schedule_textview"/>
+        app:layout_constraintTop_toBottomOf="@id/dialog_edit_schedule_textview" />
 
     <!-- Tags -->
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/dialog_edit_tags_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:orientation="horizontal"
+        app:alignContent="stretch"
+        app:alignItems="stretch"
+        app:flexWrap="wrap"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_edit_tags_textview">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/dialog_edit_add_tag_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add_white_24dp"
+            app:fabSize="mini" />
     </com.google.android.flexbox.FlexboxLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/dialog_edit_add_tag_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_white_24dp"
-        app:fabSize="mini"
-        app:layout_constraintStart_toEndOf="@id/dialog_edit_tags_layout"
-        app:layout_constraintTop_toBottomOf="@id/dialog_edit_tags_layout"/>
 
     <!-- Submit Edit FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/dialog_edit_submit_edit_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:padding="@dimen/detail_margin"
+        android:layout_gravity="end"
+        android:layout_margin="@dimen/medium"
         android:src="@drawable/ic_check_white_24dp"
         app:fabSize="mini"
-        android:layout_gravity="end"
-        app:layout_constraintTop_toBottomOf="@id/dialog_edit_add_tag_fab"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_edit_tags_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

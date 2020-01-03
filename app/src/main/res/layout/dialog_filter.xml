@@ -4,55 +4,57 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp"
+    android:layout_margin="@dimen/large"
     android:orientation="vertical">
-
 
     <TextView
         android:id="@+id/filter_by_tag_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/detail_margin"
         android:layout_gravity="center_horizontal"
-        android:text="filter by tag"
+        android:text="@string/filter_by_tag"
         android:textStyle="italic"
-        tools:text="filter by tag"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"/>
+        tools:text="filter by tag" />
 
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/dialog_filter_tags_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="@dimen/detail_margin"
         app:layout_constraintTop_toBottomOf="@id/filter_by_tag_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:flexWrap="wrap"
         app:alignItems="stretch"
-        app:alignContent="stretch" />
+        app:alignContent="stretch">
+        <!-- Example checkbox for layouting -->
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="example checkbox"/>
+    </com.google.android.flexbox.FlexboxLayout>
 
     <TextView
         android:id="@+id/filter_by_schedule_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="@dimen/detail_margin"
-        android:text="filter by schedule"
+        android:layout_marginTop="@dimen/large"
+        android:text="@string/filter_by_schedule"
         android:textStyle="italic"
-        tools:text="filter by schedule"
-        app:layout_constraintTop_toBottomOf="@id/dialog_filter_tags_layout"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"/>
+        app:layout_constraintTop_toBottomOf="@id/dialog_filter_tags_layout"
+        tools:text="filter by schedule" />
 
     <LinearLayout
         android:id="@+id/filter_by_schedule_layout"
-        android:layout_margin="@dimen/detail_margin"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -79,11 +81,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:layout_margin="@dimen/detail_margin"
+        android:layout_margin="@dimen/large"
         android:src="@drawable/ic_check_white_24dp"
         app:fabSize="mini"
-        app:layout_constraintTop_toBottomOf="@id/filter_by_schedule_layout"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/filter_by_schedule_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
