@@ -615,16 +615,20 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.tags.observe(this, Observer<List<ProjectTagEntry>> { tagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 mTags = detailViewModel.getTags(tagEntries)
+                mTags?.sortedBy { it.tag }
 
                 val tagLayout = mEditDialog?.findViewById<FlexboxLayout>(R.id.dialog_edit_tags_layout)
+                val fab = mEditDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_add_tag_fab)
+                
                 tagLayout?.removeAllViews()
-
                 for (tag in mTags!!){
                     val textView = TextView(requireContext())
                     textView.setPadding(8)
                     textView.text = tag.tag
                     tagLayout?.addView(textView)
                 }
+
+                tagLayout?.addView(fab)
             }
         })
     }
