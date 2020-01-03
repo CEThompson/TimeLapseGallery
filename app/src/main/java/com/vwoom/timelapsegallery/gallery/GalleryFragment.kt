@@ -47,6 +47,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     // TODO return transition works, but adapter does not update appropriately: figure this out
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        if (::mBinding.isInitialized) postponeEnterTransition()
         mBinding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
@@ -73,7 +74,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             layoutManager = gridLayoutManager
             setHasFixedSize(false)
             adapter = mGalleryAdapter
-            postponeEnterTransition()
+            //postponeEnterTransition()
         }
 
         // Set up navigation to add new projects
