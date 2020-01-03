@@ -619,7 +619,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
                 val tagLayout = mEditDialog?.findViewById<FlexboxLayout>(R.id.dialog_edit_tags_layout)
                 val fab = mEditDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_add_tag_fab)
-                
+
                 tagLayout?.removeAllViews()
                 for (tag in mTags!!){
                     val textView = TextView(requireContext())
