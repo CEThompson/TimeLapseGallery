@@ -142,16 +142,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         filterSubmitFab?.setOnClickListener{
             mGalleryViewModel.setFilter(mFilterTags)
-
-            // Only set data if there are active tags for filtration
-            if (mFilterTags.size != 0) {
-                mGalleryViewModel.viewModelScope.launch {
-                    val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
-                    mGalleryAdapter?.setProjectData(filteredProjects)
-                }
+            // TODO implement diff check for filtered projects?
+            mGalleryViewModel.viewModelScope.launch {
+                val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
+                mGalleryAdapter?.setProjectData(filteredProjects)
             }
-
-            // Always dismiss dialog on click
             mFilterDialog?.dismiss()
         }
 
