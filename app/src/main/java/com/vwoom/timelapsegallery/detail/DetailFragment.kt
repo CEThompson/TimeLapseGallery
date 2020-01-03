@@ -17,6 +17,7 @@ import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -30,6 +31,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -613,10 +615,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             tagJob = detailViewModel.viewModelScope.launch {
                 mTags = detailViewModel.getTags(tagEntries)
 
-                val tagLayout = mEditDialog?.findViewById<LinearLayout>(R.id.dialog_edit_tags_layout)
+                val tagLayout = mEditDialog?.findViewById<FlexboxLayout>(R.id.dialog_edit_tags_layout)
+                tagLayout?.removeAllViews()
 
                 for (tag in mTags!!){
-                    val textView: TextView = TextView(requireContext())
+                    val textView = TextView(requireContext())
+                    textView.setPadding(8)
                     textView.text = tag.tag
                     tagLayout?.addView(textView)
                 }

@@ -6,6 +6,9 @@
     <string name="filter">Filter</string>
     <string name="search">Search</string>
 
+    <string name="schedule_label">Schedule: </string>
+    <string name="tags_label">Tags: </string>
+
     <!-- Tracking -->
     <string name="submit_project">Submit Project</string>
     <string name="submitted">Submitted</string>
