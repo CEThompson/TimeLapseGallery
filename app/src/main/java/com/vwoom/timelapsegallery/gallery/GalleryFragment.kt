@@ -47,11 +47,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     // TODO return transition works, but adapter does not update appropriately: figure this out
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        //if (::mBinding.isInitialized) return mBinding.root // TODO figure out why this makes return transition work but breaks recycler view
         mBinding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
-
         // Set up options menu
         setHasOptionsMenu(true)
         val toolbar = mBinding.galleryFragmentToolbar
@@ -76,13 +74,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             setHasFixedSize(false)
             adapter = mGalleryAdapter
             postponeEnterTransition()
-            viewTreeObserver.addOnPreDrawListener(object: ViewTreeObserver.OnPreDrawListener{
-                override fun onPreDraw(): Boolean {
-                    startPostponedEnterTransition()
-                    viewTreeObserver.removeOnPreDrawListener(this)
-                    return true
-                }
-            })
         }
 
         // Set up navigation to add new projects
@@ -146,10 +137,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mGalleryViewModel.viewModelScope.launch {
                 mProjects = projects
                 val filteredProjects = mGalleryViewModel.filterProjects(projects)
-                //mProjects=projects
                 Log.d("tagfilter", "filter is ${mGalleryViewModel.projectFilter}")
                 Log.d("tagfilter", "mProjects: result of filter is ${mProjects?.size}")
                 mGalleryAdapter?.setProjectData(filteredProjects)
+                startPostponedEnterTransition()
             }
         })
 

@@ -23,7 +23,7 @@ import java.util.*
 class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
     private var mProjectData: List<Project>? = null
     private val constraintSet: ConstraintSet? = ConstraintSet()
-    private val mExternalFilesDir: File?
+    private var mExternalFilesDir: File? = null
 
     interface GalleryAdapterOnClickHandler {
         fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int)
@@ -115,8 +115,6 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
         val cardTransitionName = imageTransitionName + "card"
         binding.projectImage.transitionName = imageTransitionName
         binding.projectCardView.transitionName = cardTransitionName
-        Log.d(TAG, "tracking transition: gallery adapter $imageTransitionName & $cardTransitionName")
-
         // Load the image
         val f = File(thumbnail_path)
         Glide.with(holder.itemView.context)
