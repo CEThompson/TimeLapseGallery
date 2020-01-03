@@ -3,14 +3,18 @@ package com.vwoom.timelapsegallery.gallery
 import android.app.Dialog
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.TagEntry
@@ -18,6 +22,7 @@ import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
+import kotlinx.coroutines.launch
 
 // TODO add search option?
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
@@ -26,18 +31,23 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mGalleryAdapter: GalleryAdapter? = null
     private var mProjects: List<Project>? = null
 
+    private var mFilterTags: ArrayList<String> = arrayListOf()
+
     private lateinit var mBinding: FragmentGalleryBinding
+
+    private val mGalleryViewModel: GalleryViewModel by viewModels {
+        InjectorUtils.provideGalleryViewModelFactory(requireActivity())
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         mGalleryAdapter = null
     }
 
-    // TODO return transition works, but not adapter does not update appropriately: figure this out
+    // TODO return transition works, but adapter does not update appropriately: figure this out
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        if (::mBinding.isInitialized) return mBinding.root
-
+        //if (::mBinding.isInitialized) return mBinding.root // TODO figure out why this makes return transition work but breaks recycler view
         mBinding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
@@ -48,7 +58,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar.title = getString(R.string.app_name)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
-        // TqODO: determine if setting up action bar with nav contoller is worth it
+        // TODO: determine if setting up action bar with nav contoller is worth it
         //  (activity as TimeLapseGalleryActivity).setupActionBarWithNavController(findNavController())
 
         // Increase columns for horizontal orientation
@@ -92,7 +102,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         return mBinding.root
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.gallery_fragment_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -119,18 +128,32 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private fun initializeFilterDialog(){
         mFilterDialog = Dialog(requireContext())
         mFilterDialog?.setContentView(R.layout.dialog_filter)
+
+        mFilterDialog?.findViewById<FloatingActionButton>(R.id.filter_fab)?.setOnClickListener{
+            mGalleryViewModel.setFilter(mFilterTags)
+            Log.d("tagfilter", "setting filter $mFilterTags")
+            mGalleryViewModel.viewModelScope.launch {
+                val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
+                mGalleryAdapter?.setProjectData(filteredProjects)
+            }
+            mFilterDialog?.dismiss()
+        }
     }
 
     private fun setupViewModel() {
-        val viewModel = InjectorUtils.provideGalleryViewModel(requireContext())
-
         // Observe projects
-        viewModel.projects.observe(this, Observer { projects: List<Project> ->
-            mProjects = projects
-            mGalleryAdapter?.setProjectData(projects)
+        mGalleryViewModel.projects.observe(this, Observer { projects: List<Project> ->
+            mGalleryViewModel.viewModelScope.launch {
+                mProjects = projects
+                val filteredProjects = mGalleryViewModel.filterProjects(projects)
+                //mProjects=projects
+                Log.d("tagfilter", "filter is ${mGalleryViewModel.projectFilter}")
+                Log.d("tagfilter", "mProjects: result of filter is ${mProjects?.size}")
+                mGalleryAdapter?.setProjectData(filteredProjects)
+            }
         })
 
-        viewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
+        mGalleryViewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
             // TODO update tags here
             setFilterDialogTags(tags)
         })
@@ -140,9 +163,18 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         val tagLayout = mFilterDialog?.findViewById<LinearLayout>(R.id.dialog_filter_tags_layout)
         tagLayout?.removeAllViews()
         for (tag in tags){
-            val tagCheckBox: CheckBox = CheckBox(requireContext())
+            val tagCheckBox = CheckBox(requireContext())
             tagCheckBox.text = tag.tag
             tagLayout?.addView(tagCheckBox)
+            tagCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (isChecked) {
+                    mFilterTags.add(buttonView.text.toString())
+                    Log.d(TAG, "adding $mFilterTags")
+                } else {
+                    mFilterTags.remove(buttonView.text.toString())
+                    Log.d(TAG, "removing $mFilterTags")
+                }
+            }
         }
     }
 

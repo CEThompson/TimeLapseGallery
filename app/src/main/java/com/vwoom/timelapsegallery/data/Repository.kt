@@ -72,6 +72,8 @@ class Repository private constructor(
 
     fun getProjectTags(projectId: Long) = projectTagDao.loadTagsByProjectId(projectId)
 
+    suspend fun getProjectTags_nonLiveData(projectId: Long) = projectTagDao.loadTagsByProjectId_nonLiveData(projectId)
+
     fun getTags() = tagDao.loadAllTags()
 
     suspend fun getTagsFromProjectTags(projectTags: List<ProjectTagEntry>): List<TagEntry> {
