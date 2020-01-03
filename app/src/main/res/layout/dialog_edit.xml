@@ -68,7 +68,7 @@
         android:id="@+id/dialog_edit_tags_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:padding="@dimen/medium"
         android:orientation="horizontal"
         app:alignContent="stretch"
         app:alignItems="stretch"
@@ -76,15 +76,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_edit_tags_textview">
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/dialog_edit_add_tag_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_add_white_24dp"
-            app:fabSize="mini" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_edit_tags_textview"
+        app:layout_constraintBottom_toTopOf="@id/dialog_edit_submit_edit_fab">
     </com.google.android.flexbox.FlexboxLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/dialog_edit_add_tag_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/medium"
+        android:src="@drawable/ic_add_white_24dp"
+        app:fabSize="mini"
+        app:layout_constraintTop_toBottomOf="@id/dialog_edit_tags_layout"
+        app:layout_constraintStart_toStartOf="parent"/>
 
 
     <!-- Submit Edit FAB -->

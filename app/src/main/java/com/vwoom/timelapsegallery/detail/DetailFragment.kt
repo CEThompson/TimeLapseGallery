@@ -17,6 +17,7 @@ import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginBottom
 import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -46,6 +47,7 @@ import com.vwoom.timelapsegallery.databinding.FragmentDetailBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
+import kotlinx.android.synthetic.main.dialog_edit.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -486,6 +488,13 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             addTag()
         }
 
+        addTagFab?.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
+
+        dialog_edit_submit_edit_fab?.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
+
+
         val submitEditFab = mEditDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_submit_edit_fab)
         submitEditFab?.setOnClickListener {
             editProject()
@@ -617,18 +626,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 mTags = detailViewModel.getTags(tagEntries)
                 mTags?.sortedBy { it.tag }
 
+                // Find the layout
                 val tagLayout = mEditDialog?.findViewById<FlexboxLayout>(R.id.dialog_edit_tags_layout)
-                val fab = mEditDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_add_tag_fab)
 
+                // Clear the views and add the tags
                 tagLayout?.removeAllViews()
                 for (tag in mTags!!){
-                    val textView = TextView(requireContext())
-                    textView.setPadding(8)
-                    textView.text = tag.tag
-                    tagLayout?.addView(textView)
+                    val tagView = layoutInflater.inflate(R.layout.tag_layout, null)
+                    tagView.findViewById<TextView>(R.id.tag_text).text = tag.tag
+                    tagLayout?.addView(tagView)
                 }
-
-                tagLayout?.addView(fab)
             }
         })
     }
