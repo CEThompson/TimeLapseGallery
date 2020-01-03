@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.CheckBox
+import android.widget.GridLayout
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -16,6 +17,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
@@ -162,7 +164,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     private fun setFilterDialogTags(tags: List<TagEntry>){
-        val tagLayout = mFilterDialog?.findViewById<LinearLayout>(R.id.dialog_filter_tags_layout)
+        val tagLayout = mFilterDialog?.findViewById<FlexboxLayout>(R.id.dialog_filter_tags_layout)
         tagLayout?.removeAllViews()
         for (tag in tags){
             val tagCheckBox = CheckBox(requireContext())

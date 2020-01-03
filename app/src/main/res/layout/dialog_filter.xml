@@ -22,44 +22,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0.5"/>
 
-    <LinearLayout
+    <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/dialog_filter_tags_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:orientation="horizontal"
         android:layout_margin="@dimen/detail_margin"
         app:layout_constraintTop_toBottomOf="@id/filter_by_tag_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"/>
-
-
-    <TextView
-        android:id="@+id/filter_by_name_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="@dimen/detail_margin"
-        android:text="filter by name"
-        android:textStyle="italic"
-        tools:text="filter by name"
-        app:layout_constraintTop_toBottomOf="@id/dialog_filter_tags_layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"/>
-
-    <EditText
-        android:id="@+id/filter_name_edit_text"
-        android:layout_margin="@dimen/detail_margin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="name"
-        app:layout_constraintTop_toBottomOf="@id/filter_by_name_label"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        />
+        app:flexWrap="wrap"
+        app:alignItems="stretch"
+        app:alignContent="stretch" />
 
     <TextView
         android:id="@+id/filter_by_schedule_label"
@@ -70,7 +45,7 @@
         android:text="filter by schedule"
         android:textStyle="italic"
         tools:text="filter by schedule"
-        app:layout_constraintTop_toBottomOf="@id/filter_name_edit_text"
+        app:layout_constraintTop_toBottomOf="@id/dialog_filter_tags_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintHorizontal_bias="0.5"/>
