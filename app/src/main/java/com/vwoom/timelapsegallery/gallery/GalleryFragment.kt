@@ -4,11 +4,8 @@ import android.app.Dialog
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.CheckBox
-import android.widget.GridLayout
-import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -34,7 +31,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mGalleryAdapter: GalleryAdapter? = null
     private var mProjects: List<Project>? = null
 
-    private var mFilterTags: ArrayList<String> = arrayListOf()
+    private var mFilterTags: ArrayList<TagEntry> = arrayListOf()
 
     private lateinit var mBinding: FragmentGalleryBinding
 
@@ -135,7 +132,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         filterFab?.setOnClickListener{
             mGalleryViewModel.setFilter(mFilterTags)
-            Log.d("tagfilter", "setting filter $mFilterTags")
             mGalleryViewModel.viewModelScope.launch {
                 val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
                 mGalleryAdapter?.setProjectData(filteredProjects)
@@ -150,35 +146,33 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mGalleryViewModel.viewModelScope.launch {
                 mProjects = projects
                 val filteredProjects = mGalleryViewModel.filterProjects(projects)
-                Log.d("tagfilter", "filter is ${mGalleryViewModel.projectFilter}")
-                Log.d("tagfilter", "mProjects: result of filter is ${mProjects?.size}")
                 mGalleryAdapter?.setProjectData(filteredProjects)
                 startPostponedEnterTransition()
             }
         })
 
         mGalleryViewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
-            // TODO update tags here
-            setFilterDialogTags(tags)
+            tags.sortedBy {it.tag}
+            setTags(tags)
         })
     }
 
-    private fun setFilterDialogTags(tags: List<TagEntry>){
+    // Updates the dialog with all tags in the database for filtration
+    private fun setTags(tags: List<TagEntry>){
+        // Clear the tag layout
         val tagLayout = mFilterDialog?.findViewById<FlexboxLayout>(R.id.dialog_filter_tags_layout)
         tagLayout?.removeAllViews()
+
+        // Create the tag views
         for (tag in tags){
             val tagCheckBox = CheckBox(requireContext())
             tagCheckBox.text = tag.tag
-            tagLayout?.addView(tagCheckBox)
-            tagCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                if (isChecked) {
-                    mFilterTags.add(buttonView.text.toString())
-                    Log.d(TAG, "adding $mFilterTags")
-                } else {
-                    mFilterTags.remove(buttonView.text.toString())
-                    Log.d(TAG, "removing $mFilterTags")
-                }
+            tagCheckBox.isChecked = mGalleryViewModel.tagSelected(tag)
+            tagCheckBox.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) mFilterTags.add(tag)
+                else mFilterTags.remove(tag)
             }
+            tagLayout?.addView(tagCheckBox)
         }
     }
 

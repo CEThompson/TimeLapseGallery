@@ -489,6 +489,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val submitEditFab = mEditDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_submit_edit_fab)
         submitEditFab?.setOnClickListener {
             editProject()
+            mEditDialog?.dismiss()
         }
     }
 
