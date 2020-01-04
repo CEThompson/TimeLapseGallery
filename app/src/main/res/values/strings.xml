@@ -3,8 +3,10 @@
     <string name="app_name">Time Lapse Gallery</string>
     <string name="project_details">Project Details</string>
 
+    <!-- Option actions -->
     <string name="filter">Filter</string>
     <string name="search">Search</string>
+    <string name="share">Share</string>
 
     <string name="schedule_label">Schedule: </string>
     <string name="tags_label">Tags: </string>

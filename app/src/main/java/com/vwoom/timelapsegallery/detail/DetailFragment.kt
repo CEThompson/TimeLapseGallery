@@ -80,6 +80,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mFullscreenImage: ImageView? = null
 
     private var mEditDialog: Dialog? = null
+    private var mScheduleDialog: Dialog? = null
 
     private val KEY_DIALOG = "fullscreen_dialog"
 
@@ -168,10 +169,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // todo override on perform click
 
         binding.projectInfoIcon?.setOnClickListener {mEditDialog?.show()}
+        binding.scheduleIcon?.setOnClickListener {mScheduleDialog?.show()}
 
         // TODO (update) implement pinch zoom on fullscreen image
         initializeFullscreenImageDialog()
         initializeEditDialog()
+        initializeScheduleDialog()
 
         // Initialize fab color
         binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
@@ -432,6 +435,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     override fun onClick(clickedPhoto: PhotoEntry) {
         detailViewModel.setPhoto(clickedPhoto)
+    }
+
+    fun initializeScheduleDialog(){
+        mScheduleDialog = Dialog(requireContext())
+        mScheduleDialog?.setContentView(R.layout.dialog_schedule)
     }
 
     fun initializeEditDialog(){
