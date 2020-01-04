@@ -135,6 +135,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private fun initializeFilterDialog(){
         mFilterDialog = Dialog(requireContext())
         mFilterDialog?.setContentView(R.layout.dialog_filter)
+        mFilterDialog?.setOnCancelListener{mGalleryViewModel.filterDialogShowing=false}
 
         val filterCancelFab = mFilterDialog?.findViewById<FloatingActionButton>(R.id.filter_cancel_fab)
         val filterSubmitFab = mFilterDialog?.findViewById<FloatingActionButton>(R.id.filter_fab)
