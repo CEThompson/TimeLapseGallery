@@ -158,9 +158,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
 
         // Show the set of images in succession
-        binding.playAsVideoFab.setOnClickListener {
-            playSetOfImages()
-        }
+        binding.playAsVideoFab.setOnClickListener { playSetOfImages() }
 
         // Set a listener to display the image fullscreen
         binding.fullscreenFab.setOnClickListener { if (!mPlaying) mFullscreenImageDialog?.show() }
@@ -169,6 +167,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
         binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // todo override on perform click
 
+        binding.projectInfoIcon?.setOnClickListener {mEditDialog?.show()}
 
         // TODO (update) implement pinch zoom on fullscreen image
         initializeFullscreenImageDialog()
@@ -504,19 +503,22 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.currentProject.observe(this, Observer { currentProject: Project ->
             mCurrentProject = currentProject
 
+            // Set id
+            binding.detailsProjectId?.text = mCurrentProject?.project_id.toString()
+
+            // Set name
             val name = mCurrentProject?.project_name
             if (name == null)
-                binding.detailsProjectNameTextView.setText(mCurrentProject?.project_id.toString())
-            else {
-                val projectIdentification = getString(R.string.project_identification, mCurrentProject?.project_id, mCurrentProject?.project_name)
-                binding.detailsProjectNameTextView.setText(projectIdentification)
-            }
+                binding.detailsProjectNameTextView.text = getString(R.string.none)
+            else binding.detailsProjectNameTextView.text = name
 
+            // Set the dialog edit text
             val nameEdit = mEditDialog?.findViewById<EditText>(R.id.edit_name)
             nameEdit?.setText(currentProject.project_name)
 
+            // Set the dialog schedule information
             if (currentProject.schedule_time == null) {
-                mEditDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = "None"
+                mEditDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.none)
             } else {
                 mEditDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)
                         ?.text = TimeUtils.getDateFromTimestamp(currentProject.schedule_time)
@@ -585,20 +587,20 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 // Find the layout
                 val dialogTagLayout = mEditDialog?.findViewById<FlexboxLayout>(R.id.dialog_edit_tags_layout)
 
-                val projectTagLayout = binding.fragmentDetailsProjectTagsLayout
+                //val projectTagLayout = binding.fragmentDetailsProjectTagsLayout
 
                 // Clear the views and add the tags
                 dialogTagLayout?.removeAllViews()
-                projectTagLayout?.removeAllViews()
+                //projectTagLayout?.removeAllViews()
                 for (tag in mTags!!){
                     val tagViewForDialog = layoutInflater.inflate(R.layout.tag_layout, null)
                     tagViewForDialog.findViewById<TextView>(R.id.tag_text).text = tag.tag
                     dialogTagLayout?.addView(tagViewForDialog)
 
                     // TODO inflate mini tag layout
-                    val tagViewForProject = layoutInflater.inflate(R.layout.tag_layout, null)
-                    tagViewForProject.findViewById<TextView>(R.id.tag_text).text = tag.tag
-                    projectTagLayout?.addView(tagViewForProject)
+                    //val tagViewForProject = layoutInflater.inflate(R.layout.tag_layout, null)
+                    //tagViewForProject.findViewById<TextView>(R.id.tag_text).text = tag.tag
+                    ///projectTagLayout?.addView(tagViewForProject)
                 }
             }
         })
