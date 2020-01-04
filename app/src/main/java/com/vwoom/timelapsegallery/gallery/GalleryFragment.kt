@@ -99,6 +99,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         return mBinding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (mGalleryViewModel.filterDialogShowing) mFilterDialog?.show()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.gallery_fragment_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -120,6 +125,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             R.id.filter_option -> {
                 // TODO open dialoge to filter projects here
                 mFilterDialog?.show()
+                mGalleryViewModel.filterDialogShowing = true
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -148,10 +154,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 mGalleryAdapter?.setProjectData(filteredProjects)
             }
             mFilterDialog?.dismiss()
+            mGalleryViewModel.filterDialogShowing = false
         }
 
         filterCancelFab?.setOnClickListener {
             mFilterDialog?.dismiss()
+            mGalleryViewModel.filterDialogShowing = false
         }
 
     }

@@ -12,6 +12,8 @@ class GalleryViewModel internal constructor(val repository: Repository) : ViewMo
 
     var projectFilter: List<TagEntry> = listOf()
 
+    var filterDialogShowing = false
+
     fun setFilter(filter: List<TagEntry>) {
         projectFilter = filter
     }
