@@ -137,9 +137,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar.title = getString(R.string.project_details)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
-        }
 
         // Set up adapter and recycler view
         mDetailAdapter = DetailAdapter(this, requireContext())
@@ -194,6 +191,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        binding.detailsFragmentToolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
+    }
 
     override fun onPause() {
         super.onPause()
