@@ -595,6 +595,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     tagViewForDialog.findViewById<TextView>(R.id.tag_text).text = tag.tag
                     dialogTagLayout?.addView(tagViewForDialog)
 
+                    // TODO inflate mini tag layout
                     val tagViewForProject = layoutInflater.inflate(R.layout.tag_layout, null)
                     tagViewForProject.findViewById<TextView>(R.id.tag_text).text = tag.tag
                     projectTagLayout?.addView(tagViewForProject)

@@ -28,6 +28,15 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <ImageView
+                android:id="@+id/schedule_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_date_range_black_24dp"
+                android:padding="@dimen/large"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/play_as_video_fab"/>
+
             <!-- Layout containing project information -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/project_information_cardview"
@@ -36,7 +45,7 @@
                 android:layout_margin="@dimen/detail_margin"
                 android:minHeight="@dimen/fab_size"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/play_as_video_fab"
+                app:layout_constraintEnd_toStartOf="@id/schedule_icon"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -54,16 +63,6 @@
                         app:layout_constraintTop_toTopOf="parent"
                         android:textSize="32sp"
                         tools:text="1"/>
-
-                    <com.google.android.flexbox.FlexboxLayout
-                        android:id="@+id/fragment_details_project_tags_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/details_project_id"
-                        app:alignContent="stretch"
-                        app:alignItems="stretch"
-                        app:flexWrap="wrap"/>
 
                     <TextView
                         android:id="@+id/details_project_name_text_view"
@@ -197,6 +196,18 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:id="@+id/fragment_details_project_tags_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/project_information_cardview"
+                app:layout_constraintBottom_toTopOf="@id/image_loading_progress"
+                app:layout_constraintEnd_toStartOf="@id/details_card_container"
+                app:layout_constraintVertical_bias="0"
+                />
 
             <!-- For image loading -->
             <ProgressBar
