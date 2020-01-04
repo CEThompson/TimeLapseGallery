@@ -197,39 +197,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         super.onPause()
         playJob?.cancel()
         tagJob?.cancel()
+        mEditDialog?.dismiss()
     }
-
-    // TODO handle return from camera fragment
-    /*
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_ADD_PHOTO && resultCode == Activity.RESULT_OK) { // On successful addition of photo to project update the project thumbnail and check to update schedule
-            if (data != null) {
-                val resultPhoto: PhotoEntry = data.getParcelableExtra(Keys.PHOTO_ENTRY)
-                updateProjectThumbnail(mTimeLapseDatabase, mCurrentProject, resultPhoto)
-                // Set the current photo to null, when null the viewmodel will set to last in set
-                mCurrentPhoto = null
-                if (mProjectSchedule == null) return
-                // update the schedule
-                val schedule: Int = mProjectSchedule.getInterval_days()
-                var next: Long = mProjectSchedule.getSchedule_time()
-                // Update if there is a schedule and the timestamp belongs to today or has elapsed
-                if (schedule > 0
-                        && (DateUtils.isToday(next) || System.currentTimeMillis() > next)) { // update the time
-                    next = TimeUtils.getNextScheduledSubmission(next, schedule)
-                    // update the database reference
-                    val nextTimestampToSubmit = next
-                    instance!!.diskIO().execute {
-                        mProjectSchedule.setSchedule_time(nextTimestampToSubmit)
-                        mTimeLapseDatabase!!.projectScheduleDao().updateProjectSchedule(mProjectSchedule!!)
-                    }
-                    UpdateWidgetService.startActionUpdateWidgets(this)
-                }
-            }
-        }
-    }
-    */
-
 
     private fun showPhotoInformation() {
         val photoInformationLayout: LinearLayout = binding.photoInformationLayout
@@ -253,23 +222,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setListener(null)
     }
 
-
-    /* TODO handle back press
-    fun onBackPressed() { // Use this block for hide animation
-        val photoInformationLayout: LinearLayout = findViewById<LinearLayout>(R.id.photo_information_layout)
-        val gradientOverlay: View = findViewById<View>(R.id.details_gradient_overlay)
-        photoInformationLayout.visibility = View.INVISIBLE
-        gradientOverlay.visibility = View.INVISIBLE
-        mFullscreenFab!!.hide()
-        supportFinishAfterTransition()
-    }
-     */
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.detail_fragment_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
