@@ -583,14 +583,21 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 mTags?.sortedBy { it.tag }
 
                 // Find the layout
-                val tagLayout = mEditDialog?.findViewById<FlexboxLayout>(R.id.dialog_edit_tags_layout)
+                val dialogTagLayout = mEditDialog?.findViewById<FlexboxLayout>(R.id.dialog_edit_tags_layout)
+
+                val projectTagLayout = binding.fragmentDetailsProjectTagsLayout
 
                 // Clear the views and add the tags
-                tagLayout?.removeAllViews()
+                dialogTagLayout?.removeAllViews()
+                projectTagLayout?.removeAllViews()
                 for (tag in mTags!!){
-                    val tagView = layoutInflater.inflate(R.layout.tag_layout, null)
-                    tagView.findViewById<TextView>(R.id.tag_text).text = tag.tag
-                    tagLayout?.addView(tagView)
+                    val tagViewForDialog = layoutInflater.inflate(R.layout.tag_layout, null)
+                    tagViewForDialog.findViewById<TextView>(R.id.tag_text).text = tag.tag
+                    dialogTagLayout?.addView(tagViewForDialog)
+
+                    val tagViewForProject = layoutInflater.inflate(R.layout.tag_layout, null)
+                    tagViewForProject.findViewById<TextView>(R.id.tag_text).text = tag.tag
+                    projectTagLayout?.addView(tagViewForProject)
                 }
             }
         })
