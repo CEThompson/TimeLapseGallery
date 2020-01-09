@@ -16,6 +16,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -23,6 +25,9 @@ import com.vwoom.timelapsegallery.databinding.FragmentCameraBinding
 import com.vwoom.timelapsegallery.detail.CameraViewModel
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -39,6 +44,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
 
     private val executor = Executors.newSingleThreadExecutor()
     private var viewFinder: TextureView? = null
+    private var takePictureJob: Job? = null
 
     private val args: CameraFragmentArgs by navArgs()
 
@@ -103,6 +109,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
     override fun onStop() {
         super.onStop()
         mPreview?.removePreviewOutputListener()
+        takePictureJob?.cancel()
     }
 
     private fun startCamera() {
@@ -187,10 +194,11 @@ class CameraFragment: Fragment(), LifecycleOwner {
 
                         override fun onImageSaved(file: File) {
                             viewFinder?.post{ Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show()}
-                            cameraViewModel.handleFile(file, externalFilesDir)
-                            // TODO create job to handle adding a new project or handle adding a photo to a project
-                            // TODO navigate back on job finish
-                            //findNavController().popBackStack()
+
+                            takePictureJob = cameraViewModel.viewModelScope.launch {
+                                async {cameraViewModel.handleFile(file, externalFilesDir)}.await()
+                                findNavController().popBackStack()
+                            }
                         }
                     })
 
