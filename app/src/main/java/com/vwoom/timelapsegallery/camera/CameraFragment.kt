@@ -9,6 +9,7 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Size
 import android.view.*
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.core.content.ContextCompat
@@ -104,12 +105,11 @@ class CameraFragment: Fragment(), LifecycleOwner {
         mPreview?.removePreviewOutputListener()
     }
 
-
-
     private fun startCamera() {
         var metrics = DisplayMetrics().also{viewFinder?.display!!.getRealMetrics(it)}
         val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
 
+        // For debugging camera
         Log.d(TAG, "$metrics")
         Log.d(TAG, "$screenSize")
         Log.d(TAG, "${activity!!.windowManager.defaultDisplay.rotation}")
@@ -123,8 +123,10 @@ class CameraFragment: Fragment(), LifecycleOwner {
         }.build()
 
         mPreview = Preview(previewConfig)
+
         mPreview?.setOnPreviewOutputUpdateListener {
             // Get all dimensions
+            Log.d(TAG, "preview output update listener firing")
             metrics = DisplayMetrics().also { viewFinder?.display!!.getRealMetrics(it) }
             val previewWidth = metrics.widthPixels
             val previewHeight = metrics.heightPixels
@@ -145,12 +147,16 @@ class CameraFragment: Fragment(), LifecycleOwner {
             // Rotate matrix
             matrix.postRotate(-rotation.toFloat(), centerX, centerY)
             // Scale matrix
-            matrix.postScale(
-                    previewWidth.toFloat() / height,
-                    previewHeight.toFloat() / width,
-                    centerX,
-                    centerY
-            )
+
+            // TODO optimize this transform to match precisely the captured image
+            if (rotation!=0)
+                matrix.postScale(
+                        previewWidth.toFloat() / height,
+                        previewHeight.toFloat() / width,
+                        centerX,
+                        centerY
+                )
+
             // Assign transformation to view
             viewFinder?.setTransform(matrix)
             viewFinder?.surfaceTexture = it.surfaceTexture
