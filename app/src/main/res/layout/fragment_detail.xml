@@ -53,8 +53,8 @@
                         android:layout_height="wrap_content"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        android:textSize="32sp"
-                        tools:text="1"/>
+                        android:textSize="18sp"
+                        tools:text="100"/>
 
                     <TextView
                         android:id="@+id/details_project_name_text_view"
@@ -73,7 +73,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toBottomOf="@id/details_project_name_text_view"
-                        app:layout_constraintStart_toStartOf="@id/details_project_name_text_view"
+                        app:layout_constraintStart_toStartOf="parent"
                         tools:text="7/7/19 - 8/8/20" />
 
                     <ImageView
