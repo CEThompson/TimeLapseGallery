@@ -46,7 +46,6 @@ import com.vwoom.timelapsegallery.databinding.FragmentDetailBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
-import kotlinx.android.synthetic.main.dialog_project_information.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -162,11 +161,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // todo override on perform click
 
         binding.projectInfoIcon?.setOnClickListener {mProjectInfoDialog?.show()}
-        binding.scheduleIcon?.setOnClickListener {mScheduleDialog?.show()}
 
         // TODO (update) implement pinch zoom on fullscreen image
         initializeFullscreenImageDialog()
-        initializeEditDialog()
+        initializeProjectInformationDialog()
         initializeScheduleDialog()
 
         // Initialize fab color
@@ -441,25 +439,34 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mScheduleDialog?.setContentView(R.layout.dialog_schedule)
     }
 
-    fun initializeEditDialog(){
+    fun initializeProjectInformationDialog(){
         mProjectInfoDialog = Dialog(requireContext())
         mProjectInfoDialog?.setContentView(R.layout.dialog_project_information)
 
-        val addTagFab = mProjectInfoDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_add_tag_fab)
-        addTagFab?.setOnClickListener {
-            addTag()
-        }
+        // Get Views
+        val editTagsTextView = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_edit_tags)
+        val editNameFab = mProjectInfoDialog?.findViewById<FloatingActionButton>(R.id.edit_project_name_FAB)
+        val editScheduleFab = mProjectInfoDialog?.findViewById<FloatingActionButton>(R.id.edit_schedule_FAB)
+        val verifyFab = mProjectInfoDialog?.findViewById<FloatingActionButton>(R.id.dialog_verify_fab)
 
-        addTagFab?.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-
-        dialog_edit_submit_edit_fab?.backgroundTintList =
+        // Set fab colors
+        editNameFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+        editScheduleFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+        verifyFab?.backgroundTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
 
 
-        val submitEditFab = mProjectInfoDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_submit_edit_fab)
-        submitEditFab?.setOnClickListener {
-            editProject()
+        // Set click listeners
+        editTagsTextView?.setOnClickListener {
+            editTags()
+        }
+        editNameFab?.setOnClickListener {
+            editName()
+        }
+        editScheduleFab?.setOnClickListener {
+            mScheduleDialog?.show()
+        }
+        verifyFab?.setOnClickListener {
             mProjectInfoDialog?.dismiss()
         }
     }
@@ -505,7 +512,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     // Binds project and photos to database
     private fun setupViewModel() {
-
         // Observe the current selected project
         detailViewModel.currentProject.observe(this, Observer { currentProject: Project ->
             mCurrentProject = currentProject
@@ -610,8 +616,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 // Find the layout
                 val dialogTagLayout = mProjectInfoDialog?.findViewById<FlexboxLayout>(R.id.dialog_edit_tags_layout)
 
-                //val projectTagLayout = binding.fragmentDetailsProjectTagsLayout
-
                 // Clear the views and add the tags
                 dialogTagLayout?.removeAllViews()
                 //projectTagLayout?.removeAllViews()
@@ -670,8 +674,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-    private fun addTag(){
-        val input: EditText = EditText(requireContext())
+    private fun editTags(){
+        val input = EditText(requireContext())
         input.inputType = InputType.TYPE_CLASS_TEXT
         AlertDialog.Builder(requireContext())
                 .setTitle("Add Tag")
@@ -683,9 +687,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setNegativeButton(android.R.string.no, null).show()
     }
 
-    //Edits the current project
-    private fun editProject() {
-        // TODO handle editing project with dialog
+    private fun editName(){
+        // TODO implement name edit
+    }
+
+    private fun editSchedule(){
+        // TODO implement scheduling
     }
 
     private fun verifyPhotoDeletion() {

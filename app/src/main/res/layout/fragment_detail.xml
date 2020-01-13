@@ -28,15 +28,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/schedule_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_date_range_black_24dp"
-                android:padding="@dimen/large"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/play_as_video_fab"/>
-
             <!-- Layout containing project information -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/project_information_cardview"
@@ -46,7 +37,7 @@
                 android:minHeight="@dimen/fab_size"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/schedule_icon"
+                app:layout_constraintEnd_toStartOf="@id/play_as_video_fab"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
