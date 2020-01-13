@@ -75,6 +75,8 @@
         <item>daily</item>
         <item>weekly</item>
     </string-array>
+
+    <string name="unnamed">unnamed</string>
     <string name="none">none</string>
     <string name="daily">daily</string>
     <string name="weekly">weekly</string>

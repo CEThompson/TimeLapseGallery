@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
@@ -81,8 +82,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private var mEditDialog: Dialog? = null
     private var mScheduleDialog: Dialog? = null
-
-    private val KEY_DIALOG = "fullscreen_dialog"
 
     // For playing timelapse
     private var mPlaying = false
@@ -519,9 +518,18 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
             // Set name
             val name = mCurrentProject?.project_name
-            if (name == null)
-                binding.detailsProjectNameTextView.text = getString(R.string.none)
-            else binding.detailsProjectNameTextView.text = name
+            if (name == null) {
+                binding.detailsProjectNameTextView.text = getString(R.string.unnamed)
+                binding.detailsProjectNameTextView
+                        .setTypeface(binding.detailsProjectNameTextView.typeface, Typeface.ITALIC)
+                binding.detailsProjectNameTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+            }
+            else {
+                binding.detailsProjectNameTextView.text = name
+                binding.detailsProjectNameTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                binding.detailsProjectNameTextView
+                        .setTypeface(binding.detailsProjectNameTextView.typeface, Typeface.BOLD)
+            }
 
             // Set the dialog edit text
             val nameEdit = mEditDialog?.findViewById<EditText>(R.id.edit_name)
