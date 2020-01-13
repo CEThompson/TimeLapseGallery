@@ -4,24 +4,27 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vwoom.timelapsegallery.data.Repository
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
+import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
-class DetailViewModel(val repository: Repository, projectId: Long) : ViewModel() {
-    val photos: LiveData<List<PhotoEntry>> = repository.getPhotos(projectId)
-    val tags: LiveData<List<ProjectTagEntry>> = repository.getProjectTags(projectId)
+class DetailViewModel(val photoRepository: PhotoRepository,
+                      val projectRepository: ProjectRepository,
+                      val projectTagRepository: ProjectTagRepository,
+                      val coverPhotoRepository: CoverPhotoRepository,
+                      val tagRepository: TagRepository,
+                      projectId: Long) : ViewModel() {
+    val photos: LiveData<List<PhotoEntry>> = photoRepository.getPhotos(projectId)
+    val tags: LiveData<List<ProjectTagEntry>> = projectTagRepository.getProjectTags(projectId)
 
-    val currentProject: LiveData<Project> = repository.getProjectView(projectId)
+    val currentProject: LiveData<Project> = projectRepository.getProjectView(projectId)
     val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
 
     var isPlaying: Boolean = false
@@ -58,29 +61,29 @@ class DetailViewModel(val repository: Repository, projectId: Long) : ViewModel()
 
     fun setCoverPhoto(photoEntry: PhotoEntry) {
         viewModelScope.launch {
-            repository.setCoverPhoto(photoEntry)
+            coverPhotoRepository.setCoverPhoto(photoEntry)
         }
     }
 
     fun addTag(tagText: String, project: Project){
         viewModelScope.launch {
-            repository.addTagToProject(tagText, project)
+            projectTagRepository.addTagToProject(tagText, project)
         }
     }
 
     fun getTags(projectTags: List<ProjectTagEntry>): List<TagEntry> = runBlocking {
-        repository.getTagsFromProjectTags(projectTags)
+        tagRepository.getTagsFromProjectTags(projectTags)
     }
 
     fun deleteCurrentPhoto(externalFilesDir: File){
         viewModelScope.launch {
-            repository.deletePhoto(externalFilesDir, currentPhoto.value!!)
+            photoRepository.deletePhoto(externalFilesDir, currentPhoto.value!!)
         }
     }
 
     fun deleteCurrentProject(externalFilesDir: File) {
         viewModelScope.launch {
-            repository.deleteProject(externalFilesDir, currentProject.value?.project_id!!)
+            projectRepository.deleteProject(externalFilesDir, currentProject.value?.project_id!!)
         }
     }
 }

@@ -2,13 +2,17 @@ package com.vwoom.timelapsegallery.gallery
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.vwoom.timelapsegallery.data.Repository
 import com.vwoom.timelapsegallery.data.entry.TagEntry
+import com.vwoom.timelapsegallery.data.repository.ProjectRepository
+import com.vwoom.timelapsegallery.data.repository.ProjectTagRepository
+import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Project
 
-class GalleryViewModel internal constructor(val repository: Repository) : ViewModel() {
-    val projects: LiveData<List<Project>> = repository.getProjectViews()
-    val tags: LiveData<List<TagEntry>> = repository.getTags()
+class GalleryViewModel internal constructor(val projectRepository: ProjectRepository,
+                                            val tagRepository: TagRepository,
+                                            val projectTagRepository: ProjectTagRepository) : ViewModel() {
+    val projects: LiveData<List<Project>> = projectRepository.getProjectViews()
+    val tags: LiveData<List<TagEntry>> = tagRepository.getTags()
 
     var projectFilter: List<TagEntry> = listOf()
 
@@ -27,8 +31,8 @@ class GalleryViewModel internal constructor(val repository: Repository) : ViewMo
 
         return projectsToFilter.filter {
             // TODO get tags for project
-            val projectTags = repository.getProjectTags_nonLiveData(it.project_id)
-            val tags = repository.getTagsFromProjectTags(projectTags)
+            val projectTags = projectTagRepository.getProjectTags_nonLiveData(it.project_id)
+            val tags = tagRepository.getTagsFromProjectTags(projectTags)
 
             for (tag in tags){
                 if (projectFilter.contains(tag)) return@filter true

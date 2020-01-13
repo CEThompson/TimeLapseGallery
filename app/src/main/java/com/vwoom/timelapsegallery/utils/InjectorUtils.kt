@@ -1,47 +1,90 @@
 package com.vwoom.timelapsegallery.utils
 
 import android.content.Context
-import com.vwoom.timelapsegallery.data.Repository
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
+import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.detail.CameraViewModelFactory
 import com.vwoom.timelapsegallery.detail.DetailViewModelFactory
 import com.vwoom.timelapsegallery.detail.GalleryViewModelFactory
-import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 import com.vwoom.timelapsegallery.settings.SettingsViewModel
 
 object InjectorUtils {
 
-    private fun getRepository(context: Context): Repository {
-        return Repository.getInstance(
+    private fun getCoverPhotoRepository(context: Context): CoverPhotoRepository {
+        return CoverPhotoRepository.getInstance(
+                TimeLapseDatabase.getInstance(context.applicationContext).coverPhotoDao())
+    }
+
+    private fun getPhotoRepository(context: Context): PhotoRepository {
+        return PhotoRepository.getInstance(
+                TimeLapseDatabase.getInstance(context.applicationContext).photoDao(),
+                TimeLapseDatabase.getInstance(context.applicationContext).projectDao(),
+                TimeLapseDatabase.getInstance(context.applicationContext).coverPhotoDao())
+    }
+
+    private fun getProjectRepository(context: Context): ProjectRepository {
+        return ProjectRepository.getInstance(
                 TimeLapseDatabase.getInstance(context.applicationContext).projectDao(),
                 TimeLapseDatabase.getInstance(context.applicationContext).photoDao(),
                 TimeLapseDatabase.getInstance(context.applicationContext).coverPhotoDao(),
-                TimeLapseDatabase.getInstance(context.applicationContext).projectScheduleDao(),
+                TimeLapseDatabase.getInstance(context.applicationContext).projectScheduleDao())
+    }
+
+    private fun getProjectScheduleRepository(context: Context): ProjectScheduleRepository {
+        return ProjectScheduleRepository.getInstance(
+                TimeLapseDatabase.getInstance(context.applicationContext).projectScheduleDao())
+    }
+
+    private fun getProjectTagRepository(context: Context): ProjectTagRepository {
+        return ProjectTagRepository.getInstance(
                 TimeLapseDatabase.getInstance(context.applicationContext).projectTagDao(),
-                TimeLapseDatabase.getInstance(context.applicationContext).tagDao()
-                )
+                TimeLapseDatabase.getInstance(context.applicationContext).tagDao())
+    }
+
+    private fun getTagRepository(context: Context): TagRepository {
+        return TagRepository.getInstance(
+                TimeLapseDatabase.getInstance(context.applicationContext).tagDao())
     }
 
     fun provideCameraViewModelFactory(context: Context, photo: Photo?, project: Project?): CameraViewModelFactory {
-        val repository = getRepository(context)
-        return CameraViewModelFactory(repository, photo, project)
+        val projectRepository = getProjectRepository(context)
+        val photoRepository = getPhotoRepository(context)
+        return CameraViewModelFactory(
+                projectRepository,
+                photoRepository,
+                photo,
+                project)
     }
 
     fun provideDetailsViewModelFactory(context: Context, project: Project): DetailViewModelFactory {
-        val repository = getRepository(context)
-        return DetailViewModelFactory(repository, project.project_id)
+        val photoRepository = getPhotoRepository(context)
+        val projectRepository = getProjectRepository(context)
+        val projectTagRepository = getProjectTagRepository(context)
+        val coverPhotoRepository = getCoverPhotoRepository(context)
+        val tagRepository = getTagRepository(context)
+        return DetailViewModelFactory(
+                photoRepository,
+                projectRepository,
+                projectTagRepository,
+                coverPhotoRepository,
+                tagRepository,
+                project.project_id)
     }
 
     fun provideGalleryViewModelFactory(context: Context): GalleryViewModelFactory {
-        val repository = getRepository(context)
-        return GalleryViewModelFactory(repository)
+        val projectRepository = getProjectRepository(context)
+        val tagRepository = getTagRepository(context)
+        val projectTagRepository = getProjectTagRepository(context)
+        return GalleryViewModelFactory(
+                projectRepository,
+                tagRepository,
+                projectTagRepository)
     }
 
-    fun provideSettingsViewModel(context: Context): SettingsViewModel {
-        val repository = getRepository(context)
-        return SettingsViewModel(repository)
+    fun provideSettingsViewModel(): SettingsViewModel {
+        return SettingsViewModel()
     }
 
 }

@@ -46,7 +46,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        settingsViewModel = InjectorUtils.provideSettingsViewModel(requireActivity())
+        settingsViewModel = InjectorUtils.provideSettingsViewModel()
 
         // TODO handle database sync in coroutine or work manager
 
