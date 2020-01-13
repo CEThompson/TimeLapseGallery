@@ -18,8 +18,6 @@ import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginBottom
-import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -48,11 +46,10 @@ import com.vwoom.timelapsegallery.databinding.FragmentDetailBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
-import kotlinx.android.synthetic.main.dialog_edit.*
+import kotlinx.android.synthetic.main.dialog_project_information.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.w3c.dom.Text
 import java.io.File
 
 // TODO add schedule option (icon = date range, in overflow and with fab?)
@@ -80,7 +77,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mFullscreenImageDialog: Dialog? = null
     private var mFullscreenImage: ImageView? = null
 
-    private var mEditDialog: Dialog? = null
+    private var mProjectInfoDialog: Dialog? = null
     private var mScheduleDialog: Dialog? = null
 
     // For playing timelapse
@@ -164,7 +161,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
         binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // todo override on perform click
 
-        binding.projectInfoIcon?.setOnClickListener {mEditDialog?.show()}
+        binding.projectInfoIcon?.setOnClickListener {mProjectInfoDialog?.show()}
         binding.scheduleIcon?.setOnClickListener {mScheduleDialog?.show()}
 
         // TODO (update) implement pinch zoom on fullscreen image
@@ -201,7 +198,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         super.onPause()
         playJob?.cancel()
         tagJob?.cancel()
-        mEditDialog?.dismiss()
+        mProjectInfoDialog?.dismiss()
     }
 
     private fun showPhotoInformation() {
@@ -234,7 +231,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.edit_project -> {
-                mEditDialog?.show()
+                mProjectInfoDialog?.show()
                 true
             }
             R.id.delete_photo -> {
@@ -445,10 +442,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     fun initializeEditDialog(){
-        mEditDialog = Dialog(requireContext())
-        mEditDialog?.setContentView(R.layout.dialog_edit)
+        mProjectInfoDialog = Dialog(requireContext())
+        mProjectInfoDialog?.setContentView(R.layout.dialog_project_information)
 
-        val addTagFab = mEditDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_add_tag_fab)
+        val addTagFab = mProjectInfoDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_add_tag_fab)
         addTagFab?.setOnClickListener {
             addTag()
         }
@@ -460,10 +457,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
 
 
-        val submitEditFab = mEditDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_submit_edit_fab)
+        val submitEditFab = mProjectInfoDialog?.findViewById<FloatingActionButton>(R.id.dialog_edit_submit_edit_fab)
         submitEditFab?.setOnClickListener {
             editProject()
-            mEditDialog?.dismiss()
+            mProjectInfoDialog?.dismiss()
         }
     }
 
@@ -516,30 +513,37 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             // Set id
             binding.detailsProjectId?.text = mCurrentProject?.project_id.toString()
 
-            // Set name
+            // Set the dialog name
+            val projectInfoNameTv = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
+
+            // Set name for both the dialog and the project info card view
             val name = mCurrentProject?.project_name
             if (name == null) {
+                // Set the layout card view
                 binding.detailsProjectNameTextView.text = getString(R.string.unnamed)
                 binding.detailsProjectNameTextView
                         .setTypeface(binding.detailsProjectNameTextView.typeface, Typeface.ITALIC)
                 binding.detailsProjectNameTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                // Set the dialog
+                projectInfoNameTv?.text = getString(R.string.unnamed)
+
             }
             else {
+                // Set the card view
                 binding.detailsProjectNameTextView.text = name
                 binding.detailsProjectNameTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
                 binding.detailsProjectNameTextView
                         .setTypeface(binding.detailsProjectNameTextView.typeface, Typeface.BOLD)
+                // Set the dialog
+                projectInfoNameTv?.text = currentProject.project_name
             }
 
-            // Set the dialog edit text
-            val nameEdit = mEditDialog?.findViewById<EditText>(R.id.edit_name)
-            nameEdit?.setText(currentProject.project_name)
 
             // Set the dialog schedule information
             if (currentProject.schedule_time == null) {
-                mEditDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.none)
+                mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.none)
             } else {
-                mEditDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)
+                mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)
                         ?.text = TimeUtils.getDateFromTimestamp(currentProject.schedule_time)
             }
 
@@ -604,7 +608,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 mTags?.sortedBy { it.tag }
 
                 // Find the layout
-                val dialogTagLayout = mEditDialog?.findViewById<FlexboxLayout>(R.id.dialog_edit_tags_layout)
+                val dialogTagLayout = mProjectInfoDialog?.findViewById<FlexboxLayout>(R.id.dialog_edit_tags_layout)
 
                 //val projectTagLayout = binding.fragmentDetailsProjectTagsLayout
 
