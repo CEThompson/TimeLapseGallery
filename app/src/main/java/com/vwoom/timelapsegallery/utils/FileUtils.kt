@@ -199,7 +199,7 @@ object FileUtils {
         return photoFile.absolutePath
     }
 
-
+    // TODO handle .png images
     fun getPhotoFileName(entry: PhotoEntry): String {
         return entry.timestamp.toString() + ".jpg"
     }

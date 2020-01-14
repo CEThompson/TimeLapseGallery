@@ -22,6 +22,8 @@ import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
 import kotlinx.coroutines.launch
 
+// TODO navigating to settings then to detail causes crash, figure out why
+
 class SettingsFragment : PreferenceFragmentCompat() {
     var prefs: SharedPreferences? = null
     var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
