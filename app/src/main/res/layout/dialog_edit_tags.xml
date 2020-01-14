@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="22sp"
+        android:layout_margin="@dimen/medium"
         android:text="Tags"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,13 +27,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_edit_tags_title"/>
 
-    <!-- Manage Tags -->
+    <!-- Delete Tags -->
+    <TextView
+        android:id="@+id/dialog_edit_tags_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/medium"
+        android:layout_marginBottom="@dimen/medium"
+        android:padding="@dimen/medium"
+        android:src="@drawable/ic_add_white_24dp"
+        android:text="@string/delete"
+        android:textColor="@color/colorRedAccent"
+        android:textStyle="italic|bold"
+        app:layout_constraintTop_toBottomOf="@id/dialog_edit_tags_taglayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Add Tags -->
     <TextView
         android:id="@+id/dialog_edit_tags_add_tag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/medium"
         android:layout_marginBottom="@dimen/medium"
+        android:padding="@dimen/medium"
         android:src="@drawable/ic_add_white_24dp"
         android:text="@string/add_tag"
         android:textColor="@color/colorPrimary"

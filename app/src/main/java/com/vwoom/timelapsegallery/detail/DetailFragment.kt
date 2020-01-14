@@ -66,6 +66,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Photo and project Information
     private var mPhotos: List<PhotoEntry>? = null
     private var mTags: List<TagEntry>? = null
+    private var mSelectedTags: ArrayList<String> = arrayListOf()
     private var mCurrentPhoto: PhotoEntry? = null
     private var mCurrentPlayPosition: Int? = null
     private var mCurrentProject: Project? = null
@@ -445,8 +446,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mEditTagsDialog?.setContentView(R.layout.dialog_edit_tags)
 
         val addTagTextView = mEditTagsDialog?.findViewById<TextView>(R.id.dialog_edit_tags_add_tag)
+        val deleteTextView = mEditTagsDialog?.findViewById<TextView>(R.id.dialog_edit_tags_delete)
 
         addTagTextView?.setOnClickListener { addTag() }
+        deleteTextView?.setOnClickListener { deleteTags() }
     }
 
     fun initializeProjectInformationDialog(){
@@ -530,7 +533,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             binding.detailsProjectId?.text = mCurrentProject?.project_id.toString()
             val projectInfoDialogId = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_label)
             projectInfoDialogId?.text = getString(R.string.project_id_label, currentProject.project_id)
-            
+
             // Set the dialog name
             val projectInfoNameTv = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
 
@@ -633,8 +636,17 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
                     // Set up views for deleting tags
                     val checkBox = CheckBox(requireContext())
-                    checkBox.text = tag.tag
+                    checkBox.text = getString(R.string.hashtag, tag.tag)
                     taglayout?.addView(checkBox)
+
+                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                        val checkBoxTag = tag.tag
+                        if (isChecked){
+                            mSelectedTags.add(checkBoxTag)
+                        } else {
+                            mSelectedTags.remove(checkBoxTag)
+                        }
+                    }
                 }
                 val tags = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
                 tags?.text = text
@@ -683,6 +695,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         init {
             gestureDetector = GestureDetector(ctx, GestureListener())
         }
+    }
+
+    private fun deleteTags(){
+        detailViewModel.deleteTags(mSelectedTags)
     }
 
     private fun addTag(){
