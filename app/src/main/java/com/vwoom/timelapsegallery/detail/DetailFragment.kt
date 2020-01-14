@@ -701,6 +701,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // TODO add validation?
         Log.d(TAG, mSelectedTags.toString())
         detailViewModel.deleteTags(mSelectedTags, mCurrentProject!!)
+        mSelectedTags = arrayListOf() // reset list
     }
 
     private fun addTag(){
