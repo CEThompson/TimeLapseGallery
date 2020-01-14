@@ -528,13 +528,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
             // Set id
             binding.detailsProjectId?.text = mCurrentProject?.project_id.toString()
-
+            val projectInfoDialogId = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_label)
+            projectInfoDialogId?.text = getString(R.string.project_id_label, currentProject.project_id)
+            
             // Set the dialog name
             val projectInfoNameTv = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
 
             // Set name for both the dialog and the project info card view
             val name = mCurrentProject?.project_name
-            if (name == null) {
+            if (name == null || name.isEmpty()) {
                 // Set the layout card view
                 binding.detailsProjectNameTextView.text = getString(R.string.unnamed)
                 binding.detailsProjectNameTextView
@@ -553,7 +555,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 // Set the dialog
                 projectInfoNameTv?.text = currentProject.project_name
             }
-
 
             // Set the dialog schedule information
             if (currentProject.schedule_time == null) {

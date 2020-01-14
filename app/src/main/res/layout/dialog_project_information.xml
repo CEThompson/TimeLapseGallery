@@ -8,6 +8,32 @@
     android:layout_margin="@dimen/large"
     android:orientation="vertical">
 
+    <!-- Title -->
+    <TextView
+        android:id="@+id/dialog_project_information_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias=".5"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="22sp"
+        android:text="@string/project_information"/>
+
+    <!-- Id -->
+    <TextView
+        android:id="@+id/dialog_project_info_id_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="@dimen/large"
+        android:layout_marginBottom="@dimen/medium"
+        tools:text="@string/project_id_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_project_information_title"/>
+
     <!-- Name -->
     <TextView
         android:id="@+id/dialog_project_info_name_label"
@@ -34,9 +60,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_edit_black_24dp"
-        android:layout_marginStart="8dp"
+        android:layout_margin="@dimen/medium"
         app:layout_constraintStart_toEndOf="@id/dialog_project_info_name"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_project_info_id_label"
         app:fabSize="mini"/>
 
     <!-- Schedule -->
@@ -65,7 +91,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_date_range_black_24dp"
-        android:layout_marginStart="8dp"
+        android:layout_margin="@dimen/medium"
         app:layout_constraintStart_toEndOf="@id/dialog_edit_schedule_textview_description"
         app:layout_constraintTop_toBottomOf="@id/edit_project_name_FAB"
         app:fabSize="mini"/>

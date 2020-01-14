@@ -81,8 +81,11 @@
     <string name="daily">daily</string>
     <string name="weekly">weekly</string>
 
+    <!-- Dialog resources -->
     <string name="edit_tags"><u>edit tags</u></string>
     <string name="add_tag">add tag</string>
+    <string name="project_information">Project Information</string>
+    <string name="project_id_label">Project Id: %1$d</string>
 
     <string name="no_projects_for_today">No projects scheduled for today.</string>
 
