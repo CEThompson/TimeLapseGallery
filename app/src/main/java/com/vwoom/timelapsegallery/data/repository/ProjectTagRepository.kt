@@ -11,15 +11,29 @@ class ProjectTagRepository private constructor(val projectTagDao: ProjectTagDao,
     fun getProjectTags(projectId: Long) = projectTagDao.loadTagsByProjectId(projectId)
 
     suspend fun deleteTags(tags: ArrayList<String>, project: Project) {
+        val projectTagsToDelete: ArrayList<ProjectTagEntry> = arrayListOf()
+
         for (tag in tags){
+            // Get valid tags
             val currentTag = tagDao.loadTagByText(tag)
             if (currentTag!=null) {
+                // Determine if tag belongs to a project
                 val projectTagEntry: ProjectTagEntry? = projectTagDao.loadProjectTag(project.project_id, currentTag.id)
 
-                if (projectTagEntry!=null) projectTagDao.deleteProjectTag(projectTagEntry)
-
-                // TODO if tag does not belong to project delete tag
+                if (projectTagEntry!=null) {
+                    // Add tag to list for deletion
+                    projectTagsToDelete.add(projectTagEntry)
+                }
             }
+        }
+
+        // Bulk delete the project tags
+        projectTagDao.bulkDelete(projectTagsToDelete.toList())
+
+        // Remove any tags that are not linked to projects
+        for (tag in projectTagsToDelete){
+            val linksToProjects = projectTagDao.loadProjectTagsByTagId(tag.tag_id).size
+            if (linksToProjects == 0) tagDao.deleteTag(tagDao.loadTagById(tag.tag_id))
         }
     }
 

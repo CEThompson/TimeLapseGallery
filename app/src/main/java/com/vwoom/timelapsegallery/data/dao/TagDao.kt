@@ -19,7 +19,7 @@ interface TagDao {
     suspend fun insertTag(tagEntry: TagEntry): Long
 
     @Delete
-    fun deleteTag(tagEntry: TagEntry)
+    suspend fun deleteTag(tagEntry: TagEntry)
 
     @Update
     fun updateTag(tagEntry: TagEntry)
