@@ -31,7 +31,6 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -78,6 +77,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private var mProjectInfoDialog: Dialog? = null
     private var mScheduleDialog: Dialog? = null
+    private var mEditTagsDialog: Dialog? = null
 
     // For playing timelapse
     private var mPlaying = false
@@ -165,6 +165,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // TODO (update) implement pinch zoom on fullscreen image
         initializeFullscreenImageDialog()
         initializeProjectInformationDialog()
+        initializeEditTagsDialog()
         initializeScheduleDialog()
 
         // Initialize fab color
@@ -439,6 +440,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mScheduleDialog?.setContentView(R.layout.dialog_schedule)
     }
 
+    fun initializeEditTagsDialog(){
+        mEditTagsDialog = Dialog(requireContext())
+        mEditTagsDialog?.setContentView(R.layout.dialog_edit_tags)
+
+        val addTagTextView = mEditTagsDialog?.findViewById<TextView>(R.id.dialog_edit_tags_add_tag)
+
+        addTagTextView?.setOnClickListener { addTag() }
+    }
+
     fun initializeProjectInformationDialog(){
         mProjectInfoDialog = Dialog(requireContext())
         mProjectInfoDialog?.setContentView(R.layout.dialog_project_information)
@@ -458,7 +468,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // Set click listeners
         editTagsTextView?.setOnClickListener {
-            editTags()
+            mEditTagsDialog?.show()
         }
         editNameFab?.setOnClickListener {
             editName()
@@ -610,13 +620,25 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Observe the tags
         detailViewModel.tags.observe(this, Observer<List<ProjectTagEntry>> { tagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
+                // Update project information dialog
                 mTags = detailViewModel.getTags(tagEntries).sortedBy { it.tag }
+
+                val taglayout = mEditTagsDialog?.findViewById<LinearLayout>(R.id.dialog_edit_tags_taglayout)
+                taglayout?.removeAllViews()
                 var text = ""
                 for (tag in mTags!!){
+                    // Create the project information display text
                     text = text.plus("#${tag.tag}  ")
+
+                    // Set up views for deleting tags
+                    val checkBox = CheckBox(requireContext())
+                    checkBox.text = tag.tag
+                    taglayout?.addView(checkBox)
                 }
                 val tags = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
                 tags?.text = text
+
+                // Update edit tag dialog
             }
         })
     }
@@ -662,7 +684,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-    private fun editTags(){
+    private fun addTag(){
         val input = EditText(requireContext())
         input.inputType = InputType.TYPE_CLASS_TEXT
         AlertDialog.Builder(requireContext())
