@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 
 class SettingsViewModel() : ViewModel() {
 
-    // TODO handle database sync
-    // TODO handle dialog state
+    // TODO drive settings fragment from view model
 
 }

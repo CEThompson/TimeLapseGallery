@@ -49,7 +49,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mFilterDialog?.dismiss()
     }
 
-    // TODO return transition works, but adapter does not update appropriately: figure this out
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         if (::mBinding.isInitialized) postponeEnterTransition()
@@ -62,8 +61,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar.title = getString(R.string.app_name)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
-        // TODO: determine if setting up action bar with nav contoller is worth it
-        //  (activity as TimeLapseGalleryActivity).setupActionBarWithNavController(findNavController())
 
         // Increase columns for horizontal orientation
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) mNumberOfColumns = 6
@@ -91,7 +88,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             findNavController().navigate(action)
         }
 
-        // TODO convert dialog initializations to lazy?
         initializeFilterDialog()
 
         setupViewModel()
@@ -123,7 +119,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 true
             }
             R.id.filter_option -> {
-                // TODO open dialoge to filter projects here
                 mFilterDialog?.show()
                 mGalleryViewModel.filterDialogShowing = true
                 true
@@ -149,7 +144,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         filterSubmitFab?.setOnClickListener{
             mGalleryViewModel.setFilter(mFilterTags)
-            // TODO implement diff check for filtered projects?
             mGalleryViewModel.viewModelScope.launch {
                 val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
                 mGalleryAdapter?.setProjectData(filteredProjects)

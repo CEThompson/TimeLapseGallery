@@ -48,14 +48,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         settingsViewModel = InjectorUtils.provideSettingsViewModel()
 
-        // TODO handle database sync in coroutine or work manager
-
         // Set up dialogs
         createSyncDialog()
         createVerifyProjectImportDialog()
         createManualFileModificationDialog()
 
-        // TODO drive settings fragment from view model?
         // Restore instance state of sync dialog
         if (savedInstanceState != null) {
             mSyncing = savedInstanceState.getBoolean("mSyncing", false)
@@ -168,9 +165,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 .setMessage(R.string.database_sync_warning)
                 .setPositiveButton(R.string.ok) { _, _ ->
                     Log.d("settings activity", "Launching database sync asynct task")
-                    // Execute the sync in the background
-                    // TODO execute database sync with coroutine or work manager
-                    // executeDatabaseSync()
+                    // TODO implement dialogs for project import
                     if (ProjectUtils.validateFileStructure(requireContext()) == getString(R.string.valid_file_structure)){
                         settingsViewModel.viewModelScope.launch {
                             ProjectUtils.importProjects(requireContext())
@@ -251,27 +246,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         imageFeedback.visibility = View.VISIBLE
         button.visibility = View.VISIBLE
     }
-
-    /* Async Task Callbacks */
-    // TODO convert these callbacks to coroutine callbacks or work manager callbacks?
-    /*
-    override fun onPostExecute(response: String) {
-        Log.d(TAG, "onPostExecute: setting mSyncing to false and updating dialog")
-        mResponse = response
-        mSyncing = false
-        updateSyncDialog(response)
-
-        // Log syncing and responses
-        val params = Bundle()
-        params.putString(getString(R.string.analytics_sync_response), response)
-        mFirebaseAnalytics?.logEvent(getString(R.string.analytics_manual_sync_executed), params)
-    }
-    override fun onPreExecute() {
-        Log.d(TAG, "onPreExecute: setting mSyncing to true and show dialog")
-        mSyncing = true
-        showSyncDialog()
-        mShowingSyncDialog = true
-    }*/
 
     /* Settings Fragment Callbacks */
     fun showVerifyProjectImportDialog() {

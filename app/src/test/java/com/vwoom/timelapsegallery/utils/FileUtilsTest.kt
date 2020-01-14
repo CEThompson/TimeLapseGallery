@@ -12,9 +12,9 @@ import java.io.File
 
 class FileUtilsTest {
 
-    // TODO naming
-    // TODO Given/when/then
-    // TODO assertion framework
+    // TODO lock down naming for tests
+    // TODO use given/when/then structure for tests
+    // TODO consider assertion framework
 
     @Rule @JvmField
     val folder = TemporaryFolder()
@@ -25,7 +25,7 @@ class FileUtilsTest {
         /* Given */
         // Create the project to test
         val projectName = "test project"
-        val projectEntry = ProjectEntry(1, projectName, 0)
+        val projectEntry = ProjectEntry(1, projectName)
         // Create the base folder for the pictures
         val picturesFolder = folder.newFolder("pictures")
         // Create the project directory
@@ -55,7 +55,7 @@ class FileUtilsTest {
         /* Assert out response is equal to the expectation */
         assertThat(listOfPhotoEntries, `is`(expectedList))
 
-        // TODO convert to logs?
+        // TODO figure out logging for tests
         //System.out.println("$TAG $projectFolder")
         //System.out.println("$TAG ${listOfPhotoEntries == null}")
         //System.out.println("$TAG returned list is $listOfPhotoEntries")
@@ -89,7 +89,7 @@ class FileUtilsTest {
         val timestamp = System.currentTimeMillis()
 
         // Create the project
-        val projectEntry = ProjectEntry("test project", 0)
+        val projectEntry = ProjectEntry("test project")
 
         // Create the folder for the project
         val finalFile = FileUtils.createFinalFileFromTemp(picturesFolder, tempFile.absolutePath, projectEntry, timestamp)
@@ -97,9 +97,9 @@ class FileUtilsTest {
         assert(!tempFile.exists()) // make sure temp file was deleted
         assert(finalFile != null) // make sure final file was created
         assert(finalFile.exists())
-        // TODO make other assertions about the final copied file?
+        // TODO make other assertions about the final copied file
 
-        // TODO convert to logs?
+        // TODO convert to logs
         System.out.println("$TAG tempFile path $finalFile")
         System.out.println("$TAG finalFile path $tempFile")
         System.out.println("$TAG tempFile exists ${tempFile.exists()}")

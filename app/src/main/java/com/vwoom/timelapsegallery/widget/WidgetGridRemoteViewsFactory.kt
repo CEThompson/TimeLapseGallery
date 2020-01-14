@@ -64,8 +64,9 @@ class WidgetGridRemoteViewsFactory(private val mContext: Context, intent: Intent
         views.setImageViewBitmap(R.id.widget_list_item_image_view, bitmap)
         // Send the project in an intent
         val extras = Bundle()
-        // TODO determine what to pass here!
-//extras.putParcelable(Keys.PROJECT, currentProject);
+        // TODO determine what to pass here so that clicking widget takes user to project
+        // TODO determine how this is different from usage in widget provider
+        //extras.putParcelable(Keys.PROJECT, currentProject);
         val fillInIntent = Intent()
         fillInIntent.putExtras(extras)
         views.setOnClickFillInIntent(R.id.widget_grid_item_layout, fillInIntent)

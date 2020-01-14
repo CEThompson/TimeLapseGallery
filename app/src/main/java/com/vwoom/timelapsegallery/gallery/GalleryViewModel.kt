@@ -30,7 +30,6 @@ class GalleryViewModel internal constructor(val projectRepository: ProjectReposi
         if (projectFilter.isEmpty()) return projectsToFilter
 
         return projectsToFilter.filter {
-            // TODO get tags for project
             val projectTags = projectTagRepository.getProjectTags_nonLiveData(it.project_id)
             val tags = tagRepository.getTagsFromProjectTags(projectTags)
 

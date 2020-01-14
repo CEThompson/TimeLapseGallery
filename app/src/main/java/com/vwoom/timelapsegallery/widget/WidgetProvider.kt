@@ -58,7 +58,7 @@ class WidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.widget_layout)
             val adapterIntent = Intent(context, WidgetGridRemoteViewsService::class.java)
             views.setRemoteAdapter(R.id.widget_list_view, adapterIntent)
-            // TODO nav to detail fragment
+            // TODO navigate to detail fragment
             val appIntent = Intent(context, TimeLapseGalleryActivity::class.java)
             val appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             views.setPendingIntentTemplate(R.id.widget_list_view, appPendingIntent)

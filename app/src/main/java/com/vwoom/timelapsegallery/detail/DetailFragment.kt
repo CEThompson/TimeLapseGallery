@@ -52,9 +52,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
-// TODO add schedule option (icon = date range, in overflow and with fab?)
-// TODO implement project editing (icon = pencil, if room)
-// TODO implement sharing (icon = share)
+// TODO lock down project editing
 
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
@@ -124,7 +122,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        // TODO determine if this apply block is necessary
         binding = FragmentDetailBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
@@ -248,7 +245,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 true
             }
             R.id.delete_photo -> {
-                // TODO handle photo deletion through viewmodel
                 if (mPhotos?.size == 1) {
                     verifyLastPhotoDeletion()
                 } else {
@@ -333,7 +329,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                                 .load(f)
                                 .listener(object : RequestListener<Drawable?> {
                                     override fun onLoadFailed(e: GlideException?, model: Any, target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
-                                        //schedulePostponedTransition() TODO schedule transition?
                                         startPostponedEnterTransition()
                                         val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
                                         toast.show()
@@ -341,7 +336,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                                     }
 
                                     override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
-                                        //schedulePostponedTransition() TODO schedule transition?
                                         startPostponedEnterTransition()
                                         binding.detailNextImage.visibility = View.INVISIBLE
                                         mImageIsLoaded = true
@@ -417,7 +411,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     var playJob: Job? = null
     var tagJob: Job? = null
 
-    // TODO convert these runnables into coroutine chain?
     private fun scheduleLoadPhoto(position: Int, interval: Long) {
         Log.e("DetailsFragment", "schedule loading position $position")
         if (position < 0 || position >= mPhotos!!.size) {
@@ -711,7 +704,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     private fun deleteTags(){
-        // TODO add validation?
         Log.d(TAG, mSelectedTags.toString())
         detailViewModel.deleteTags(mSelectedTags, mCurrentProject!!)
         mSelectedTags = arrayListOf() // reset list

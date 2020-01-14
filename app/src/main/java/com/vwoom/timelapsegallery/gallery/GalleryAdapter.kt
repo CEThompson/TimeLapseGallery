@@ -44,36 +44,18 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryAdapterViewHolder {
         val context = parent.context
-        //val layoutIdForGridItem = R.layout.gallery_recyclerview_item
         val inflater = LayoutInflater.from(context)
         val shouldAttachToParentImmediately = false
 
         val binding = GalleryRecyclerviewItemBinding.inflate(inflater, parent, shouldAttachToParentImmediately)
-        //val view = inflater.inflate(layoutIdForGridItem, parent, shouldAttachToParentImmediately)
-        //return ProjectsAdapterViewHolder(view)
         return GalleryAdapterViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: GalleryAdapterViewHolder, position: Int) { // Get project information
+    override fun onBindViewHolder(holder: GalleryAdapterViewHolder, position: Int) {
+        // Get project information
         val currentProject = mProjectData!![position]
         val binding = holder.binding
 
-        // TODO remove these logs
-        // Logs for project information
-        val project_id = currentProject.project_id
-        Log.d(TAG, "project_id is " + project_id)
-        val project_name = currentProject.project_name
-        Log.d(TAG, "project name is " + project_name)
-        val schedule_time = currentProject.schedule_time
-        Log.d(TAG, "schedule time is " + schedule_time)
-        val interval_days = currentProject.interval_days
-        Log.d(TAG, "interval days is " + interval_days)
-        val cover_photo_id = currentProject.cover_photo_id
-        Log.d(TAG, "cover photo id is " + cover_photo_id)
-        val cover_photo_timestamp = currentProject.cover_photo_timestamp
-        Log.d(TAG, "cover photo timestamp is " + cover_photo_timestamp)
-
-        // TODO test photo url from hashmap
         val thumbnail_path = FileUtils.getCoverPhotoUrl(mExternalFilesDir!!, currentProject)
         Log.d(TAG, "thumbnail_path is $thumbnail_path")
         // Set the constraint ratio
@@ -81,6 +63,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
         constraintSet!!.clone(binding.projectRecyclerviewConstraintLayout)
         constraintSet.setDimensionRatio(binding.projectImage.id, ratio)
         constraintSet.applyTo(binding.projectRecyclerviewConstraintLayout)
+
         // Display schedule information
         // TODO test schedule information
         val next = currentProject.schedule_time
