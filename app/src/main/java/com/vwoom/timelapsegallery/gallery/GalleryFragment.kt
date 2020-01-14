@@ -166,6 +166,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 mProjects = projects
                 val filteredProjects = mGalleryViewModel.filterProjects(projects)
                 mGalleryAdapter?.setProjectData(filteredProjects)
+                mBinding.galleryRecyclerView.scrollToPosition(mGalleryViewModel.returnPosition)
                 startPostponedEnterTransition()
             }
         })
@@ -195,6 +196,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     override fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int) {
+        mGalleryViewModel.returnPosition = position
         val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProject, position)
         val extras = FragmentNavigatorExtras(
                 mBinding.addProjectFAB as View to getString(R.string.key_add_transition),

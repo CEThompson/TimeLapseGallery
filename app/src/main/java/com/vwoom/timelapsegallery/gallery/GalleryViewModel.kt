@@ -15,6 +15,7 @@ class GalleryViewModel internal constructor(val projectRepository: ProjectReposi
     val tags: LiveData<List<TagEntry>> = tagRepository.getTags()
 
     var projectFilter: List<TagEntry> = listOf()
+    var returnPosition: Int = 0
 
     var filterDialogShowing = false
 
