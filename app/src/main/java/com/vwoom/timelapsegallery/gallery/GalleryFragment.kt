@@ -177,8 +177,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         })
 
         mGalleryViewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
-            tags.sortedBy {it.tag}
-            setTags(tags)
+            setTags(tags.sortedBy {it.tag})
         })
     }
 
