@@ -11,8 +11,6 @@ interface ProjectDao {
     @Query("SELECT * FROM project ORDER BY id")
     fun loadAllProjects(): LiveData<List<ProjectEntry>>
 
-    // TODO test this join query
-    //@Query("SELECT * FROM project WHERE schedule != 0 ORDER BY schedule_next_submission")
     @Query("SELECT * FROM project " +
             "INNER JOIN project_schedule " +
             "ON project.id = project_schedule.project_id " +
@@ -34,7 +32,6 @@ interface ProjectDao {
     @Delete
     suspend fun deleteProject(projectEntry: ProjectEntry)
 
-    // TODO test delete by project id
     @Query ("DELETE FROM project WHERE project.id = :projectId")
     suspend fun deleteProject(projectId: Long)
 

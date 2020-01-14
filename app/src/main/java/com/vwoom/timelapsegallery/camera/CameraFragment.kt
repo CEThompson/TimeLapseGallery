@@ -38,7 +38,6 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
 // TODO camera x is somehow leaking: hunt it down
-// TODO handle photo verification and completion
 
 class CameraFragment: Fragment(), LifecycleOwner {
 
@@ -86,7 +85,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
                     .load(file).into(binding.previousPhoto)
         }
 
-        // TODO: Override perform click for ontouch listener
+        // TODO: Override perform click for on touch listener
         binding.quickCompareFab.setOnTouchListener { v, event ->
             when (event.action){
                 MotionEvent.ACTION_DOWN -> {
@@ -122,7 +121,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
         Log.d(TAG, "${activity!!.windowManager.defaultDisplay.rotation}")
         Log.d(TAG, "${viewFinder?.display!!.rotation}")
 
-        // TODO: Implement CameraX operations
+        // TODO: Implement CameraX on touch focus
         val previewConfig = PreviewConfig.Builder().apply {
             setLensFacing(CameraX.LensFacing.BACK)
             setTargetResolution(screenSize)
@@ -179,7 +178,6 @@ class CameraFragment: Fragment(), LifecycleOwner {
 
         val imageCapture = ImageCapture(imageCaptureConfig)
         mTakePictureFab?.setOnClickListener {
-            // TODO handle external files directory better, perhaps as a companion object?
             val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
             val file = FileUtils.createTemporaryImageFile(externalFilesDir)
             imageCapture.takePicture(file, executor,
