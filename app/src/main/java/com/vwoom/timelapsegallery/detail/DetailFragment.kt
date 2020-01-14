@@ -610,25 +610,13 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Observe the tags
         detailViewModel.tags.observe(this, Observer<List<ProjectTagEntry>> { tagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
-                mTags = detailViewModel.getTags(tagEntries)
-                mTags?.sortedBy { it.tag }
-
-                // Find the layout
-                val dialogTagLayout = mProjectInfoDialog?.findViewById<FlexboxLayout>(R.id.dialog_edit_tags_layout)
-
-                // Clear the views and add the tags
-                dialogTagLayout?.removeAllViews()
-                //projectTagLayout?.removeAllViews()
+                mTags = detailViewModel.getTags(tagEntries).sortedBy { it.tag }
+                var text = ""
                 for (tag in mTags!!){
-                    val tagViewForDialog = layoutInflater.inflate(R.layout.tag_layout, null)
-                    tagViewForDialog.findViewById<TextView>(R.id.tag_text).text = tag.tag
-                    dialogTagLayout?.addView(tagViewForDialog)
-
-                    // TODO inflate mini tag layout
-                    //val tagViewForProject = layoutInflater.inflate(R.layout.tag_layout, null)
-                    //tagViewForProject.findViewById<TextView>(R.id.tag_text).text = tag.tag
-                    ///projectTagLayout?.addView(tagViewForProject)
+                    text = text.plus("#${tag.tag}  ")
                 }
+                val tags = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
+                tags?.text = text
             }
         })
     }

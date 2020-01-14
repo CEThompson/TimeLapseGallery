@@ -72,7 +72,7 @@
 
     <!-- Tags -->
     <TextView
-        android:id="@+id/dialog_edit_tags_textview"
+        android:id="@+id/dialog_tags_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -82,35 +82,32 @@
         app:layout_constraintTop_toBottomOf="@+id/edit_schedule_FAB" />
 
     <!-- Tags -->
-    <com.google.android.flexbox.FlexboxLayout
-        android:id="@+id/dialog_edit_tags_layout"
+    <TextView
+        android:id="@+id/dialog_information_tags"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/medium"
-        android:orientation="horizontal"
-        app:alignContent="stretch"
-        app:alignItems="stretch"
-        app:flexWrap="wrap"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
+        android:layout_marginTop="@dimen/medium"
+        android:layout_marginBottom="@dimen/medium"
+        android:textColor="@color/colorTag"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_edit_tags_textview"
-        app:layout_constraintBottom_toTopOf="@id/dialog_verify_fab">
-    </com.google.android.flexbox.FlexboxLayout>
+        app:layout_constraintTop_toBottomOf="@id/dialog_tags_label"
+        tools:text="#tag"
+        />
 
     <!-- Manage Tags -->
     <TextView
         android:id="@+id/dialog_project_info_edit_tags"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
+        android:layout_marginTop="@dimen/medium"
+        android:layout_marginBottom="@dimen/medium"
         android:src="@drawable/ic_add_white_24dp"
         android:text="@string/edit_tags"
         android:textColor="@color/colorPrimary"
         android:textStyle="italic|bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/dialog_edit_tags_textview"
-        app:layout_constraintTop_toBottomOf="@id/dialog_edit_tags_layout" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_information_tags" />
 
 
     <!-- Verify FAB -->
@@ -124,6 +121,6 @@
         app:fabSize="mini"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_edit_tags_layout" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_information_tags" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
