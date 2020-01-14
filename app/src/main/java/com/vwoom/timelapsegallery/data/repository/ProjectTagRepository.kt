@@ -14,8 +14,9 @@ class ProjectTagRepository private constructor(val projectTagDao: ProjectTagDao,
         for (tag in tags){
             val currentTag = tagDao.loadTagByText(tag)
             if (currentTag!=null) {
-                val projectTagEntry = projectTagDao.loadProjectTag(project.project_id, currentTag.id)
-                projectTagDao.deleteProjectTag(projectTagEntry)
+                val projectTagEntry: ProjectTagEntry? = projectTagDao.loadProjectTag(project.project_id, currentTag.id)
+
+                if (projectTagEntry!=null) projectTagDao.deleteProjectTag(projectTagEntry)
 
                 // TODO if tag does not belong to project delete tag
             }
@@ -26,17 +27,19 @@ class ProjectTagRepository private constructor(val projectTagDao: ProjectTagDao,
 
     suspend fun addTagToProject(tagText: String, project: Project){
         var tagEntry: TagEntry? = tagDao.loadTagByText(tagText)
-        // TODO debug tag management
-        // If tag does not exist create a new entry
-        if (tagEntry == null) tagEntry = TagEntry(tagText)
+        
+        // If tag does not exist create it
+        if (tagEntry == null) {
+            tagEntry = TagEntry(tagText)
+            tagEntry.id = tagDao.insertTag(tagEntry)
+        }
 
         // Check if tag already belongs to project
-        val projectTagEntry = projectTagDao.loadProjectTag(project.project_id, tagEntry.id)
+        var projectTagEntry = projectTagDao.loadProjectTag(project.project_id, tagEntry.id)
 
-        // Only insert project tag if unique
+        // Only insert project tag if unique the project hasn't been assigned that tag already
         if (projectTagEntry == null) {
-            val tagId = tagDao.insertTag(tagEntry)
-            val projectTagEntry = ProjectTagEntry(project.project_id, tagId)
+            projectTagEntry = ProjectTagEntry(project.project_id, tagEntry.id)
             projectTagDao.insertProjectTag(projectTagEntry)
         }
     }
