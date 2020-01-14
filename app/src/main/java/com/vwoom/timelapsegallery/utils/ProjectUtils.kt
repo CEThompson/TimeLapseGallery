@@ -104,7 +104,7 @@ object ProjectUtils {
                         // Create the project entry
                         val currentProject = ProjectEntry(
                                 java.lang.Long.valueOf(id),
-                                projectName, 0)
+                                projectName)
                         Log.d(TAG, "inserting project = $currentProject")
                         // Insert the project - this updates on conflict
                         db.projectDao().insertProject(currentProject);

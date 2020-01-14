@@ -42,7 +42,6 @@ interface ProjectDao {
     @Query("SELECT " +
             "project.id AS project_id, " +
             "project.project_name AS project_name, " +
-            "project.cover_set_by_user AS cover_set_by_user, " +
             "project_schedule.schedule_time AS schedule_time, " +
             "project_schedule.interval_days AS interval_days, " +
             "cover_photo.photo_id AS cover_photo_id, " +
@@ -56,7 +55,6 @@ interface ProjectDao {
     @Query("SELECT " +
             "project.id AS project_id, " +
             "project.project_name AS project_name, " +
-            "project.cover_set_by_user AS cover_set_by_user, " +
             "project_schedule.schedule_time AS schedule_time, " +
             "project_schedule.interval_days AS interval_days, " +
             "cover_photo.photo_id AS cover_photo_id, " +

@@ -64,8 +64,6 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
         Log.d(TAG, "project_id is " + project_id)
         val project_name = currentProject.project_name
         Log.d(TAG, "project name is " + project_name)
-        val cover_set_by_user = currentProject.cover_set_by_user
-        Log.d(TAG, "cover set by user is " + cover_set_by_user)
         val schedule_time = currentProject.schedule_time
         Log.d(TAG, "schedule time is " + schedule_time)
         val interval_days = currentProject.interval_days

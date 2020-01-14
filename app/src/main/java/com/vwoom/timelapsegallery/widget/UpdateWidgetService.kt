@@ -33,6 +33,7 @@ class UpdateWidgetService : IntentService("UpdateWidgetService"), CoroutineScope
                 // Retrieve the database
                 val timeLapseDatabase = getInstance(context)
                 // Get the list of all scheduled projects from the database
+                // TODO test widget
                 val allScheduledProjects = timeLapseDatabase.projectDao().loadAllScheduledProjects()
                 // Get the list of projects scheduled for today
                 val projectsScheduledForToday = timeLapseDatabase.projectDao().loadAllScheduledProjects()

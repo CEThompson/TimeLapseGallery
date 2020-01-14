@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "20b7dc9a68d96964a0523ae4a332619f",
+    "identityHash": "b5336241b51a1532ff5f0d82276f43ab",
     "entities": [
       {
         "tableName": "project",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `project_name` TEXT, `cover_set_by_user` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `project_name` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -19,12 +19,6 @@
             "columnName": "project_name",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "cover_set_by_user",
-            "columnName": "cover_set_by_user",
-            "affinity": "INTEGER",
-            "notNull": true
           }
         ],
         "primaryKey": {
@@ -258,7 +252,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '20b7dc9a68d96964a0523ae4a332619f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b5336241b51a1532ff5f0d82276f43ab')"
     ]
   }
 }

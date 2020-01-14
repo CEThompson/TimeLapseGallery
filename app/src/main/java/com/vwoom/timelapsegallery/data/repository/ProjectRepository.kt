@@ -23,7 +23,7 @@ class ProjectRepository private constructor(val projectDao: ProjectDao,
 
     suspend fun updateProjectName(externalFilesDir: File, sourceProject: Project, name: String){
         val source = projectDao.loadProjectById(sourceProject.project_id)
-        val destination = ProjectEntry(source.id, name, sourceProject.cover_set_by_user)
+        val destination = ProjectEntry(source.id, name)
         val success = FileUtils.renameProject(externalFilesDir, source, destination)
         if (success){
             source.project_name = destination.project_name
@@ -36,7 +36,7 @@ class ProjectRepository private constructor(val projectDao: ProjectDao,
         val timestamp = System.currentTimeMillis()
 
         // Create and insert the project
-        val projectEntry = ProjectEntry(null, 0)
+        val projectEntry = ProjectEntry(null)
         val project_id = projectDao.insertProject(projectEntry)
         projectEntry.id = project_id
 

@@ -86,7 +86,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
         }
 
         // TODO: Override perform click for on touch listener
-        binding.quickCompareFab.setOnTouchListener { v, event ->
+        binding.quickCompareFab.setOnTouchListener { _, event ->
             when (event.action){
                 MotionEvent.ACTION_DOWN -> {
                     binding.previousPhoto.visibility = View.VISIBLE
