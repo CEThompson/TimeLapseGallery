@@ -698,7 +698,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     private fun editName(){
-        // TODO implement name edit
+        val input = EditText(requireContext())
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        AlertDialog.Builder(requireContext())
+                .setTitle("Edit Name")
+                .setView(input)
+                .setPositiveButton(android.R.string.yes) { _, _: Int ->
+                    val nameText = input.text.toString()
+                    detailViewModel.updateProjectName(mExternalFilesDir!!, nameText, mCurrentProject!!)
+                }
+                .setNegativeButton(android.R.string.no, null).show()
     }
 
     private fun editSchedule(){

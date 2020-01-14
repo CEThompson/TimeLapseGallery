@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.repository.*
@@ -30,6 +31,12 @@ class DetailViewModel(val photoRepository: PhotoRepository,
     var isPlaying: Boolean = false
 
     var lastPhoto: Photo? = null
+
+    fun updateProjectName(externalFilesDir: File, name: String, source: Project){
+        viewModelScope.launch {
+            projectRepository.updateProjectName(externalFilesDir, source, name)
+        }
+    }
 
     fun setLastPhotoByEntry(externalFilesDir: File, project: Project, entry: PhotoEntry){
         val url = FileUtils.getPhotoUrl(externalFilesDir, project, entry)

@@ -8,6 +8,7 @@ import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
+import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
 import java.io.File
 
@@ -19,6 +20,16 @@ class ProjectRepository private constructor(val projectDao: ProjectDao,
     fun getProjectViews() = projectDao.loadProjectViews()
 
     fun getProjectView(projectId: Long) = projectDao.loadProjectView(projectId)
+
+    suspend fun updateProjectName(externalFilesDir: File, sourceProject: Project, name: String){
+        val source = projectDao.loadProjectById(sourceProject.project_id)
+        val destination = ProjectEntry(source.id, name, sourceProject.cover_set_by_user)
+        val success = FileUtils.renameProject(externalFilesDir, source, destination)
+        if (success){
+            source.project_name = destination.project_name
+            projectDao.updateProject(source)
+        }
+    }
 
     suspend fun newProject(file: File, externalFilesDir: File){
         // Create database entries
