@@ -3,9 +3,11 @@ package com.vwoom.timelapsegallery.detail
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
@@ -230,6 +232,17 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.share -> {
+                val shareIntent: Intent = Intent().apply{
+                    action = Intent.ACTION_SEND
+                    type = "image/jpeg"
+                    val photoFile = File(FileUtils.getPhotoUrl(mExternalFilesDir!!, mCurrentProject!!, mCurrentPhoto!!))
+                    Log.d(TAG, photoFile.absolutePath)
+                    putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile))
+                }
+                startActivity(Intent.createChooser(shareIntent, "Share Image"))
+                true
+            }
             R.id.edit_project -> {
                 mProjectInfoDialog?.show()
                 true
