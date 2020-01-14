@@ -12,11 +12,14 @@ interface ProjectTagDao {
     @Query("SELECT * FROM project_tag WHERE project_id = :projectId")
     suspend fun loadTagsByProjectId_nonLiveData(projectId: Long): List<ProjectTagEntry>
 
+    @Query("SELECT * FROM project_tag WHERE project_id = :projectId AND tag_id = :tagId")
+    suspend fun loadProjectTag(projectId: Long, tagId: Long): ProjectTagEntry
+
     @Insert
     suspend fun insertProjectTag(projectTagEntry: ProjectTagEntry)
 
     @Delete
-    fun deleteProjectTag(projectTagEntry: ProjectTagEntry)
+    suspend fun deleteProjectTag(projectTagEntry: ProjectTagEntry)
 
     @Update
     fun updateProjectTag(projectTagEntry: ProjectTagEntry)
