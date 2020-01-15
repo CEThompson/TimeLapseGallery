@@ -2,7 +2,6 @@ package com.vwoom.timelapsegallery.activities
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Matrix
 import android.os.Bundle
 import android.os.Environment
 import android.util.DisplayMetrics
@@ -10,11 +9,9 @@ import android.util.Log
 import android.util.Size
 import android.view.*
 import android.widget.Toast
-import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.camera.view.TextureViewMeteringPointFactory
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -58,8 +55,6 @@ class CameraFragment: Fragment(), LifecycleOwner {
     }
 
     private var mTakePictureFab: FloatingActionButton? = null
-
-    private var mCameraSelector: CameraSelector? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentCameraBinding.inflate(inflater, container, false).apply {
@@ -112,50 +107,9 @@ class CameraFragment: Fragment(), LifecycleOwner {
     }
 
     private fun startCamera() {
-
-        /* TODO determine update preview output for camera X alpha 08
-        preview.setOnPreviewOutputUpdateListener {
-            // Get all dimensions
-            Log.d(TAG, "preview output update listener firing")
-            metrics = DisplayMetrics().also { cameraPreview?.display!!.getRealMetrics(it) }
-            val previewWidth = metrics.widthPixels
-            val previewHeight = metrics.heightPixels
-            val width = it.textureSize.width
-            val height = it.textureSize.height
-            val centerX = cameraPreview?.width!!.toFloat() / 2
-            val centerY = cameraPreview?.height!!.toFloat() / 2
-
-            // Get rotation
-            val rotation = when (cameraPreview?.display!!.rotation) {
-                Surface.ROTATION_0 -> 0
-                Surface.ROTATION_90 -> 90
-                Surface.ROTATION_180 -> 180
-                Surface.ROTATION_270 -> 270
-                else -> throw IllegalStateException()
-            }
-            val matrix = Matrix()
-            // Rotate matrix
-            matrix.postRotate(-rotation.toFloat(), centerX, centerY)
-            // Scale matrix
-
-            // TODO optimize this transform to match precisely the captured image
-            if (rotation!=0)
-                matrix.postScale(
-                        previewWidth.toFloat() / height,
-                        previewHeight.toFloat() / width,
-                        centerX,
-                        centerY
-                )
-
-            // Assign transformation to view
-            cameraPreview?.setTransform(matrix)
-            cameraPreview?.surfaceTexture = it.surfaceTexture
-        }
-         */
         cameraProviderFuture.addListener(Runnable {
             val cameraProvider = cameraProviderFuture.get()
             bindPreview(cameraProvider)
-            //cameraProvider.bindToLifecycle(requireParentFragment(), cameraSelector)
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
@@ -163,7 +117,6 @@ class CameraFragment: Fragment(), LifecycleOwner {
         var metrics = DisplayMetrics().also{cameraPreview?.display!!.getRealMetrics(it)}
         val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
 
-        // TODO: Implement CameraX on touch focus
         val preview = Preview.Builder().apply {
             setTargetResolution(screenSize)
             setTargetRotation(activity!!.windowManager.defaultDisplay.rotation)
@@ -207,27 +160,20 @@ class CameraFragment: Fragment(), LifecycleOwner {
         }
     }
 
+    // TODO implement tap to focus
     /*
     private fun setUpTapToFocus() {
 
         cameraPreview?.setOnTouchListener { _, event ->
-
             if (event.action != MotionEvent.ACTION_UP) {
-
                 return@setOnTouchListener false
-
             }
 
             val factory = TextureViewMeteringPointFactory(cameraPreview!!)
-
             val point = factory.createPoint(event.x, event.y)
-
             val action = FocusMeteringAction.Builder.from(point).build()
-
             cameraControl.startFocusAndMetering(action)
-
             return@setOnTouchListener true
-
         }
     }*/
 
