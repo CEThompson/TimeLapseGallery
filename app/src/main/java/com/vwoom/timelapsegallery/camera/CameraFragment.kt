@@ -9,9 +9,12 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Size
 import android.view.*
-import android.widget.ImageView
 import android.widget.Toast
+import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.*
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.camera.view.TextureViewMeteringPointFactory
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -21,6 +24,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.common.util.concurrent.ListenableFuture
 import com.vwoom.timelapsegallery.databinding.FragmentCameraBinding
 import com.vwoom.timelapsegallery.detail.CameraViewModel
 import com.vwoom.timelapsegallery.utils.FileUtils
@@ -41,8 +45,10 @@ private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
 class CameraFragment: Fragment(), LifecycleOwner {
 
+    private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
+
     private val executor = Executors.newSingleThreadExecutor()
-    private var viewFinder: TextureView? = null
+    private var cameraPreview: PreviewView? = null
     private var takePictureJob: Job? = null
 
     private val args: CameraFragmentArgs by navArgs()
@@ -53,26 +59,21 @@ class CameraFragment: Fragment(), LifecycleOwner {
 
     private var mTakePictureFab: FloatingActionButton? = null
 
-    private var mPreview: Preview? = null
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mPreview = null
-        mTakePictureFab = null
-        viewFinder = null
-    }
+    private var mCameraSelector: CameraSelector? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentCameraBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
 
-        viewFinder = binding.viewFinder
+        cameraPreview = binding.cameraPreview
         mTakePictureFab = binding.takePictureFab
+
+        cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         // Request camera permissions
         if (allPermissionsGranted()) {
-            viewFinder?.post { startCamera() }
+            cameraPreview?.post { startCamera() }
         } else {
             requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
@@ -107,42 +108,25 @@ class CameraFragment: Fragment(), LifecycleOwner {
 
     override fun onStop() {
         super.onStop()
-        mPreview?.removePreviewOutputListener()
         takePictureJob?.cancel()
     }
 
     private fun startCamera() {
-        var metrics = DisplayMetrics().also{viewFinder?.display!!.getRealMetrics(it)}
-        val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
 
-        // For debugging camera
-        Log.d(TAG, "$metrics")
-        Log.d(TAG, "$screenSize")
-        Log.d(TAG, "${activity!!.windowManager.defaultDisplay.rotation}")
-        Log.d(TAG, "${viewFinder?.display!!.rotation}")
-
-        // TODO: Implement CameraX on touch focus
-        val previewConfig = PreviewConfig.Builder().apply {
-            setLensFacing(CameraX.LensFacing.BACK)
-            setTargetResolution(screenSize)
-            setTargetRotation(activity!!.windowManager.defaultDisplay.rotation)
-        }.build()
-
-        mPreview = Preview(previewConfig)
-
-        mPreview?.setOnPreviewOutputUpdateListener {
+        /* TODO determine update preview output for camera X alpha 08
+        preview.setOnPreviewOutputUpdateListener {
             // Get all dimensions
             Log.d(TAG, "preview output update listener firing")
-            metrics = DisplayMetrics().also { viewFinder?.display!!.getRealMetrics(it) }
+            metrics = DisplayMetrics().also { cameraPreview?.display!!.getRealMetrics(it) }
             val previewWidth = metrics.widthPixels
             val previewHeight = metrics.heightPixels
             val width = it.textureSize.width
             val height = it.textureSize.height
-            val centerX = viewFinder?.width!!.toFloat() / 2
-            val centerY = viewFinder?.height!!.toFloat() / 2
+            val centerX = cameraPreview?.width!!.toFloat() / 2
+            val centerY = cameraPreview?.height!!.toFloat() / 2
 
             // Get rotation
-            val rotation = when (viewFinder?.display!!.rotation) {
+            val rotation = when (cameraPreview?.display!!.rotation) {
                 Surface.ROTATION_0 -> 0
                 Surface.ROTATION_90 -> 90
                 Surface.ROTATION_180 -> 180
@@ -164,52 +148,94 @@ class CameraFragment: Fragment(), LifecycleOwner {
                 )
 
             // Assign transformation to view
-            viewFinder?.setTransform(matrix)
-            viewFinder?.surfaceTexture = it.surfaceTexture
+            cameraPreview?.setTransform(matrix)
+            cameraPreview?.surfaceTexture = it.surfaceTexture
         }
+         */
+        cameraProviderFuture.addListener(Runnable {
+            val cameraProvider = cameraProviderFuture.get()
+            bindPreview(cameraProvider)
+            //cameraProvider.bindToLifecycle(requireParentFragment(), cameraSelector)
+        }, ContextCompat.getMainExecutor(requireContext()))
+    }
 
+    fun bindPreview(cameraProvider: ProcessCameraProvider) {
+        var metrics = DisplayMetrics().also{cameraPreview?.display!!.getRealMetrics(it)}
+        val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
 
-        val imageCaptureConfig = ImageCaptureConfig.Builder()
+        // TODO: Implement CameraX on touch focus
+        val preview = Preview.Builder().apply {
+            setTargetResolution(screenSize)
+            setTargetRotation(activity!!.windowManager.defaultDisplay.rotation)
+        }.build()
+
+        preview.previewSurfaceProvider = cameraPreview?.previewSurfaceProvider
+
+        val imageCapture = ImageCapture.Builder()
                 .apply {
-                    setCaptureMode(ImageCapture.CaptureMode.MAX_QUALITY)
+                    setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                     setTargetResolution(screenSize)
                     setTargetRotation(activity!!.windowManager.defaultDisplay.rotation)
                 }.build()
 
-        val imageCapture = ImageCapture(imageCaptureConfig)
+        setTakePictureFab(imageCapture)
+
+        val cameraSelector = CameraSelector.Builder()
+                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .build()
+        cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+    }
+
+    fun setTakePictureFab(imageCapture: ImageCapture) {
         mTakePictureFab?.setOnClickListener {
             val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
             val file = FileUtils.createTemporaryImageFile(externalFilesDir)
-            imageCapture.takePicture(file, executor,
-                    object: ImageCapture.OnImageSavedListener{
-                        override fun onError(
-                                imageCaptureError: ImageCapture.ImageCaptureError,
-                                message: String,
-                                cause: Throwable?) {
-                            viewFinder?.post{ Toast.makeText(context, "Capture failed: $message", Toast.LENGTH_LONG).show()}
-                            Log.e(TAG, "Capture Failed: $message")
-                        }
+            imageCapture.takePicture(file, executor, object: ImageCapture.OnImageSavedCallback{
+                override fun onError(imageCaptureError: Int, message: String, cause: Throwable?) {
+                    cameraPreview?.post{ Toast.makeText(context, "Capture failed: $message", Toast.LENGTH_LONG).show()}
+                    Log.e(TAG, "Capture Failed: $message")
+                }
+                override fun onImageSaved(file: File) {
+                    cameraPreview?.post{ Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show()}
 
-                        override fun onImageSaved(file: File) {
-                            viewFinder?.post{ Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show()}
+                    takePictureJob = cameraViewModel.viewModelScope.launch {
+                        async {cameraViewModel.handleFile(file, externalFilesDir)}.await()
+                        findNavController().popBackStack()
+                    }
+                }
+            })
+        }
+    }
 
-                            takePictureJob = cameraViewModel.viewModelScope.launch {
-                                async {cameraViewModel.handleFile(file, externalFilesDir)}.await()
-                                findNavController().popBackStack()
-                            }
-                        }
-                    })
+    /*
+    private fun setUpTapToFocus() {
+
+        cameraPreview?.setOnTouchListener { _, event ->
+
+            if (event.action != MotionEvent.ACTION_UP) {
+
+                return@setOnTouchListener false
+
+            }
+
+            val factory = TextureViewMeteringPointFactory(cameraPreview!!)
+
+            val point = factory.createPoint(event.x, event.y)
+
+            val action = FocusMeteringAction.Builder.from(point).build()
+
+            cameraControl.startFocusAndMetering(action)
+
+            return@setOnTouchListener true
 
         }
-
-        CameraX.bindToLifecycle(this, mPreview, imageCapture)
-    }
+    }*/
 
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS){
             if (allPermissionsGranted()){
-                viewFinder?.post {
+                cameraPreview?.post {
                     Toast.makeText(this.requireContext(), "Permissions granted, firing up the camera.", Toast.LENGTH_SHORT).show()
                     startCamera()
                 }

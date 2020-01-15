@@ -10,8 +10,8 @@
         android:orientation="vertical"
         tools:context="com.vwoom.timelapsegallery.activities.CameraFragment">
 
-        <TextureView
-            android:id="@+id/view_finder"
+        <androidx.camera.view.PreviewView
+            android:id="@+id/camera_preview"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
