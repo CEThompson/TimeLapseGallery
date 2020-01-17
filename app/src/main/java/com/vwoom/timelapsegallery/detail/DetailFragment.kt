@@ -160,7 +160,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
         binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // todo override on perform click
 
-        binding.projectInfoIcon?.setOnClickListener {mProjectInfoDialog?.show()}
+        binding.projectInformationLayout?.projectInfoIcon?.setOnClickListener {mProjectInfoDialog?.show()}
 
         // TODO (update) implement pinch zoom on fullscreen image
         initializeFullscreenImageDialog()
@@ -536,7 +536,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mCurrentProject = currentProject
 
             // Set id
-            binding.detailsProjectId?.text = mCurrentProject?.project_id.toString()
+            binding.projectInformationLayout?.detailsProjectId?.text = mCurrentProject?.project_id.toString()
             val projectInfoDialogId = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_label)
             projectInfoDialogId?.text = getString(R.string.project_id_label, currentProject.project_id)
 
@@ -547,20 +547,20 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             val name = mCurrentProject?.project_name
             if (name == null || name.isEmpty()) {
                 // Set the layout card view
-                binding.detailsProjectNameTextView.text = getString(R.string.unnamed)
-                binding.detailsProjectNameTextView
-                        .setTypeface(binding.detailsProjectNameTextView.typeface, Typeface.ITALIC)
-                binding.detailsProjectNameTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                binding.projectInformationLayout?.detailsProjectNameTextView?.text = getString(R.string.unnamed)
+                binding.projectInformationLayout?.detailsProjectNameTextView
+                        ?.setTypeface(binding.projectInformationLayout?.detailsProjectNameTextView?.typeface, Typeface.ITALIC)
+                binding.projectInformationLayout?.detailsProjectNameTextView?.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
                 // Set the dialog
                 projectInfoNameTv?.text = getString(R.string.unnamed)
 
             }
             else {
                 // Set the card view
-                binding.detailsProjectNameTextView.text = name
-                binding.detailsProjectNameTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-                binding.detailsProjectNameTextView
-                        .setTypeface(binding.detailsProjectNameTextView.typeface, Typeface.BOLD)
+                binding.projectInformationLayout?.detailsProjectNameTextView?.text = name
+                binding.projectInformationLayout?.detailsProjectNameTextView?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                binding.projectInformationLayout?.detailsProjectNameTextView
+                        ?.setTypeface(binding.projectInformationLayout?.detailsProjectNameTextView?.typeface, Typeface.BOLD)
                 // Set the dialog
                 projectInfoNameTv?.text = currentProject.project_name
             }
@@ -607,7 +607,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             val firstProjectDateString = TimeUtils.getShortDateFromTimestamp(firstTimestamp!!)
             val lastTimestamp = mPhotos?.get(mPhotos!!.size - 1)?.timestamp
             val lastProjectDateString = TimeUtils.getShortDateFromTimestamp(lastTimestamp!!)
-            binding.detailsProjectTimespanTextview.text = getString(R.string.timespan, firstProjectDateString, lastProjectDateString)
+            binding.projectInformationLayout?.detailsProjectTimespanTextview?.text = getString(R.string.timespan, firstProjectDateString, lastProjectDateString)
 
             // Set max for progress bar
             binding.imageLoadingProgress.max = mPhotos!!.size - 1

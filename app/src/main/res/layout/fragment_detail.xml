@@ -29,66 +29,14 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Layout containing project information -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/project_information_cardview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/detail_margin"
-                android:minHeight="@dimen/fab_size"
+            <include
+                android:id="@+id/project_information_layout"
+                layout="@layout/project_information_layout"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/play_as_video_fab"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/project_information_layout"
-                    android:padding="@dimen/detail_margin"
-                    android:layout_gravity="start"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/details_project_id"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:textSize="18sp"
-                        tools:text="100"/>
-
-                    <TextView
-                        android:id="@+id/details_project_name_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:layout_marginStart="@dimen/medium"
-                        android:layout_marginTop="@dimen/small"
-                        tools:text="project name"
-                        app:layout_constraintStart_toEndOf="@id/details_project_id"
-                        app:layout_constraintTop_toTopOf="@id/details_project_id"
-                        app:layout_constraintBottom_toTopOf="@id/details_project_timespan_textview"/>
-
-                    <TextView
-                        android:id="@+id/details_project_timespan_textview"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintTop_toBottomOf="@id/details_project_name_text_view"
-                        app:layout_constraintStart_toStartOf="parent"
-                        tools:text="7/7/19 - 8/8/20" />
-
-                    <ImageView
-                        android:id="@+id/project_info_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="@dimen/medium"
-                        android:paddingBottom="@dimen/medium"
-                        android:src="@drawable/ic_info_black_24dp"
-                        app:layout_constraintStart_toEndOf="@id/details_project_timespan_textview"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
             <!-- Photo Layout -->
             <androidx.cardview.widget.CardView
@@ -100,7 +48,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/project_information_cardview"
+                app:layout_constraintTop_toBottomOf="@+id/project_information_layout"
                 app:layout_constraintVertical_bias="0.5">
 
                 <!-- Constraint layout used to dynamically resize the photo -->
