@@ -15,26 +15,13 @@
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize">
 
-            <!-- FAB to compile a video from the images -->
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/play_as_video_fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:contentDescription="@string/play_as_video_fab_content_description"
-                android:src="@drawable/ic_play_arrow_white_24dp"
-                app:borderWidth="0dp"
-                app:fabSize="normal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <!-- Layout containing project information -->
             <include
                 android:id="@+id/project_information_layout"
                 layout="@layout/project_information_layout"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/play_as_video_fab"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 />
 
@@ -181,6 +168,20 @@
                 android:minHeight="?attr/actionBarSize"
                 android:theme="@style/AppToolbar" />
         </com.google.android.material.appbar.AppBarLayout>
+
+        <!-- FAB to compile a video from the images -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/play_as_video_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="@dimen/fab_detail_plus_add_margin_bottom"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:contentDescription="@string/play_as_video_fab_content_description"
+            android:src="@drawable/ic_play_arrow_white_24dp"
+            app:borderWidth="0dp"
+            app:fabSize="normal"
+            />
 
         <!-- FAB to add a new photo -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
