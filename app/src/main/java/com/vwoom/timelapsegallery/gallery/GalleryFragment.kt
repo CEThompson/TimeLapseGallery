@@ -29,6 +29,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     private var mFilterDialog: Dialog? = null
     private var mGalleryAdapter: GalleryAdapter? = null
+    private var mGridLayoutManager: StaggeredGridLayoutManager? = null
     private var mProjects: List<Project>? = null
 
     private var mFilterTags: ArrayList<TagEntry> = arrayListOf()
@@ -70,10 +71,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mGalleryAdapter = GalleryAdapter(this, this.requireContext())
 
         // Set up the recycler view
-        val gridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
+        mGridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
         val galleryRecyclerView = mBinding.galleryRecyclerView
         galleryRecyclerView.apply {
-            layoutManager = gridLayoutManager
+            layoutManager = mGridLayoutManager
             setHasFixedSize(false)
             adapter = mGalleryAdapter
             //postponeEnterTransition()
@@ -196,7 +197,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     override fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int) {
-        mGalleryViewModel.returnPosition = position
+        // Save the position of the first visible item in the gallery
+        val firstItems = IntArray(mNumberOfColumns)
+        mGridLayoutManager?.findFirstCompletelyVisibleItemPositions(firstItems)
+        mGalleryViewModel.returnPosition = firstItems[0]
+
+        // Navigate to the detail fragment
         val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProject, position)
         val extras = FragmentNavigatorExtras(
                 mBinding.addProjectFAB as View to getString(R.string.key_add_transition),
