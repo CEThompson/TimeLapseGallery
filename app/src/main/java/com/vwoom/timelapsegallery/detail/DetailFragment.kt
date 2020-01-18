@@ -160,7 +160,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
         binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // todo override on perform click
 
-        binding.projectInformationLayout?.projectInfoIcon?.setOnClickListener {mProjectInfoDialog?.show()}
+        binding.projectInformationFab?.setOnClickListener {mProjectInfoDialog?.show()}
 
         // TODO (update) implement pinch zoom on fullscreen image
         initializeFullscreenImageDialog()
