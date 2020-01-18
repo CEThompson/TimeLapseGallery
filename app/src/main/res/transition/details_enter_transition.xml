@@ -19,7 +19,7 @@
     <slide
         android:slideEdge="left">
         <targets>
-            <target android:targetId="@id/project_information_cardview"/>
+            <target android:targetId="@id/project_information_layout"/>
         </targets>
     </slide>
 
