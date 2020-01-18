@@ -48,6 +48,7 @@
     <string name="sync_image_feedback_content_description">Image feedback for the result of syncing files to the database.</string>
     <string name="schedule_management_fab_content_description">Fab to manage the schedule for a project."</string>
     <string name="project_information_fab_management_content_description">Fab to manage information for a project."</string>
+    <string name="project_tag_fab_content_description">Fab to manage tags for a project.</string>
 
     <!-- Options -->
     <string name="disable_notifications">Disable notifications</string>
