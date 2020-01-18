@@ -49,18 +49,6 @@
                     tools:text="7/7/19 - 8/8/20" />
                 </LinearLayout>
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/project_add_tag_FAB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_info_black_24dp"
-                android:backgroundTint="@color/white"
-                app:borderWidth="0dp"
-                app:fabSize="mini"
-                app:layout_constraintStart_toEndOf="@id/information_container"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </layout>
