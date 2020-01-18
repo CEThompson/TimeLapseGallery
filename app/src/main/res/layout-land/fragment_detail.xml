@@ -14,21 +14,6 @@
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize">
 
-            <!-- FAB to compile a video from the images -->
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/play_as_video_fab"
-                android:contentDescription="@string/play_as_video_fab_content_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:backgroundTint="@color/colorGreen"
-                android:src="@drawable/ic_play_arrow_white_24dp"
-                app:borderWidth="0dp"
-                app:fabSize="normal"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                />
-
             <!-- Layout containing project information -->
             <include
                 android:id="@+id/project_information_layout"
@@ -41,19 +26,51 @@
                 app:layout_constraintTop_toTopOf="parent"
                 />
 
+            <!-- project management FAB -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/project_information_fab"
+                android:contentDescription="@string/project_information_fab_management_content_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin"
+                android:backgroundTint="@color/white"
+                android:src="@drawable/ic_info_outline_black_24dp"
+                app:borderWidth="0dp"
+                app:fabSize="mini"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
+            <!-- schedule management FAB -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/project_schedule_fab"
+                android:contentDescription="@string/schedule_management_fab_content_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin"
+                android:backgroundTint="@color/white"
+                android:src="@drawable/ic_date_range_black_24dp"
+                app:borderWidth="0dp"
+                app:fabSize="mini"
+                app:layout_constraintTop_toBottomOf="@id/project_information_fab"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
             <!-- Photo Layout -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/details_card_container"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="@dimen/detail_margin"
+                android:layout_marginBottom="@dimen/detail_margin"
+                android:layout_marginTop="@dimen/detail_margin"
+                android:layout_marginStart="@dimen/detail_margin"
                 android:layout_marginEnd="@dimen/fab_size_plus_padding"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintVertical_bias="0.5"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/image_loading_progress"
                 app:layout_constraintStart_toEndOf="@+id/project_information_layout"
-                app:layout_constraintEnd_toStartOf="@+id/play_as_video_fab">
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <!-- Constraint layout used to dynamically resize the photo -->
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -186,6 +203,21 @@
                 android:minHeight="?attr/actionBarSize"/>
         </com.google.android.material.appbar.AppBarLayout>
 
+
+        <!-- FAB to compile a video from the images -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/play_as_video_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="@dimen/fab_detail_plus_add_margin_bottom"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:backgroundTint="@color/colorGreen"
+            android:contentDescription="@string/play_as_video_fab_content_description"
+            android:src="@drawable/ic_play_arrow_white_24dp"
+            app:borderWidth="0dp"
+            app:fabSize="normal"
+            />
 
         <!-- FAB to add a new photo -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton

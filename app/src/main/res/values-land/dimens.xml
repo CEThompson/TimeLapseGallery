@@ -17,4 +17,6 @@
 
     <dimen name="project_name_edit_text_width">450dp</dimen>
 
+    <dimen name="fab_detail_plus_add_margin_bottom">100dp</dimen>
+
 </resources>
