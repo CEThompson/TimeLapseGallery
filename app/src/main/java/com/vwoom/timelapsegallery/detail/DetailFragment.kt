@@ -141,6 +141,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding.detailsRecyclerview.layoutManager = linearLayoutManager
         binding.detailsRecyclerview.adapter = mDetailAdapter
 
+        // Set up fabs
         // Set the listener to add a photo to the project
         binding.addPhotoFab.setOnClickListener {
             // TODO: Determine if there is a better way to handle leaking toolbar references
@@ -149,28 +150,24 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     .actionDetailsFragmentToCameraFragment(detailViewModel.lastPhoto, mCurrentProject)
             findNavController().navigate(action)
         }
-
         // Show the set of images in succession
         binding.playAsVideoFab.setOnClickListener { playSetOfImages() }
-
+        binding.projectScheduleFab.setOnClickListener { mScheduleDialog?.show() }
+        binding.projectTagFab.setOnClickListener { mEditTagsDialog?.show() }
+        binding.projectInformationFab?.setOnClickListener {mProjectInfoDialog?.show()}
         // Set a listener to display the image fullscreen
         binding.fullscreenFab.setOnClickListener { if (!mPlaying) mFullscreenImageDialog?.show() }
 
         // Set a swipe listener for the image
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
-        binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // todo override on perform click
+        binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // TODO override on perform click
+        // TODO implement pinch zoom on fullscreen image
 
-        binding.projectInformationFab?.setOnClickListener {mProjectInfoDialog?.show()}
-
-        // TODO (update) implement pinch zoom on fullscreen image
+        // Initialize dialogs
         initializeFullscreenImageDialog()
         initializeProjectInformationDialog()
         initializeEditTagsDialog()
         initializeScheduleDialog()
-
-        // Initialize fab color
-        binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-        binding.playAsVideoFab.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
 
         // Set the transition name for the image
         val imageTransitionName= "${mCurrentProject?.project_id}"
@@ -198,6 +195,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         playJob?.cancel()
         tagJob?.cancel()
         mProjectInfoDialog?.dismiss()
+        mEditTagsDialog?.dismiss()
+        mScheduleDialog?.dismiss()
+        mFullscreenImageDialog?.dismiss()
     }
 
     private fun showPhotoInformation() {
