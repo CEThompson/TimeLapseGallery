@@ -264,7 +264,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-
     fun loadUi(photoEntry: PhotoEntry) { // Set the fullscreen image dialogue to the current photo
         if (!mPlaying) preloadFullscreenImage()
         // Notify the adapter
@@ -354,15 +353,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
 
-    // Loads the set of images concurrently
-    private fun playSetOfImages() { // Lazy Initialize handler
+    // Loads the set of images in sequence
+    private fun playSetOfImages() {
+        // If already playing then stop
         if (mPlaying) {
             stopPlaying()
             mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
             return
         }
-
-        mCurrentPlayPosition = mPhotos!!.indexOf(mCurrentPhoto)
 
         // If not enough photos give user feedback
         if (mPhotos!!.size <= 1) {
@@ -372,33 +370,33 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             return
         }
 
+        // Handle UI
         binding.fullscreenFab.hide()
-        // Set color of play fab
         binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
         binding.playAsVideoFab.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
-        // Set paying true
-        mPlaying = true
-        // Handle UI
         binding.playAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp)
 
-        // Schedule the runnable for a certain number of ms from now
+        // Handle play state
+        mPlaying = true
+        mCurrentPlayPosition = mPhotos!!.indexOf(mCurrentPhoto)
+
+        // Get the playback interval from the shared preferences
         val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), "50")
         val playbackInterval = playbackIntervalSharedPref!!.toLong()
 
-        // If the play position / current photo is at the end, start from the beginning
+        // Override the play position to beginning if currently already at the end
         if (mCurrentPlayPosition == mPhotos!!.size - 1) {
             mCurrentPlayPosition = 0
             detailViewModel.setPhoto(mPhotos!![0])
         }
 
-        // Otherwise start from wherever it is at
+        // Actually schedule the sequence via recursive function
         binding.imageLoadingProgress.progress = mCurrentPlayPosition!!
         scheduleLoadPhoto(mCurrentPlayPosition!!, playbackInterval) // Recursively loads the rest of set from beginning
 
         // Track play button interaction
         mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_play_time_lapse), null)
-
     }
 
     // Resets the UI & handles state after playing
