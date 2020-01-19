@@ -141,8 +141,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding.detailsRecyclerview.layoutManager = linearLayoutManager
         binding.detailsRecyclerview.adapter = mDetailAdapter
 
-        // Set up fabs
-        // Set the listener to add a photo to the project
+        // Set up fabs:
+        // 1. Initialize the color of the play as video fab
+        // NOTE: this is not set in XML because setting by xml seems to lock the value of the color
+        binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
+        binding.playAsVideoFab.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
+
+
+        // 2. Set the click listeners
         binding.addPhotoFab.setOnClickListener {
             // TODO: Determine if there is a better way to handle leaking toolbar references
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
@@ -150,12 +156,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     .actionDetailsFragmentToCameraFragment(detailViewModel.lastPhoto, mCurrentProject)
             findNavController().navigate(action)
         }
-        // Show the set of images in succession
         binding.playAsVideoFab.setOnClickListener { playSetOfImages() }
         binding.projectScheduleFab.setOnClickListener { mScheduleDialog?.show() }
         binding.projectTagFab.setOnClickListener { mEditTagsDialog?.show() }
         binding.projectInformationFab?.setOnClickListener {mProjectInfoDialog?.show()}
-        // Set a listener to display the image fullscreen
         binding.fullscreenFab.setOnClickListener { if (!mPlaying) mFullscreenImageDialog?.show() }
 
         // Set a swipe listener for the image
