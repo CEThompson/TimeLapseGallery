@@ -110,21 +110,27 @@ class FileUtilsTest {
     @Test
     fun renameProject() {
         /* Given - A named project that has files */
+
         /* When - We run the function renameProject */
+
         /* Then - Expect the previous folder to be gone, a new folder with the same files to exist */
     }
 
     @Test
     fun deleteTempFiles() {
         /* Given - A directory of temp files */
+
         /* When - deleteTempFiles() is run */
+
         /* Then - the directory is empty / gone */
     }
 
     @Test
     fun deleteProject() {
         /* Given an existing project */
+
         /* When deleteProject() is run */
+
         /* Project folder no longer exists */
     }
 
@@ -133,12 +139,33 @@ class FileUtilsTest {
     }
 
     @Test
-    fun deletePhoto1() {
+    fun pathContainsReservedCharacter() {
     }
 
     @Test
-    fun pathContainsReservedCharacter() {
+    fun getPhotoUrlFromProject(){
+
     }
+
+    @Test
+    fun getPhotoUrlFromProjectEntry(){
+
+    }
+
+    @Test
+    fun getCoverPhotoUrl(){
+
+    }
+
+    @Test
+    fun getPhotoFileNameFromEntry() {
+    }
+
+    @Test
+    fun getPhotoFileNameFromTimeStamp() {
+
+    }
+
 
     companion object {
         private val TAG = FileUtilsTest::class.java.simpleName
