@@ -30,7 +30,6 @@ class FileUtilsTest {
         picturesFolder = testFolder.newFolder("pictures")
     }
 
-
     /* Tests retrieving a list of photo entries from a project folder*/
     @Test
     fun getPhotoEntriesInProjectDirectory_directoryWithImagesTextAndFolder_twoOrderedPhotoEntries() {
@@ -115,13 +114,30 @@ class FileUtilsTest {
     @Test
     fun renameProject() {
         /* Given - A named project that has files */
-        val project = "test project"
+        // Create the project to test
+        val projectName = "second test project"
+        val id: Long = 2
+        val projectEntry = ProjectEntry(id, projectName)
 
+        // Create the project directory
+        val projectFolder = File(picturesFolder, "${id}_$projectName")
+        projectFolder.mkdir()
+
+        // Create files in the directory
+        File(projectFolder, "99999999.jpg").createNewFile()
+        File(projectFolder, "11111111.jpg").createNewFile()
+        File(projectFolder, "videos").mkdir()
+        File(projectFolder, "tags.txt").createNewFile()
+
+        // Create the project entry to rename it to
+        val projectRenameString = "test rename"
+        val projectEntryToRename = ProjectEntry(id, projectRenameString)
 
         /* When - We run the function renameProject */
+        FileUtils.renameProject(picturesFolder, projectEntry, projectEntryToRename)
 
         /* Then - Expect the previous folder to be gone, a new folder with the same files to exist */
-
+        assert(File(picturesFolder, "${id}_$projectRenameString").exists())
     }
 
     @Test
