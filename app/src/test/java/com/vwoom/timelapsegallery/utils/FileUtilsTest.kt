@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.utils
 
-
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.view.Project
@@ -50,6 +49,7 @@ class FileUtilsTest {
 
         /* Actually use the method we are testing with mocked data */
         /* When */
+        // TODO this utility fails when the test environment is a windows system, figure out how to fix this
         val listOfPhotoEntries = FileUtils.getPhotoEntriesInProjectDirectory(externalFilesTestDir, projectEntry)
 
         val expectedList = listOf(
@@ -288,6 +288,7 @@ class FileUtilsTest {
         first.createNewFile()
 
         val photoEntry = PhotoEntry(id, id, timestamp)
+
         // When - utilities gets the entry
         val photoUrl = FileUtils.getPhotoUrl(externalFilesTestDir, projectEntry, photoEntry)
 
@@ -297,23 +298,51 @@ class FileUtilsTest {
 
     @Test
     fun getCoverPhotoUrl(){
-        // Given
-        // When
-        // Then
+        // Given a project with a cover photo
+        // Create the project to test
+        val projectName = "cover photo url test project"
+        val id: Long = 7
+        // Create the project directory
+        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
+        projectFolder.mkdir()
+
+        // Create files in the directory
+        val timestamp: Long = 999999999
+        val first = File(projectFolder, "${timestamp}.jpg")
+        first.createNewFile()
+
+        val project = Project(id, projectName, 0, 0, id, timestamp)
+
+        // When - utility is called
+        val url = FileUtils.getCoverPhotoUrl(externalFilesTestDir, project)
+
+        // Then - url matches the created file url
+        assert(url == first.absolutePath)
     }
 
     @Test
     fun getPhotoFileNameFromEntry() {
-        // Given
+        // Given - a photo file
+        val timestamp: Long = 12345
+        val photoEntry = PhotoEntry(1, timestamp)
+
         // When
+        val filename = FileUtils.getPhotoFileName(photoEntry)
+
         // Then
+        assert(filename == "$timestamp.jpg")
     }
 
     @Test
     fun getPhotoFileNameFromTimeStamp() {
         // Given
+        val timestamp: Long = 12345
+
         // When
+        val filename = FileUtils.getPhotoFileName(timestamp)
+
         // Then
+        assert(filename == "$timestamp.jpg")
     }
 
     companion object {
