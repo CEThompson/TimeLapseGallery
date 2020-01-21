@@ -3,6 +3,8 @@ package com.vwoom.timelapsegallery.utils
 
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import junit.framework.Assert.assertFalse
+import junit.framework.Assert.assertTrue
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Rule
@@ -139,7 +141,27 @@ class FileUtilsTest {
     }
 
     @Test
-    fun pathContainsReservedCharacter() {
+    fun pathContainsReservedCharacter_noReservedCharacters_shouldPass() {
+        // Given
+        val testString = "1_Test Project Name"
+
+        // When
+        val containsReservedCharacters = FileUtils.pathContainsReservedCharacter(testString)
+
+        // Then
+        assertFalse(containsReservedCharacters)
+    }
+
+    @Test
+    fun pathContainsReservedCharacter_containsReservedCharacters_shouldFail() {
+        // Given
+        val testString = "1_Test?Project Name/"
+
+        // When
+        val containsReservedCharacters = FileUtils.pathContainsReservedCharacter(testString)
+
+        // Then
+        assertTrue(containsReservedCharacters)
     }
 
     @Test
@@ -165,7 +187,6 @@ class FileUtilsTest {
     fun getPhotoFileNameFromTimeStamp() {
 
     }
-
 
     companion object {
         private val TAG = FileUtilsTest::class.java.simpleName
