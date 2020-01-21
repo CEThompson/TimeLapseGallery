@@ -128,7 +128,6 @@ object FileUtils {
         if (externalFilesDir == null) return
         val tempDir = File(externalFilesDir, TEMP_FILE_SUBDIRECTORY)
         deleteRecursive(tempDir)
-        Log.d("deletion check", "delete temp files firing")
     }
 
     // Recursive delete used by delete project, delete temp, or delete photo
@@ -138,7 +137,6 @@ object FileUtils {
                 deleteRecursive(child)
             }
         }
-        Log.d("deletion check", "deleting temporary file named: " + fileOrFileDirectory.name)
         fileOrFileDirectory.delete()
     }
 
