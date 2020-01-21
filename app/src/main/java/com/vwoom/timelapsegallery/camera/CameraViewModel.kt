@@ -13,9 +13,6 @@ class CameraViewModel(
         val photo: Photo?,
         val project: Project?
 ) : ViewModel() {
-
-    var resultPhoto: Photo? = null
-
     suspend fun handleFile(file: File, externalFilesDir: File){
         // If no photo when constructed then we have a new project
         if (photo == null) projectRepository.newProject(file, externalFilesDir)
