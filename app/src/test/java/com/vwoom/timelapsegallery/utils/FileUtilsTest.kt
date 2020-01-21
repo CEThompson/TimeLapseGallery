@@ -7,6 +7,8 @@ import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -19,7 +21,15 @@ class FileUtilsTest {
     // TODO consider assertion framework
 
     @Rule @JvmField
-    val folder = TemporaryFolder()
+    val testFolder = TemporaryFolder()
+
+    private lateinit var picturesFolder: File
+
+    @Before
+    fun setUp(){
+        picturesFolder = testFolder.newFolder("pictures")
+    }
+
 
     /* Tests retrieving a list of photo entries from a project folder*/
     @Test
@@ -28,22 +38,16 @@ class FileUtilsTest {
         // Create the project to test
         val projectName = "test project"
         val projectEntry = ProjectEntry(1, projectName)
-        // Create the base folder for the pictures
-        val picturesFolder = folder.newFolder("pictures")
+
         // Create the project directory
         val projectFolder = File(picturesFolder, "1_$projectName")
         projectFolder.mkdir()
-        // Create a set of image files to test: note the ordering on these
-        var file = File(projectFolder, "99999999.jpg")
-        file.createNewFile()
-        file = File(projectFolder, "11111111.jpg")
-        file.createNewFile()
-        // Also create folder to contain encoded videos
-        file = File(projectFolder, "videos")
-        file.mkdir()
-        // And txt to contain tags
-        file = File(projectFolder, "tags.txt")
-        file.createNewFile()
+
+        // Create files in the directory
+        File(projectFolder, "99999999.jpg").createNewFile()
+        File(projectFolder, "11111111.jpg").createNewFile()
+        File(projectFolder, "videos").mkdir()
+        File(projectFolder, "tags.txt").createNewFile()
 
         /* Actually use the method we are testing with mocked data */
         /* When */
@@ -67,22 +71,21 @@ class FileUtilsTest {
     @Test
     fun createTemporaryImageFile_tempImageFolder_tempFileShouldExist() {
         /* Given */
-        val picturesFolder = folder.newFolder("pictures")
         // Create the project directory
         val tempFolder = File(picturesFolder, FileUtils.TEMP_FILE_SUBDIRECTORY)
         tempFolder.mkdir()
 
         /* When */
-        val fileCreated = FileUtils.createTemporaryImageFile(tempFolder)
+        FileUtils.createTemporaryImageFile(tempFolder)
 
-        System.out.println("$TAG $fileCreated")
-        assert(fileCreated != null)
+        /* Then */
+        // The temp directory should not be empty
+        assert(tempFolder.listFiles()?.size!=0)
     }
 
     @Test
     fun createFinalFileFromTempTest_shouldPass() {
         // Create the pictures directory and temporary_images directory
-        val picturesFolder = folder.newFolder("pictures")
         val tempFolder = File(picturesFolder, FileUtils.TEMP_FILE_SUBDIRECTORY)
         tempFolder.mkdir()
 
@@ -112,10 +115,13 @@ class FileUtilsTest {
     @Test
     fun renameProject() {
         /* Given - A named project that has files */
+        val project = "test project"
+
 
         /* When - We run the function renameProject */
 
         /* Then - Expect the previous folder to be gone, a new folder with the same files to exist */
+
     }
 
     @Test
@@ -138,6 +144,12 @@ class FileUtilsTest {
 
     @Test
     fun deletePhoto() {
+        // Given - a photo belonging to a project
+
+        // When deleting photo
+
+
+        // Photo no longer exists
     }
 
     @Test
@@ -186,6 +198,11 @@ class FileUtilsTest {
     @Test
     fun getPhotoFileNameFromTimeStamp() {
 
+    }
+
+    @After
+    fun cleanUp(){
+        testFolder.delete()
     }
 
     companion object {
