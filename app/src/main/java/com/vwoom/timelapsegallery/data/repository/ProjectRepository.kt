@@ -10,6 +10,8 @@ import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class ProjectRepository private constructor(val projectDao: ProjectDao,
@@ -37,22 +39,23 @@ class ProjectRepository private constructor(val projectDao: ProjectDao,
 
         // Create and insert the project
         val projectEntry = ProjectEntry(null)
-        val project_id = projectDao.insertProject(projectEntry)
-        projectEntry.id = project_id
+        val projectId = projectDao.insertProject(projectEntry)
+        projectEntry.id = projectId
 
         // Create and insert the photo
-        val photoEntry = PhotoEntry(project_id, timestamp)
-        val photo_id = photoDao.insertPhoto(photoEntry)
-        photoEntry.id = photo_id
+        val photoEntry = PhotoEntry(projectId, timestamp)
+        val photoId = photoDao.insertPhoto(photoEntry)
+        photoEntry.id = photoId
 
         // Create cover photo and schedule then insert
-        val coverPhotoEntry = CoverPhotoEntry(project_id, photo_id)
-        val projectScheduleEntry = ProjectScheduleEntry(project_id, null, null)
+        val coverPhotoEntry = CoverPhotoEntry(projectId, photoId)
+        val projectScheduleEntry = ProjectScheduleEntry(projectId, null, null)
         coverPhotoDao.insertPhoto(coverPhotoEntry)
         projectScheduleDao.insertProjectSchedule(projectScheduleEntry)
 
-        // TODO set up a work manager to handle file operations
-        FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
+        withContext(Dispatchers.IO) {
+            FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
+        }
     }
 
     suspend fun deleteProject(externalFilesDir: File, projectId: Long){
