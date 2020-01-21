@@ -7,7 +7,6 @@ import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -23,11 +22,11 @@ class FileUtilsTest {
     @Rule @JvmField
     val testFolder = TemporaryFolder()
 
-    private lateinit var picturesFolder: File
+    private lateinit var externalFilesTestDir: File
 
     @Before
     fun setUp(){
-        picturesFolder = testFolder.newFolder("pictures")
+        externalFilesTestDir = testFolder.newFolder("pictures")
     }
 
     /* Tests retrieving a list of photo entries from a project folder*/
@@ -39,7 +38,7 @@ class FileUtilsTest {
         val projectEntry = ProjectEntry(1, projectName)
 
         // Create the project directory
-        val projectFolder = File(picturesFolder, "1_$projectName")
+        val projectFolder = File(externalFilesTestDir, "1_$projectName")
         projectFolder.mkdir()
 
         // Create files in the directory
@@ -50,7 +49,7 @@ class FileUtilsTest {
 
         /* Actually use the method we are testing with mocked data */
         /* When */
-        val listOfPhotoEntries = FileUtils.getPhotoEntriesInProjectDirectory(picturesFolder, projectEntry)
+        val listOfPhotoEntries = FileUtils.getPhotoEntriesInProjectDirectory(externalFilesTestDir, projectEntry)
 
         val expectedList = listOf(
                 PhotoEntry(1,11111111),
@@ -71,7 +70,7 @@ class FileUtilsTest {
     fun createTemporaryImageFile_tempImageFolder_tempFileShouldExist() {
         /* Given */
         // Create the project directory
-        val tempFolder = File(picturesFolder, FileUtils.TEMP_FILE_SUBDIRECTORY)
+        val tempFolder = File(externalFilesTestDir, FileUtils.TEMP_FILE_SUBDIRECTORY)
         tempFolder.mkdir()
 
         /* When */
@@ -85,7 +84,7 @@ class FileUtilsTest {
     @Test
     fun createFinalFileFromTempTest_shouldPass() {
         // Create the pictures directory and temporary_images directory
-        val tempFolder = File(picturesFolder, FileUtils.TEMP_FILE_SUBDIRECTORY)
+        val tempFolder = File(externalFilesTestDir, FileUtils.TEMP_FILE_SUBDIRECTORY)
         tempFolder.mkdir()
 
         // Create the temporary image file
@@ -96,7 +95,7 @@ class FileUtilsTest {
         val projectEntry = ProjectEntry("test project")
 
         // Create the folder for the project
-        val finalFile = FileUtils.createFinalFileFromTemp(picturesFolder, tempFile.absolutePath, projectEntry, timestamp)
+        val finalFile = FileUtils.createFinalFileFromTemp(externalFilesTestDir, tempFile.absolutePath, projectEntry, timestamp)
 
         assert(!tempFile.exists()) // make sure temp file was deleted
         assert(finalFile != null) // make sure final file was created
@@ -120,7 +119,7 @@ class FileUtilsTest {
         val projectEntry = ProjectEntry(id, projectName)
 
         // Create the project directory
-        val projectFolder = File(picturesFolder, "${id}_$projectName")
+        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
         projectFolder.mkdir()
 
         // Create files in the directory
@@ -134,21 +133,21 @@ class FileUtilsTest {
         val projectEntryToRename = ProjectEntry(id, projectRenameString)
 
         /* When - We run the function renameProject */
-        FileUtils.renameProject(picturesFolder, projectEntry, projectEntryToRename)
+        FileUtils.renameProject(externalFilesTestDir, projectEntry, projectEntryToRename)
 
         /* Then - Expect the previous folder to be gone, a new folder with the same files to exist */
-        assert(File(picturesFolder, "${id}_$projectRenameString").exists())
+        assert(File(externalFilesTestDir, "${id}_$projectRenameString").exists())
     }
 
     @Test
     fun deleteTempFiles() {
         /* Given - A directory of temp files */
-        val tempFolder = File(picturesFolder, FileUtils.TEMP_FILE_SUBDIRECTORY)
+        val tempFolder = File(externalFilesTestDir, FileUtils.TEMP_FILE_SUBDIRECTORY)
         tempFolder.mkdir()
 
         File(tempFolder, "11.jpg")
         /* When - deleteTempFiles() is run */
-        FileUtils.deleteTempFiles(picturesFolder)
+        FileUtils.deleteTempFiles(externalFilesTestDir)
 
         /* Then - the directory is empty / gone */
         assert(!tempFolder.exists())
@@ -157,10 +156,34 @@ class FileUtilsTest {
     @Test
     fun deleteProject() {
         /* Given an existing project */
+        // Create the project to test
+        val projectName = "delete test project"
+        val id: Long = 3
+        val projectEntry = ProjectEntry(id, projectName)
+
+        // Create the project directory
+        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
+        projectFolder.mkdir()
+
+        // Create files in the directory
+        val first = File(projectFolder, "99999999.jpg")
+        first.createNewFile()
+        val second = File(projectFolder, "11111111.jpg")
+        second.createNewFile()
+        val third = File(projectFolder, "videos")
+        third.mkdir()
+        val fourth = File(projectFolder, "tags.txt")
+        fourth.createNewFile()
 
         /* When deleteProject() is run */
+        FileUtils.deleteProject(externalFilesTestDir, projectEntry)
 
         /* Project folder no longer exists */
+        assert(!first.exists())
+        assert(!second.exists())
+        assert(!third.exists())
+        assert(!fourth.exists())
+        assert(!projectFolder.exists())
     }
 
     @Test
