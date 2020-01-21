@@ -14,10 +14,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class ProjectRepository private constructor(val projectDao: ProjectDao,
-                                            val photoDao: PhotoDao,
-                                            val coverPhotoDao: CoverPhotoDao,
-                                            val projectScheduleDao: ProjectScheduleDao){
+class ProjectRepository private constructor(private val projectDao: ProjectDao,
+                                            private val photoDao: PhotoDao,
+                                            private val coverPhotoDao: CoverPhotoDao,
+                                            private val projectScheduleDao: ProjectScheduleDao){
 
     fun getProjectViews() = projectDao.loadProjectViews()
 

@@ -6,7 +6,8 @@ import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
 
-class ProjectTagRepository private constructor(val projectTagDao: ProjectTagDao, val tagDao: TagDao) {
+class ProjectTagRepository private constructor(private val projectTagDao: ProjectTagDao,
+                                               private val tagDao: TagDao) {
 
     fun getProjectTags(projectId: Long) = projectTagDao.loadTagsByProjectId(projectId)
 

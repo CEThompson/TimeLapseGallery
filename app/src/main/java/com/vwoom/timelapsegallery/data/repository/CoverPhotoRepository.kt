@@ -4,7 +4,7 @@ import com.vwoom.timelapsegallery.data.dao.CoverPhotoDao
 import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 
-class CoverPhotoRepository private constructor(val coverPhotoDao: CoverPhotoDao) {
+class CoverPhotoRepository private constructor(private val coverPhotoDao: CoverPhotoDao) {
 
     suspend fun setCoverPhoto(entry: PhotoEntry) {
         coverPhotoDao.insertPhoto(CoverPhotoEntry(entry.project_id, entry.id))

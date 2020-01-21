@@ -4,7 +4,7 @@ import com.vwoom.timelapsegallery.data.dao.TagDao
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 
-class TagRepository private constructor(val tagDao: TagDao){
+class TagRepository private constructor(private val tagDao: TagDao){
 
     fun getTags() = tagDao.loadAllTags()
 

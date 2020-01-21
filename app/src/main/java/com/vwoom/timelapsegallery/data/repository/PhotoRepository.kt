@@ -11,9 +11,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class PhotoRepository private constructor(val photoDao: PhotoDao,
-                                          val projectDao: ProjectDao,
-                                          val coverPhotoDao: CoverPhotoDao){
+class PhotoRepository private constructor(private val photoDao: PhotoDao,
+                                          private val projectDao: ProjectDao,
+                                          private val coverPhotoDao: CoverPhotoDao){
 
     fun getPhotos(projectId: Long) = photoDao.loadAllPhotosByProjectId(projectId)
 
@@ -28,7 +28,7 @@ class PhotoRepository private constructor(val photoDao: PhotoDao,
         coverPhotoDao.insertPhoto(coverPhotoEntry)
 
         val projectEntry = projectDao.loadProjectById(project.project_id)
-        
+
         withContext(Dispatchers.IO) {
             FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
         }
