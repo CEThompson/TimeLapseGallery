@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.utils
 
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.view.Project
 import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
 import org.hamcrest.CoreMatchers.`is`
@@ -189,59 +190,130 @@ class FileUtilsTest {
     @Test
     fun deletePhoto() {
         // Given - a photo belonging to a project
+        // Create the project to test
+        val projectName = "delete photo test project"
+        val id: Long = 4
+        val projectEntry = ProjectEntry(id, projectName)
+
+        // Create the project directory
+        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
+        projectFolder.mkdir()
+
+        // Create files in the directory
+        val deletePhotoTimestamp: Long = 999999999
+        val first = File(projectFolder, "${deletePhotoTimestamp}.jpg")
+        first.createNewFile()
+        val second = File(projectFolder, "11111111.jpg")
+        second.createNewFile()
+        val third = File(projectFolder, "videos")
+        third.mkdir()
+        val fourth = File(projectFolder, "tags.txt")
+        fourth.createNewFile()
+
+        val photoEntry = PhotoEntry(projectEntry.id, deletePhotoTimestamp)
 
         // When deleting photo
-
+        FileUtils.deletePhoto(externalFilesTestDir, projectEntry, photoEntry)
 
         // Photo no longer exists
+        assert(!first.exists())
+        assert(second.exists())
+        assert(third.exists())
     }
 
     @Test
     fun pathContainsReservedCharacter_noReservedCharacters_shouldPass() {
-        // Given
+        // Given - a string without any reserved characters
         val testString = "1_Test Project Name"
 
-        // When
+        // When - the utility is called
         val containsReservedCharacters = FileUtils.pathContainsReservedCharacter(testString)
 
-        // Then
+        // Then - the utility should indicate false, the path does not contain a reserved character
         assertFalse(containsReservedCharacters)
     }
 
     @Test
     fun pathContainsReservedCharacter_containsReservedCharacters_shouldFail() {
-        // Given
+        // Given - a string with a reserved character
         val testString = "1_Test?Project Name/"
 
-        // When
+        // When - the utility is called
         val containsReservedCharacters = FileUtils.pathContainsReservedCharacter(testString)
 
-        // Then
+        // Then - the utility should indicate true
         assertTrue(containsReservedCharacters)
     }
 
     @Test
-    fun getPhotoUrlFromProject(){
+    fun getPhotoUrlForPhotoEntryFromProject(){
+        // Given - a created photo file, a photo entry and project abstraction
+        // Create the project to test
+        val projectName = "get photo url test project"
+        val id: Long = 5
+        // Create the project directory
+        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
+        projectFolder.mkdir()
 
+        // Create files in the directory
+        val timestamp: Long = 999999999
+        val first = File(projectFolder, "${timestamp}.jpg")
+        first.createNewFile()
+
+        val photoEntry = PhotoEntry(id, id, timestamp)
+        val project = Project(id, projectName, 0, 0, id, timestamp)
+
+        // When - utilities gets the entry
+        val photoUrl = FileUtils.getPhotoUrl(externalFilesTestDir, project, photoEntry)
+
+        // Then - the returned path should be the same as the created path
+        assert(photoUrl == first.absolutePath)
     }
 
     @Test
-    fun getPhotoUrlFromProjectEntry(){
+    fun getPhotoUrlForPhotoEntryFromProjectEntry(){
+        // Given - a created photo file, a photo entry and project abstraction
+        // Create the project to test
+        val projectName = "get photo url test project"
+        val id: Long = 6
+        val projectEntry = ProjectEntry(id, projectName)
 
+        // Create the project directory
+        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
+        projectFolder.mkdir()
+
+        // Create files in the directory
+        val timestamp: Long = 999999999
+        val first = File(projectFolder, "${timestamp}.jpg")
+        first.createNewFile()
+
+        val photoEntry = PhotoEntry(id, id, timestamp)
+        // When - utilities gets the entry
+        val photoUrl = FileUtils.getPhotoUrl(externalFilesTestDir, projectEntry, photoEntry)
+
+        // Then - the returned path should be the same as the created path
+        assert(photoUrl == first.absolutePath)
     }
 
     @Test
     fun getCoverPhotoUrl(){
-
+        // Given
+        // When
+        // Then
     }
 
     @Test
     fun getPhotoFileNameFromEntry() {
+        // Given
+        // When
+        // Then
     }
 
     @Test
     fun getPhotoFileNameFromTimeStamp() {
-
+        // Given
+        // When
+        // Then
     }
 
     companion object {
