@@ -7,6 +7,8 @@ import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class PhotoRepository private constructor(val photoDao: PhotoDao,
@@ -26,9 +28,10 @@ class PhotoRepository private constructor(val photoDao: PhotoDao,
         coverPhotoDao.insertPhoto(coverPhotoEntry)
 
         val projectEntry = projectDao.loadProjectById(project.project_id)
-
-        // TODO set up a work manager to handle file operations
-        FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
+        
+        withContext(Dispatchers.IO) {
+            FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
+        }
     }
 
     suspend fun deletePhoto(externalFilesDir: File, photoEntry: PhotoEntry){
