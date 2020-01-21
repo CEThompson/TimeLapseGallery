@@ -143,10 +143,15 @@ class FileUtilsTest {
     @Test
     fun deleteTempFiles() {
         /* Given - A directory of temp files */
+        val tempFolder = File(picturesFolder, FileUtils.TEMP_FILE_SUBDIRECTORY)
+        tempFolder.mkdir()
 
+        File(tempFolder, "11.jpg")
         /* When - deleteTempFiles() is run */
+        FileUtils.deleteTempFiles(picturesFolder)
 
         /* Then - the directory is empty / gone */
+        assert(!tempFolder.exists())
     }
 
     @Test
@@ -219,6 +224,12 @@ class FileUtilsTest {
     @After
     fun cleanUp(){
         testFolder.delete()
+    }
+
+    fun createTempFolder(){
+        val tempFolder = File(picturesFolder, FileUtils.TEMP_FILE_SUBDIRECTORY)
+        if (tempFolder.exists()) return
+        tempFolder.mkdir()
     }
 
     companion object {
