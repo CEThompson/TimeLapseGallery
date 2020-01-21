@@ -221,17 +221,6 @@ class FileUtilsTest {
 
     }
 
-    @After
-    fun cleanUp(){
-        testFolder.delete()
-    }
-
-    fun createTempFolder(){
-        val tempFolder = File(picturesFolder, FileUtils.TEMP_FILE_SUBDIRECTORY)
-        if (tempFolder.exists()) return
-        tempFolder.mkdir()
-    }
-
     companion object {
         private val TAG = FileUtilsTest::class.java.simpleName
     }
