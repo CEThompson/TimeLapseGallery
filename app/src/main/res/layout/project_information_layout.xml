@@ -2,7 +2,7 @@
 <!-- Layout containing project information -->
 <layout>
     <androidx.cardview.widget.CardView android:id="@+id/project_information_cardview"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/fab_size"
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,7 +11,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/project_information_constraint_layout"
-            android:padding="@dimen/detail_margin"
+            android:padding="@dimen/small"
             android:layout_gravity="start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

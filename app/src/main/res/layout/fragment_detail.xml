@@ -19,7 +19,9 @@
             <include
                 android:id="@+id/project_information_layout"
                 layout="@layout/project_information_layout"
-                app:layout_constraintHorizontal_bias="0"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/medium"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/project_schedule_fab"
                 app:layout_constraintTop_toTopOf="parent"
