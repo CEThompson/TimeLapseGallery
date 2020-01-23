@@ -35,7 +35,7 @@
                 android:backgroundTint="@color/white"
                 android:src="@drawable/ic_info_outline_black_24dp"
                 app:borderWidth="0dp"
-                app:fabSize="normal"
+                app:fabSize="mini"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 />
@@ -50,6 +50,7 @@
                 android:backgroundTint="@color/white"
                 android:src="@drawable/ic_hashtag"
                 app:borderWidth="0dp"
+                app:fabSize="mini"
                 app:layout_constraintTop_toBottomOf="@id/project_information_fab"
                 app:layout_constraintEnd_toEndOf="parent"
                 />
@@ -64,6 +65,7 @@
                 android:backgroundTint="@color/white"
                 android:src="@drawable/ic_date_range_black_24dp"
                 app:borderWidth="0dp"
+                app:fabSize="mini"
                 app:layout_constraintTop_toBottomOf="@id/project_tag_fab"
                 app:layout_constraintEnd_toEndOf="parent"
                 />
@@ -212,7 +214,7 @@
                 android:theme="@style/AppToolbar" />
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- FAB to compile a video from the images -->
+        <!-- FAB to play a video from the images -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/play_as_video_fab"
             android:layout_width="wrap_content"
