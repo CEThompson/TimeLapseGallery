@@ -66,8 +66,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     // Photo and project Information
     private var mPhotos: List<PhotoEntry>? = null
-    private var mTagEntries: List<TagEntry>? = null
-    private var mTags: ArrayList<String>? = null
+    private var mProjectTags: List<TagEntry>? = null
+    private var mAllTags: ArrayList<String>? = null
     private var mSelectedTags: ArrayList<String> = arrayListOf()
     private var mCurrentPhoto: PhotoEntry? = null
     private var mCurrentPlayPosition: Int? = null
@@ -639,13 +639,13 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.projectTags.observe(this, Observer<List<ProjectTagEntry>> { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 // Update project information dialog
-                mTagEntries = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag }
+                mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag }
 
                 val taglayout = mEditTagsDialog?.findViewById<LinearLayout>(R.id.dialog_edit_tags_taglayout)
                 taglayout?.removeAllViews()
                 var text = ""
                 // Create the project information display text
-                for (tag in mTagEntries!!){
+                for (tag in mProjectTags!!){
                     // Concatenate a string for non-interactive output
                     text = text.plus("#${tag.tag}  ")
 
@@ -671,8 +671,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
 
         detailViewModel.tags.observe(this, Observer<List<TagEntry>> {tagEntries: List<TagEntry> ->
-            mTags = arrayListOf()
-            for (tag in tagEntries) mTags?.add(tag.tag)
+            mAllTags = arrayListOf()
+            for (tag in tagEntries) mAllTags?.add(tag.tag)
         })
     }
 
@@ -733,16 +733,21 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         existingTagsLayout.removeAllViews()
 
         mSelectedTags = arrayListOf()
+        val currentTags = arrayListOf<String>()
+        for (tag in mProjectTags!!) currentTags.add(tag.tag)
 
         // Create a list of available tags
-        if (mTags != null) {
-            for (tag in mTags!!){
+        if (mAllTags != null) {
+            for (tag in mAllTags!!){
+
                 val checkBoxView = CheckBox(requireContext())
                 checkBoxView.text = getString(R.string.hashtag, tag)
                 checkBoxView.layoutParams = exampleParams
+                checkBoxView.isEnabled = !currentTags.contains(tag) // disable checkbox if tag is already added to project
+
                 existingTagsLayout.addView(checkBoxView)
 
-                checkBoxView.setOnCheckedChangeListener { buttonView, isChecked ->
+                checkBoxView.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
                         mSelectedTags.add(tag)
                     } else {
