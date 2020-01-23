@@ -15,7 +15,7 @@ import android.transition.TransitionInflater
 import android.util.Log
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
-import android.view.View.OnTouchListener
+import android.view.View.*
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -73,6 +73,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mCurrentPlayPosition: Int? = null
     private var mCurrentProject: Project? = null
     private var mProjectSchedule: ProjectScheduleEntry? = null
+    private var mTagsText: String? = null
 
     // Views for fullscreen dialog
     private var mFullscreenImageDialog: Dialog? = null
@@ -665,7 +666,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 val tags = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
                 tags?.text = text
 
-                // TODO: Update edit tag dialog?
+
+                if (mProjectTags!!.isEmpty()) {
+                    binding.projectInformationLayout.detailsProjectTagsTextview.visibility = GONE
+                }
+                else {
+                    binding.projectInformationLayout.detailsProjectTagsTextview.text = text
+                    binding.projectInformationLayout.detailsProjectTagsTextview.visibility = VISIBLE
+                }
             }
         })
 
