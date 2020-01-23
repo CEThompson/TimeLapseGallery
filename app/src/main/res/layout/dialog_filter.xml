@@ -7,19 +7,47 @@
     android:layout_margin="@dimen/large"
     android:orientation="vertical">
 
+    <!-- search by name -->
     <TextView
-        android:id="@+id/filter_by_tag_label"
+        android:id="@+id/search_by_name_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="by name"
         android:layout_gravity="center_horizontal"
-        android:text="@string/filter_by_tag"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="filter by tag" />
+        />
 
+    <EditText
+        android:id="@+id/search_edit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:hint="@string/project_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_by_name_label"
+        />
+
+    <!-- filter by tag -->
+    <TextView
+        android:id="@+id/filter_by_tag_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/by_tag"
+        android:textStyle="italic"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_edit_text" />
+
+    <!-- empty tags label -->
     <TextView
         android:id="@+id/empty_tags_label"
         android:layout_width="wrap_content"
@@ -33,6 +61,7 @@
         android:visibility="gone"
         />
 
+    <!-- layout for tag filtration -->
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/dialog_filter_tags_layout"
         android:layout_width="wrap_content"
@@ -59,7 +88,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="32dp"
-        android:text="@string/filter_by_schedule"
+        android:text="@string/by_schedule"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -93,34 +122,4 @@
             android:layout_height="wrap_content"
             android:text="unscheduled" />
     </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/filter_cancel_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="@dimen/large"
-        android:layout_marginStart="@dimen/large"
-        android:layout_marginEnd="@dimen/large"
-        android:src="@drawable/ic_clear_white_24dp"
-        app:fabSize="mini"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filter_by_schedule_layout" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/filter_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/ic_check_white_24dp"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filter_by_schedule_layout" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

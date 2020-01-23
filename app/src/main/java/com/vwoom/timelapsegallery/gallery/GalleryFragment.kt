@@ -111,6 +111,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         return when (item.itemId){
             R.id.search_option -> {
                 // TODO implement search
+                mFilterDialog?.show()
+                mGalleryViewModel.filterDialogShowing = true
                 true
             }
             R.id.settings_option -> {
@@ -133,32 +135,14 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mFilterDialog = Dialog(requireContext())
         mFilterDialog?.setContentView(R.layout.dialog_filter)
         mFilterDialog?.setOnCancelListener{mGalleryViewModel.filterDialogShowing=false}
+    }
 
-        val filterCancelFab = mFilterDialog?.findViewById<FloatingActionButton>(R.id.filter_cancel_fab)
-        val filterSubmitFab = mFilterDialog?.findViewById<FloatingActionButton>(R.id.filter_fab)
-
-        // Set colors
-        filterSubmitFab?.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-        filterCancelFab?.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorSubtleRedAccent))
-
-
-        filterSubmitFab?.setOnClickListener{
-            mGalleryViewModel.setFilter(mFilterTags)
-            mGalleryViewModel.viewModelScope.launch {
-                val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
-                mGalleryAdapter?.setProjectData(filteredProjects)
-            }
-            mFilterDialog?.dismiss()
-            mGalleryViewModel.filterDialogShowing = false
+    private fun updateSearchFilter(){
+        mGalleryViewModel.setFilter(mFilterTags)
+        mGalleryViewModel.viewModelScope.launch {
+            val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
+            mGalleryAdapter?.setProjectData(filteredProjects)
         }
-
-        filterCancelFab?.setOnClickListener {
-            mFilterDialog?.dismiss()
-            mGalleryViewModel.filterDialogShowing = false
-        }
-
     }
 
     private fun setupViewModel() {
@@ -202,6 +186,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             tagCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) mFilterTags.add(tag)
                 else mFilterTags.remove(tag)
+                updateSearchFilter()
             }
             tagLayout?.addView(tagCheckBox)
         }
