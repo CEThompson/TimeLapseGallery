@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import android.widget.CheckBox
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -181,7 +182,17 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private fun setTags(tags: List<TagEntry>){
         // Clear the tag layout
         val tagLayout = mFilterDialog?.findViewById<FlexboxLayout>(R.id.dialog_filter_tags_layout)
+        val emptyListIndicator = mFilterDialog?.findViewById<TextView>(R.id.empty_tags_label)
         tagLayout?.removeAllViews()
+
+        if (tags.isEmpty()){
+            emptyListIndicator?.visibility = View.VISIBLE
+            tagLayout?.visibility = View.GONE
+            return
+        } else {
+            tagLayout?.visibility = View.VISIBLE
+            emptyListIndicator?.visibility = View.GONE
+        }
 
         // Create the tag views
         for (tag in tags){

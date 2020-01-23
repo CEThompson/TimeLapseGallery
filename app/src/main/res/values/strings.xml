@@ -84,6 +84,8 @@
     <string name="daily">daily</string>
     <string name="weekly">weekly</string>
 
+    <string name="no_projects_tagged">no projects tagged</string>
+
     <!-- Dialog resources -->
     <string name="edit_tags"><u>edit tags</u></string>
     <string name="add_tag">add tag</string>

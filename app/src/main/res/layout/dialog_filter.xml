@@ -20,6 +20,19 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="filter by tag" />
 
+    <TextView
+        android:id="@+id/empty_tags_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_projects_tagged"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filter_by_tag_label"
+        android:visibility="gone"
+        />
+
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/dialog_filter_tags_layout"
         android:layout_width="wrap_content"
