@@ -754,7 +754,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
 
         AlertDialog.Builder(requireContext())
-                .setTitle("Add Tag")
+                .setTitle(getString(R.string.add_tag))
                 .setView(view)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     val tagText = view.findViewById<EditText>(R.id.add_tag_dialog_edit_text).text.toString()
