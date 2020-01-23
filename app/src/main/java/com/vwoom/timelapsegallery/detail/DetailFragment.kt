@@ -743,13 +743,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 existingTagsLayout.addView(checkBoxView)
 
                 checkBoxView.setOnCheckedChangeListener { buttonView, isChecked ->
-                    editText.isEnabled = mSelectedTags.isEmpty()
-
                     if (isChecked) {
                         mSelectedTags.add(tag)
                     } else {
                         mSelectedTags.remove(tag)
                     }
+                    editText.isEnabled = mSelectedTags.isEmpty()
                 }
             }
         }
