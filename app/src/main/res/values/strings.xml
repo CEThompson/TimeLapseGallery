@@ -92,6 +92,7 @@
     <string name="delete">delete</string>
     <string name="project_information">Project Information</string>
     <string name="project_id_label">Project Id: %1$d</string>
+    <string name="new_tag_text">new tag text</string>
 
     <string name="hashtag">#%1$s</string>
 

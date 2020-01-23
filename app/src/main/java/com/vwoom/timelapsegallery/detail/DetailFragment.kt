@@ -158,7 +158,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         binding.playAsVideoFab.setOnClickListener { playSetOfImages() }
         binding.projectScheduleFab.setOnClickListener { mScheduleDialog?.show() }
-        binding.projectTagFab.setOnClickListener { mEditTagsDialog?.show() }
+        binding.projectTagFab.setOnClickListener { addTag() }
         binding.projectInformationFab?.setOnClickListener {mProjectInfoDialog?.show()}
         binding.fullscreenFab.setOnClickListener { if (!mPlaying) mFullscreenImageDialog?.show() }
 
@@ -168,6 +168,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // TODO implement pinch zoom on fullscreen image
 
         // Initialize dialogs
+        // TODO convert to alert dialogs
         initializeFullscreenImageDialog()
         initializeProjectInformationDialog()
         initializeEditTagsDialog()
@@ -712,13 +713,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     private fun addTag(){
-        val input = EditText(requireContext())
-        input.inputType = InputType.TYPE_CLASS_TEXT
+        val view = layoutInflater.inflate(R.layout.dialog_add_tag, binding.root as ViewGroup, false)
         AlertDialog.Builder(requireContext())
                 .setTitle("Add Tag")
-                .setView(input)
+                .setView(view)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    val tagText = input.text.toString()
+                    val tagText = view.findViewById<EditText>(R.id.add_tag_edit_text).text.toString()
                     detailViewModel.addTag(tagText, mCurrentProject!!)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
