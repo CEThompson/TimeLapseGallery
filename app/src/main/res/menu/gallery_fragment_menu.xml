@@ -5,12 +5,7 @@
     <item android:id="@+id/search_option"
         android:title="@string/search"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_search_white_24dp"
-        />
-
-    <item android:id="@+id/filter_option"
-        android:title="@string/filter"
-        app:showAsAction="never"/>
+        android:icon="@drawable/ic_search_white_24dp"/>
 
     <item android:id="@+id/settings_option"
         android:title="@string/title_activity_settings"

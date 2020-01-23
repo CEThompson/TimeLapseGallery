@@ -122,11 +122,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 findNavController().navigate(action)
                 true
             }
-            R.id.filter_option -> {
-                mFilterDialog?.show()
-                mGalleryViewModel.filterDialogShowing = true
-                true
-            }
             else -> super.onOptionsItemSelected(item)
         }
     }

@@ -90,7 +90,8 @@
 
     <!-- Dialog resources -->
     <string name="edit_tags"><u>edit tags</u></string>
-    <string name="add_tag">Add Tag(s)</string>
+    <string name="manage_tags">Manage tags</string>
+    <string name="add_tag">Add Tag</string>
     <string name="delete">delete</string>
     <string name="project_information">Project Information</string>
     <string name="project_id_label">Project Id: %1$d</string>
@@ -107,6 +108,8 @@
     <!-- Photo / Project information -->
     <string name="details_photo_number_out_of" translatable="false">%1$d / %2$d</string>
     <string name="today">Today</string>
+    <string name="scheduled">Scheduled</string>
+    <string name="unscheduled">Unscheduled</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="number_of_days">In %1$d Days</string>
     <string name="timespan">%1$s - %2$s</string>

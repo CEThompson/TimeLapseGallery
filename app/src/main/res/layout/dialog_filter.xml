@@ -12,7 +12,7 @@
         android:id="@+id/search_by_name_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="by name"
+        android:text="@string/by_name"
         android:layout_gravity="center_horizontal"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
@@ -110,16 +110,16 @@
         <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="today" />
+            android:text="@string/today" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="scheduled" />
+            android:text="@string/scheduled" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="unscheduled" />
+            android:text="@string/unscheduled" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
