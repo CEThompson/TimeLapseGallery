@@ -33,6 +33,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -65,7 +66,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     // Photo and project Information
     private var mPhotos: List<PhotoEntry>? = null
-    private var mTags: List<TagEntry>? = null
+    private var mTagEntries: List<TagEntry>? = null
+    private var mTags: ArrayList<String>? = null
     private var mSelectedTags: ArrayList<String> = arrayListOf()
     private var mCurrentPhoto: PhotoEntry? = null
     private var mCurrentPlayPosition: Int? = null
@@ -546,6 +548,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             // Set the dialog name
             val projectInfoNameTv = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
 
+            val tagsForProjectTV = mEditTagsDialog?.findViewById<TextView>(R.id.dialog_edit_tags_title)
+
             // Set name for both the dialog and the project info card view
             val name = mCurrentProject?.project_name
             if (name == null || name.isEmpty()) {
@@ -556,7 +560,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 binding.projectInformationLayout?.detailsProjectNameTextView?.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
                 // Set the dialog
                 projectInfoNameTv?.text = getString(R.string.unnamed)
-
+                tagsForProjectTV?.text = getString(R.string.unnamed)
             }
             else {
                 // Set the card view
@@ -566,6 +570,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         ?.setTypeface(binding.projectInformationLayout?.detailsProjectNameTextView?.typeface, Typeface.BOLD)
                 // Set the dialog
                 projectInfoNameTv?.text = currentProject.project_name
+                tagsForProjectTV?.text = getString(R.string.tags_for_project, currentProject.project_name)
             }
 
             // Set the dialog schedule information
@@ -631,23 +636,23 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         })
 
         // Observe the tags
-        detailViewModel.tags.observe(this, Observer<List<ProjectTagEntry>> { tagEntries: List<ProjectTagEntry> ->
+        detailViewModel.projectTags.observe(this, Observer<List<ProjectTagEntry>> { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 // Update project information dialog
-                mTags = detailViewModel.getTags(tagEntries).sortedBy { it.tag }
+                mTagEntries = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag }
 
                 val taglayout = mEditTagsDialog?.findViewById<LinearLayout>(R.id.dialog_edit_tags_taglayout)
                 taglayout?.removeAllViews()
                 var text = ""
-                for (tag in mTags!!){
-                    // Create the project information display text
+                // Create the project information display text
+                for (tag in mTagEntries!!){
+                    // Concatenate a string for non-interactive output
                     text = text.plus("#${tag.tag}  ")
 
-                    // Set up views for deleting tags
+                    // Set up check boxes for deleting tags
                     val checkBox = CheckBox(requireContext())
                     checkBox.text = getString(R.string.hashtag, tag.tag)
                     taglayout?.addView(checkBox)
-
                     checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
                         val checkBoxTag = tag.tag
                         if (isChecked){
@@ -660,8 +665,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 val tags = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
                 tags?.text = text
 
-                // Update edit tag dialog
+                // TODO: Update edit tag dialog?
             }
+        })
+
+
+        detailViewModel.tags.observe(this, Observer<List<TagEntry>> {tagEntries: List<TagEntry> ->
+            mTags = arrayListOf()
+            for (tag in tagEntries) mTags?.add(tag.tag)
         })
     }
 
@@ -714,12 +725,44 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private fun addTag(){
         val view = layoutInflater.inflate(R.layout.dialog_add_tag, binding.root as ViewGroup, false)
+
+        val editText = view.findViewById<EditText>(R.id.add_tag_dialog_edit_text)
+        val existingTagsLayout = view.findViewById<FlexboxLayout>(R.id.add_tag_dialog_existing_tags_layout)
+        val exampleTagCheckBox = existingTagsLayout.getChildAt(0)
+        val exampleParams = exampleTagCheckBox.layoutParams
+        existingTagsLayout.removeAllViews()
+
+        mSelectedTags = arrayListOf()
+
+        // Create a list of available tags
+        if (mTags != null) {
+            for (tag in mTags!!){
+                val checkBoxView = CheckBox(requireContext())
+                checkBoxView.text = getString(R.string.hashtag, tag)
+                checkBoxView.layoutParams = exampleParams
+                existingTagsLayout.addView(checkBoxView)
+
+                checkBoxView.setOnCheckedChangeListener { buttonView, isChecked ->
+                    editText.isEnabled = mSelectedTags.isEmpty()
+
+                    if (isChecked) {
+                        mSelectedTags.add(tag)
+                    } else {
+                        mSelectedTags.remove(tag)
+                    }
+                }
+            }
+        }
+
         AlertDialog.Builder(requireContext())
                 .setTitle("Add Tag")
                 .setView(view)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    val tagText = view.findViewById<EditText>(R.id.add_tag_edit_text).text.toString()
-                    detailViewModel.addTag(tagText, mCurrentProject!!)
+                    val tagText = view.findViewById<EditText>(R.id.add_tag_dialog_edit_text).text.toString()
+                    if (tagText.isNotEmpty()) detailViewModel.addTag(tagText, mCurrentProject!!)
+                    else {
+                        for (tag in mSelectedTags) detailViewModel.addTag(tagText, mCurrentProject!!)
+                    }
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }

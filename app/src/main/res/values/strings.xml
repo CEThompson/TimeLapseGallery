@@ -8,6 +8,7 @@
     <string name="search">Search</string>
     <string name="share">Share</string>
 
+    <string name="tags_for_project">Tags for project %1$s</string>
     <string name="schedule_label">Schedule: </string>
     <string name="tags_label">Tags: </string>
     <string name="project_name_label">Project Name: </string>

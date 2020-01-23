@@ -16,14 +16,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
-class DetailViewModel(val photoRepository: PhotoRepository,
-                      val projectRepository: ProjectRepository,
-                      val projectTagRepository: ProjectTagRepository,
-                      val coverPhotoRepository: CoverPhotoRepository,
-                      val tagRepository: TagRepository,
+class DetailViewModel(private val photoRepository: PhotoRepository,
+                      private val projectRepository: ProjectRepository,
+                      private val projectTagRepository: ProjectTagRepository,
+                      private val coverPhotoRepository: CoverPhotoRepository,
+                      private val tagRepository: TagRepository,
                       projectId: Long) : ViewModel() {
     val photos: LiveData<List<PhotoEntry>> = photoRepository.getPhotos(projectId)
-    val tags: LiveData<List<ProjectTagEntry>> = projectTagRepository.getProjectTags(projectId)
+    val projectTags: LiveData<List<ProjectTagEntry>> = projectTagRepository.getProjectTags(projectId)
+    val tags: LiveData<List<TagEntry>> = tagRepository.getTags()
 
     val currentProject: LiveData<Project> = projectRepository.getProjectView(projectId)
     val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
