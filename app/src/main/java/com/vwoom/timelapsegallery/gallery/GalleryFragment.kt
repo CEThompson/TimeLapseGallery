@@ -182,7 +182,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Create the tag views
         for (tag in tags){
             val tagCheckBox = CheckBox(requireContext())
-            tagCheckBox.text = tag.tag
+            tagCheckBox.text = getString(R.string.hashtag, tag)
             tagCheckBox.isChecked = mGalleryViewModel.tagSelected(tag)
             tagCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) mFilterTags.add(tag)
