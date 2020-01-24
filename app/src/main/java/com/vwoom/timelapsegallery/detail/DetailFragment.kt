@@ -773,7 +773,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     val tagText = view.findViewById<EditText>(R.id.add_tag_dialog_edit_text).text.toString()
                     if (tagText.isNotEmpty()) detailViewModel.addTag(tagText, mCurrentProject!!)
                     else {
-                        for (tag in mSelectedTags) detailViewModel.addTag(tagText, mCurrentProject!!)
+                        for (tag in mSelectedTags) detailViewModel.addTag(tag, mCurrentProject!!)
                     }
                 }
                 .setNegativeButton(android.R.string.no, null).show()
