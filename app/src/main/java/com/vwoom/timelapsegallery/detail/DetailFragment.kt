@@ -634,7 +634,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.projectTags.observe(this, Observer<List<ProjectTagEntry>> { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 // Update project information dialog
-                mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag }
+                mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag.toLowerCase() }
 
                 val taglayout = mEditTagsDialog?.findViewById<LinearLayout>(R.id.dialog_edit_tags_taglayout)
                 taglayout?.removeAllViews()
@@ -674,7 +674,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         detailViewModel.tags.observe(this, Observer<List<TagEntry>> {tagEntries: List<TagEntry> ->
             mAllTags = arrayListOf()
-            for (tag in tagEntries) mAllTags?.add(tag.tag)
+            val sortedEntries = tagEntries.sortedBy { it.tag.toLowerCase() }
+            for (tag in sortedEntries) mAllTags?.add(tag.tag)
         })
     }
 
