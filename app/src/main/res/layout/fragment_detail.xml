@@ -171,8 +171,8 @@
                         android:visibility="invisible"
                         app:backgroundTint="@color/darkImagePlaceHolder"
                         app:fabSize="mini"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintEnd_toEndOf="@id/detail_current_image"
+                        app:layout_constraintTop_toTopOf="@id/detail_current_image" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
