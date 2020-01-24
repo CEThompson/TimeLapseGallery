@@ -297,6 +297,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Get photo info
         val ratio = PhotoUtils.getAspectRatioFromImagePath(imagePath)
         val isImageLandscape = PhotoUtils.isLandscape(imagePath)
+
         // Set cardview constraints depending upon if photo is landscape or portrait
         val layoutParams = binding.detailsCardContainer.layoutParams
 
