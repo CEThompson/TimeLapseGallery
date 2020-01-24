@@ -9,6 +9,7 @@
     android:orientation="vertical">
 
     <!-- Title -->
+    <!--
     <TextView
         android:id="@+id/dialog_project_information_title"
         android:layout_width="wrap_content"
@@ -21,18 +22,17 @@
         android:textStyle="bold"
         android:textSize="22sp"
         android:text="@string/project_information"/>
-
+    -->
     <!-- Id -->
     <TextView
         android:id="@+id/dialog_project_info_id_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:layout_marginTop="@dimen/large"
         android:layout_marginBottom="@dimen/medium"
         tools:text="@string/project_id_label"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_project_information_title"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <!-- Name -->
     <TextView
@@ -71,7 +71,7 @@
         android:id="@+id/dialog_edit_schedule_textview_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="@dimen/medium"
         android:gravity="center_vertical"
         android:textStyle="italic"
         app:layout_constraintStart_toEndOf="@id/dialog_edit_schedule_textview"
@@ -89,6 +89,19 @@
         android:text="@string/tags_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_schedule_FAB" />
+    <!-- Edit Tags Link -->
+    <TextView
+        android:id="@+id/dialog_project_info_edit_tags"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/medium"
+        android:src="@drawable/ic_add_white_24dp"
+        android:text="@string/edit_tags"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="italic|bold"
+        app:layout_constraintStart_toEndOf="@id/dialog_tags_label"
+        app:layout_constraintTop_toTopOf="@id/dialog_tags_label" />
+
 
     <!-- Tags -->
     <TextView
@@ -102,57 +115,23 @@
         app:layout_constraintTop_toBottomOf="@id/dialog_tags_label"
         tools:text="#tag"
         />
-
     <!-- Edit name fab -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageView
         android:id="@+id/edit_project_name_FAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/medium"
         android:src="@drawable/ic_edit_black_24dp"
         app:layout_constraintStart_toEndOf="@id/dialog_project_info_name"
-        app:layout_constraintTop_toBottomOf="@id/dialog_project_info_id_label"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1"
-        app:fabSize="mini"/>
-    <!-- Edit schedule fab -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        app:layout_constraintTop_toBottomOf="@id/dialog_project_info_id_label" />
+    <!-- Edit schedule -->
+    <ImageView
         android:id="@+id/edit_schedule_FAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/medium"
         android:src="@drawable/ic_date_range_black_24dp"
         app:layout_constraintStart_toEndOf="@id/dialog_edit_schedule_textview_description"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintTop_toBottomOf="@id/edit_project_name_FAB"
-        app:fabSize="mini"/>
-    <!-- Edit Tags Link -->
-    <TextView
-        android:id="@+id/dialog_project_info_edit_tags"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
-        android:src="@drawable/ic_add_white_24dp"
-        android:text="@string/edit_tags"
-        android:textColor="@color/colorPrimary"
-        android:textStyle="italic|bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toEndOf="@id/dialog_tags_label"
-        app:layout_constraintTop_toTopOf="@id/dialog_tags_label" />
-
-    <!-- Verify FAB -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/dialog_verify_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
-        android:layout_gravity="end"
-        android:src="@drawable/ic_check_white_24dp"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_information_tags" />
+        app:layout_constraintTop_toBottomOf="@id/edit_project_name_FAB" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

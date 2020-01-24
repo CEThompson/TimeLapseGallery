@@ -94,8 +94,8 @@
     <string name="add_tag">Add Tag</string>
     <string name="delete">delete</string>
     <string name="project_information">Project Information</string>
-    <string name="project_id_label">Project Id: %1$d</string>
-    <string name="new_tag_text">#tag</string>
+    <string name="project_id_label">Id: %1$d</string>
+    <string name="new_tag_text">#newtag</string>
 
     <string name="hashtag">#%1$s</string>
 

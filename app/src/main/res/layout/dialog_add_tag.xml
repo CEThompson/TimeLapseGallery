@@ -6,18 +6,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/add_tag_dialog_edit_text"
-        android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/large"
-        tools:text="new tag text"
-        android:inputType="text"
-        android:singleLine="true"
-        android:hint="@string/new_tag_text"
-        android:autofillHints="@string/new_tag_text"
-        />
-
+        android:layout_margin="@dimen/large">
+        <EditText
+            android:id="@+id/add_tag_dialog_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="150dp"
+            tools:text="#newtag"
+            android:inputType="text"
+            android:singleLine="true"
+            android:hint="@string/new_tag_text"
+            android:autofillHints="@string/new_tag_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/add_tag_fab"
+            />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_tag_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_add_white_24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:fabSize="mini"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/add_tag_dialog_existing_tags_layout"
         android:layout_width="wrap_content"

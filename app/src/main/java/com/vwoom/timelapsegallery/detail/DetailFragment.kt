@@ -471,29 +471,22 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // Get Views
         val editTagsTextView = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_edit_tags)
-        val editNameFab = mProjectInfoDialog?.findViewById<FloatingActionButton>(R.id.edit_project_name_FAB)
-        val editScheduleFab = mProjectInfoDialog?.findViewById<FloatingActionButton>(R.id.edit_schedule_FAB)
-        val verifyFab = mProjectInfoDialog?.findViewById<FloatingActionButton>(R.id.dialog_verify_fab)
+        val editNameButton = mProjectInfoDialog?.findViewById<ImageView>(R.id.edit_project_name_FAB)
+        val editScheduleButton = mProjectInfoDialog?.findViewById<ImageView>(R.id.edit_schedule_FAB)
 
         // Set fab colors
-        editNameFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-        editScheduleFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-        verifyFab?.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-
+        editNameButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+        editScheduleButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
 
         // Set click listeners
         editTagsTextView?.setOnClickListener {
             mEditTagsDialog?.show()
         }
-        editNameFab?.setOnClickListener {
+        editNameButton?.setOnClickListener {
             editName()
         }
-        editScheduleFab?.setOnClickListener {
+        editScheduleButton?.setOnClickListener {
             mScheduleDialog?.show()
-        }
-        verifyFab?.setOnClickListener {
-            mProjectInfoDialog?.dismiss()
         }
     }
 
@@ -768,7 +761,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
 
         AlertDialog.Builder(requireContext())
-                .setTitle(getString(R.string.add_tag))
                 .setView(view)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     val tagText = view.findViewById<EditText>(R.id.add_tag_dialog_edit_text).text.toString()
