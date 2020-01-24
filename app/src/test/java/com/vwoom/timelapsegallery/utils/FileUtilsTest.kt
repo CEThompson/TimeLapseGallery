@@ -327,10 +327,12 @@ class FileUtilsTest {
         val photoEntry = PhotoEntry(1, timestamp)
 
         // When
-        val filename = FileUtils.getPhotoFileName(photoEntry)
+        val filenames = FileUtils.getPhotoFileNames(photoEntry)
 
         // Then
-        assert(filename == "$timestamp.jpg")
+        assert(filenames[0] == "$timestamp.jpg")
+        assert(filenames[1] == "$timestamp.png")
+        assert(filenames[2] == "$timestamp.jpeg")
     }
 
     @Test
@@ -339,10 +341,12 @@ class FileUtilsTest {
         val timestamp: Long = 12345
 
         // When
-        val filename = FileUtils.getPhotoFileName(timestamp)
+        val filenames = FileUtils.getPhotoFileNames(timestamp)
 
         // Then
-        assert(filename == "$timestamp.jpg")
+        assert(filenames[0] == "$timestamp.jpg")
+        assert(filenames[1] == "$timestamp.png")
+        assert(filenames[2] == "$timestamp.jpeg")
     }
 
     companion object {

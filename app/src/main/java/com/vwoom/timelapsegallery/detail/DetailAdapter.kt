@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.detail
 
 import android.content.Context
 import android.os.Environment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,8 +50,8 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, cont
         val binding = holder.binding
         val context = holder.itemView.context
         val currentPhoto = mPhotos?.get(position)
-        val photo_path = FileUtils.getPhotoUrl(mExternalFilesDir!!, mProject!!, currentPhoto!!)
-        val f = File(photo_path)
+        val photoPath = FileUtils.getPhotoUrl(mExternalFilesDir!!, mProject!!, currentPhoto!!)
+        val f = File(photoPath)
         // TODO (update) dynamically resize detail view
         Glide.with(context)
                 .load(f)

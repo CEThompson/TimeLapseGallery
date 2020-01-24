@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.utils
 
-import android.util.Log
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.view.Project
@@ -177,32 +176,50 @@ object FileUtils {
     }
 
     fun getPhotoUrl(externalFilesDir: File, projectEntry: ProjectEntry, photoEntry: PhotoEntry): String {
-        val imageFileName = getPhotoFileName(photoEntry)
+        val imageFileNames = getPhotoFileNames(photoEntry)
         val projectDir = getProjectFolder(externalFilesDir, projectEntry)
-        val photoFile = File(projectDir, imageFileName)
-        return photoFile.absolutePath
+
+        lateinit var photoFile: File
+        for (fileName in imageFileNames){
+            photoFile = File(projectDir, fileName)
+            if (photoFile.exists()) return photoFile.absolutePath
+        }
+        // TODO handle error case better
+        return "error retrieving image file from timestamp"
     }
 
     fun getPhotoUrl(externalFilesDir: File, project: Project, photoEntry: PhotoEntry): String {
-        val imageFileName = getPhotoFileName(photoEntry)
+        val imageFileNames: Array<String> = getPhotoFileNames(photoEntry)
         val projectDir = getProjectFolder(externalFilesDir, project)
-        val photoFile = File(projectDir, imageFileName)
-        return photoFile.absolutePath
+
+        lateinit var photoFile: File
+        for (fileName in imageFileNames){
+            photoFile = File(projectDir, fileName)
+            if (photoFile.exists()) return photoFile.absolutePath
+        }
+        // TODO handle error case better
+        return "error retrieving image file from timestamp"
     }
 
     fun getCoverPhotoUrl(externalFilesDir: File, project: Project): String {
-        val imageFileName = getPhotoFileName(project.cover_photo_timestamp)
+        val imageFileNames = getPhotoFileNames(project.cover_photo_timestamp)
         val projectDir = getProjectFolder(externalFilesDir, project)
-        val photoFile = File(projectDir, imageFileName)
-        return photoFile.absolutePath
+
+        lateinit var photoFile: File
+        for (fileName in imageFileNames){
+            photoFile = File(projectDir, fileName)
+            if (photoFile.exists()) return photoFile.absolutePath
+        }
+        // TODO handle error case better
+        return "error retrieving image file from timestamp"
     }
 
-    // TODO handle .png images
-    fun getPhotoFileName(entry: PhotoEntry): String {
-        return entry.timestamp.toString() + ".jpg"
+    fun getPhotoFileNames(entry: PhotoEntry): Array<String> {
+        val timestamp = entry.timestamp.toString()
+        return arrayOf("$timestamp.jpg","$timestamp.png","$timestamp.jpeg")
     }
 
-    fun getPhotoFileName(timestamp: Long): String {
-        return "$timestamp.jpg"
+    fun getPhotoFileNames(timestamp: Long): Array<String> {
+        return arrayOf("$timestamp.jpg","$timestamp.png","$timestamp.jpeg")
     }
 }

@@ -273,7 +273,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Notify the adapter
         mDetailAdapter?.setCurrentPhoto(photoEntry)
         // Load the current image
-        loadImage(FileUtils.getPhotoUrl(mExternalFilesDir!!, mCurrentProject!!, photoEntry))
+        val imagePath = FileUtils.getPhotoUrl(mExternalFilesDir!!, mCurrentProject!!, photoEntry)
+        loadImage(imagePath)
+
         // Get info for the current photo
         val timestamp = photoEntry.timestamp
         val photoNumber = mPhotos!!.indexOf(photoEntry) + 1
