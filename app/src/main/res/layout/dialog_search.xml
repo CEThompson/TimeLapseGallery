@@ -33,9 +33,9 @@
         app:layout_constraintTop_toBottomOf="@id/search_by_name_label"
         />
 
-    <!-- filter by tag -->
+    <!-- search by tag -->
     <TextView
-        android:id="@+id/filter_by_tag_label"
+        android:id="@+id/search_by_tag_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -57,13 +57,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filter_by_tag_label"
+        app:layout_constraintTop_toBottomOf="@id/search_by_tag_label"
         android:visibility="gone"
         />
 
-    <!-- layout for tag filtration -->
+    <!-- layout for tags -->
     <com.google.android.flexbox.FlexboxLayout
-        android:id="@+id/dialog_filter_tags_layout"
+        android:id="@+id/dialog_search_tags_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -74,8 +74,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filter_by_tag_label">
-        <!-- Example checkbox for layouting -->
+        app:layout_constraintTop_toBottomOf="@id/search_by_tag_label">
+        <!-- Example checkbox for layout -->
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -83,7 +83,7 @@
     </com.google.android.flexbox.FlexboxLayout>
 
     <TextView
-        android:id="@+id/filter_by_schedule_label"
+        android:id="@+id/search_by_schedule_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -93,7 +93,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_filter_tags_layout"
+        app:layout_constraintTop_toBottomOf="@id/dialog_search_tags_layout"
         tools:text="filter by schedule" />
 
     <LinearLayout
@@ -105,7 +105,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filter_by_schedule_label">
+        app:layout_constraintTop_toBottomOf="@id/search_by_schedule_label">
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:layout_width="wrap_content"

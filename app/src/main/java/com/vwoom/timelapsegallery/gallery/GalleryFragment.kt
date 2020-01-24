@@ -127,13 +127,17 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 findNavController().navigate(action)
                 true
             }
+            R.id.filter_option -> {
+                // TODO implement filter
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun initializeFilterDialog(){
         mFilterDialog = Dialog(requireContext())
-        mFilterDialog?.setContentView(R.layout.dialog_filter)
+        mFilterDialog?.setContentView(R.layout.dialog_search)
         mFilterDialog?.setOnCancelListener{mGalleryViewModel.filterDialogShowing=false}
     }
 
@@ -166,7 +170,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     // Updates the dialog with all tags in the database for filtration
     private fun setTags(tags: List<TagEntry>){
         // Clear the tag layout
-        val tagLayout = mFilterDialog?.findViewById<FlexboxLayout>(R.id.dialog_filter_tags_layout)
+        val tagLayout = mFilterDialog?.findViewById<FlexboxLayout>(R.id.dialog_search_tags_layout)
         val emptyListIndicator = mFilterDialog?.findViewById<TextView>(R.id.empty_tags_label)
         tagLayout?.removeAllViews()
 
