@@ -2,10 +2,8 @@ package com.vwoom.timelapsegallery.settings
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.utils.ProjectUtils
-import kotlinx.coroutines.launch
 
 class SettingsViewModel : ViewModel() {
 

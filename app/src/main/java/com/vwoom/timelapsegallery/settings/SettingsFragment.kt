@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -33,7 +34,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private var mFileModDialog: Dialog? = null
     private var mVerifySyncDialog: Dialog? = null
 
-    private lateinit var settingsViewModel: SettingsViewModel
+    private val settingsViewModel: SettingsViewModel by viewModels {
+        InjectorUtils.provideSettingsViewModelFactory(requireActivity())
+    }
 
     private var databaseSyncJob: Job? = null
 
@@ -48,8 +51,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        settingsViewModel = InjectorUtils.provideSettingsViewModel()
 
         // Set up dialogs
         createSyncDialog()
@@ -88,7 +89,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         super.onPause()
         prefs?.unregisterOnSharedPreferenceChangeListener(prefListener)
     }
-
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)

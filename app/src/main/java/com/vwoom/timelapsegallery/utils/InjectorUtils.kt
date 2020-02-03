@@ -9,6 +9,7 @@ import com.vwoom.timelapsegallery.detail.CameraViewModelFactory
 import com.vwoom.timelapsegallery.detail.DetailViewModelFactory
 import com.vwoom.timelapsegallery.detail.GalleryViewModelFactory
 import com.vwoom.timelapsegallery.settings.SettingsViewModel
+import com.vwoom.timelapsegallery.settings.SettingsViewModelFactory
 
 object InjectorUtils {
 
@@ -83,8 +84,8 @@ object InjectorUtils {
                 projectTagRepository)
     }
 
-    fun provideSettingsViewModel(): SettingsViewModel {
-        return SettingsViewModel()
+    fun provideSettingsViewModelFactory(context: Context): SettingsViewModelFactory {
+        return SettingsViewModelFactory()
     }
 
 }
