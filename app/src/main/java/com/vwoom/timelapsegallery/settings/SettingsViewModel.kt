@@ -16,7 +16,9 @@ class SettingsViewModel : ViewModel() {
     suspend fun executeSync(context: Context) {
         response = ProjectUtils.validateFileStructure(context)
         if (response == context.getString(R.string.valid_file_structure)){
+                syncing = true
                 ProjectUtils.importProjects(context)
+                syncing = false
             }
     }
 

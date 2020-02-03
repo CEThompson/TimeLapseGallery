@@ -58,7 +58,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         createManualFileModificationDialog()
 
         // Restore dialog state from view model
-        if (settingsViewModel.syncing) showSyncDialog()
+        if (settingsViewModel.syncing) {
+            executeSync()
+        }
         else if (settingsViewModel.showingSyncDialog) {
             updateSyncDialog(settingsViewModel.response)
             mSyncDialog?.show()
@@ -165,13 +167,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 .setPositiveButton(R.string.ok) { _, _ ->
                     Log.d("settings activity", "Launching database sync asynct task")
                     settingsViewModel.showingVerifySyncDialog = false
-                    showSyncDialog()
-                    // TODO implement dialogs for project import
-                    mVerifySyncDialog?.dismiss()
-                    databaseSyncJob = settingsViewModel.viewModelScope.async {
-                        settingsViewModel.executeSync(requireContext())
-                        updateSyncDialog(settingsViewModel.response)
-                    }
+                    executeSync()
                 }
                 .setNegativeButton(R.string.cancel){_,_ -> settingsViewModel.showingVerifySyncDialog = false}
                 .setIcon(R.drawable.ic_warning_black_24dp)
@@ -255,6 +251,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
     //
     // End Dialog Functions
     //
+
+    // TODO execute synchronization with work manager?
+    private fun executeSync(){
+        showSyncDialog()
+        databaseSyncJob = settingsViewModel.viewModelScope.async {
+            settingsViewModel.executeSync(requireContext())
+            updateSyncDialog(settingsViewModel.response)
+        }
+    }
 
     companion object {
         private val TAG = SettingsFragment::class.java.simpleName
