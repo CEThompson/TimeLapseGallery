@@ -25,23 +25,25 @@ import kotlinx.coroutines.launch
 // TODO navigating to settings then to detail causes crash, figure out why
 
 class SettingsFragment : PreferenceFragmentCompat() {
-    var prefs: SharedPreferences? = null
-    var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
+    private var prefs: SharedPreferences? = null
+    private var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
     // Dialogs
-    var mSyncDialog: Dialog? = null
-    var mFileModDialog: Dialog? = null
-    var mVerifySyncDialog: Dialog? = null
+    private var mSyncDialog: Dialog? = null
+    private var mFileModDialog: Dialog? = null
+    private var mVerifySyncDialog: Dialog? = null
 
+    // TODO move state to view model
     // State
-    var mSyncing: Boolean? = null
-    var mShowingSyncDialog: Boolean? = null
-    var mShowingFileModDialog: Boolean? = null
-    var mShowingVerifySyncDialog: Boolean? = null
-    var mResponse: String? = null
+    private var mSyncing: Boolean? = null
+    private var mShowingSyncDialog: Boolean? = null
+    private var mShowingFileModDialog: Boolean? = null
+    private var mShowingVerifySyncDialog: Boolean? = null
+    private var mResponse: String? = null
 
     private lateinit var settingsViewModel: SettingsViewModel
 
+    // TODO remove firebase analytics?
     /* Analytics */
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
@@ -55,6 +57,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         createVerifyProjectImportDialog()
         createManualFileModificationDialog()
 
+        // TODO move state to view model
         // Restore instance state of sync dialog
         if (savedInstanceState != null) {
             mSyncing = savedInstanceState.getBoolean("mSyncing", false)
@@ -72,6 +75,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             else if (mShowingVerifySyncDialog == true) showVerifyProjectImportDialog()
         }
 
+        // TODO remove firebase?
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
     }
 
@@ -106,6 +110,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
             Log.d("settings activity", "Notification listener activitating for key = $key")
 
+            // TODO remove ads from application
             if (key.equals(this.getString(R.string.key_ads_disabled))){
                 val adsDisabled = prefs.getBoolean(context?.getString(R.string.key_ads_disabled), false)
                 if (adsDisabled)
@@ -160,8 +165,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    /* Dialog functions */
-    fun createVerifyProjectImportDialog(){
+    //
+    // Start Dialog Functions
+    //
+    private fun createVerifyProjectImportDialog(){
         val builder = AlertDialog.Builder(requireContext())
                 .setTitle(R.string.warning)
                 .setMessage(R.string.database_sync_warning)
@@ -180,7 +187,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         mVerifySyncDialog = builder.create()
     }
-    fun createManualFileModificationDialog() {
+    private fun createManualFileModificationDialog() {
         val builder = AlertDialog.Builder(requireContext())
                 .setTitle(R.string.warning)
                 .setMessage(R.string.file_modification_information)
@@ -188,7 +195,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 .setIcon(R.drawable.ic_warning_black_24dp)
         mFileModDialog = builder.create()
     }
-    fun createSyncDialog(){
+    private fun createSyncDialog(){
         Log.d(TAG, "creating sync dialog")
         mSyncDialog = Dialog(requireContext())
         mSyncDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -204,7 +211,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
     // Shows a dialog to give progress feedback on synchronization
-    fun showSyncDialog(){
+    private fun showSyncDialog(){
         Log.d(TAG, "showing sync dialog")
         // Set the response
         val responseView = mSyncDialog?.findViewById(R.id.sync_response) as TextView
@@ -221,9 +228,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // Show the dialog
         mSyncDialog?.show()
     }
-
     // Updates the dialog showing progress on synchronization
-    fun updateSyncDialog(response: String){
+    private fun updateSyncDialog(response: String){
         Log.d(TAG, "updating sync dialog")
         val success = (response.equals(getString(R.string.valid_file_structure)))
 
@@ -248,17 +254,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
         imageFeedback.visibility = View.VISIBLE
         button.visibility = View.VISIBLE
     }
-
-    /* Settings Fragment Callbacks */
-    fun showVerifyProjectImportDialog() {
+    private fun showVerifyProjectImportDialog() {
         mShowingVerifySyncDialog = true
         mVerifySyncDialog?.show()
     }
-    fun showFileModificationDialog() {
+    private fun showFileModificationDialog() {
         mShowingFileModDialog = true
         mFileModDialog?.show()
     }
+    //
+    // End Dialog Functions
+    //
 
+    // TODO handle state in view model
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         if (mSyncing == true) outState.putBoolean("mSyncing", true)
