@@ -24,6 +24,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 
 // TODO navigating to settings then to detail causes crash, figure out why
+// TODO fix shared preference options and dialog content
 
 class SettingsFragment : PreferenceFragmentCompat() {
     private var prefs: SharedPreferences? = null
