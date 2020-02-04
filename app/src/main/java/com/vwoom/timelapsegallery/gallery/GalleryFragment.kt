@@ -29,6 +29,8 @@ import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
@@ -185,7 +187,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         })
 
         mGalleryViewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
-            setTags(tags.sortedBy {it.tag.toLowerCase()})
+            setTags(tags.sortedBy {it.tag.toLowerCase(Locale.getDefault())})
         })
     }
 
