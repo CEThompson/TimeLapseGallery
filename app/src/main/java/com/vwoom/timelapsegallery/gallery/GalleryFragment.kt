@@ -78,8 +78,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
 
         // Increase columns for horizontal orientation
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) mNumberOfColumns = 6
-        else mNumberOfColumns = 3
+        when(resources.configuration.orientation){
+            Configuration.ORIENTATION_LANDSCAPE -> mNumberOfColumns = 6
+            Configuration.ORIENTATION_PORTRAIT -> mNumberOfColumns = 3
+        }
 
         // Set up the adapter for the recycler view
         mGalleryAdapter = GalleryAdapter(this, this.requireContext())
