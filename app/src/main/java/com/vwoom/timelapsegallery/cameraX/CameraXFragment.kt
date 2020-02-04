@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.activities
+package com.vwoom.timelapsegallery.cameraX
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -22,8 +22,8 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.common.util.concurrent.ListenableFuture
-import com.vwoom.timelapsegallery.databinding.FragmentCameraBinding
-import com.vwoom.timelapsegallery.detail.CameraViewModel
+import com.vwoom.timelapsegallery.databinding.FragmentCameraXBinding
+import com.vwoom.timelapsegallery.detail.CameraXViewModel
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.coroutines.Job
@@ -40,43 +40,43 @@ private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
 // TODO camera x is somehow leaking: hunt it down
 
-class CameraFragment: Fragment(), LifecycleOwner {
-
-    private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
+class CameraXFragment: Fragment(), LifecycleOwner {
+    /*
+    private lateinit var cameraXProviderFuture: ListenableFuture<ProcessCameraProvider>
 
     private val executor = Executors.newSingleThreadExecutor()
-    private var cameraPreview: PreviewView? = null
+    private var cameraXPreview: PreviewView? = null
     private var takePictureJob: Job? = null
 
-    private val args: CameraFragmentArgs by navArgs()
+    private val args: CameraXFragmentArgs by navArgs()
 
-    private val cameraViewModel: CameraViewModel by viewModels {
-        InjectorUtils.provideCameraViewModelFactory(requireActivity(), args.photo, args.project)
+    private val cameraXViewModel: CameraXViewModel by viewModels {
+        InjectorUtils.provideCameraXViewModelFactory(requireActivity(), args.photo, args.project)
     }
 
     private var mTakePictureFab: FloatingActionButton? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = FragmentCameraBinding.inflate(inflater, container, false).apply {
+        val binding = FragmentCameraXBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
 
-        cameraPreview = binding.cameraPreview
+        cameraXPreview = binding.cameraPreview
         mTakePictureFab = binding.takePictureFab
 
-        cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+        cameraXProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         // Request camera permissions
         if (allPermissionsGranted()) {
-            cameraPreview?.post { startCamera() }
+            cameraXPreview?.post { startCamera() }
         } else {
             requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
         // Loads the last photo from the project into the compare view
         // If a project has been passed as a parameter
-        if (cameraViewModel.photo != null){
-            val file = File(cameraViewModel.photo?.photo_url!!)
+        if (cameraXViewModel.photo != null){
+            val file = File(cameraXViewModel.photo?.photo_url!!)
             Glide.with(requireContext())
                     .load(file).into(binding.previousPhoto)
         }
@@ -107,14 +107,14 @@ class CameraFragment: Fragment(), LifecycleOwner {
     }
 
     private fun startCamera() {
-        cameraProviderFuture.addListener(Runnable {
-            val cameraProvider = cameraProviderFuture.get()
+        cameraXProviderFuture.addListener(Runnable {
+            val cameraProvider = cameraXProviderFuture.get()
             bindPreview(cameraProvider)
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
     fun bindPreview(cameraProvider: ProcessCameraProvider) {
-        var metrics = DisplayMetrics().also{cameraPreview?.display!!.getRealMetrics(it)}
+        var metrics = DisplayMetrics().also{cameraXPreview?.display!!.getRealMetrics(it)}
         val screenSize = Size(metrics.widthPixels, metrics.heightPixels)
 
         val preview = Preview.Builder().apply {
@@ -122,7 +122,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
             setTargetRotation(activity!!.windowManager.defaultDisplay.rotation)
         }.build()
 
-        preview.previewSurfaceProvider = cameraPreview?.previewSurfaceProvider
+        preview.previewSurfaceProvider = cameraXPreview?.previewSurfaceProvider
 
         val imageCapture = ImageCapture.Builder()
                 .apply {
@@ -145,14 +145,14 @@ class CameraFragment: Fragment(), LifecycleOwner {
             val file = FileUtils.createTemporaryImageFile(externalFilesDir)
             imageCapture.takePicture(file, executor, object: ImageCapture.OnImageSavedCallback{
                 override fun onError(imageCaptureError: Int, message: String, cause: Throwable?) {
-                    cameraPreview?.post{ Toast.makeText(context, "Capture failed: $message", Toast.LENGTH_LONG).show()}
+                    cameraXPreview?.post{ Toast.makeText(context, "Capture failed: $message", Toast.LENGTH_LONG).show()}
                     Log.e(TAG, "Capture Failed: $message")
                 }
                 override fun onImageSaved(file: File) {
-                    cameraPreview?.post{ Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show()}
+                    cameraXPreview?.post{ Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show()}
 
-                    takePictureJob = cameraViewModel.viewModelScope.launch {
-                        async {cameraViewModel.handleFile(file, externalFilesDir)}.await()
+                    takePictureJob = cameraXViewModel.viewModelScope.launch {
+                        async {cameraXViewModel.handleFile(file, externalFilesDir)}.await()
                         findNavController().popBackStack()
                     }
                 }
@@ -181,7 +181,7 @@ class CameraFragment: Fragment(), LifecycleOwner {
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS){
             if (allPermissionsGranted()){
-                cameraPreview?.post {
+                cameraXPreview?.post {
                     Toast.makeText(this.requireContext(), "Permissions granted, firing up the camera.", Toast.LENGTH_SHORT).show()
                     startCamera()
                 }
@@ -196,7 +196,8 @@ class CameraFragment: Fragment(), LifecycleOwner {
                 requireContext(), it) == PackageManager.PERMISSION_GRANTED
     }
 
+     */
     companion object {
-        val TAG = CameraFragment::class.java.simpleName
+        val TAG = CameraXFragment::class.java.simpleName
     }
 }

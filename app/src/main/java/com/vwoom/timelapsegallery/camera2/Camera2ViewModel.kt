@@ -7,7 +7,7 @@ import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 import java.io.File
 
-class CameraViewModel(
+class Camera2ViewModel(
         private val projectRepository: ProjectRepository,
         private val photoRepository: PhotoRepository,
         val photo: Photo?,

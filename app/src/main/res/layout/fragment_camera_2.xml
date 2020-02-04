@@ -8,9 +8,9 @@
         android:layout_height="match_parent"
         android:background="@color/black"
         android:orientation="vertical"
-        tools:context="com.vwoom.timelapsegallery.activities.CameraFragment">
+        tools:context="com.vwoom.timelapsegallery.camera2.Camera2Fragment">
 
-        <androidx.camera.view.PreviewView
+        <TextureView
             android:id="@+id/camera_preview"
             android:layout_width="0dp"
             android:layout_height="0dp"

@@ -7,12 +7,12 @@ import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 
-class CameraViewModelFactory(private val projectRepository: ProjectRepository,
-                             private val photoRepository: PhotoRepository,
-                             private val photo: Photo?,
-                             private val project: Project?) : NewInstanceFactory() {
+class CameraXViewModelFactory(private val projectRepository: ProjectRepository,
+                              private val photoRepository: PhotoRepository,
+                              private val photo: Photo?,
+                              private val project: Project?) : NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return CameraViewModel(
+        return CameraXViewModel(
                 projectRepository,
                 photoRepository,
                 photo,
