@@ -5,7 +5,7 @@
     tools:ignore="GoogleAppIndexingWarning">
 
     <uses-feature
-        android:name="android.hardware.camera.any"
+        android:name="android.hardware.camera2"
         android:required="true" />
 
     <!-- Permissions -->
@@ -33,37 +33,11 @@
             </intent-filter>
         </activity>
 
-        <!-- Settings -->
-        <activity
-            android:name=".settings.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".activities.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vwoom.timelapsegallery.activities.MainActivity" />
-        </activity>
-        <activity android:name=".activities.CameraActivity" />
 
         <!-- AdMob -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_id" />
-
-        <!-- Add Photo Activity -->
-        <activity
-            android:name=".activities.AddPhotoActivity"
-            android:parentActivityName=".activities.DetailsActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
-
-        <!-- New Project Activity -->
-        <activity
-            android:name=".activities.NewProjectActivity"
-            android:parentActivityName=".activities.MainActivity"
-            android:windowSoftInputMode="stateHidden" />
-
-        <!-- Details Activity -->
-
-        <!-- Main Activity -->
 
         <!-- Providers -->
         <provider
