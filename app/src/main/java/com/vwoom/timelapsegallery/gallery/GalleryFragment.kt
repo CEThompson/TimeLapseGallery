@@ -44,6 +44,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mUnscheduledSearch: Boolean = false
     private var mSearchName: String? = null
 
+    // TODO figure out how to deal with binding and why shared element transitions no longer work
     private lateinit var mBinding: FragmentGalleryBinding
 
     private var tagJob: Job? = null

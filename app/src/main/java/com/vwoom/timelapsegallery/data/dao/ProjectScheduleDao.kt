@@ -7,7 +7,10 @@ import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 @Dao
 interface ProjectScheduleDao {
     @Query("SELECT * FROM project_schedule")
-    fun getProjectSchedules(): LiveData<List<ProjectScheduleEntry>>
+    fun getProjectSchedulesLiveData(): LiveData<List<ProjectScheduleEntry>>
+
+    @Query("SELECT * FROM project_schedule")
+    fun getProjectSchedules(): List<ProjectScheduleEntry>
 
     @Query("SELECT * FROM project_schedule WHERE project_id = :projectId")
     fun getProjectScheduleByProjectId(projectId: Long): ProjectScheduleEntry

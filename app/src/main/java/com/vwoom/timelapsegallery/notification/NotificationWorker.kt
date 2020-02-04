@@ -7,22 +7,27 @@ import androidx.preference.PreferenceManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.data.TimeLapseDatabase.Companion.getInstance
+import com.vwoom.timelapsegallery.data.repository.ProjectRepository
+import com.vwoom.timelapsegallery.data.repository.ProjectScheduleRepository
 import com.vwoom.timelapsegallery.utils.TimeUtils.isTomorrow
 import java.util.*
 
-// TODO update notification worker to use repository
-class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class NotificationWorker(context: Context, params: WorkerParameters,
+        private val projectRepository: ProjectRepository,
+        private val projectScheduleRepository: ProjectScheduleRepository)
+    : Worker(context, params)
+{
     override fun doWork(): Result {
         Log.d(TAG, "Notification Tracker: Executing work")
-        // Get all the scheduled projects from the database
-        val timeLapseDatabase = getInstance(applicationContext)
-        val scheduledProjects = timeLapseDatabase.projectDao().getScheduledProjects()
+
+        // Get all the scheduled projects from the repo
+        val scheduledProjects = projectRepository.getScheduledProjects()
         val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val notificationsEnabled = prefs.getBoolean(applicationContext.getString(R.string.key_notifications_enabled), true)
         Log.d(TAG, "Notification Tracker: notificationsEnabled == $notificationsEnabled")
+
         // If there are no scheduled projects cancel the worker
-        if (scheduledProjects.size == 0) {
+        if (scheduledProjects.isEmpty()) {
             Log.d(TAG, "Notification Tracker: No projects scheduled")
             NotificationUtils.cancelNotificationWorker(applicationContext)
         } else if (!notificationsEnabled) {
@@ -33,9 +38,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
             var scheduleNotification = false
             // Loop through scheduled projects and set up alarms for each day
             for (scheduledProject in scheduledProjects) {
-                val schedule = timeLapseDatabase
-                        .projectScheduleDao()
-                        .getProjectScheduleByProjectId(scheduledProject.id)
+                val schedule = projectScheduleRepository.getProjectSchedule(scheduledProject.id)
                 Log.d(TAG, "Notification Tracker: Processing alarm for project named " + scheduledProject.project_name)
 
                 val nextSubmissionTime = schedule.schedule_time!!

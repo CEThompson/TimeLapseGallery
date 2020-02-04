@@ -13,4 +13,5 @@ class ProjectScheduleRepository private constructor(private val projectScheduleD
                 }
     }
 
+    fun getProjectSchedule(projectId: Long) = projectScheduleDao.getProjectScheduleByProjectId(projectId)
 }

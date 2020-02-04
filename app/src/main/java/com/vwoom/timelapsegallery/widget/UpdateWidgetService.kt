@@ -5,8 +5,10 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.text.format.DateUtils
 import android.util.Log
-import com.vwoom.timelapsegallery.data.TimeLapseDatabase.Companion.getInstance
+import com.vwoom.timelapsegallery.data.repository.ProjectRepository
+import com.vwoom.timelapsegallery.data.repository.ProjectScheduleRepository
 import com.vwoom.timelapsegallery.widget.WidgetProvider.Companion.updateWidgets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +16,11 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 // TODO update update widget service to use repository
-class UpdateWidgetService : IntentService("UpdateWidgetService"), CoroutineScope {
+// TODO test widget
+class UpdateWidgetService(
+        private val projectRepository: ProjectRepository,
+        private val projectScheduleRepository: ProjectScheduleRepository)
+    : IntentService("UpdateWidgetService"), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
@@ -32,12 +38,17 @@ class UpdateWidgetService : IntentService("UpdateWidgetService"), CoroutineScope
         val context = this
         launch {
                 // Retrieve the database
-                val timeLapseDatabase = getInstance(context)
+
                 // Get the list of all scheduled projects from the database
-                // TODO test widget
-                val allScheduledProjects = timeLapseDatabase.projectDao().getScheduledProjects()
-                // Get the list of projects scheduled for today
-                val projectsScheduledForToday = timeLapseDatabase.projectDao().getScheduledProjects()
+                val allScheduledProjects = projectRepository.getScheduledProjects()
+
+                // TODO figure out better way to get projects scheduled for today
+                // Create the list of projects scheduled for today
+                val projectsScheduledForToday = allScheduledProjects.filter {
+                    val schedule = projectScheduleRepository.getProjectSchedule(it.id)
+                    if (schedule.schedule_time == null) return@filter false
+                    else return@filter DateUtils.isToday(schedule.schedule_time!!)
+                }
                 // Update the widgets
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 val appWidgetIds = appWidgetManager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java))
@@ -45,7 +56,7 @@ class UpdateWidgetService : IntentService("UpdateWidgetService"), CoroutineScope
                         context,
                         appWidgetManager,
                         appWidgetIds,
-                        projectsScheduledForToday) // Send the list of todays projects
+                        projectsScheduledForToday) // Send the list of projects scheduled for today
 
         }
     }

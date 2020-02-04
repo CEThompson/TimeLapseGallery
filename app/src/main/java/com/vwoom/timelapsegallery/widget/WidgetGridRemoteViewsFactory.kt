@@ -5,13 +5,22 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Environment
+import android.text.format.DateUtils
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService.RemoteViewsFactory
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase.Companion.getInstance
+import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
+import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
+import com.vwoom.timelapsegallery.data.repository.CoverPhotoRepository
+import com.vwoom.timelapsegallery.data.repository.PhotoRepository
+import com.vwoom.timelapsegallery.data.repository.ProjectRepository
+import com.vwoom.timelapsegallery.data.repository.ProjectScheduleRepository
+import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.FileUtils.getPhotoUrl
 import com.vwoom.timelapsegallery.utils.PhotoUtils.decodeSampledBitmapFromPath
 import com.vwoom.timelapsegallery.utils.PhotoUtils.getOrientationFromImagePath
@@ -22,31 +31,48 @@ import java.io.File
 import java.io.IOException
 
 // TODO update widget grid remote views factory to use repository
-class WidgetGridRemoteViewsFactory(private val mContext: Context, intent: Intent?) : RemoteViewsFactory {
-    private var mProjects: List<ProjectEntry>?
-    private val mTimeLapseDatabase: TimeLapseDatabase
-    private val mExternalFilesDir: File?
+class WidgetGridRemoteViewsFactory(
+        private val mContext: Context,
+        intent: Intent?,
+        private val projectRepository: ProjectRepository,
+        private val projectScheduleRepository: ProjectScheduleRepository,
+        private val coverPhotoRepository: CoverPhotoRepository,
+        private val photoRepository: PhotoRepository) : RemoteViewsFactory {
+
+    private var mProjects: List<ProjectEntry>
+    private var mExternalFilesDir: File? = null
+
     override fun onCreate() {}
+
     override fun onDataSetChanged() { /* Load the projects for the day */
-        mProjects = mTimeLapseDatabase.projectDao().getScheduledProjects()
+        var projects = projectRepository.getScheduledProjects()
+
+        // Filter scheduled projects for today
+        projects = projects.filter {
+            val schedule = projectScheduleRepository.getProjectSchedule(it.id)
+            if (schedule.schedule_time == null) return@filter false
+            else return@filter DateUtils.isToday(schedule.schedule_time!!)
+        }
+        mProjects = projects
     }
 
     override fun onDestroy() {}
     override fun getCount(): Int {
-        return if (mProjects == null) 0 else mProjects!!.size
+        return mProjects.size
     }
 
     override fun getViewAt(i: Int): RemoteViews { // Get the current project
-        val currentProject = mProjects!![i]
-        val (_, schedule_time, interval_days) = mTimeLapseDatabase.projectScheduleDao().getProjectScheduleByProjectId(currentProject.id)
-        val (_, photo_id) = mTimeLapseDatabase.coverPhotoDao().getCoverPhoto(currentProject.id)
-        val coverPhoto = mTimeLapseDatabase.photoDao().getPhoto(currentProject.id, photo_id)
-        val nextSubmissionTime = getNextScheduledSubmission(schedule_time!!, interval_days!!)
+        val currentProject: ProjectEntry = mProjects!![i]
+        val projectSchedule: ProjectScheduleEntry = projectScheduleRepository.getProjectSchedule(currentProject.id)
+        val coverPhoto: CoverPhotoEntry = coverPhotoRepository.getCoverPhoto(currentProject.id)
+        val photoEntry: PhotoEntry = photoRepository.getPhoto(currentProject.id, coverPhoto.photo_id)
+
+        val nextSubmissionTime = getNextScheduledSubmission(projectSchedule.schedule_time!!, projectSchedule.interval_days!!)
         // Get strings
         val nextSubmissionTimeString = getTimeFromTimestamp(nextSubmissionTime)
         // Create the remote views
         val views = RemoteViews(mContext.packageName, R.layout.widget_list_item)
-        val coverPhotoPath = getPhotoUrl(mExternalFilesDir!!, currentProject, coverPhoto)
+        val coverPhotoPath = getPhotoUrl(mExternalFilesDir!!, currentProject, photoEntry)
         // Decode the bitmap from path
         var bitmap: Bitmap? = decodeSampledBitmapFromPath(
                 coverPhotoPath,
@@ -96,7 +122,6 @@ class WidgetGridRemoteViewsFactory(private val mContext: Context, intent: Intent
 
     init {
         mExternalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        mProjects = null
-        mTimeLapseDatabase = getInstance(mContext)
+        mProjects = arrayListOf()
     }
 }

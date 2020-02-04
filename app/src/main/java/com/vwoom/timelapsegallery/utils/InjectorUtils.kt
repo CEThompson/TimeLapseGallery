@@ -1,6 +1,8 @@
 package com.vwoom.timelapsegallery.utils
 
 import android.content.Context
+import android.content.Intent
+import android.widget.RemoteViewsService
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.Photo
@@ -10,6 +12,7 @@ import com.vwoom.timelapsegallery.detail.CameraXViewModelFactory
 import com.vwoom.timelapsegallery.detail.DetailViewModelFactory
 import com.vwoom.timelapsegallery.detail.GalleryViewModelFactory
 import com.vwoom.timelapsegallery.settings.SettingsViewModelFactory
+import com.vwoom.timelapsegallery.widget.WidgetGridRemoteViewsFactory
 
 object InjectorUtils {
 
@@ -96,6 +99,19 @@ object InjectorUtils {
 
     fun provideSettingsViewModelFactory(context: Context): SettingsViewModelFactory {
         return SettingsViewModelFactory()
+    }
+
+    fun provideWidgetGridRemotViewsFactory(context: Context, intent: Intent): WidgetGridRemoteViewsFactory {
+        val projectRepository = getProjectRepository(context)
+        val projectScheduleRepository = getProjectScheduleRepository(context)
+        val coverPhotoRepository = getCoverPhotoRepository(context)
+        val photoRepository = getPhotoRepository(context)
+        return WidgetGridRemoteViewsFactory(
+                context,
+                intent, projectRepository,
+                projectScheduleRepository,
+                coverPhotoRepository,
+                photoRepository)
     }
 
 }
