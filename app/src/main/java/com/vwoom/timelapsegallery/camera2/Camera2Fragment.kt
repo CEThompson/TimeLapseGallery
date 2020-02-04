@@ -49,7 +49,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     }
 
-    // TODO implement camera characteristics?
+    private var cameraCharacteristics: CameraCharacteristics? = null
+
     private lateinit var camera2Preview: TextureView
     private var takePictureJob: Job? = null
 
@@ -65,6 +66,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private var cameraDevice: CameraDevice? = null
     private var cameraThread: HandlerThread? = null
     private var cameraHandler: Handler? = null
+    private var captureRequestBuilder: CaptureRequest.Builder? = null
 
     private var previewSize: Size? = null
 
@@ -185,12 +187,14 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         lateinit var cameraIdToSet: String
         try {
             for (cameraId in cameraManager.cameraIdList) {
-                val cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId)
+                val currentCameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId)
 
-                if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) {
-                    val streamConfigurationMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+                if (currentCameraCharacteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) {
+                    val streamConfigurationMap = currentCameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                     previewSize = streamConfigurationMap?.getOutputSizes(SurfaceTexture::class.java)!![0]
                     cameraIdToSet = cameraId
+                    cameraCharacteristics = currentCameraCharacteristics
+                    break
                 }
             }
             Log.d(TAG, "opening camera")
@@ -201,6 +205,15 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         } catch (s: SecurityException) {
             Log.d(TAG, "Camera security exception ${s.message}")
         }
+    }
+
+    fun setTapToFocus(){
+        // TODO override perform click
+        camera2Preview.setOnTouchListener(CameraFocusOnTouchHandler(
+                cameraCharacteristics,
+                captureRequestBuilder,
+                cameraCaptureSession,
+                cameraHandler))
     }
 
     // TODO set take picture for camera 2
@@ -239,7 +252,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
             val previewSurface = Surface(surfaceTexture)
 
-            val captureRequestBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+            captureRequestBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
             captureRequestBuilder?.addTarget(previewSurface)
 
             Log.d(TAG,"creating capture session")
@@ -253,6 +266,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                         Log.d(TAG,"capture request ${captureRequest.toString()}")
                         cameraCaptureSession = session
                         cameraCaptureSession?.setRepeatingRequest(captureRequest!!, null, cameraHandler)
+
+                        setTapToFocus()
                     } catch (e: CameraAccessException) {
                         Log.d(TAG, "Camera access exception ${e.message}")
                     }
