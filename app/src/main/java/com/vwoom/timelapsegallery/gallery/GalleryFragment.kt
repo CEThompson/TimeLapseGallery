@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.gallery
 import android.app.Dialog
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.*
 import android.widget.CheckBox
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
+import com.vwoom.timelapsegallery.TimeLapseGalleryApplication
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
@@ -26,6 +28,7 @@ import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.io.File
 
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
@@ -84,7 +87,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // Set up the adapter for the recycler view
-        mGalleryAdapter = GalleryAdapter(this, this.requireContext())
+        val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        mGalleryAdapter = GalleryAdapter(this, externalFilesDir!!)
 
         // Set up the recycler view
         mGridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)

@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.gallery
 
-import android.content.Context
 import android.os.Environment
 import android.text.format.DateUtils
 import android.util.Log
@@ -20,10 +19,9 @@ import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 import java.util.*
 
-class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
+class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, val externalFilesDir: File) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
     private var mProjectData: List<Project>? = null
     private val constraintSet: ConstraintSet? = ConstraintSet()
-    private var mExternalFilesDir: File? = null
 
     interface GalleryAdapterOnClickHandler {
         fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int)
@@ -56,10 +54,10 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
         val currentProject = mProjectData!![position]
         val binding = holder.binding
 
-        val thumbnail_path = FileUtils.getCoverPhotoUrl(mExternalFilesDir!!, currentProject)
-        Log.d(TAG, "thumbnail_path is $thumbnail_path")
+        val thumbnailPath = FileUtils.getCoverPhotoUrl(this.externalFilesDir, currentProject)
+        Log.d(TAG, "thumbnail_path is $thumbnailPath")
         // Set the constraint ratio
-        val ratio = PhotoUtils.getAspectRatioFromImagePath(thumbnail_path)
+        val ratio = PhotoUtils.getAspectRatioFromImagePath(thumbnailPath)
         constraintSet!!.clone(binding.projectRecyclerviewConstraintLayout)
         constraintSet.setDimensionRatio(binding.projectImage.id, ratio)
         constraintSet.applyTo(binding.projectRecyclerviewConstraintLayout)
@@ -97,7 +95,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
         binding.projectImage.transitionName = imageTransitionName
         binding.projectCardView.transitionName = cardTransitionName
         // Load the image
-        val f = File(thumbnail_path)
+        val f = File(thumbnailPath)
         Glide.with(holder.itemView.context)
                 .load(f)
                 .into(binding.projectImage)
@@ -114,9 +112,5 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, co
 
     companion object {
         private val TAG = GalleryAdapter::class.java.simpleName
-    }
-
-    init {
-        mExternalFilesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
     }
 }
