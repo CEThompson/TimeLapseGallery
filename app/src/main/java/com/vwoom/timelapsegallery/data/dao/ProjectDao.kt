@@ -9,29 +9,29 @@ import com.vwoom.timelapsegallery.data.view.Project
 @Dao
 interface ProjectDao {
     @Query("SELECT * FROM project ORDER BY id")
-    fun loadAllProjects(): LiveData<List<ProjectEntry>>
+    fun getProjectsLiveData(): LiveData<List<ProjectEntry>>
 
     @Query("SELECT * FROM project " +
             "INNER JOIN project_schedule " +
             "ON project.id = project_schedule.project_id " +
             "WHERE project_schedule.interval_days != 0")
-    fun loadAllScheduledProjects(): List<ProjectEntry>
+    fun getScheduledProjects(): List<ProjectEntry>
 
     @Query("SELECT * FROM project " +
             "INNER JOIN project_schedule " +
             "ON project.id = project_schedule.project_id " +
             "WHERE project_schedule.interval_days = 0")
-    fun loadAllUnscheduledProjects(): List<ProjectEntry>
+    fun getUnscheduledProjects(): List<ProjectEntry>
 
     @Query("SELECT * FROM project " +
             "WHERE project_name LIKE '%' || :search || '%'")
-    suspend fun loadProjectsByName(search: String): List<ProjectEntry>
+    suspend fun getProjectsByName(search: String): List<ProjectEntry>
 
     @Query("SELECT * FROM project WHERE id = :id")
-    suspend fun loadProjectById(id: Long): ProjectEntry
+    suspend fun getProjectById(id: Long): ProjectEntry
 
     @Query("SELECT * FROM project WHERE id = :id")
-    fun loadLiveDataProjectById(id: Long): LiveData<ProjectEntry>
+    fun getProjectLiveDataById(id: Long): LiveData<ProjectEntry>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProject(projectEntry: ProjectEntry): Long
@@ -40,10 +40,7 @@ interface ProjectDao {
     suspend fun updateProject(projectEntry: ProjectEntry)
 
     @Delete
-    suspend fun deleteProject(projectEntry: ProjectEntry)
-
-    @Query ("DELETE FROM project WHERE project.id = :projectId")
-    suspend fun deleteProject(projectId: Long)
+    suspend fun deleteProjectByEntry(projectEntry: ProjectEntry)
 
     @Query("DELETE FROM project")
     suspend fun deleteAllProjects()
@@ -60,7 +57,7 @@ interface ProjectDao {
             "LEFT JOIN project_schedule ON project.id = project_schedule.project_id " +
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id")
-    fun loadProjectViews(): LiveData<List<Project>>
+    fun getProjectViewsLiveData(): LiveData<List<Project>>
 
     @Query("SELECT " +
             "project.id AS project_id, " +
@@ -74,7 +71,7 @@ interface ProjectDao {
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id " +
             "WHERE project.id =:id")
-    fun loadProjectView(id: Long): LiveData<Project>
+    fun getProjectViewLiveData(id: Long): LiveData<Project>
 
     @Query("SELECT " +
             "project.id AS project_id, " +
@@ -88,5 +85,5 @@ interface ProjectDao {
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id " +
             "WHERE project.id =:id")
-    suspend fun loadProjectViewById(id: Long): Project
+    suspend fun getProjectViewById(id: Long): Project
 }

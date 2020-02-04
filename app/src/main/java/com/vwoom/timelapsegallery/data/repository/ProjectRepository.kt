@@ -19,17 +19,17 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
                                             private val coverPhotoDao: CoverPhotoDao,
                                             private val projectScheduleDao: ProjectScheduleDao){
 
-    fun getProjectViews() = projectDao.loadProjectViews()
+    fun getProjectViews() = projectDao.getProjectViewsLiveData()
 
-    fun getProjectView(projectId: Long) = projectDao.loadProjectView(projectId)
-    suspend fun getProjectViewById(projectId: Long) = projectDao.loadProjectViewById(projectId)
+    fun getProjectView(projectId: Long) = projectDao.getProjectViewLiveData(projectId)
+    suspend fun getProjectViewById(projectId: Long) = projectDao.getProjectViewById(projectId)
 
-    fun getScheduledProjects(): List<ProjectEntry> { return projectDao.loadAllScheduledProjects() }
-    fun getUnscheduledProjects(): List<ProjectEntry> { return projectDao.loadAllUnscheduledProjects() }
-    suspend fun getProjectsByName(string: String): List<ProjectEntry> {return projectDao.loadProjectsByName(string)}
+    fun getScheduledProjects(): List<ProjectEntry> { return projectDao.getScheduledProjects() }
+    fun getUnscheduledProjects(): List<ProjectEntry> { return projectDao.getUnscheduledProjects() }
+    suspend fun getProjectsByName(string: String): List<ProjectEntry> {return projectDao.getProjectsByName(string)}
 
     suspend fun updateProjectName(externalFilesDir: File, sourceProject: Project, name: String){
-        val source = projectDao.loadProjectById(sourceProject.project_id)
+        val source = projectDao.getProjectById(sourceProject.project_id)
         val destination = ProjectEntry(source.id, name)
         val success = FileUtils.renameProject(externalFilesDir, source, destination)
         if (success){
@@ -64,11 +64,11 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
     }
 
     suspend fun deleteProject(externalFilesDir: File, projectId: Long){
-        val projectEntry = projectDao.loadProjectById(projectId)
+        val projectEntry = projectDao.getProjectById(projectId)
         // Delete files first since there is a listener on the project
         FileUtils.deleteProject(externalFilesDir, projectEntry)
         // Now remove reference from the database
-        projectDao.deleteProject(projectEntry)
+        projectDao.deleteProjectByEntry(projectEntry)
     }
 
     companion object {

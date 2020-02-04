@@ -15,7 +15,7 @@ class PhotoRepository private constructor(private val photoDao: PhotoDao,
                                           private val projectDao: ProjectDao,
                                           private val coverPhotoDao: CoverPhotoDao){
 
-    fun getPhotos(projectId: Long) = photoDao.loadAllPhotosByProjectId(projectId)
+    fun getPhotos(projectId: Long) = photoDao.getPhotosLiveDataByProjectId(projectId)
 
     suspend fun addPhotoToProject(file: File,
                                   externalFilesDir: File,
@@ -27,7 +27,7 @@ class PhotoRepository private constructor(private val photoDao: PhotoDao,
         val coverPhotoEntry = CoverPhotoEntry(project.project_id, photoId)
         coverPhotoDao.insertPhoto(coverPhotoEntry)
 
-        val projectEntry = projectDao.loadProjectById(project.project_id)
+        val projectEntry = projectDao.getProjectById(project.project_id)
 
         withContext(Dispatchers.IO) {
             FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
@@ -35,7 +35,7 @@ class PhotoRepository private constructor(private val photoDao: PhotoDao,
     }
 
     suspend fun deletePhoto(externalFilesDir: File, photoEntry: PhotoEntry){
-        val projectEntry = projectDao.loadProjectById(photoEntry.project_id)
+        val projectEntry = projectDao.getProjectById(photoEntry.project_id)
         FileUtils.deletePhoto(externalFilesDir, projectEntry, photoEntry)
         photoDao.deletePhoto(photoEntry)
     }

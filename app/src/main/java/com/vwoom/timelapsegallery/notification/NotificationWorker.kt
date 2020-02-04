@@ -11,14 +11,13 @@ import com.vwoom.timelapsegallery.data.TimeLapseDatabase.Companion.getInstance
 import com.vwoom.timelapsegallery.utils.TimeUtils.isTomorrow
 import java.util.*
 
-class NotificationWorker(
-        context: Context,
-        params: WorkerParameters) : Worker(context, params) {
+// TODO update notification worker to use repository
+class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
     override fun doWork(): Result {
         Log.d(TAG, "Notification Tracker: Executing work")
         // Get all the scheduled projects from the database
         val timeLapseDatabase = getInstance(applicationContext)
-        val scheduledProjects = timeLapseDatabase.projectDao().loadAllScheduledProjects()
+        val scheduledProjects = timeLapseDatabase.projectDao().getScheduledProjects()
         val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val notificationsEnabled = prefs.getBoolean(applicationContext.getString(R.string.key_notifications_enabled), true)
         Log.d(TAG, "Notification Tracker: notificationsEnabled == $notificationsEnabled")
@@ -36,7 +35,7 @@ class NotificationWorker(
             for (scheduledProject in scheduledProjects) {
                 val schedule = timeLapseDatabase
                         .projectScheduleDao()
-                        .loadScheduleByProjectId(scheduledProject.id)
+                        .getProjectScheduleByProjectId(scheduledProject.id)
                 Log.d(TAG, "Notification Tracker: Processing alarm for project named " + scheduledProject.project_name)
 
                 val nextSubmissionTime = schedule.schedule_time!!

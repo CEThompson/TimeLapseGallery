@@ -7,10 +7,10 @@ import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 @Dao
 interface ProjectScheduleDao {
     @Query("SELECT * FROM project_schedule")
-    fun loadProjectSchedules(): LiveData<List<ProjectScheduleEntry>>
+    fun getProjectSchedules(): LiveData<List<ProjectScheduleEntry>>
 
     @Query("SELECT * FROM project_schedule WHERE project_id = :projectId")
-    fun loadScheduleByProjectId(projectId: Long): ProjectScheduleEntry
+    fun getProjectScheduleByProjectId(projectId: Long): ProjectScheduleEntry
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProjectSchedule(projectScheduleEntry: ProjectScheduleEntry)

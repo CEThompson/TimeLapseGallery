@@ -6,12 +6,12 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 
 class TagRepository private constructor(private val tagDao: TagDao){
 
-    fun getTags() = tagDao.loadAllTags()
+    fun getTags() = tagDao.getTagsLiveData()
 
     suspend fun getTagsFromProjectTags(projectTags: List<ProjectTagEntry>): List<TagEntry> {
         val tags = arrayListOf<TagEntry>()
         for (projectTag in projectTags){
-            val currentTag = tagDao.loadTagById(projectTag.tag_id)
+            val currentTag = tagDao.getTagById(projectTag.tag_id)
             tags.add(currentTag)
         }
         return tags

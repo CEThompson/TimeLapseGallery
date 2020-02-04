@@ -21,13 +21,14 @@ import com.vwoom.timelapsegallery.utils.TimeUtils.getTimeFromTimestamp
 import java.io.File
 import java.io.IOException
 
+// TODO update widget grid remote views factory to use repository
 class WidgetGridRemoteViewsFactory(private val mContext: Context, intent: Intent?) : RemoteViewsFactory {
     private var mProjects: List<ProjectEntry>?
     private val mTimeLapseDatabase: TimeLapseDatabase
     private val mExternalFilesDir: File?
     override fun onCreate() {}
     override fun onDataSetChanged() { /* Load the projects for the day */
-        mProjects = mTimeLapseDatabase.projectDao().loadAllScheduledProjects()
+        mProjects = mTimeLapseDatabase.projectDao().getScheduledProjects()
     }
 
     override fun onDestroy() {}
@@ -37,9 +38,9 @@ class WidgetGridRemoteViewsFactory(private val mContext: Context, intent: Intent
 
     override fun getViewAt(i: Int): RemoteViews { // Get the current project
         val currentProject = mProjects!![i]
-        val (_, schedule_time, interval_days) = mTimeLapseDatabase.projectScheduleDao().loadScheduleByProjectId(currentProject.id)
-        val (_, photo_id) = mTimeLapseDatabase.coverPhotoDao().getCoverPhoto_nonLiveData(currentProject.id)
-        val coverPhoto = mTimeLapseDatabase.photoDao().loadPhoto(currentProject.id, photo_id)
+        val (_, schedule_time, interval_days) = mTimeLapseDatabase.projectScheduleDao().getProjectScheduleByProjectId(currentProject.id)
+        val (_, photo_id) = mTimeLapseDatabase.coverPhotoDao().getCoverPhoto(currentProject.id)
+        val coverPhoto = mTimeLapseDatabase.photoDao().getPhoto(currentProject.id, photo_id)
         val nextSubmissionTime = getNextScheduledSubmission(schedule_time!!, interval_days!!)
         // Get strings
         val nextSubmissionTimeString = getTimeFromTimestamp(nextSubmissionTime)

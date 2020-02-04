@@ -7,13 +7,13 @@ import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 @Dao
 interface CoverPhotoDao {
     @Query("SELECT * FROM cover_photo WHERE project_id =:projectId")
-    fun getCoverPhoto(projectId: Long): LiveData<CoverPhotoEntry>
+    fun getCoverPhotoLiveData(projectId: Long): LiveData<CoverPhotoEntry>
 
     @Query("SELECT * FROM cover_photo WHERE project_id =:projectId")
-    fun getCoverPhoto_nonLiveData(projectId: Long): CoverPhotoEntry
+    fun getCoverPhoto(projectId: Long): CoverPhotoEntry
 
-    @get:Query("SELECT * FROM cover_photo")
-    val allCoverPhotos: LiveData<List<CoverPhotoEntry>>
+    @Query("SELECT * FROM cover_photo")
+    fun getAllCoverPhotosLiveData(): LiveData<List<CoverPhotoEntry>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPhoto(entry: CoverPhotoEntry)

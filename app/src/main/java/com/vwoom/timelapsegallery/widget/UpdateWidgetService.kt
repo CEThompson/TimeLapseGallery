@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
+// TODO update update widget service to use repository
 class UpdateWidgetService : IntentService("UpdateWidgetService"), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -34,9 +35,9 @@ class UpdateWidgetService : IntentService("UpdateWidgetService"), CoroutineScope
                 val timeLapseDatabase = getInstance(context)
                 // Get the list of all scheduled projects from the database
                 // TODO test widget
-                val allScheduledProjects = timeLapseDatabase.projectDao().loadAllScheduledProjects()
+                val allScheduledProjects = timeLapseDatabase.projectDao().getScheduledProjects()
                 // Get the list of projects scheduled for today
-                val projectsScheduledForToday = timeLapseDatabase.projectDao().loadAllScheduledProjects()
+                val projectsScheduledForToday = timeLapseDatabase.projectDao().getScheduledProjects()
                 // Update the widgets
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 val appWidgetIds = appWidgetManager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java))

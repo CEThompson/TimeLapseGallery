@@ -7,13 +7,13 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 @Dao
 interface TagDao {
     @Query("SELECT * FROM tag")
-    fun loadAllTags(): LiveData<List<TagEntry>>
+    fun getTagsLiveData(): LiveData<List<TagEntry>>
 
     @Query("SELECT * FROM tag WHERE id = :id")
-    suspend fun loadTagById(id: Long): TagEntry
+    suspend fun getTagById(id: Long): TagEntry
 
     @Query("SELECT * FROM tag WHERE tag = :text")
-    suspend fun loadTagByText(text: String): TagEntry?
+    suspend fun getTagByText(text: String): TagEntry?
 
     @Insert
     suspend fun insertTag(tagEntry: TagEntry): Long

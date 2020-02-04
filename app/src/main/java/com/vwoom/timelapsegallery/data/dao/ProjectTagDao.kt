@@ -7,16 +7,16 @@ import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 @Dao
 interface ProjectTagDao {
     @Query("SELECT * FROM project_tag WHERE project_id = :projectId")
-    fun loadTagsByProjectId(projectId: Long): LiveData<List<ProjectTagEntry>>
+    fun getProjectTagsLiveDataByProjectId(projectId: Long): LiveData<List<ProjectTagEntry>>
 
     @Query("SELECT * FROM project_tag WHERE project_id = :projectId")
-    suspend fun loadTagsByProjectId_nonLiveData(projectId: Long): List<ProjectTagEntry>
+    suspend fun getProjectTagsByProjectId(projectId: Long): List<ProjectTagEntry>
 
     @Query("SELECT * FROM project_tag WHERE project_id = :projectId AND tag_id = :tagId")
-    suspend fun loadProjectTag(projectId: Long, tagId: Long): ProjectTagEntry?
+    suspend fun getProjectTag(projectId: Long, tagId: Long): ProjectTagEntry?
 
     @Query("SELECT * FROM project_tag WHERE tag_id = :tagId")
-    suspend fun loadProjectTagsByTagId(tagId: Long): List<ProjectTagEntry>
+    suspend fun getProjectTagsByTagId(tagId: Long): List<ProjectTagEntry>
 
     @Insert
     suspend fun insertProjectTag(projectTagEntry: ProjectTagEntry)
