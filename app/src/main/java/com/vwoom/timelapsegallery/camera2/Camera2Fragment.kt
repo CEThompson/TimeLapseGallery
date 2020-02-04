@@ -3,9 +3,11 @@ package com.vwoom.timelapsegallery.camera2
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
@@ -16,14 +18,21 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
 import com.vwoom.timelapsegallery.detail.CameraXViewModel
+import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileOutputStream
+import java.lang.Exception
 
 // Arbitrary number to keep track of permission request
 private const val REQUEST_CODE_PERMISSIONS = 10
@@ -99,6 +108,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         }
         camera2Preview = binding.cameraPreview
         mTakePictureFab = binding.takePictureFab
+
+        setTakePictureFab() // Set take photo function
 
         // Loads the last photo from a project into the compare view if available
         if (cameraViewModel.photo != null) {
@@ -193,29 +204,32 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     }
 
     // TODO set take picture for camera 2
-    /*
-    fun setTakePictureFab(imageCapture: ImageCapture) {
+    fun setTakePictureFab() {
         mTakePictureFab?.setOnClickListener {
-            val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-            val file = FileUtils.createTemporaryImageFile(externalFilesDir)
-            imageCapture.takePicture(file, executor, object : ImageCapture.OnImageSavedCallback {
-                override fun onError(imageCaptureError: Int, message: String, cause: Throwable?) {
-                    camera2Preview?.post { Toast.makeText(context, "Capture failed: $message", Toast.LENGTH_LONG).show() }
-                    Log.e(TAG, "Capture Failed: $message")
-                }
+            var outputPhoto: FileOutputStream? = null
+            try {
+                val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
+                val file = FileUtils.createTemporaryImageFile(externalFilesDir)
+                outputPhoto = FileOutputStream(file)
+                camera2Preview.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
 
-                override fun onImageSaved(file: File) {
-                    camera2Preview?.post { Toast.makeText(context, "Capture success", Toast.LENGTH_LONG).show() }
-
-                    takePictureJob = cameraViewModel.viewModelScope.launch {
-                        async { cameraViewModel.handleFile(file, externalFilesDir) }.await()
-                        findNavController().popBackStack()
-                    }
+                takePictureJob = cameraViewModel.viewModelScope.launch {
+                    async { cameraViewModel.handleFile(file, externalFilesDir) }.await()
+                    findNavController().popBackStack()
                 }
-            })
+            } catch(e: Exception) {
+                camera2Preview.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
+                Log.d(TAG, "Take picture exception: ${e.message}")
+            } finally {
+                try {
+                    outputPhoto?.close()
+                } catch (e: Exception) {
+                    Log.d(TAG, "Take picture exception in finally block, exception closing photo: ${e.message}")
+                }
+            }
         }
     }
-    */
+
 
     private fun createPreviewSession() {
         Log.d(TAG,"creating preview session")
