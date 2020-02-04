@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.*
 import android.widget.CheckBox
 import android.widget.EditText
@@ -124,7 +123,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         initializeFilterDialog()
 
-        Log.d(TAG, "setting up viewmodel")
         setupViewModel()
 
         return binding?.root
@@ -171,7 +169,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         searchEditText?.setText(mGalleryViewModel.searchName)   // recover current search term
         searchEditText?.addTextChangedListener {
             mSearchName = it.toString()
-            Log.d(TAG, "search name = $mSearchName")
             updateSearchFilter()
         }
     }
