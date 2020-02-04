@@ -40,8 +40,6 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
-// TODO camera x is somehow leaking: hunt it down
-
 class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val cameraManager: CameraManager by lazy {
@@ -216,7 +214,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 cameraHandler))
     }
 
-    // TODO set take picture for camera 2
     fun setTakePictureFab() {
         mTakePictureFab?.setOnClickListener {
             var outputPhoto: FileOutputStream? = null
@@ -281,22 +278,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
             Log.d(TAG, "Camera access exception ${e.message}")
         }
     }
-    // TODO implement tap to focus
-    /*
-    private fun setUpTapToFocus() {
-
-        cameraPreview?.setOnTouchListener { _, event ->
-            if (event.action != MotionEvent.ACTION_UP) {
-                return@setOnTouchListener false
-            }
-
-            val factory = TextureViewMeteringPointFactory(cameraPreview!!)
-            val point = factory.createPoint(event.x, event.y)
-            val action = FocusMeteringAction.Builder.from(point).build()
-            cameraControl.startFocusAndMetering(action)
-            return@setOnTouchListener true
-        }
-    }*/
 
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
