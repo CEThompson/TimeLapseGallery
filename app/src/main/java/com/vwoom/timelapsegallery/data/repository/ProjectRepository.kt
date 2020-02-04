@@ -22,6 +22,11 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
     fun getProjectViews() = projectDao.loadProjectViews()
 
     fun getProjectView(projectId: Long) = projectDao.loadProjectView(projectId)
+    suspend fun getProjectViewById(projectId: Long) = projectDao.loadProjectViewById(projectId)
+
+    fun getScheduledProjects(): List<ProjectEntry> { return projectDao.loadAllScheduledProjects() }
+    fun getUnscheduledProjects(): List<ProjectEntry> { return projectDao.loadAllUnscheduledProjects() }
+    suspend fun getProjectsByName(string: String): List<ProjectEntry> {return projectDao.loadProjectsByName(string)}
 
     suspend fun updateProjectName(externalFilesDir: File, sourceProject: Project, name: String){
         val source = projectDao.loadProjectById(sourceProject.project_id)

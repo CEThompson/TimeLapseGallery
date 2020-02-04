@@ -14,8 +14,18 @@ interface ProjectDao {
     @Query("SELECT * FROM project " +
             "INNER JOIN project_schedule " +
             "ON project.id = project_schedule.project_id " +
-            "ORDER BY project_schedule.schedule_time")
+            "WHERE project_schedule.interval_days != 0")
     fun loadAllScheduledProjects(): List<ProjectEntry>
+
+    @Query("SELECT * FROM project " +
+            "INNER JOIN project_schedule " +
+            "ON project.id = project_schedule.project_id " +
+            "WHERE project_schedule.interval_days = 0")
+    fun loadAllUnscheduledProjects(): List<ProjectEntry>
+
+    @Query("SELECT * FROM project " +
+            "WHERE project_name LIKE '%' || :search || '%'")
+    suspend fun loadProjectsByName(search: String): List<ProjectEntry>
 
     @Query("SELECT * FROM project WHERE id = :id")
     suspend fun loadProjectById(id: Long): ProjectEntry
@@ -65,4 +75,18 @@ interface ProjectDao {
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id " +
             "WHERE project.id =:id")
     fun loadProjectView(id: Long): LiveData<Project>
+
+    @Query("SELECT " +
+            "project.id AS project_id, " +
+            "project.project_name AS project_name, " +
+            "project_schedule.schedule_time AS schedule_time, " +
+            "project_schedule.interval_days AS interval_days, " +
+            "cover_photo.photo_id AS cover_photo_id, " +
+            "photo.timestamp AS cover_photo_timestamp " +
+            "FROM project " +
+            "LEFT JOIN project_schedule ON project.id = project_schedule.project_id " +
+            "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
+            "LEFT JOIN photo ON cover_photo.photo_id = photo.id " +
+            "WHERE project.id =:id")
+    suspend fun loadProjectViewById(id: Long): Project
 }

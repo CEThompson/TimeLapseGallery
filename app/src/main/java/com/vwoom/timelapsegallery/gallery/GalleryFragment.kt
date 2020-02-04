@@ -3,9 +3,12 @@ package com.vwoom.timelapsegallery.gallery
 import android.app.Dialog
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.TextView
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -31,7 +34,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mGridLayoutManager: StaggeredGridLayoutManager? = null
     private var mProjects: List<Project>? = null
 
+    // Search variables
     private var mFilterTags: ArrayList<TagEntry> = arrayListOf()
+    private var mTodaySearch: Boolean = false
+    private var mScheduledSearch: Boolean = false
+    private var mUnscheduledSearch: Boolean = false
+    private var mSearchName: String? = null
 
     private lateinit var mBinding: FragmentGalleryBinding
 
@@ -139,11 +147,17 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mFilterDialog = Dialog(requireContext())
         mFilterDialog?.setContentView(R.layout.dialog_search)
         mFilterDialog?.setOnCancelListener{mGalleryViewModel.filterDialogShowing=false}
+        val searchEditText = mFilterDialog?.findViewById<EditText>(R.id.search_edit_text)
+        searchEditText?.addTextChangedListener {
+            mSearchName = it.toString()
+            Log.d(TAG, "search name = $mSearchName")
+            updateSearchFilter()
+        }
     }
 
     private fun updateSearchFilter(){
         tagJob?.cancel()
-        mGalleryViewModel.setFilter(mFilterTags)
+        mGalleryViewModel.setFilter(mFilterTags, mSearchName, mTodaySearch, mScheduledSearch, mUnscheduledSearch)
         tagJob = mGalleryViewModel.viewModelScope.launch {
             val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
             mGalleryAdapter?.setProjectData(filteredProjects)
