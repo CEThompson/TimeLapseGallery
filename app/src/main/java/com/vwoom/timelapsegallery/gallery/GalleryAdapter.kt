@@ -1,18 +1,19 @@
 package com.vwoom.timelapsegallery.gallery
 
-import android.os.Environment
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.gallery.GalleryAdapter.GalleryAdapterViewHolder
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
+import com.vwoom.timelapsegallery.gallery.GalleryAdapter.GalleryAdapterViewHolder
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils
@@ -24,15 +25,20 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
     private val constraintSet: ConstraintSet? = ConstraintSet()
 
     interface GalleryAdapterOnClickHandler {
-        fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int)
+        fun onClick(clickedProject: Project, projectImageView: ImageView, projectCardView: CardView, position: Int)
     }
 
-    inner class GalleryAdapterViewHolder(var binding: GalleryRecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+    inner class GalleryAdapterViewHolder(var binding: GalleryRecyclerviewItemBinding)
+        : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
             val clickedProject = mProjectData!![adapterPosition]
-            mClickHandler.onClick(clickedProject, binding, adapterPosition)
+            mClickHandler.onClick(
+                    clickedProject,
+                    binding.projectImage,
+                    binding.projectCardView,
+                    adapterPosition)
         }
 
         init {
@@ -94,6 +100,8 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         val cardTransitionName = imageTransitionName + "card"
         binding.projectImage.transitionName = imageTransitionName
         binding.projectCardView.transitionName = cardTransitionName
+
+        Log.d(TAG, "tracking transition: detail fragment $imageTransitionName & $cardTransitionName")
         // Load the image
         val f = File(thumbnailPath)
         Glide.with(holder.itemView.context)
