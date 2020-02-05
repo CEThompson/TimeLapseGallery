@@ -4,10 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vwoom.timelapsegallery.data.entry.PhotoEntry
-import com.vwoom.timelapsegallery.data.entry.ProjectEntry
-import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
-import com.vwoom.timelapsegallery.data.entry.TagEntry
+import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
@@ -21,6 +18,7 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
                       private val projectTagRepository: ProjectTagRepository,
                       private val coverPhotoRepository: CoverPhotoRepository,
                       private val tagRepository: TagRepository,
+                      private val projectScheduleRepository: ProjectScheduleRepository,
                       projectId: Long) : ViewModel() {
     val photos: LiveData<List<PhotoEntry>> = photoRepository.getPhotos(projectId)
     val projectTags: LiveData<List<ProjectTagEntry>> = projectTagRepository.getProjectTags(projectId)
@@ -32,6 +30,15 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
     var isPlaying: Boolean = false
 
     var lastPhoto: Photo? = null
+
+    fun toggleSchedule(project: Project){
+        viewModelScope.launch {
+            var projectScheduleEntry: ProjectScheduleEntry? = projectScheduleRepository.getProjectSchedule(project.project_id)
+            if (projectScheduleEntry == null)
+                projectScheduleEntry = ProjectScheduleEntry(project.project_id,0, 0)
+            projectScheduleRepository.setProjectSchedule(projectScheduleEntry)
+        }
+    }
 
     fun deleteTags(tags: ArrayList<String>, project: Project){
         viewModelScope.launch {

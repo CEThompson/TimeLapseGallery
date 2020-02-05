@@ -38,11 +38,11 @@ class NotificationWorker(context: Context, params: WorkerParameters,
             var scheduleNotification = false
             // Loop through scheduled projects and set up alarms for each day
             for (scheduledProject in scheduledProjects) {
-                val schedule = projectScheduleRepository.getProjectSchedule(scheduledProject.id)
+                val schedule = projectScheduleRepository.getProjectScheduleNonSuspend(scheduledProject.id)
                 Log.d(TAG, "Notification Tracker: Processing alarm for project named " + scheduledProject.project_name)
 
-                val nextSubmissionTime = schedule.schedule_time!!
-                val dayInterval = schedule.interval_days!!.toLong()
+                val nextSubmissionTime = schedule?.schedule_time!!
+                val dayInterval = schedule?.interval_days!!.toLong()
                 // Schedule a notification for tomorrow
 // If any project has a daily schedule create the notification
                 if (dayInterval == 1L) {

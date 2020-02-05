@@ -13,7 +13,11 @@ interface ProjectScheduleDao {
     fun getProjectSchedules(): List<ProjectScheduleEntry>
 
     @Query("SELECT * FROM project_schedule WHERE project_id = :projectId")
-    fun getProjectScheduleByProjectId(projectId: Long): ProjectScheduleEntry
+    suspend fun getProjectScheduleByProjectId(projectId: Long): ProjectScheduleEntry?
+
+    // TODO reconsider work manager and remote views usage of this function
+    @Query("SELECT * FROM project_schedule WHERE project_id = :projectId")
+    fun getProjectScheduleByProjectIdNonSuspend(projectId: Long): ProjectScheduleEntry?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProjectSchedule(projectScheduleEntry: ProjectScheduleEntry)

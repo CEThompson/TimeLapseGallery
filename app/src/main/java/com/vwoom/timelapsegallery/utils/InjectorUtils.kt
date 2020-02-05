@@ -78,12 +78,14 @@ object InjectorUtils {
         val projectTagRepository = getProjectTagRepository(context)
         val coverPhotoRepository = getCoverPhotoRepository(context)
         val tagRepository = getTagRepository(context)
+        val projectScheduleRepository = getProjectScheduleRepository(context)
         return DetailViewModelFactory(
                 photoRepository,
                 projectRepository,
                 projectTagRepository,
                 coverPhotoRepository,
                 tagRepository,
+                projectScheduleRepository,
                 project.project_id)
     }
 

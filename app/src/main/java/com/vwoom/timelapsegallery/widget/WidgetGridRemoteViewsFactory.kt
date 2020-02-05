@@ -44,14 +44,15 @@ class WidgetGridRemoteViewsFactory(
 
     override fun onCreate() {}
 
-    override fun onDataSetChanged() { /* Load the projects for the day */
+    override fun onDataSetChanged() {
+        // Load the projects for the day
         var projects = projectRepository.getScheduledProjects()
 
         // Filter scheduled projects for today
         projects = projects.filter {
-            val schedule = projectScheduleRepository.getProjectSchedule(it.id)
-            if (schedule.schedule_time == null) return@filter false
-            else return@filter DateUtils.isToday(schedule.schedule_time!!)
+            val schedule = projectScheduleRepository.getProjectScheduleNonSuspend(it.id)
+            if (schedule?.schedule_time == null) return@filter false
+            else return@filter DateUtils.isToday(schedule?.schedule_time!!)
         }
         mProjects = projects
     }
@@ -63,11 +64,11 @@ class WidgetGridRemoteViewsFactory(
 
     override fun getViewAt(i: Int): RemoteViews { // Get the current project
         val currentProject: ProjectEntry = mProjects!![i]
-        val projectSchedule: ProjectScheduleEntry = projectScheduleRepository.getProjectSchedule(currentProject.id)
+        val projectSchedule: ProjectScheduleEntry? = projectScheduleRepository.getProjectScheduleNonSuspend(currentProject.id)
         val coverPhoto: CoverPhotoEntry = coverPhotoRepository.getCoverPhoto(currentProject.id)
         val photoEntry: PhotoEntry = photoRepository.getPhoto(currentProject.id, coverPhoto.photo_id)
 
-        val nextSubmissionTime = getNextScheduledSubmission(projectSchedule.schedule_time!!, projectSchedule.interval_days!!)
+        val nextSubmissionTime = getNextScheduledSubmission(projectSchedule?.schedule_time!!, projectSchedule?.interval_days!!)
         // Get strings
         val nextSubmissionTimeString = getTimeFromTimestamp(nextSubmissionTime)
         // Create the remote views

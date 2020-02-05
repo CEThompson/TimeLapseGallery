@@ -80,7 +80,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mFullscreenImage: ImageView? = null
 
     private var mProjectInfoDialog: Dialog? = null
-    private var mScheduleDialog: Dialog? = null
     private var mEditTagsDialog: Dialog? = null
 
     // For playing timelapse
@@ -160,7 +159,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             findNavController().navigate(action)
         }
         binding.playAsVideoFab.setOnClickListener { playSetOfImages() }
-        binding.projectScheduleFab.setOnClickListener { mScheduleDialog?.show() }
+        binding.projectScheduleFab.setOnClickListener { detailViewModel.toggleSchedule(mCurrentProject!!) }
         binding.projectTagFab.setOnClickListener { addTag() }
         binding.projectInformationFab?.setOnClickListener {mProjectInfoDialog?.show()}
         binding.fullscreenFab.setOnClickListener { if (!mPlaying) mFullscreenImageDialog?.show() }
@@ -175,7 +174,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         initializeFullscreenImageDialog()
         initializeProjectInformationDialog()
         initializeEditTagsDialog()
-        initializeScheduleDialog()
 
         // Set the transition name for the image
         val imageTransitionName= "${mCurrentProject?.project_id}"
@@ -204,7 +202,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         tagJob?.cancel()
         mProjectInfoDialog?.dismiss()
         mEditTagsDialog?.dismiss()
-        mScheduleDialog?.dismiss()
         mFullscreenImageDialog?.dismiss()
     }
 
@@ -451,11 +448,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.setPhoto(clickedPhoto)
     }
 
-    fun initializeScheduleDialog(){
-        mScheduleDialog = Dialog(requireContext())
-        mScheduleDialog?.setContentView(R.layout.dialog_schedule)
-    }
-
     fun initializeEditTagsDialog(){
         mEditTagsDialog = Dialog(requireContext())
         mEditTagsDialog?.setContentView(R.layout.dialog_edit_tags)
@@ -474,11 +466,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Get Views
         val editTagsTextView = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_edit_tags)
         val editNameButton = mProjectInfoDialog?.findViewById<ImageView>(R.id.edit_project_name_FAB)
-        val editScheduleButton = mProjectInfoDialog?.findViewById<ImageView>(R.id.edit_schedule_FAB)
 
         // Set fab colors
         editNameButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-        editScheduleButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
 
         // Set click listeners
         editTagsTextView?.setOnClickListener {
@@ -486,9 +476,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         editNameButton?.setOnClickListener {
             editName()
-        }
-        editScheduleButton?.setOnClickListener {
-            mScheduleDialog?.show()
         }
     }
 
@@ -570,14 +557,18 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 tagsForProjectTV?.text = getString(R.string.tags_for_project, currentProject.project_name)
             }
 
-            // Set the dialog schedule information
-            if (currentProject.schedule_time == null) {
+            //
+            // Begin set schedule information
+            //
+            if (currentProject.interval_days == 0 || currentProject.interval_days == null) {
                 mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.none)
             } else {
                 mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)
-                        ?.text = TimeUtils.getDateFromTimestamp(currentProject.schedule_time)
+                        ?.text = getString(R.string.scheduled)
             }
-
+            //
+            // End set schedule information
+            //
         })
 
         // Observe the list of photos
@@ -786,10 +777,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     detailViewModel.updateProjectName(mExternalFilesDir!!, nameText, mCurrentProject!!)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
-    }
-
-    private fun editSchedule(){
-        // TODO implement scheduling
     }
 
     private fun verifyPhotoDeletion() {

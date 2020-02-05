@@ -46,8 +46,8 @@ class UpdateWidgetService(
                 // Create the list of projects scheduled for today
                 val projectsScheduledForToday = allScheduledProjects.filter {
                     val schedule = projectScheduleRepository.getProjectSchedule(it.id)
-                    if (schedule.schedule_time == null) return@filter false
-                    else return@filter DateUtils.isToday(schedule.schedule_time!!)
+                    if (schedule?.schedule_time == null) return@filter false
+                    else return@filter DateUtils.isToday(schedule?.schedule_time!!)
                 }
                 // Update the widgets
                 val appWidgetManager = AppWidgetManager.getInstance(context)
