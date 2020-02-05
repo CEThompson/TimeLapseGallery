@@ -67,8 +67,8 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
         if (project.interval_days == null) {
-            holder.binding.scheduleIndicatorCheck.visibility = View.VISIBLE
-            holder.binding.scheduleIndicatorX.visibility = View.VISIBLE
+            holder.binding.scheduleIndicatorCheck.visibility = View.INVISIBLE
+            holder.binding.scheduleIndicatorX.visibility = View.INVISIBLE
         }
         else {
             if (DateUtils.isToday(project.cover_photo_timestamp)) {
