@@ -773,7 +773,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setTitle("Edit Name")
                 .setView(input)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    val nameText = input.text.toString()
+                    val nameText = input.text.toString().trim()
                     detailViewModel.updateProjectName(mExternalFilesDir!!, nameText, mCurrentProject!!)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
