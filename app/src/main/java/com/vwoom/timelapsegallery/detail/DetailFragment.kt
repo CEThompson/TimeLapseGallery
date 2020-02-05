@@ -637,8 +637,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 // Set the tags in the project tag dialog
                 //
                 val currentTagsLayout = mProjectTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_current_tags_layout)
-                val exampleTagTextView = currentTagsLayout?.getChildAt(0)
-                val exampleParams = exampleTagTextView?.layoutParams
                 currentTagsLayout?.removeAllViews()
 
                 // Set up the flexbox with current tags for the project
@@ -648,7 +646,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     currentTags.add(tagEntry.tag)
                     val textView = TextView(requireContext())
                     textView.text = getString(R.string.hashtag, tagEntry.tag)
-                    textView.layoutParams = exampleParams
 
                     textView.setOnClickListener {
                         detailViewModel.deleteTag(tagEntry, mCurrentProject!!)
@@ -686,8 +683,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mAllTags = tagEntries.sortedBy { it.tag.toLowerCase() }
 
             val availableTagsLayout = mProjectTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_available_tags_layout)
-            val exampleTagTextView = availableTagsLayout?.getChildAt(0)
-            val exampleParams = exampleTagTextView?.layoutParams
             availableTagsLayout?.removeAllViews()
 
             // Set up the available tags in the project information dialog
@@ -699,11 +694,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
                     val textView = TextView(requireContext())
                     textView.text = getString(R.string.hashtag, tag.tag)
-                    textView.layoutParams = exampleParams
                     availableTagsLayout?.addView(textView)
                     textView.setOnClickListener { v ->
                         detailViewModel.addTag(tag.tag, mCurrentProject!!)
-                        // TODO update tag layouts or convert to observable setup for this dialog?
+                        // TODO remove tag from available tags OR update available tags from project tag observer?
                     }
                 }
             }
