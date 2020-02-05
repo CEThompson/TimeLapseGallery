@@ -1,7 +1,6 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,19 +9,19 @@ import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.gallery.GalleryAdapter.GalleryAdapterViewHolder
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
-import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 import java.util.*
 
 class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, val externalFilesDir: File) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
     private var mProjectData: List<Project>? = null
-    private val constraintSet: ConstraintSet? = ConstraintSet()
+    private var mProjectsToCoverPhotos: HashMap<Project, File> = hashMapOf()
+    private var mCoverPhotosToRatios: HashMap<File, String> = hashMapOf()
+    private val constraintSet: ConstraintSet = ConstraintSet()
 
     interface GalleryAdapterOnClickHandler {
         fun onClick(clickedProject: Project, projectImageView: ImageView, projectCardView: CardView, position: Int)
@@ -55,66 +54,61 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         return GalleryAdapterViewHolder(binding)
     }
 
+    // TODO create daily picture indicator and remove previous schedule info?
     override fun onBindViewHolder(holder: GalleryAdapterViewHolder, position: Int) {
         // Get project information
-        val currentProject = mProjectData!![position]
-        val binding = holder.binding
+        val project = mProjectData!![position]
+        val photoFile = mProjectsToCoverPhotos[project]
 
-        val thumbnailPath = FileUtils.getCoverPhotoUrl(this.externalFilesDir, currentProject)
-        Log.d(TAG, "thumbnail_path is $thumbnailPath")
         // Set the constraint ratio
-        val ratio = PhotoUtils.getAspectRatioFromImagePath(thumbnailPath)
-        constraintSet!!.clone(binding.projectRecyclerviewConstraintLayout)
-        constraintSet.setDimensionRatio(binding.projectImage.id, ratio)
-        constraintSet.applyTo(binding.projectRecyclerviewConstraintLayout)
+        val ratio = mCoverPhotosToRatios[photoFile]
+        constraintSet.clone(holder.binding.projectRecyclerviewConstraintLayout)
+        constraintSet.setDimensionRatio(holder.binding.projectImage.id, ratio)
+        constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
-        // Display schedule information
-        // TODO test schedule information
-        val next = currentProject.schedule_time
-        val interval = currentProject.interval_days
-        if (next != null && interval != null) {
-            val nextSchedule: String
-            // Calculate day countdown
-            val cal = Calendar.getInstance()
-            cal.timeInMillis = System.currentTimeMillis()
-            val currentDay = cal[Calendar.DAY_OF_YEAR]
-            cal.timeInMillis = next
-            val scheduledDay = cal[Calendar.DAY_OF_YEAR]
-            val daysUntilPhoto = scheduledDay - currentDay
-            // Handle projects scheduled for today
-            nextSchedule = if (DateUtils.isToday(next) || System.currentTimeMillis() > next) TimeUtils.getTimeFromTimestamp(next) else if (daysUntilPhoto == 1) holder.itemView.context.getString(R.string.tomorrow) else holder.itemView.context.getString(R.string.number_of_days, daysUntilPhoto)
-            // Set fields
-            binding.nextSubmissionDayCountdownTextview.text = nextSchedule
-            // Set visibility
-            binding.scheduleIndicator.visibility = View.VISIBLE
-            binding.nextSubmissionDayCountdownTextview.visibility = View.VISIBLE
-            binding.projectImageGradientOverlay.visibility = View.VISIBLE
-        } else {
-            binding.scheduleIndicator.visibility = View.INVISIBLE
-            binding.nextSubmissionDayCountdownTextview.visibility = View.INVISIBLE
-            binding.projectImageGradientOverlay.visibility = View.INVISIBLE
+        if (project.interval_days == null) {
+            holder.binding.scheduleIndicatorCheck.visibility = View.VISIBLE
+            holder.binding.scheduleIndicatorX.visibility = View.VISIBLE
+        }
+        else {
+            if (DateUtils.isToday(project.cover_photo_timestamp)) {
+                holder.binding.scheduleIndicatorCheck.visibility = View.VISIBLE
+                holder.binding.scheduleIndicatorX.visibility = View.INVISIBLE
+            } else {
+                holder.binding.scheduleIndicatorCheck.visibility = View.INVISIBLE
+                holder.binding.scheduleIndicatorX.visibility = View.VISIBLE
+            }
         }
 
         // Set transition targets
-        val imageTransitionName = currentProject.project_id.toString()
-        val cardTransitionName = imageTransitionName + "card"
-        binding.projectImage.transitionName = imageTransitionName
-        binding.projectCardView.transitionName = cardTransitionName
+        val imageTransitionName = project.project_id.toString()
+        val cardTransitionName = "${imageTransitionName}card"
+        holder.binding.projectImage.transitionName = imageTransitionName
+        holder.binding.projectCardView.transitionName = cardTransitionName
 
-        Log.d(TAG, "tracking transition: detail fragment $imageTransitionName & $cardTransitionName")
         // Load the image
-        val f = File(thumbnailPath)
         Glide.with(holder.itemView.context)
-                .load(f)
-                .into(binding.projectImage)
+                .load(photoFile)
+                .into(holder.binding.projectImage)
     }
 
     override fun getItemCount(): Int {
         return if (mProjectData == null) 0 else mProjectData!!.size
     }
 
-    fun setProjectData(projectData: List<Project>?) {
+    fun setProjectData(projectData: List<Project>) {
         mProjectData = projectData
+
+        // TODO convert this to a diff util?
+        mProjectsToCoverPhotos.clear()
+        for (project in projectData){
+            val photoUrl = FileUtils.getCoverPhotoUrl(externalFilesDir, project)
+            val ratio = PhotoUtils.getAspectRatioFromImagePath(photoUrl)
+            val file = File(photoUrl)
+            mProjectsToCoverPhotos.apply {put(project, file)}
+            mCoverPhotosToRatios.apply{put(file, ratio)}
+        }
+
         notifyDataSetChanged()
     }
 

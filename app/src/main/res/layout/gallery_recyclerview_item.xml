@@ -30,41 +30,27 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
-            <!-- Gradient overlay -->
-            <View
-                android:id="@+id/project_image_gradient_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="@drawable/gradient_overlay_top_down"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="@id/project_image"
-                app:layout_constraintEnd_toEndOf="@id/project_image"
-                app:layout_constraintStart_toStartOf="@id/project_image"
-                app:layout_constraintTop_toTopOf="@id/project_image" />
-
-            <!-- clock drawable to indicate schedule -->
+            <!-- x or check mark drawable to indicate if photo has been taken today -->
             <ImageView
-                android:id="@+id/schedule_indicator"
+                android:id="@+id/schedule_indicator_x"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/schedule_indicator_content_description"
-                android:src="@drawable/ic_schedule_white_24dp"
+                android:contentDescription="@string/schedule_indicator_x_content_description"
+                android:src="@drawable/ic_clear_schedule_red_40dp"
                 android:visibility="invisible"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
-            <!-- textview to display days until photo -->
-            <TextView
-                android:id="@+id/next_submission_day_countdown_textview"
-                style="@style/WhiteText"
+            <!-- x or check mark drawable to indicate if photo has been taken today -->
+            <ImageView
+                android:id="@+id/schedule_indicator_check"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/detail_small_margin"
+                android:contentDescription="@string/schedule_indicator_check_content_description"
+                android:src="@drawable/ic_check_schedule_green_40dp"
                 android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="@+id/schedule_indicator"
-                app:layout_constraintEnd_toStartOf="@+id/schedule_indicator"
-                app:layout_constraintTop_toTopOf="@id/schedule_indicator"
-                tools:text="6" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
