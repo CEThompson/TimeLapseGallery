@@ -41,6 +41,12 @@ class ProjectTagRepository private constructor(private val projectTagDao: Projec
         }
     }
 
+    suspend fun deleteTag(tagEntry: TagEntry, project: Project){
+        val projectTagEntry = projectTagDao.getProjectTag(project.project_id, tagEntry.id)
+        if (projectTagEntry!=null)
+            projectTagDao.deleteProjectTag(projectTagEntry)
+    }
+
     suspend fun getProjectTags_nonLiveData(projectId: Long) = projectTagDao.getProjectTagsByProjectId(projectId)
 
     suspend fun addTagToProject(tagText: String, project: Project){

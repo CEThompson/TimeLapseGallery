@@ -67,18 +67,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Photo and project Information
     private var mPhotos: List<PhotoEntry>? = null
     private var mProjectTags: List<TagEntry>? = null
-    private var mAllTags: ArrayList<String>? = null
-    private var mSelectedTags: ArrayList<String> = arrayListOf()
+    private var mAllTags: List<TagEntry>? = null
     private var mCurrentPhoto: PhotoEntry? = null
     private var mCurrentPlayPosition: Int? = null
     private var mCurrentProject: Project? = null
-    private var mProjectSchedule: ProjectScheduleEntry? = null
-    private var mTagsText: String? = null
 
-    // Views for fullscreen dialog
-    private var mFullscreenImageDialog: Dialog? = null
+    // Views for fullscreen and dialogs
     private var mFullscreenImage: ImageView? = null
-
+    private var mFullscreenImageDialog: Dialog? = null
+    private var mProjectTagDialog: Dialog? = null
     private var mProjectInfoDialog: Dialog? = null
 
     // For playing timelapse
@@ -159,7 +156,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         binding.playAsVideoFab.setOnClickListener { playSetOfImages() }
         binding.projectScheduleFab.setOnClickListener { detailViewModel.toggleSchedule(mCurrentProject!!) }
-        binding.projectTagFab.setOnClickListener { addTag() }
+        binding.projectTagFab.setOnClickListener { mProjectTagDialog?.show() }
         binding.projectInformationFab?.setOnClickListener {mProjectInfoDialog?.show()}
         binding.fullscreenFab.setOnClickListener { if (!mPlaying) mFullscreenImageDialog?.show() }
 
@@ -172,6 +169,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // TODO convert to alert dialogs
         initializeFullscreenImageDialog()
         initializeProjectInformationDialog()
+        initializeProjectTagDialog()
 
         // Set the transition name for the image
         val imageTransitionName= "${mCurrentProject?.project_id}"
@@ -200,6 +198,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         tagJob?.cancel()
         mProjectInfoDialog?.dismiss()
         mFullscreenImageDialog?.dismiss()
+        mProjectTagDialog?.dismiss()
     }
 
     private fun showPhotoInformation() {
@@ -460,6 +459,20 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
+    private fun initializeProjectTagDialog(){
+        mProjectTagDialog = Dialog(requireContext())
+        mProjectTagDialog?.setContentView(R.layout.dialog_manage_project_tag)
+
+        // set add tag fab
+        val editText = mProjectTagDialog?.findViewById<EditText>(R.id.add_tag_dialog_edit_text)
+        val addTagFab = mProjectTagDialog?.findViewById<FloatingActionButton>(R.id.add_tag_fab)
+        addTagFab?.setOnClickListener {
+            // TODO validate tags?
+            val tagText = editText?.text.toString().trim()
+            if (tagText.isNotEmpty()) detailViewModel.addTag(tagText, mCurrentProject!!)
+        }
+    }
+
     fun initializeFullscreenImageDialog() {
         // Create the dialog
         mFullscreenImageDialog = Dialog(requireContext(), R.style.Theme_AppCompat_Light_NoActionBar_FullScreen)
@@ -613,22 +626,51 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     text = text.plus("#${tag.tag}  ")
 
                     // Set up check boxes for deleting tags
-                    val checkBox = CheckBox(requireContext())
-                    checkBox.text = getString(R.string.hashtag, tag.tag)
-                    checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                        val checkBoxTag = tag.tag
-                        if (isChecked){
-                            mSelectedTags.add(checkBoxTag)
-                        } else {
-                            mSelectedTags.remove(checkBoxTag)
-                        }
+                    val textView = TextView(requireContext())
+                    textView.text = getString(R.string.hashtag, tag.tag)
+                    textView.setOnClickListener { view ->
+                        // TODO handle clicking on tag
                     }
                 }
+
+                //
+                // Set the tags in the project tag dialog
+                //
+                val currentTagsLayout = mProjectTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_current_tags_layout)
+                val exampleTagTextView = currentTagsLayout?.getChildAt(0)
+                val exampleParams = exampleTagTextView?.layoutParams
+                currentTagsLayout?.removeAllViews()
+
+                // Set up the flexbox with current tags for the project
+                val currentTags = arrayListOf<String>()
+                for (tagEntry in mProjectTags!!) {
+                    Log.d(TAG, "$tagEntry")
+                    currentTags.add(tagEntry.tag)
+                    val textView = TextView(requireContext())
+                    textView.text = getString(R.string.hashtag, tagEntry.tag)
+                    textView.layoutParams = exampleParams
+
+                    textView.setOnClickListener {
+                        detailViewModel.deleteTag(tagEntry, mCurrentProject!!)
+                        // TODO update tag layouts here or convert to observable setup
+                    }
+                    currentTagsLayout?.addView(textView)
+                }
+                //
+                // End updating the project tag dialog
+                //
+
+                //
+                // Begin updating the project info dialog
+                //
                 val tags = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
                 if (text.isEmpty()) tags?.text = getString(R.string.none)
                 else tags?.text = text
+                //
+                // End updating the project info dialog
+                //
 
-
+                // Update project info in the card
                 if (mProjectTags!!.isEmpty()) {
                     binding.projectInformationLayout.detailsProjectTagsTextview.visibility = GONE
                 }
@@ -641,9 +683,30 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
 
         detailViewModel.tags.observe(this, Observer<List<TagEntry>> {tagEntries: List<TagEntry> ->
-            mAllTags = arrayListOf()
-            val sortedEntries = tagEntries.sortedBy { it.tag.toLowerCase() }
-            for (tag in sortedEntries) mAllTags?.add(tag.tag)
+            mAllTags = tagEntries.sortedBy { it.tag.toLowerCase() }
+
+            val availableTagsLayout = mProjectTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_available_tags_layout)
+            val exampleTagTextView = availableTagsLayout?.getChildAt(0)
+            val exampleParams = exampleTagTextView?.layoutParams
+            availableTagsLayout?.removeAllViews()
+
+            // Set up the available tags in the project information dialog
+            if (mAllTags!=null) {
+                for (tag in mAllTags!!) {
+                    if (mProjectTags!=null) {
+                        if (mProjectTags!!.contains(tag)) continue // skip if tag is already in project
+                    }
+
+                    val textView = TextView(requireContext())
+                    textView.text = getString(R.string.hashtag, tag.tag)
+                    textView.layoutParams = exampleParams
+                    availableTagsLayout?.addView(textView)
+                    textView.setOnClickListener { v ->
+                        detailViewModel.addTag(tag.tag, mCurrentProject!!)
+                        // TODO update tag layouts or convert to observable setup for this dialog?
+                    }
+                }
+            }
         })
     }
 
@@ -686,59 +749,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         init {
             gestureDetector = GestureDetector(ctx, GestureListener())
         }
-    }
-
-    private fun deleteTags(){
-        Log.d(TAG, mSelectedTags.toString())
-        detailViewModel.deleteTags(mSelectedTags, mCurrentProject!!)
-        mSelectedTags = arrayListOf() // reset list
-    }
-
-    private fun addTag(){
-        val view = layoutInflater.inflate(R.layout.dialog_add_tag, binding.root as ViewGroup, false)
-
-        val editText = view.findViewById<EditText>(R.id.add_tag_dialog_edit_text)
-        val existingTagsLayout = view.findViewById<FlexboxLayout>(R.id.add_tag_dialog_existing_tags_layout)
-        val exampleTagCheckBox = existingTagsLayout.getChildAt(0)
-        val exampleParams = exampleTagCheckBox.layoutParams
-        existingTagsLayout.removeAllViews()
-
-        mSelectedTags = arrayListOf()
-        val currentTags = arrayListOf<String>()
-        for (tag in mProjectTags!!) currentTags.add(tag.tag)
-
-        // Create a list of available tags
-        if (mAllTags != null) {
-            for (tag in mAllTags!!){
-
-                val checkBoxView = CheckBox(requireContext())
-                checkBoxView.text = getString(R.string.hashtag, tag)
-                checkBoxView.layoutParams = exampleParams
-                checkBoxView.isEnabled = !currentTags.contains(tag) // disable checkbox if tag is already added to project
-
-                existingTagsLayout.addView(checkBoxView)
-
-                checkBoxView.setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) {
-                        mSelectedTags.add(tag)
-                    } else {
-                        mSelectedTags.remove(tag)
-                    }
-                    editText.isEnabled = mSelectedTags.isEmpty()
-                }
-            }
-        }
-
-        AlertDialog.Builder(requireContext())
-                .setView(view)
-                .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    val tagText = view.findViewById<EditText>(R.id.add_tag_dialog_edit_text).text.toString()
-                    if (tagText.isNotEmpty()) detailViewModel.addTag(tagText, mCurrentProject!!)
-                    else {
-                        for (tag in mSelectedTags) detailViewModel.addTag(tag, mCurrentProject!!)
-                    }
-                }
-                .setNegativeButton(android.R.string.no, null).show()
     }
 
     private fun editName(){

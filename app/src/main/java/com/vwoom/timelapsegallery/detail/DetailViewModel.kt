@@ -46,6 +46,12 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
         }
     }
 
+    fun deleteTag(tagEntry: TagEntry, project: Project){
+        viewModelScope.launch {
+            projectTagRepository.deleteTag(tagEntry, project)
+        }
+    }
+
     fun updateProjectName(externalFilesDir: File, name: String, source: Project){
         viewModelScope.launch {
             projectRepository.updateProjectName(externalFilesDir, source, name)
