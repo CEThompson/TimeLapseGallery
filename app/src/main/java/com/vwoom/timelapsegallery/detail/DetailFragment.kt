@@ -80,7 +80,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mFullscreenImage: ImageView? = null
 
     private var mProjectInfoDialog: Dialog? = null
-    private var mEditTagsDialog: Dialog? = null
 
     // For playing timelapse
     private var mPlaying = false
@@ -173,7 +172,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // TODO convert to alert dialogs
         initializeFullscreenImageDialog()
         initializeProjectInformationDialog()
-        initializeEditTagsDialog()
 
         // Set the transition name for the image
         val imageTransitionName= "${mCurrentProject?.project_id}"
@@ -201,7 +199,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         playJob?.cancel()
         tagJob?.cancel()
         mProjectInfoDialog?.dismiss()
-        mEditTagsDialog?.dismiss()
         mFullscreenImageDialog?.dismiss()
     }
 
@@ -448,32 +445,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.setPhoto(clickedPhoto)
     }
 
-    fun initializeEditTagsDialog(){
-        mEditTagsDialog = Dialog(requireContext())
-        mEditTagsDialog?.setContentView(R.layout.dialog_edit_tags)
-
-        val addTagTextView = mEditTagsDialog?.findViewById<TextView>(R.id.dialog_edit_tags_add_tag)
-        val deleteTextView = mEditTagsDialog?.findViewById<TextView>(R.id.dialog_edit_tags_delete)
-
-        addTagTextView?.setOnClickListener { addTag() }
-        deleteTextView?.setOnClickListener { deleteTags() }
-    }
-
     fun initializeProjectInformationDialog(){
         mProjectInfoDialog = Dialog(requireContext())
         mProjectInfoDialog?.setContentView(R.layout.dialog_project_information)
 
         // Get Views
-        val editTagsTextView = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_edit_tags)
-        val editNameButton = mProjectInfoDialog?.findViewById<ImageView>(R.id.edit_project_name_FAB)
+        val editNameButton = mProjectInfoDialog?.findViewById<ImageView>(R.id.edit_project_name_button)
 
         // Set fab colors
         editNameButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
 
-        // Set click listeners
-        editTagsTextView?.setOnClickListener {
-            mEditTagsDialog?.show()
-        }
         editNameButton?.setOnClickListener {
             editName()
         }
@@ -532,8 +513,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             // Set the dialog name
             val projectInfoNameTv = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
 
-            val tagsForProjectTV = mEditTagsDialog?.findViewById<TextView>(R.id.dialog_edit_tags_title)
-
             // Set name for both the dialog and the project info card view
             val name = mCurrentProject?.project_name
             if (name == null || name.isEmpty()) {
@@ -544,7 +523,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 binding.projectInformationLayout?.detailsProjectNameTextView?.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
                 // Set the dialog
                 projectInfoNameTv?.text = getString(R.string.unnamed)
-                tagsForProjectTV?.text = getString(R.string.unnamed)
             }
             else {
                 // Set the card view
@@ -554,7 +532,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         ?.setTypeface(binding.projectInformationLayout?.detailsProjectNameTextView?.typeface, Typeface.BOLD)
                 // Set the dialog
                 projectInfoNameTv?.text = currentProject.project_name
-                tagsForProjectTV?.text = getString(R.string.tags_for_project, currentProject.project_name)
             }
 
             //
@@ -629,8 +606,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 // Update project information dialog
                 mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag.toLowerCase() }
 
-                val taglayout = mEditTagsDialog?.findViewById<LinearLayout>(R.id.dialog_edit_tags_taglayout)
-                taglayout?.removeAllViews()
                 var text = ""
                 // Create the project information display text
                 for (tag in mProjectTags!!){
@@ -640,7 +615,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     // Set up check boxes for deleting tags
                     val checkBox = CheckBox(requireContext())
                     checkBox.text = getString(R.string.hashtag, tag.tag)
-                    taglayout?.addView(checkBox)
                     checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
                         val checkBoxTag = tag.tag
                         if (isChecked){
@@ -651,7 +625,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     }
                 }
                 val tags = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
-                tags?.text = text
+                if (text.isEmpty()) tags?.text = getString(R.string.none)
+                else tags?.text = text
 
 
                 if (mProjectTags!!.isEmpty()) {

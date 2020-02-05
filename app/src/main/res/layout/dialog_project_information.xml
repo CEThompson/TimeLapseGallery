@@ -9,7 +9,6 @@
     android:orientation="vertical">
 
     <!-- Title -->
-    <!--
     <TextView
         android:id="@+id/dialog_project_information_title"
         android:layout_width="wrap_content"
@@ -20,9 +19,9 @@
         app:layout_constraintHorizontal_bias=".5"
         android:textColor="@color/black"
         android:textStyle="bold"
-        android:textSize="22sp"
+        android:textSize="20sp"
         android:text="@string/project_information"/>
-    -->
+
     <!-- Id -->
     <TextView
         android:id="@+id/dialog_project_info_id_label"
@@ -32,18 +31,20 @@
         android:layout_marginBottom="@dimen/medium"
         tools:text="@string/project_id_label"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/dialog_project_information_title"/>
 
-    <!-- Name -->
+    <!-- Name Label -->
     <TextView
         android:id="@+id/dialog_project_info_name_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:text="@string/project_name_label"
+        app:layout_constraintVertical_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/edit_project_name_FAB"
-        app:layout_constraintBottom_toBottomOf="@id/edit_project_name_FAB"/>
+        app:layout_constraintTop_toTopOf="@id/edit_project_name_button"
+        app:layout_constraintBottom_toBottomOf="@id/edit_project_name_button"/>
+    <!-- Name Field -->
     <TextView
         android:id="@+id/dialog_project_info_name"
         android:layout_width="wrap_content"
@@ -51,13 +52,22 @@
         android:textStyle="italic"
         android:layout_marginStart="8dp"
         android:gravity="center_vertical"
+        app:layout_constraintVertical_bias="0.5"
         app:layout_constraintStart_toEndOf="@id/dialog_project_info_name_label"
-        app:layout_constraintTop_toTopOf="@id/edit_project_name_FAB"
-        app:layout_constraintBottom_toBottomOf="@id/edit_project_name_FAB"
+        app:layout_constraintTop_toTopOf="@id/edit_project_name_button"
+        app:layout_constraintBottom_toBottomOf="@id/edit_project_name_button"
         tools:text="project name" />
+    <!-- Edit name image -->
+    <ImageView
+        android:id="@+id/edit_project_name_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/medium"
+        android:src="@drawable/ic_edit_black_24dp"
+        app:layout_constraintStart_toEndOf="@id/dialog_project_info_name"
+        app:layout_constraintTop_toBottomOf="@id/dialog_project_info_id_label" />
 
-
-    <!-- Schedule -->
+    <!-- Schedule Label -->
     <TextView
         android:id="@+id/dialog_edit_schedule_textview"
         android:layout_width="wrap_content"
@@ -65,8 +75,8 @@
         android:gravity="center_vertical"
         android:text="@string/schedule_label"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/edit_schedule_FAB"
-        app:layout_constraintBottom_toBottomOf="@id/edit_schedule_FAB"/>
+        app:layout_constraintTop_toBottomOf="@id/edit_project_name_button"/>
+    <!-- Schedule Field -->
     <TextView
         android:id="@+id/dialog_edit_schedule_textview_description"
         android:layout_width="wrap_content"
@@ -75,11 +85,10 @@
         android:gravity="center_vertical"
         android:textStyle="italic"
         app:layout_constraintStart_toEndOf="@id/dialog_edit_schedule_textview"
-        app:layout_constraintTop_toTopOf="@id/edit_schedule_FAB"
-        app:layout_constraintBottom_toBottomOf="@id/edit_schedule_FAB"
+        app:layout_constraintTop_toBottomOf="@id/edit_project_name_button"
         tools:text="none" />
 
-    <!-- Tags -->
+    <!-- Tags Label -->
     <TextView
         android:id="@+id/dialog_tags_label"
         android:layout_width="wrap_content"
@@ -88,50 +97,18 @@
         android:layout_marginTop="@dimen/medium"
         android:text="@string/tags_label"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_schedule_FAB" />
-    <!-- Edit Tags Link -->
-    <TextView
-        android:id="@+id/dialog_project_info_edit_tags"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/medium"
-        android:src="@drawable/ic_add_white_24dp"
-        android:text="@string/edit_tags"
-        android:textColor="@color/colorPrimary"
-        android:textStyle="italic|bold"
-        app:layout_constraintStart_toEndOf="@id/dialog_tags_label"
-        app:layout_constraintTop_toTopOf="@id/dialog_tags_label" />
+        app:layout_constraintTop_toBottomOf="@+id/dialog_edit_schedule_textview" />
 
-
-    <!-- Tags -->
+    <!-- Tags Field -->
     <TextView
         android:id="@+id/dialog_information_tags"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/medium"
-        android:layout_marginBottom="@dimen/medium"
+        android:layout_marginStart="@dimen/medium"
         android:textColor="@color/colorTag"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_tags_label"
+        app:layout_constraintStart_toEndOf="@id/dialog_tags_label"
+        app:layout_constraintTop_toTopOf="@id/dialog_tags_label"
         tools:text="#tag"
         />
-    <!-- Edit name fab -->
-    <ImageView
-        android:id="@+id/edit_project_name_FAB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
-        android:src="@drawable/ic_edit_black_24dp"
-        app:layout_constraintStart_toEndOf="@id/dialog_project_info_name"
-        app:layout_constraintTop_toBottomOf="@id/dialog_project_info_id_label" />
-    <!-- Edit schedule -->
-    <ImageView
-        android:id="@+id/edit_schedule_FAB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
-        android:src="@drawable/ic_date_range_black_24dp"
-        app:layout_constraintStart_toEndOf="@id/dialog_edit_schedule_textview_description"
-        app:layout_constraintTop_toBottomOf="@id/edit_project_name_FAB" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
