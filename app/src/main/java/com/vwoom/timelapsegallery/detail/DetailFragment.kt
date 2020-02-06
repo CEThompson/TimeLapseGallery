@@ -51,6 +51,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.*
 
 // TODO lock down project editing
 
@@ -207,14 +208,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding.fullscreenFab.show()
         // Fade in gradient overlay
         gradientOverlay.alpha = 0f
-        gradientOverlay.visibility = View.VISIBLE
+        gradientOverlay.visibility = VISIBLE
         gradientOverlay.animate()
                 .alpha(1f)
                 .setDuration(shortAnimationDuration)
                 .setListener(null)
         // Fade in photo information
         photoInformationLayout.alpha = 0f
-        photoInformationLayout.visibility = View.VISIBLE
+        photoInformationLayout.visibility = VISIBLE
         photoInformationLayout.animate()
                 .alpha(1f)
                 .setDuration(shortAnimationDuration)
@@ -259,7 +260,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-    fun loadUi(photoEntry: PhotoEntry) { // Set the fullscreen image dialogue to the current photo
+    private fun loadUi(photoEntry: PhotoEntry) { // Set the fullscreen image dialogue to the current photo
         if (!mPlaying) preloadFullscreenImage()
         // Notify the adapter
         mDetailAdapter?.setCurrentPhoto(photoEntry)
@@ -310,22 +311,23 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         constraintSet.setDimensionRatio(R.id.detail_current_image, ratio)
         constraintSet.setDimensionRatio(R.id.detail_next_image, ratio)
         constraintSet.applyTo(constraintLayout)
+
         // TODO (update) streamline code for image loading
         // Load the image
-
         val f = File(imagePath)
-
         Glide.with(this)
                 .load(f)
                 .listener(object : RequestListener<Drawable?> {
-                    override fun onLoadFailed(e: GlideException?, model: Any, target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
+                    override fun onLoadFailed(e: GlideException?,
+                                              model: Any,
+                                              target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
                         val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
                         toast.show()
                         return false
                     }
 
                     override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
-                        binding.detailNextImage.visibility = View.VISIBLE
+                        binding.detailNextImage.visibility = VISIBLE
                         Glide.with(requireContext())
                                 .load(f)
                                 .listener(object : RequestListener<Drawable?> {
@@ -338,7 +340,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
                                     override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
                                         startPostponedEnterTransition()
-                                        binding.detailNextImage.visibility = View.INVISIBLE
+                                        binding.detailNextImage.visibility = INVISIBLE
                                         mImageIsLoaded = true
                                         return false
                                     }
@@ -501,6 +503,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // Set a listener to change the current photo on swipe
         // Note: this may be preferable as a viewpager instead
+        @Suppress("ClickableViewAccessibility")
         mFullscreenImage?.setOnTouchListener(mOnSwipeTouchListener)
     }
 
@@ -631,7 +634,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.projectTags.observe(this, Observer<List<ProjectTagEntry>> { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 // Update project information dialog
-                mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag.toLowerCase() }
+                mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
 
                 // Set the tags for the project tag dialog
                 setProjectTagDialogTags()
@@ -659,7 +662,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
 
         detailViewModel.tags.observe(this, Observer<List<TagEntry>> {tagEntries: List<TagEntry> ->
-            mAllTags = tagEntries.sortedBy { it.tag.toLowerCase() }
+            mAllTags = tagEntries.sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
             setProjectTagDialogTags()
         })
     }
