@@ -165,7 +165,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // TODO implement pinch zoom on fullscreen image
 
         // Initialize dialogs
-        // TODO convert to alert dialogs
         initializeFullscreenImageDialog()
         initializeProjectInformationDialog()
         initializeProjectTagDialog()
@@ -471,6 +470,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             if (tagText.isNotEmpty()) {
                 detailViewModel.addTag(tagText, mCurrentProject!!)
                 editText?.text?.clear()
+
             }
         }
 
