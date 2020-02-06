@@ -66,7 +66,8 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         constraintSet.setDimensionRatio(holder.binding.projectImage.id, ratio)
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
-        if (project.interval_days == null) {
+        // TODO refactor project schedule in database to boolean
+        if (project.interval_days == null || project.interval_days == 0) {
             holder.binding.scheduleIndicatorCheck.visibility = View.INVISIBLE
             holder.binding.scheduleIndicatorX.visibility = View.INVISIBLE
         }
