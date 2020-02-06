@@ -88,11 +88,11 @@ object InjectorUtils {
                 projectTagRepository)
     }
 
-    fun provideSettingsViewModelFactory(context: Context): SettingsViewModelFactory {
+    fun provideSettingsViewModelFactory(): SettingsViewModelFactory {
         return SettingsViewModelFactory()
     }
 
-    fun provideWidgetGridRemotViewsFactory(context: Context, intent: Intent): WidgetGridRemoteViewsFactory {
+    fun provideWidgetGridRemoteViewsFactory(context: Context, intent: Intent): WidgetGridRemoteViewsFactory {
         val projectRepository = getProjectRepository(context)
         val projectScheduleRepository = getProjectScheduleRepository(context)
         val coverPhotoRepository = getCoverPhotoRepository(context)

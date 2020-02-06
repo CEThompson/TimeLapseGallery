@@ -284,7 +284,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                camera2Preview?.post {
+                camera2Preview.post {
                     Toast.makeText(this.requireContext(), "Permissions granted, firing up the camera.", Toast.LENGTH_SHORT).show()
                     setupCamera()
                 }

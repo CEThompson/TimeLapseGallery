@@ -36,7 +36,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private var mVerifySyncDialog: Dialog? = null
 
     private val settingsViewModel: SettingsViewModel by viewModels {
-        InjectorUtils.provideSettingsViewModelFactory(requireActivity())
+        InjectorUtils.provideSettingsViewModelFactory()
     }
 
     private var databaseSyncJob: Job? = null
