@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.camera2
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -24,7 +25,7 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
-import com.vwoom.timelapsegallery.detail.CameraXViewModel
+import com.vwoom.timelapsegallery.detail.Camera2ViewModel
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.coroutines.Job
@@ -54,7 +55,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val args: Camera2FragmentArgs by navArgs()
 
-    private val cameraViewModel: CameraXViewModel by viewModels {
+    private val cameraViewModel: Camera2ViewModel by viewModels {
         InjectorUtils.provideCameraXViewModelFactory(requireActivity(), args.photo, args.project)
     }
 
@@ -118,8 +119,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     .load(file).into(binding.previousPhoto)
         }
 
-        // TODO: Override perform click for on touch listener
         // Set up quick compare function
+        @Suppress("ClickableViewAccessibility")
         binding.quickCompareFab.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -206,7 +207,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     }
 
     fun setTapToFocus(){
-        // TODO override perform click
+        @Suppress("ClickableViewAccessibility")
         camera2Preview.setOnTouchListener(CameraFocusOnTouchHandler(
                 cameraCharacteristics,
                 captureRequestBuilder,
