@@ -8,7 +8,6 @@ import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.detail.Camera2ViewModelFactory
-import com.vwoom.timelapsegallery.detail.CameraXViewModelFactory
 import com.vwoom.timelapsegallery.detail.DetailViewModelFactory
 import com.vwoom.timelapsegallery.detail.GalleryViewModelFactory
 import com.vwoom.timelapsegallery.settings.SettingsViewModelFactory
@@ -56,16 +55,6 @@ object InjectorUtils {
         val projectRepository = getProjectRepository(context)
         val photoRepository = getPhotoRepository(context)
         return Camera2ViewModelFactory(
-                projectRepository,
-                photoRepository,
-                photo,
-                project)
-    }
-
-    fun provideCameraXViewModelFactory(context: Context, photo: Photo?, project: Project?): CameraXViewModelFactory {
-        val projectRepository = getProjectRepository(context)
-        val photoRepository = getPhotoRepository(context)
-        return CameraXViewModelFactory(
                 projectRepository,
                 photoRepository,
                 photo,

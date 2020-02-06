@@ -56,7 +56,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private val args: Camera2FragmentArgs by navArgs()
 
     private val cameraViewModel: Camera2ViewModel by viewModels {
-        InjectorUtils.provideCameraXViewModelFactory(requireActivity(), args.photo, args.project)
+        InjectorUtils.provideCamera2ViewModelFactory(requireActivity(), args.photo, args.project)
     }
 
     private var mTakePictureFab: FloatingActionButton? = null
