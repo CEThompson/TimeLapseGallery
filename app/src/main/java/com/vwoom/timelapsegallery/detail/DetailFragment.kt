@@ -52,6 +52,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
+import kotlin.math.absoluteValue
 
 // TODO lock down project editing
 
@@ -81,6 +82,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // For playing timelapse
     private var mPlaying = false
     private var mImageIsLoaded = false
+
+    // Jobs
+    private var playJob: Job? = null
+    private var tagJob: Job? = null
+
 
     // Swipe listener for image navigation
     private var mOnSwipeTouchListener: OnSwipeTouchListener? = null
@@ -162,7 +168,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // Set a swipe listener for the image
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
-        binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener) // TODO override on perform click
+        @Suppress("ClickableViewAccessibility")
+        binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener)
+        // TODO override on perform click
         // TODO implement pinch zoom on fullscreen image
 
         // Initialize dialogs
@@ -201,22 +209,20 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     private fun showPhotoInformation() {
-        val photoInformationLayout: LinearLayout = binding.photoInformationLayout
-        val gradientOverlay: View = binding.detailsGradientOverlay
         val shortAnimationDuration = resources.getInteger(
                 android.R.integer.config_shortAnimTime).toLong()
         binding.fullscreenFab.show()
         // Fade in gradient overlay
-        gradientOverlay.alpha = 0f
-        gradientOverlay.visibility = VISIBLE
-        gradientOverlay.animate()
+        binding.detailsGradientOverlay.alpha = 0f
+        binding.detailsGradientOverlay.visibility = VISIBLE
+        binding.detailsGradientOverlay.animate()
                 .alpha(1f)
                 .setDuration(shortAnimationDuration)
                 .setListener(null)
         // Fade in photo information
-        photoInformationLayout.alpha = 0f
-        photoInformationLayout.visibility = VISIBLE
-        photoInformationLayout.animate()
+        binding.photoInformationLayout.alpha = 0f
+        binding.photoInformationLayout.visibility = VISIBLE
+        binding.photoInformationLayout.animate()
                 .alpha(1f)
                 .setDuration(shortAnimationDuration)
                 .setListener(null)
@@ -410,9 +416,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding.fullscreenFab.show()
     }
 
-    var playJob: Job? = null
-    var tagJob: Job? = null
-
     private fun scheduleLoadPhoto(position: Int, interval: Long) {
         Log.e("DetailsFragment", "schedule loading position $position")
         if (position < 0 || position >= mPhotos!!.size) {
@@ -444,7 +447,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.setPhoto(clickedPhoto)
     }
 
-    fun initializeProjectInformationDialog(){
+    private fun initializeProjectInformationDialog(){
         mProjectInfoDialog = Dialog(requireContext())
         mProjectInfoDialog?.setContentView(R.layout.dialog_project_information)
 
@@ -480,7 +483,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         okTextView?.setOnClickListener { mProjectTagDialog?.dismiss() }
     }
 
-    fun initializeFullscreenImageDialog() {
+    private fun initializeFullscreenImageDialog() {
         // Create the dialog
         mFullscreenImageDialog = Dialog(requireContext(), R.style.Theme_AppCompat_Light_NoActionBar_FullScreen)
         mFullscreenImageDialog?.setCancelable(false)
@@ -706,14 +709,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Changes photo on swipe
     inner class OnSwipeTouchListener(ctx: Context?) : OnTouchListener {
         private val gestureDetector: GestureDetector
+        @Suppress("ClickableViewAccessibility")
         override fun onTouch(v: View, event: MotionEvent): Boolean {
             return gestureDetector.onTouchEvent(event)
         }
 
         private inner class GestureListener : SimpleOnGestureListener() {
 
-            private val SWIPE_THRESHOLD = 100
-            private val SWIPE_VELOCITY_THRESHOLD = 100
+            private val swipeThreshold = 100
+            private val swipeVelocityThreshold = 100
 
             override fun onDown(e: MotionEvent): Boolean {
                 return true
@@ -723,8 +727,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 var result = false
                 val diffY = e2.y - e1.y
                 val diffX = e2.x - e1.x
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                if (diffX.absoluteValue > diffY.absoluteValue) {
+                    if (diffX.absoluteValue > swipeThreshold && velocityX.absoluteValue > swipeVelocityThreshold) {
                         if (diffX > 0) {
                             onSwipeRight()
                         } else {
