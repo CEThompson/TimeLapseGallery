@@ -156,7 +156,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding.playAsVideoFab.setOnClickListener { playSetOfImages() }
         binding.projectScheduleFab.setOnClickListener { detailViewModel.toggleSchedule(mCurrentProject!!) }
         binding.projectTagFab.setOnClickListener { mProjectTagDialog?.show() }
-        binding.projectInformationFab?.setOnClickListener {mProjectInfoDialog?.show()}
+        binding.projectInformationFab.setOnClickListener {mProjectInfoDialog?.show()}
         binding.fullscreenFab.setOnClickListener { if (!mPlaying) mFullscreenImageDialog?.show() }
 
         // Set a swipe listener for the image
@@ -524,7 +524,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mCurrentProject = currentProject
 
             // Set id
-            binding.projectInformationLayout?.detailsProjectId?.text = mCurrentProject?.project_id.toString()
+            binding.projectInformationLayout.detailsProjectId.text = mCurrentProject?.project_id.toString()
             val projectInfoDialogId = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_label)
             projectInfoDialogId?.text = getString(R.string.project_id_label, currentProject.project_id)
 
@@ -535,19 +535,27 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             val name = mCurrentProject?.project_name
             if (name == null || name.isEmpty()) {
                 // Set the layout card view
-                binding.projectInformationLayout?.detailsProjectNameTextView?.text = getString(R.string.unnamed)
-                binding.projectInformationLayout?.detailsProjectNameTextView
-                        ?.setTypeface(binding.projectInformationLayout?.detailsProjectNameTextView?.typeface, Typeface.ITALIC)
-                binding.projectInformationLayout?.detailsProjectNameTextView?.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                binding.projectInformationLayout
+                        .detailsProjectNameTextView
+                        .text = getString(R.string.unnamed)
+                binding.projectInformationLayout
+                        .detailsProjectNameTextView
+                        .setTypeface(binding.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.ITALIC)
+                binding.projectInformationLayout
+                        .detailsProjectNameTextView
+                        .setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
                 // Set the dialog
                 projectInfoNameTv?.text = getString(R.string.unnamed)
             }
             else {
                 // Set the card view
-                binding.projectInformationLayout?.detailsProjectNameTextView?.text = name
-                binding.projectInformationLayout?.detailsProjectNameTextView?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-                binding.projectInformationLayout?.detailsProjectNameTextView
-                        ?.setTypeface(binding.projectInformationLayout?.detailsProjectNameTextView?.typeface, Typeface.BOLD)
+                binding.projectInformationLayout
+                        .detailsProjectNameTextView.text = name
+                binding.projectInformationLayout
+                        .detailsProjectNameTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                binding.projectInformationLayout
+                        .detailsProjectNameTextView
+                        .setTypeface(binding.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.BOLD)
                 // Set the dialog
                 projectInfoNameTv?.text = currentProject.project_name
             }
@@ -598,14 +606,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             val firstProjectDateString = TimeUtils.getShortDateFromTimestamp(firstTimestamp!!)
             val lastTimestamp = mPhotos?.get(mPhotos!!.size - 1)?.timestamp
             val lastProjectDateString = TimeUtils.getShortDateFromTimestamp(lastTimestamp!!)
-            binding.projectInformationLayout?.detailsProjectTimespanTextview?.text = getString(R.string.timespan, firstProjectDateString, lastProjectDateString)
+            binding.projectInformationLayout
+                    .detailsProjectTimespanTextview.text = getString(R.string.timespan, firstProjectDateString, lastProjectDateString)
 
             // Set max for progress bar
             binding.imageLoadingProgress.max = mPhotos!!.size - 1
 
             // If current photo isn't set, set it to the last photo
             if (detailViewModel.currentPhoto.value == null) {
-                mCurrentPhoto = mPhotos!!.get(mPhotos!!.size-1)
+                mCurrentPhoto = mPhotos!![mPhotos!!.size-1]
                 detailViewModel.currentPhoto.value = mCurrentPhoto
             }
         })
