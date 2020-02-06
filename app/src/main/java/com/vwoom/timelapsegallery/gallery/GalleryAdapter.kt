@@ -66,17 +66,14 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         constraintSet.setDimensionRatio(holder.binding.projectImage.id, ratio)
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
-        // TODO refactor project schedule in database to boolean
-        if (project.interval_days == null || project.interval_days == 0) {
+        // Display a check if a picture was taken today
+        if (DateUtils.isToday(project.cover_photo_timestamp)) {
+            holder.binding.scheduleIndicatorCheck.visibility = View.VISIBLE
+            holder.binding.scheduleIndicatorX.visibility = View.INVISIBLE
+        } else {
             holder.binding.scheduleIndicatorCheck.visibility = View.INVISIBLE
             holder.binding.scheduleIndicatorX.visibility = View.INVISIBLE
-        }
-        else {
-            if (DateUtils.isToday(project.cover_photo_timestamp)) {
-                holder.binding.scheduleIndicatorCheck.visibility = View.VISIBLE
-                holder.binding.scheduleIndicatorX.visibility = View.INVISIBLE
-            } else {
-                holder.binding.scheduleIndicatorCheck.visibility = View.INVISIBLE
+            if (project.interval_days != null && project.interval_days != 0){
                 holder.binding.scheduleIndicatorX.visibility = View.VISIBLE
             }
         }
