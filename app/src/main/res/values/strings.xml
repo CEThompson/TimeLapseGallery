@@ -57,6 +57,7 @@
     <string name="disable_notifications">Disable notifications</string>
     <string name="enable_notifications">Enable notifications</string>
     <string name="delete_photo">Delete photo</string>
+    <string name="delete_tag">Delete tag</string>
     <string name="delete_project">Delete project</string>
     <string name="edit_project">Edit project</string>
 
@@ -68,6 +69,8 @@
     <!-- Verification strings -->
     <string name="verify_delete_project">Are you sure you wish to delete the project?</string>
     <string name="verify_delete_photo">Are you sure you wish to delete this photo?</string>
+    <string name="verify_delete_tag">This will delete the tag and remove it from all associated projects.\n\n
+        Do you wish to continue? </string>
     <string name="verify_delete_last_photo">This is the last photo in the project. Would you like to delete the project instead?</string>
     <string name="double_verify_project_deletion">Please verify to confirm.</string>
 

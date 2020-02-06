@@ -693,23 +693,23 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         availableTagsLayout?.removeAllViews()
         // Set up the available tags in the project information dialog
         if (mAllTags != null) {
-            for (tag in mAllTags!!) {
+            for (tagEntry in mAllTags!!) {
                 if (mProjectTags != null) {
-                    if (mProjectTags!!.contains(tag)) continue // skip if tag is already in project
+                    if (mProjectTags!!.contains(tagEntry)) continue // skip if tag is already in project
                 }
 
                 val textView: TextView = layoutInflater.inflate(R.layout.tag_text_view, availableTagsLayout, false) as TextView
-                textView.text = getString(R.string.hashtag, tag.tag)
+                textView.text = getString(R.string.hashtag, tagEntry.tag)
                 textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
 
                 availableTagsLayout?.addView(textView)
                 textView.setOnClickListener { v ->
-                    detailViewModel.addTag(tag.tag, mCurrentProject!!)
+                    detailViewModel.addTag(tagEntry.tag, mCurrentProject!!)
                 }
 
                 textView.setOnLongClickListener{
                     // TODO confirm tag deletion with alert dialog
-                    detailViewModel.deleteTagFromRepo(tag)
+                    verifyTagDeletion(tagEntry)
                     true
                 }
             }
@@ -778,6 +778,18 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     // If this photo is the last photo then set the new thumbnail to its previous
                     detailViewModel.deleteCurrentPhoto(mExternalFilesDir!!)
+                }
+                .setNegativeButton(android.R.string.no, null).show()
+    }
+
+    private fun verifyTagDeletion(tagEntry: TagEntry){
+        AlertDialog.Builder(requireContext())
+                .setTitle(R.string.delete_tag)
+                .setMessage(R.string.verify_delete_tag)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes) { _, _: Int ->
+                    // If this photo is the last photo then set the new thumbnail to its previous
+                    detailViewModel.deleteTagFromRepo(tagEntry)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
