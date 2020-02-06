@@ -1,70 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <!-- Layout for adding new tag -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_margin="@dimen/large">
-        <EditText
-            android:id="@+id/add_tag_dialog_edit_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="150dp"
-            tools:text="#newtag"
-            android:inputType="text"
-            android:singleLine="true"
-            android:hint="@string/new_tag_text"
-            android:autofillHints="@string/new_tag_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/add_tag_fab"
-            app:layout_constraintVertical_bias="0.5"
-            app:layout_constraintBottom_toBottomOf="@id/add_tag_fab"
-            app:layout_constraintEnd_toStartOf="@id/add_tag_fab"
-            />
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/add_tag_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/large"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_add_white_24dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:fabSize="mini"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/medium">
 
     <!-- Layout for current project tags -->
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/project_tag_dialog_current_tags_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
         app:alignContent="stretch"
         app:alignItems="stretch"
         app:flexWrap="wrap">
+
         <TextView
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:minHeight="@dimen/touch_target_min"
-            android:minWidth="@dimen/touch_target_min"
-            android:textColor="@color/colorTag"
+            android:layout_height="wrap_content"
             android:layout_margin="@dimen/small"
-            tools:text="#tag one"/>
+            android:minWidth="@dimen/touch_target_min"
+            android:minHeight="@dimen/touch_target_min"
+            android:textColor="@color/colorTag"
+            tools:text="#tag one" />
+
         <TextView
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:minHeight="@dimen/touch_target_min"
-            android:minWidth="@dimen/touch_target_min"
-            android:textColor="@color/colorTag"
+            android:layout_height="wrap_content"
             android:layout_margin="@dimen/small"
-            tools:text="#tag two"/>
+            android:minWidth="@dimen/touch_target_min"
+            android:minHeight="@dimen/touch_target_min"
+            android:textColor="@color/colorTag"
+            tools:text="#tag two" />
     </com.google.android.flexbox.FlexboxLayout>
 
     <!-- Layout for available project tags -->
@@ -72,24 +40,64 @@
         android:id="@+id/project_tag_dialog_available_tags_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
         app:alignContent="stretch"
         app:alignItems="stretch"
         app:flexWrap="wrap">
+
         <TextView
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:minHeight="@dimen/touch_target_min"
-            android:minWidth="@dimen/touch_target_min"
+            android:layout_height="wrap_content"
             android:layout_margin="@dimen/small"
-            tools:text="#tag three"/>
+            android:minWidth="@dimen/touch_target_min"
+            android:minHeight="@dimen/touch_target_min"
+            tools:text="#tag three" />
+
         <TextView
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:minHeight="@dimen/touch_target_min"
-            android:minWidth="@dimen/touch_target_min"
+            android:layout_height="wrap_content"
             android:layout_margin="@dimen/small"
-            tools:text="#tag four"/>
+            android:minWidth="@dimen/touch_target_min"
+            android:minHeight="@dimen/touch_target_min"
+            tools:text="#tag four" />
     </com.google.android.flexbox.FlexboxLayout>
+
+    <!-- Layout for adding new tag -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/medium">
+
+        <EditText
+            android:id="@+id/add_tag_dialog_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:autofillHints="@string/new_tag_text"
+            android:hint="@string/new_tag_text"
+            android:inputType="text"
+            android:minWidth="150dp"
+            android:singleLine="true"
+            tools:text="#newtag" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_tag_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/large"
+            android:src="@drawable/ic_add_white_24dp"
+            app:fabSize="mini" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:gravity="center"
+        android:minWidth="@dimen/touch_target_min"
+        android:minHeight="@dimen/touch_target_min"
+        android:text="@string/ok"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold" />
 
 </LinearLayout>

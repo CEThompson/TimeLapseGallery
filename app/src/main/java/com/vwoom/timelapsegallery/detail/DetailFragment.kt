@@ -700,7 +700,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
                 val textView: TextView = layoutInflater.inflate(R.layout.tag_text_view, availableTagsLayout, false) as TextView
                 textView.text = getString(R.string.hashtag, tagEntry.tag)
-                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
+                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
 
                 availableTagsLayout?.addView(textView)
                 textView.setOnClickListener { v ->
