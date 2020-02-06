@@ -17,6 +17,10 @@ class TagRepository private constructor(private val tagDao: TagDao){
         return tags
     }
 
+    suspend fun deleteTag(tagEntry: TagEntry){
+        tagDao.deleteTag(tagEntry)
+    }
+
     companion object {
         @Volatile private var instance: TagRepository? = null
 

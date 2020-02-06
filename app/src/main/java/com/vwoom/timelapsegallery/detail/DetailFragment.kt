@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -41,7 +40,6 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
-import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
@@ -684,7 +682,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             textView.text = getString(R.string.hashtag, tagEntry.tag)
             textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
             textView.setOnClickListener {
-                detailViewModel.deleteTag(tagEntry, mCurrentProject!!)
+                detailViewModel.deleteTagFromProject(tagEntry, mCurrentProject!!)
             }
             currentTagsLayout?.addView(textView)
         }
@@ -710,7 +708,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 }
 
                 textView.setOnLongClickListener{
-
+                    // TODO confirm tag deletion with alert dialog
+                    detailViewModel.deleteTagFromRepo(tag)
                     true
                 }
             }

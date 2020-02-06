@@ -46,9 +46,15 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
         }
     }
 
-    fun deleteTag(tagEntry: TagEntry, project: Project){
+    fun deleteTagFromProject(tagEntry: TagEntry, project: Project){
         viewModelScope.launch {
             projectTagRepository.deleteTagFromProject(tagEntry, project)
+        }
+    }
+
+    fun deleteTagFromRepo(tagEntry: TagEntry){
+        viewModelScope.launch {
+            tagRepository.deleteTag(tagEntry)
         }
     }
 
