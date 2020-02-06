@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -636,23 +637,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 //
                 // Set the tags in the project tag dialog
                 //
-                val currentTagsLayout = mProjectTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_current_tags_layout)
-                currentTagsLayout?.removeAllViews()
-
-                // Set up the flexbox with current tags for the project
-                val currentTags = arrayListOf<String>()
-                for (tagEntry in mProjectTags!!) {
-                    Log.d(TAG, "$tagEntry")
-                    currentTags.add(tagEntry.tag)
-                    val textView = TextView(requireContext())
-                    textView.text = getString(R.string.hashtag, tagEntry.tag)
-
-                    textView.setOnClickListener {
-                        detailViewModel.deleteTag(tagEntry, mCurrentProject!!)
-                        // TODO update tag layouts here or convert to observable setup
-                    }
-                    currentTagsLayout?.addView(textView)
-                }
+                setCurrentTags()
+                setAvailableTags()
                 //
                 // End updating the project tag dialog
                 //
@@ -681,27 +667,54 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         detailViewModel.tags.observe(this, Observer<List<TagEntry>> {tagEntries: List<TagEntry> ->
             mAllTags = tagEntries.sortedBy { it.tag.toLowerCase() }
+            setAvailableTags()
+        })
+    }
 
-            val availableTagsLayout = mProjectTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_available_tags_layout)
-            availableTagsLayout?.removeAllViews()
+    private fun setCurrentTags() {
+        val currentTagsLayout = mProjectTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_current_tags_layout)
+        currentTagsLayout?.removeAllViews()
 
-            // Set up the available tags in the project information dialog
-            if (mAllTags!=null) {
-                for (tag in mAllTags!!) {
-                    if (mProjectTags!=null) {
-                        if (mProjectTags!!.contains(tag)) continue // skip if tag is already in project
-                    }
+        // Set up the flexbox with current tags for the project
+        val currentTags = arrayListOf<String>()
+        for (tagEntry in mProjectTags!!) {
+            Log.d(TAG, "$tagEntry")
+            currentTags.add(tagEntry.tag)
+            val textView: TextView = layoutInflater.inflate(R.layout.tag_text_view, currentTagsLayout, false) as TextView
+            textView.text = getString(R.string.hashtag, tagEntry.tag)
+            textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
+            textView.setOnClickListener {
+                detailViewModel.deleteTag(tagEntry, mCurrentProject!!)
+            }
+            currentTagsLayout?.addView(textView)
+        }
+    }
 
-                    val textView = TextView(requireContext())
-                    textView.text = getString(R.string.hashtag, tag.tag)
-                    availableTagsLayout?.addView(textView)
-                    textView.setOnClickListener { v ->
-                        detailViewModel.addTag(tag.tag, mCurrentProject!!)
-                        // TODO remove tag from available tags OR update available tags from project tag observer?
-                    }
+    private fun setAvailableTags() {
+        val availableTagsLayout = mProjectTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_available_tags_layout)
+        availableTagsLayout?.removeAllViews()
+        // Set up the available tags in the project information dialog
+        if (mAllTags != null) {
+            for (tag in mAllTags!!) {
+                if (mProjectTags != null) {
+                    if (mProjectTags!!.contains(tag)) continue // skip if tag is already in project
+                }
+
+                val textView: TextView = layoutInflater.inflate(R.layout.tag_text_view, availableTagsLayout, false) as TextView
+                textView.text = getString(R.string.hashtag, tag.tag)
+                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccent))
+
+                availableTagsLayout?.addView(textView)
+                textView.setOnClickListener { v ->
+                    detailViewModel.addTag(tag.tag, mCurrentProject!!)
+                }
+
+                textView.setOnLongClickListener{
+
+                    true
                 }
             }
-        })
+        }
     }
 
     // Changes photo on swipe
