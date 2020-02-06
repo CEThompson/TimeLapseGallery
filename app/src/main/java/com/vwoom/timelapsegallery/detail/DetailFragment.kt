@@ -460,7 +460,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private fun initializeProjectTagDialog(){
         mProjectTagDialog = Dialog(requireContext())
-        mProjectTagDialog?.setContentView(R.layout.dialog_manage_project_tag)
+        mProjectTagDialog?.setContentView(R.layout.dialog_project_tag)
 
         // set add tag fab
         val editText = mProjectTagDialog?.findViewById<EditText>(R.id.add_tag_dialog_edit_text)
@@ -468,8 +468,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         addTagFab?.setOnClickListener {
             // TODO validate tags?
             val tagText = editText?.text.toString().trim()
-            if (tagText.isNotEmpty()) detailViewModel.addTag(tagText, mCurrentProject!!)
+            if (tagText.isNotEmpty()) {
+                detailViewModel.addTag(tagText, mCurrentProject!!)
+                editText?.text?.clear()
+            }
         }
+
+        val okTextView = mProjectTagDialog?.findViewById<TextView>(R.id.dialog_project_tag_dismiss)
+        okTextView?.setOnClickListener { mProjectTagDialog?.dismiss() }
     }
 
     fun initializeFullscreenImageDialog() {
@@ -618,45 +624,25 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 // Update project information dialog
                 mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag.toLowerCase() }
 
-                var text = ""
-                // Create the project information display text
+                // Set the tags for the project tag dialog
+                setProjectTagDialogTags()
+
+                // Update the tags in the project information dialog
+                var tagsText = ""
                 for (tag in mProjectTags!!){
                     // Concatenate a string for non-interactive output
-                    text = text.plus("#${tag.tag}  ")
-
-                    // Set up check boxes for deleting tags
-                    val textView = TextView(requireContext())
-                    textView.text = getString(R.string.hashtag, tag.tag)
-                    textView.setOnClickListener { view ->
-                        // TODO handle clicking on tag
-                    }
+                    tagsText = tagsText.plus("#${tag.tag}  ")
                 }
+                val tagsTextView = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
+                if (tagsText.isEmpty()) tagsTextView?.text = getString(R.string.none)
+                else tagsTextView?.text = tagsText
 
-                //
-                // Set the tags in the project tag dialog
-                //
-                setCurrentTags()
-                setAvailableTags()
-                //
-                // End updating the project tag dialog
-                //
-
-                //
-                // Begin updating the project info dialog
-                //
-                val tags = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
-                if (text.isEmpty()) tags?.text = getString(R.string.none)
-                else tags?.text = text
-                //
-                // End updating the project info dialog
-                //
-
-                // Update project info in the card
+                // Update the tags in the project info card
                 if (mProjectTags!!.isEmpty()) {
                     binding.projectInformationLayout.detailsProjectTagsTextview.visibility = GONE
                 }
                 else {
-                    binding.projectInformationLayout.detailsProjectTagsTextview.text = text
+                    binding.projectInformationLayout.detailsProjectTagsTextview.text = tagsText
                     binding.projectInformationLayout.detailsProjectTagsTextview.visibility = VISIBLE
                 }
             }
@@ -665,53 +651,42 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         detailViewModel.tags.observe(this, Observer<List<TagEntry>> {tagEntries: List<TagEntry> ->
             mAllTags = tagEntries.sortedBy { it.tag.toLowerCase() }
-            setAvailableTags()
+            setProjectTagDialogTags()
         })
     }
 
-    private fun setCurrentTags() {
-        val currentTagsLayout = mProjectTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_current_tags_layout)
-        currentTagsLayout?.removeAllViews()
-
-        // Set up the flexbox with current tags for the project
-        val currentTags = arrayListOf<String>()
-        for (tagEntry in mProjectTags!!) {
-            Log.d(TAG, "$tagEntry")
-            currentTags.add(tagEntry.tag)
-            val textView: TextView = layoutInflater.inflate(R.layout.tag_text_view, currentTagsLayout, false) as TextView
-            textView.text = getString(R.string.hashtag, tagEntry.tag)
-            textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
-            textView.setOnClickListener {
-                detailViewModel.deleteTagFromProject(tagEntry, mCurrentProject!!)
-            }
-            currentTagsLayout?.addView(textView)
-        }
-    }
-
-    private fun setAvailableTags() {
+    private fun setProjectTagDialogTags() {
         val availableTagsLayout = mProjectTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_available_tags_layout)
         availableTagsLayout?.removeAllViews()
         // Set up the available tags in the project information dialog
         if (mAllTags != null) {
             for (tagEntry in mAllTags!!) {
+                var tagInProject = false
                 if (mProjectTags != null) {
-                    if (mProjectTags!!.contains(tagEntry)) continue // skip if tag is already in project
+                    if (mProjectTags!!.contains(tagEntry)) {
+                        tagInProject = true
+                    }
                 }
 
                 val textView: TextView = layoutInflater.inflate(R.layout.tag_text_view, availableTagsLayout, false) as TextView
+
                 textView.text = getString(R.string.hashtag, tagEntry.tag)
-                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                if (tagInProject) textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
+                else textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
 
-                availableTagsLayout?.addView(textView)
-                textView.setOnClickListener { v ->
-                    detailViewModel.addTag(tagEntry.tag, mCurrentProject!!)
-                }
+                // Set the textview to remove or add the tag depending on whether the tag is in the project
+                if (tagInProject) textView.setOnClickListener { detailViewModel.deleteTagFromProject(tagEntry, mCurrentProject!!) }
+                else textView.setOnClickListener { detailViewModel.addTag(tagEntry.tag, mCurrentProject!!) }
 
+
+                // Set the textview to delete tag on long click
                 textView.setOnLongClickListener{
-                    // TODO confirm tag deletion with alert dialog
                     verifyTagDeletion(tagEntry)
                     true
                 }
+
+                // Finally add the view
+                availableTagsLayout?.addView(textView)
             }
         }
     }
