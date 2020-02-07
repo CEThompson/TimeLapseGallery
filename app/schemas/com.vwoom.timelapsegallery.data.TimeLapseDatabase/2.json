@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "b5336241b51a1532ff5f0d82276f43ab",
+    "identityHash": "db460818f165da59beef2a6aa0454405",
     "entities": [
       {
         "tableName": "project",
@@ -59,7 +59,16 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_photo_project_id",
+            "unique": false,
+            "columnNames": [
+              "project_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_photo_project_id` ON `${TABLE_NAME}` (`project_id`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "project",
@@ -129,7 +138,24 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_project_tag_project_id",
+            "unique": false,
+            "columnNames": [
+              "project_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_project_tag_project_id` ON `${TABLE_NAME}` (`project_id`)"
+          },
+          {
+            "name": "index_project_tag_tag_id",
+            "unique": false,
+            "columnNames": [
+              "tag_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_project_tag_tag_id` ON `${TABLE_NAME}` (`tag_id`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "project",
@@ -222,7 +248,24 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_cover_photo_project_id",
+            "unique": false,
+            "columnNames": [
+              "project_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cover_photo_project_id` ON `${TABLE_NAME}` (`project_id`)"
+          },
+          {
+            "name": "index_cover_photo_photo_id",
+            "unique": false,
+            "columnNames": [
+              "photo_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cover_photo_photo_id` ON `${TABLE_NAME}` (`photo_id`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "project",
@@ -252,7 +295,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b5336241b51a1532ff5f0d82276f43ab')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'db460818f165da59beef2a6aa0454405')"
     ]
   }
 }

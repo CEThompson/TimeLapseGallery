@@ -1,9 +1,6 @@
 package com.vwoom.timelapsegallery.data.entry
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 @Entity(tableName = "photo",
         foreignKeys = [ForeignKey(entity = ProjectEntry::class,
@@ -11,8 +8,10 @@ import androidx.room.PrimaryKey
                 childColumns = ["project_id"],
                 onDelete = ForeignKey.CASCADE)])
 
-data class PhotoEntry(var project_id: Long,
-                      var timestamp: Long) {
+data class PhotoEntry(
+        @ColumnInfo(index = true)
+        var project_id: Long,
+        var timestamp: Long) {
     /* Getters *//* Setters */
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0

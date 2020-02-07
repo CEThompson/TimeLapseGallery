@@ -1,9 +1,6 @@
 package com.vwoom.timelapsegallery.data.entry
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 // TODO verify cascade deletion works appropriately
 // TODO set index for columns
@@ -18,7 +15,11 @@ import androidx.room.PrimaryKey
                 childColumns = ["tag_id"],
                 onDelete = ForeignKey.CASCADE)
         ])
-data class ProjectTagEntry(var project_id: Long, var tag_id: Long){
+data class ProjectTagEntry(
+        @ColumnInfo(index = true)
+        var project_id: Long,
+        @ColumnInfo(index = true)
+        var tag_id: Long){
         @PrimaryKey(autoGenerate = true)
         var id: Long = 0
 }

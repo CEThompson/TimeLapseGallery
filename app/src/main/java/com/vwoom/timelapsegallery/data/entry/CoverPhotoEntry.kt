@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.data.entry
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 
@@ -13,4 +14,8 @@ import androidx.room.ForeignKey
                     parentColumns = ["id"],
                     childColumns = ["photo_id"],
                     onDelete = ForeignKey.CASCADE)])
-data class CoverPhotoEntry(var project_id: Long, var photo_id: Long)
+data class CoverPhotoEntry(
+        @ColumnInfo(index = true)
+        var project_id: Long,
+        @ColumnInfo(index = true)
+        var photo_id: Long)
