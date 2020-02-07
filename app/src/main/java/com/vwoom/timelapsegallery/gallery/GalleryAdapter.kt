@@ -67,16 +67,16 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
         // Display a check if a picture was taken today
-        if (DateUtils.isToday(project.cover_photo_timestamp)) {
+        if (DateUtils.isToday(project.cover_photo_timestamp))
             holder.binding.scheduleIndicatorCheck.visibility = View.VISIBLE
-            holder.binding.scheduleIndicatorX.visibility = View.INVISIBLE
-        } else {
+        else
             holder.binding.scheduleIndicatorCheck.visibility = View.INVISIBLE
-            holder.binding.scheduleIndicatorX.visibility = View.INVISIBLE
-            if (project.interval_days != null && project.interval_days != 0){
-                holder.binding.scheduleIndicatorX.visibility = View.VISIBLE
-            }
-        }
+
+        // Show if the project is scheduled
+        if (project.interval_days != null && project.interval_days != 0)
+            holder.binding.scheduleIndicator.visibility = View.VISIBLE
+        else
+            holder.binding.scheduleIndicator.visibility = View.INVISIBLE
 
         // Set transition targets
         val imageTransitionName = project.project_id.toString()
