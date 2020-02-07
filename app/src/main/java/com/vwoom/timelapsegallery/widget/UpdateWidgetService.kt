@@ -15,7 +15,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-// TODO update update widget service to use repository
 // TODO test widget
 class UpdateWidgetService(
         private val projectRepository: ProjectRepository,

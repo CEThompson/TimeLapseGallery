@@ -141,7 +141,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.search_option -> {
-                // TODO implement search
                 mFilterDialog?.show()
                 mGalleryViewModel.filterDialogShowing = true
                 true

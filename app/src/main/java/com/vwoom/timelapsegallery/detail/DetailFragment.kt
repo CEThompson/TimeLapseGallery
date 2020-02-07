@@ -54,8 +54,7 @@ import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
 
-// TODO lock down project editing
-
+// TODO implement pinch zoom on fullscreen image
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     lateinit var binding: FragmentDetailBinding
@@ -170,8 +169,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
         @Suppress("ClickableViewAccessibility")
         binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener)
-        // TODO override on perform click
-        // TODO implement pinch zoom on fullscreen image
 
         // Initialize dialogs
         initializeFullscreenImageDialog()
@@ -475,7 +472,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             if (tagText.isNotEmpty()) {
                 detailViewModel.addTag(tagText, mCurrentProject!!)
                 editText?.text?.clear()
-
             }
         }
 

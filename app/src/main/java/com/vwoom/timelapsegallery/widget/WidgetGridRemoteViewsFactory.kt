@@ -30,7 +30,6 @@ import com.vwoom.timelapsegallery.utils.TimeUtils.getTimeFromTimestamp
 import java.io.File
 import java.io.IOException
 
-// TODO update widget grid remote views factory to use repository
 class WidgetGridRemoteViewsFactory(
         private val mContext: Context,
         intent: Intent?,
