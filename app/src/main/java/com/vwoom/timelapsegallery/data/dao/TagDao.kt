@@ -23,4 +23,7 @@ interface TagDao {
 
     @Update
     fun updateTag(tagEntry: TagEntry)
+
+    @Query("DELETE FROM tag")
+    suspend fun deleteAllTags()
 }

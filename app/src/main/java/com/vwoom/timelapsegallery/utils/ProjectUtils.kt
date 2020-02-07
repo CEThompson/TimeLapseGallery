@@ -8,9 +8,11 @@ import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase.Companion.getInstance
 import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import java.io.BufferedReader
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileReader
 import java.util.*
 
@@ -32,7 +34,7 @@ object ProjectUtils {
             // Determine ID of project
             val id = if (projectFilename.lastIndexOf("_") == -1) projectFilename
             else projectFilename.substring(0, projectFilename.lastIndexOf("_"))
-            Log.d(TAG, "deriving project id = $id")
+            //Log.d(TAG, "deriving project id = $id")
 
             /* Ensure ids are unique */
             val longId = java.lang.Long.valueOf(id)
@@ -42,7 +44,7 @@ object ProjectUtils {
             var projectName: String? = null
             if (projectFilename.lastIndexOf("_")>=0)
                 projectName = projectFilename.substring(projectFilename.lastIndexOf("_") + 1)
-            Log.d(TAG, "deriving project name = $projectName")
+            //Log.d(TAG, "deriving project name = $projectName")
 
             /* Ensure names do not contain reserved characters */
             if (projectName != null
@@ -70,11 +72,18 @@ object ProjectUtils {
 
     /* Helper to scan through folders and import projects */
     suspend fun importProjects(context: Context) {
-        Log.d(TAG, "Importing projects")
+        //Log.d(TAG, "Importing projects")
+        //context.deleteDatabase(TimeLapseDatabase.DATABASE_NAME)
         val db = getInstance(context)
 
         // Delete all project references in the database
+        // TODO clear entire database
         db.projectDao().deleteAllProjects()
+        //db.coverPhotoDao().deleteAllCoverPhotos()
+        //db.photoDao().deleteAllPhotos()
+        //db.projectTagDao().deleteAllProjectTags()
+        //db.projectScheduleDao().deleteAllProjectSchedules()
+        db.tagDao().deleteAllTags()
 
         // Add all project references from the file structure
         val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -126,7 +135,7 @@ object ProjectUtils {
 
     /* Finds all photos in the project directory and adds any missing photos to the database */
     private suspend fun importProjectPhotos(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry) {
-        Log.d(TAG, "Importing photos for project")
+        //Log.d(TAG, "Importing photos for project")
         // Create a list of all photos in the project directory
         val allPhotosInFolder = FileUtils.getPhotoEntriesInProjectDirectory(externalFilesDir, currentProject)
         // Insert the photos from the file structure
@@ -143,31 +152,37 @@ object ProjectUtils {
         }
     }
 
-    private suspend fun importProjectTags(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry): List<TagEntry>? {
+    private suspend fun importProjectTags(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry) {
         val metaDir = FileUtils.getMetaDirectoryForProject(externalFilesDir, currentProject)
         val tagsFile = File(metaDir, FileUtils.TAGS_DEFINITION_TEXT_FILE)
 
+        // Only import tags if the file exists
         if (metaDir.exists() && tagsFile.exists()){
-            val br = BufferedReader(FileReader(tagsFile))
-            val tags: MutableList<String> = mutableListOf()
-            
-            br.useLines {
-                it.map {line -> tags.add(line)}
-            }
+            Log.d(TAG, "importing project tags for $currentProject")
 
-            // Convert strings to tag entries
-            val tagEntries: MutableList<TagEntry> = mutableListOf()
+            val inputAsString = FileInputStream(tagsFile).bufferedReader().use { it.readText() }
+            val tags: List<String> = inputAsString.split('\n')
+
+            Log.d(TAG, "handling $tags")
+            // Convert text to tag entries and enter into database
             for (text in tags){
-                var tagEntry = db.tagDao().getTagByText(text)
-                if (tagEntry == null) tagEntry = TagEntry(text)
-                tagEntries.add(tagEntry)
+                if (text.isEmpty()) continue
+                Log.d(TAG, "handling $text")
+                // Get the tag
+                var tagEntry: TagEntry? = db.tagDao().getTagByText(text)
+                // If it does not exist insert into tag table
+                if (tagEntry == null) {
+                    tagEntry = TagEntry(text)
+                    val tagId = db.tagDao().insertTag(tagEntry)
+                    tagEntry.id = tagId
+                    Log.d(TAG, "inserted $tagEntry")
+                }
+
+                val projectTagEntry = ProjectTagEntry(currentProject.id, tagEntry.id)
+                // Insert tag and project tag into db
+                db.projectTagDao().insertProjectTag(projectTagEntry)
+                Log.d(TAG, "inserted $projectTagEntry")
             }
-
-            // TODO insert tags into database
-            return tagEntries.toList()
-
-        } else {
-            return null
         }
     }
 }
