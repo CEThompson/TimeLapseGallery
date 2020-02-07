@@ -32,6 +32,11 @@ object FileUtils {
         return File(externalFilesDir, projectPath)
     }
 
+    fun getMetaDirectoryForProject(externalFilesDir: File, projectEntry: ProjectEntry): File{
+        val projectDir = getProjectFolder(externalFilesDir, projectEntry)
+        return File(projectDir, META_FILE_SUBDIRECTORY)
+    }
+
     // Creates a list of photo entries in a project folder sorted by timestamp
     fun getPhotoEntriesInProjectDirectory(externalFilesDir: File, projectEntry: ProjectEntry): List<PhotoEntry>? {
         val photos: MutableList<PhotoEntry> = ArrayList()
@@ -227,6 +232,8 @@ object FileUtils {
     }
 
     fun addTagToProject(externalFilesDir: File, project: Project, tags: List<TagEntry>?){
+        if (tags == null) return // If no tags no need to write file
+
         val projectDir = getProjectFolder(externalFilesDir, project)
         val metaDir = File(projectDir, META_FILE_SUBDIRECTORY)
 
@@ -234,10 +241,14 @@ object FileUtils {
 
         val tagsFile = File(metaDir, "tags.txt")
 
+        // TODO handle writing in try catch block
         // Write the tags to a text file
         val output = FileOutputStream(tagsFile)
         val outputStreamWriter = OutputStreamWriter(output)
-        outputStreamWriter.write(tags.toString())
+
+        for (tag in tags) {
+            outputStreamWriter.write(tag.tag + "\n")
+        }
         outputStreamWriter.flush()
         output.fd.sync()
         outputStreamWriter.close()

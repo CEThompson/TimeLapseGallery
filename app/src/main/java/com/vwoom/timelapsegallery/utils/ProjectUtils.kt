@@ -8,7 +8,10 @@ import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase.Companion.getInstance
 import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.entry.TagEntry
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
 import java.util.*
 
 object ProjectUtils {
@@ -50,8 +53,9 @@ object ProjectUtils {
 
             // Check for valid timestamps
             if (projectFiles != null) {
-                for (photoFile in projectFiles) {
-                    val photoUrl = photoFile.absolutePath
+                for (file in projectFiles) {
+                    if (file.isDirectory) continue  // skips the meta subfolder
+                    val photoUrl = file.absolutePath
                     val photoFilename = photoUrl.substring(photoUrl.lastIndexOf("/") + 1)
                     try {
                         java.lang.Long.valueOf(photoFilename.replaceFirst("[.][^.]+$".toRegex(), ""))
@@ -111,6 +115,9 @@ object ProjectUtils {
 
                         /* import the photos for the project */
                         importProjectPhotos(storageDir, db, currentProject)
+
+                        // TODO import the tags for the project
+                        importProjectTags(storageDir, db, currentProject)
                     }
                 }
             }
@@ -133,6 +140,39 @@ object ProjectUtils {
             val coverPhoto = CoverPhotoEntry(lastPhoto.project_id, lastPhoto.id)
             Log.d(TAG, "inserting coverphoto $coverPhoto")
             db.coverPhotoDao().insertPhoto(coverPhoto)
+        }
+    }
+
+    private suspend fun importProjectTags(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry): List<TagEntry>? {
+        val metaDir = FileUtils.getMetaDirectoryForProject(externalFilesDir, currentProject)
+        val tagsFile = File(metaDir, FileUtils.TAGS_DEFINITION_TEXT_FILE)
+
+        if (metaDir.exists() && tagsFile.exists()){
+            val br = BufferedReader(FileReader(tagsFile))
+            var line: String
+
+            val tags: MutableList<String> = mutableListOf()
+
+            // TODO handle writing as try catch
+            while(true){
+                line = br.readLine()
+                if (line.isEmpty()) break
+                tags.add(line)
+            }
+            br.close()
+
+            // Convert strings to tag entries
+            val tagEntries: MutableList<TagEntry> = mutableListOf()
+            for (text in tags){
+                var tagEntry = db.tagDao().getTagByText(text)
+                if (tagEntry == null) tagEntry = TagEntry(text)
+                tagEntries.add(tagEntry)
+            }
+
+            return tagEntries.toList()
+
+        } else {
+            return null
         }
     }
 }
