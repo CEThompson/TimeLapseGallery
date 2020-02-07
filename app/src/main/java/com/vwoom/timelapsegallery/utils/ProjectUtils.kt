@@ -149,17 +149,11 @@ object ProjectUtils {
 
         if (metaDir.exists() && tagsFile.exists()){
             val br = BufferedReader(FileReader(tagsFile))
-            var line: String
-
             val tags: MutableList<String> = mutableListOf()
-
-            // TODO handle writing as try catch
-            while(true){
-                line = br.readLine()
-                if (line.isEmpty()) break
-                tags.add(line)
+            
+            br.useLines {
+                it.map {line -> tags.add(line)}
             }
-            br.close()
 
             // Convert strings to tag entries
             val tagEntries: MutableList<TagEntry> = mutableListOf()
@@ -169,6 +163,7 @@ object ProjectUtils {
                 tagEntries.add(tagEntry)
             }
 
+            // TODO insert tags into database
             return tagEntries.toList()
 
         } else {
