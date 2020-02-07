@@ -7,6 +7,7 @@
 
     <color name="colorTag">#03A9F4</color>
 
+    <color name="colorYellow">#FFC107</color>
     <color name="colorGreen">#4CAF50</color>
     <color name="colorGreenDark">#00574B</color>
     <color name="colorRedAccent">#D81B60</color>

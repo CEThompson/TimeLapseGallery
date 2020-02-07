@@ -567,11 +567,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             //
             if (currentProject.interval_days == 0 || currentProject.interval_days == null) {
                 mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.none)
-                binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorAccent))
+                binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
             } else {
                 mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)
                         ?.text = getString(R.string.scheduled)
-                binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+                binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
             }
 
             //
