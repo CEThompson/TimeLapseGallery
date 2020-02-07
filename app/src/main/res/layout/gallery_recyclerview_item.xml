@@ -36,10 +36,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/schedule_indicator_content_description"
-                android:src="@drawable/ic_schedule_white_24dp"
+                android:src="@drawable/ic_schedule_indicator_40dp"
                 android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintBottom_toBottomOf="parent" />
 
             <!-- x or check mark drawable to indicate if photo has been taken today -->
             <ImageView

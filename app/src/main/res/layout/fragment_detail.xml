@@ -179,7 +179,7 @@
                         android:id="@+id/detail_schedule_indicator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_schedule_white_24dp"
+                        android:src="@drawable/ic_schedule_indicator_40dp"
                         android:visibility="invisible"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintStart_toStartOf="parent"/>
