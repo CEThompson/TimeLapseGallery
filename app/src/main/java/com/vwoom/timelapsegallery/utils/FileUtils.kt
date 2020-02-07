@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.utils
 
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import java.io.*
 import java.util.*
@@ -9,6 +10,8 @@ import java.util.*
 object FileUtils {
     const val ReservedChars = "|\\?*<\":>+[]/'"
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
+    const val META_FILE_SUBDIRECTORY = "meta"
+    const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
     private val TAG = FileUtils::class.java.simpleName
 
     // Creates an image file for a project in the projects folder by project view
@@ -221,5 +224,22 @@ object FileUtils {
 
     fun getPhotoFileNames(timestamp: Long): Array<String> {
         return arrayOf("$timestamp.jpg","$timestamp.png","$timestamp.jpeg")
+    }
+
+    fun addTagToProject(externalFilesDir: File, project: Project, tags: List<TagEntry>?){
+        val projectDir = getProjectFolder(externalFilesDir, project)
+        val metaDir = File(projectDir, META_FILE_SUBDIRECTORY)
+
+        if (!metaDir.exists()) metaDir.mkdir()
+
+        val tagsFile = File(metaDir, "tags.txt")
+
+        // Write the tags to a text file
+        val output = FileOutputStream(tagsFile)
+        val outputStreamWriter = OutputStreamWriter(output)
+        outputStreamWriter.write(tags.toString())
+        outputStreamWriter.flush()
+        output.fd.sync()
+        outputStreamWriter.close()
     }
 }

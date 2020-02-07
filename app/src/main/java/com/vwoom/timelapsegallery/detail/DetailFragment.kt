@@ -656,6 +656,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     binding.projectInformationLayout.detailsProjectTagsTextview.text = tagsText
                     binding.projectInformationLayout.detailsProjectTagsTextview.visibility = VISIBLE
                 }
+
+                // TODO write the tags to the projects text file
+                FileUtils.addTagToProject(mExternalFilesDir!!, mCurrentProject!!, mProjectTags)
             }
         })
 

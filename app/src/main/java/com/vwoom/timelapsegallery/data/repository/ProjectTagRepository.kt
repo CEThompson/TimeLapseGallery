@@ -5,6 +5,7 @@ import com.vwoom.timelapsegallery.data.dao.TagDao
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.utils.FileUtils
 
 class ProjectTagRepository private constructor(private val projectTagDao: ProjectTagDao,
                                                private val tagDao: TagDao) {
@@ -61,7 +62,7 @@ class ProjectTagRepository private constructor(private val projectTagDao: Projec
         // Check if tag already belongs to project
         var projectTagEntry = projectTagDao.getProjectTag(project.project_id, tagEntry.id)
 
-        // Only insert project tag if unique the project hasn't been assigned that tag already
+        // Only insert project tag if the project hasn't been assigned that tag already
         if (projectTagEntry == null) {
             projectTagEntry = ProjectTagEntry(project.project_id, tagEntry.id)
             projectTagDao.insertProjectTag(projectTagEntry)
