@@ -119,8 +119,24 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     override fun onStop() {
         super.onStop()
-        if (mFullscreenImageDialog?.isShowing == true) mFullscreenImageDialog?.dismiss()
         binding.detailsFragmentToolbar.setNavigationOnClickListener(null)
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        binding.detailsFragmentToolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        playJob?.cancel()
+        tagJob?.cancel()
+        mProjectInfoDialog?.dismiss()
+        mFullscreenImageDialog?.dismiss()
+        mProjectTagDialog?.dismiss()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -187,22 +203,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         showPhotoInformation()
 
         return binding.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        binding.detailsFragmentToolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        playJob?.cancel()
-        tagJob?.cancel()
-        mProjectInfoDialog?.dismiss()
-        mFullscreenImageDialog?.dismiss()
-        mProjectTagDialog?.dismiss()
     }
 
     private fun showPhotoInformation() {
