@@ -139,6 +139,13 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mProjectTagDialog?.dismiss()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (detailViewModel.fullscreenIsShowing){
+            mFullscreenImageDialog?.show()
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = FragmentDetailBinding.inflate(inflater, container, false).apply {
@@ -179,7 +186,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding.projectScheduleFab.setOnClickListener { detailViewModel.toggleSchedule(mCurrentProject!!) }
         binding.projectTagFab.setOnClickListener { mProjectTagDialog?.show() }
         binding.projectInformationFab.setOnClickListener {mProjectInfoDialog?.show()}
-        binding.fullscreenFab.setOnClickListener { if (!mPlaying) mFullscreenImageDialog?.show() }
+        binding.fullscreenFab.setOnClickListener {
+            if (!mPlaying) {
+                mFullscreenImageDialog?.show()
+                detailViewModel.fullscreenIsShowing = true
+            }
+        }
 
         // Set a swipe listener for the image
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
@@ -492,11 +504,20 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val mFullscreenBackFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_back_fab)
 
         // Display the dialog on clicking the image
-        mFullscreenBackFab?.setOnClickListener { mFullscreenImageDialog?.dismiss() }
-        mFullscreenExitFab?.setOnClickListener { mFullscreenImageDialog?.dismiss() }
+        mFullscreenBackFab?.setOnClickListener {
+            mFullscreenImageDialog?.dismiss()
+            detailViewModel.fullscreenIsShowing = false
+        }
+        mFullscreenExitFab?.setOnClickListener {
+            mFullscreenImageDialog?.dismiss()
+            detailViewModel.fullscreenIsShowing = false
+        }
 
         mFullscreenImageDialog?.setOnKeyListener { _, keyCode, _ ->
-            if (keyCode == KeyEvent.KEYCODE_BACK) mFullscreenImageDialog?.dismiss()
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                mFullscreenImageDialog?.dismiss()
+                detailViewModel.fullscreenIsShowing = false
+            }
             true
         }
 

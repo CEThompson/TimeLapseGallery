@@ -27,7 +27,8 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
     val currentProject: LiveData<Project> = projectRepository.getProjectView(projectId)
     val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
 
-    var isPlaying: Boolean = false
+    private var isPlaying: Boolean = false
+    var fullscreenIsShowing: Boolean = false
 
     var lastPhoto: Photo? = null
 
