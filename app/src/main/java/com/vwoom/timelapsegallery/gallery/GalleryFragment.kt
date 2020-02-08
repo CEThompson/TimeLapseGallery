@@ -54,11 +54,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mGalleryAdapter = null
-    }
-
     override fun onPause() {
         super.onPause()
         mFilterDialog?.dismiss()
