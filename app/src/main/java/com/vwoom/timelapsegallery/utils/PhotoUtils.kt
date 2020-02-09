@@ -9,6 +9,7 @@ import java.io.IOException
 
 object PhotoUtils {
     private val TAG = PhotoUtils::class.java.simpleName
+
     /* Returns the aspect ratio from the photo path */
     fun getAspectRatioFromImagePath(path: String?): String {
         val bmOptions = BitmapFactory.Options()
@@ -96,7 +97,7 @@ object PhotoUtils {
         return BitmapFactory.decodeFile(path, options)
     }
 
-    fun calculateInSampleSize(
+    private fun calculateInSampleSize(
             options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int { // Raw height and width of image
         val height = options.outHeight
         val width = options.outWidth

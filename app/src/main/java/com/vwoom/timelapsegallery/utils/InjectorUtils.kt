@@ -2,7 +2,6 @@ package com.vwoom.timelapsegallery.utils
 
 import android.content.Context
 import android.content.Intent
-import android.widget.RemoteViewsService
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.Photo

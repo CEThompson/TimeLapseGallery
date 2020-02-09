@@ -72,17 +72,10 @@ object ProjectUtils {
 
     /* Helper to scan through folders and import projects */
     suspend fun importProjects(context: Context) {
-        //Log.d(TAG, "Importing projects")
-        //context.deleteDatabase(TimeLapseDatabase.DATABASE_NAME)
         val db = getInstance(context)
 
-        // Delete all project references in the database
-        // TODO clear entire database
+        // Delete projects and tags in the database: should clear all tables by cascade
         db.projectDao().deleteAllProjects()
-        //db.coverPhotoDao().deleteAllCoverPhotos()
-        //db.photoDao().deleteAllPhotos()
-        //db.projectTagDao().deleteAllProjectTags()
-        //db.projectScheduleDao().deleteAllProjectSchedules()
         db.tagDao().deleteAllTags()
 
         // Add all project references from the file structure
