@@ -12,6 +12,7 @@ object FileUtils {
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
     const val META_FILE_SUBDIRECTORY = "meta"
     const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
+    private const val ERROR_TIMESTAMP_TO_PHOTO = "error retrieving photo from timestamp"
     private val TAG = FileUtils::class.java.simpleName
 
     // Creates an image file for a project in the projects folder by project view
@@ -191,17 +192,18 @@ object FileUtils {
         return "error retrieving image file from timestamp"
     }
 
+    // TODO Look into improving photo retrieval
     fun getPhotoUrl(externalFilesDir: File, project: Project, photoEntry: PhotoEntry): String {
         val imageFileNames: Array<String> = getPhotoFileNames(photoEntry)
         val projectDir = getProjectFolder(externalFilesDir, project)
 
         lateinit var photoFile: File
+        // Try the timestamp to various file formats, i.e. timestamp.jpeg, timestamp.png, timestamp.jpg
         for (fileName in imageFileNames){
             photoFile = File(projectDir, fileName)
             if (photoFile.exists()) return photoFile.absolutePath
         }
-        // TODO handle error case better
-        return "error retrieving image file from timestamp"
+        return ERROR_TIMESTAMP_TO_PHOTO
     }
 
     fun getCoverPhotoUrl(externalFilesDir: File, project: Project): String {
@@ -213,8 +215,7 @@ object FileUtils {
             photoFile = File(projectDir, fileName)
             if (photoFile.exists()) return photoFile.absolutePath
         }
-        // TODO handle error case better
-        return "error retrieving image file from timestamp"
+        return ERROR_TIMESTAMP_TO_PHOTO
     }
 
     fun getPhotoFileNames(entry: PhotoEntry): Array<String> {
@@ -234,7 +235,7 @@ object FileUtils {
 
         if (!metaDir.exists()) metaDir.mkdir()
 
-        val tagsFile = File(metaDir, "tags.txt")
+        val tagsFile = File(metaDir, TAGS_DEFINITION_TEXT_FILE)
 
         // TODO handle writing in try catch block
         // Write the tags to a text file
