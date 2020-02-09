@@ -161,26 +161,26 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         closeBackgroundThread()
     }
 
-    fun closeCamera() {
+    private fun closeCamera() {
         cameraCaptureSession?.close()
         cameraCaptureSession = null
         cameraDevice?.close()
         cameraDevice = null
     }
 
-    fun closeBackgroundThread() {
+    private fun closeBackgroundThread() {
         cameraThread?.quitSafely()
         cameraThread = null
         cameraHandler = null
     }
 
-    fun openBackGroundThread() {
+    private fun openBackGroundThread() {
         cameraThread = HandlerThread("camera_handler")
         cameraThread?.start()
         cameraHandler = Handler(cameraThread!!.looper)
     }
 
-    fun setupCamera() {
+    private fun setupCamera() {
         openBackGroundThread()
         lateinit var cameraIdToSet: String
         try {
@@ -207,14 +207,20 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     fun setTapToFocus(){
         @Suppress("ClickableViewAccessibility")
-        camera2Preview.setOnTouchListener(CameraFocusOnTouchHandler(
-                cameraCharacteristics,
-                captureRequestBuilder,
-                cameraCaptureSession,
-                cameraHandler))
+        if (cameraCharacteristics != null
+            && captureRequestBuilder != null
+            && cameraCaptureSession != null
+            && cameraHandler != null)
+        {
+            camera2Preview.setOnTouchListener(CameraFocusOnTouchHandler(
+                    cameraCharacteristics!!,
+                    captureRequestBuilder!!,
+                    cameraCaptureSession!!,
+                    cameraHandler!!))
+        }
     }
 
-    fun setTakePictureFab() {
+    private fun setTakePictureFab() {
         mTakePictureFab?.setOnClickListener {
             var outputPhoto: FileOutputStream? = null
             try {
