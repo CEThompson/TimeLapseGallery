@@ -31,6 +31,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
+// TODO fix gallery leak
+// TODO gallery slows down with usage, figure out why
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private var mFilterDialog: Dialog? = null
