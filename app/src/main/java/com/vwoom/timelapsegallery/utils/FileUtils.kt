@@ -82,12 +82,12 @@ object FileUtils {
     @Throws(IOException::class)
     fun createFinalFileFromTemp(
             externalFilesDir: File,
-            tempPath: String?,
+            tempPath: String,
             projectEntry: ProjectEntry,
             timestamp: Long): File {
         // Create the permanent file for the photo
         val finalFile = createImageFileForProject(externalFilesDir, projectEntry, timestamp)
-        // Create tempfile from previous path
+        // Create temporary file from previous path
         val tempFile = File(tempPath)
         // Copy file to new destination
         copy(tempFile, finalFile)
@@ -99,35 +99,29 @@ object FileUtils {
     // Used to copy temp photo file to final photo file
     @Throws(IOException::class)
     private fun copy(src: File, dst: File) {
-        val `in`: InputStream = FileInputStream(src)
-        try {
+        val input: InputStream = FileInputStream(src)
+        input.use {
             val out: OutputStream = FileOutputStream(dst)
-            try {
+            out.use {
                 val buf = ByteArray(1024)
                 var len: Int
-                while (`in`.read(buf).also { len = it } > 0) {
+                while (input.read(buf).also { len = it } > 0) {
                     out.write(buf, 0, len)
                 }
-            } finally {
-                out.close()
             }
-        } finally {
-            `in`.close()
         }
     }
 
     // Copies a Project from one folder to another: For use in renaming a project
-    fun renameProject(externalFilesDir: File, sourceProject: ProjectEntry, destinationProject: ProjectEntry): Boolean { // Create a file for the source project
-        val sourceProjectPath = getProjectDirectoryPath(sourceProject)
+    fun renameProject(externalFilesDir: File, sourceProjectEntry: ProjectEntry, destinationProjectEntry: ProjectEntry): Boolean { // Create a file for the source project
+        val sourceProjectPath = getProjectDirectoryPath(sourceProjectEntry)
         val sourceProject = File(externalFilesDir, sourceProjectPath)
         // Create a file for the destination project
-        val destinationProjectPath = getProjectDirectoryPath(destinationProject)
+        val destinationProjectPath = getProjectDirectoryPath(destinationProjectEntry)
         val destinationProject = File(externalFilesDir, destinationProjectPath)
-        // Rename the folder
-        val success = sourceProject.renameTo(destinationProject)
 
-        // Return true if rename is successful
-        return success
+        // Rename the folder: returns true if successful and false if not
+        return sourceProject.renameTo(destinationProject)
     }
 
     // Deletes the temporary directory and files within
@@ -140,9 +134,11 @@ object FileUtils {
     // Recursive delete used by delete project, delete temp, or delete photo
     private fun deleteRecursive(fileOrFileDirectory: File) {
         if (fileOrFileDirectory.isDirectory) {
-            for (child in fileOrFileDirectory.listFiles()) {
-                deleteRecursive(child)
-            }
+            val files = fileOrFileDirectory.listFiles()
+            if (files!=null)
+                for (child in files) {
+                    deleteRecursive(child)
+                }
         }
         fileOrFileDirectory.delete()
     }
@@ -162,9 +158,8 @@ object FileUtils {
 
     // Returns true if a path contain a reserved character
     fun pathContainsReservedCharacter(path: String): Boolean {
-        for (i in 0 until ReservedChars.length) {
-            val current = ReservedChars[i]
-            if (path.indexOf(current) >= 0) return true
+        for (character in ReservedChars){
+            if (path.contains(character)) return true
         }
         return false
     }
