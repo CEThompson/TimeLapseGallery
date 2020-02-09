@@ -230,7 +230,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 camera2Preview.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
 
                 takePictureJob = cameraViewModel.viewModelScope.launch {
-                    async { cameraViewModel.handleFile(file, externalFilesDir) }.await()
+                    cameraViewModel.handleFile(file, externalFilesDir)
                     findNavController().popBackStack()
                 }
             } catch(e: Exception) {
