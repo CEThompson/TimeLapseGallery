@@ -10,10 +10,9 @@ import java.util.*
 object FileUtils {
     const val ReservedChars = "|\\?*<\":>+[]/'"
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
-    const val META_FILE_SUBDIRECTORY = "meta"
+    private const val META_FILE_SUBDIRECTORY = "meta"
     const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
     private const val ERROR_TIMESTAMP_TO_PHOTO = "error retrieving photo from timestamp"
-    private val TAG = FileUtils::class.java.simpleName
 
     // Creates an image file for a project in the projects folder by project view
     private fun createImageFileForProject(storageDirectory: File, projectEntry: ProjectEntry, timestamp: Long): File {
