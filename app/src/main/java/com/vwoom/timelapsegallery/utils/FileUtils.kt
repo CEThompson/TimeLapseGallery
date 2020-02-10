@@ -44,17 +44,16 @@ object FileUtils {
         val files = projectFolder.listFiles()
         if (files != null) {
             for (child in files) {
-                if (!child.isFile) continue  // If the child is a directory skip it
+                // Skip directories
+                if (!child.isFile) continue
+
+                // Get the timestamp from the url
                 val url = child.absolutePath
                 val filename = url.substring(url.lastIndexOf("/") + 1)
-                // Split the filename at the extension
                 val filenameParts = filename.split(".").toTypedArray()
-                val extension = filenameParts[1]
+                val timestamp = filenameParts[0].toLong()
 
-                if (extension == "txt") continue  // If the child is a text file skip it
-                // This regex matches and replaces (removes) the file extension
-// long timestamp = Long.valueOf(filename.replaceFirst("[.][^.]+$",""));
-                val timestamp = java.lang.Long.valueOf(filenameParts[0])
+                // Create a photo entry for the timestamp
                 val photoEntry = PhotoEntry(projectEntry.id, timestamp)
                 photos.add(photoEntry)
             }
@@ -188,7 +187,7 @@ object FileUtils {
             if (photoFile.exists()) return photoFile.absolutePath
         }
         // TODO handle error case better
-        return "error retrieving image file from timestamp"
+        return ERROR_TIMESTAMP_TO_PHOTO
     }
 
     // TODO Look into improving photo retrieval
