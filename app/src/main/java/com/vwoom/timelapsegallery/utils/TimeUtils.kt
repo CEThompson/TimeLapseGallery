@@ -6,14 +6,16 @@ import com.vwoom.timelapsegallery.R
 import java.text.SimpleDateFormat
 import java.util.*
 
+// TODO determine if time utils should be removed: depends on scheduling system usage overall
 object TimeUtils {
-    var DAY_IN_MILLISECONDS = (1000 * 60 * 60 * 24).toLong()
-    var WEEK_IN_MILLISECONDS = (1000 * 60 * 60 * 24 * 7).toLong()
-    var SCHEDULE_NONE = 0
-    var SCHEDULE_DAILY = 1
-    var SCHEDULE_WEEKLY = 2
+    private var DAY_IN_MILLISECONDS = (1000 * 60 * 60 * 24).toLong()
+    private var WEEK_IN_MILLISECONDS = (1000 * 60 * 60 * 24 * 7).toLong()
+    private var SCHEDULE_NONE = 0
+    private var SCHEDULE_DAILY = 1
+    private var SCHEDULE_WEEKLY = 2
+
     /* Creates a time interval from a schedule identification */
-    fun getTimeIntervalFromSchedule(schedule: Int): Long {
+    private fun getTimeIntervalFromSchedule(schedule: Int): Long {
         var alarmInterval: Long = 0
         // Minutes = 1000 ms * 60 seconds per minute * 60 minutes per hour * 24 hours per day
         if (schedule == SCHEDULE_DAILY) {
