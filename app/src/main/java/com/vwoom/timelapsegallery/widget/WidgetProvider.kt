@@ -48,7 +48,7 @@ class WidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.widget_layout)
             val adapterIntent = Intent(context, WidgetGridRemoteViewsService::class.java)
             views.setRemoteAdapter(R.id.widget_list_view, adapterIntent)
-            
+
 
             // TODO launch gallery filtered by schedule on clicking widget
             // TODO simplify widget to a simple preview of scheduled projects
