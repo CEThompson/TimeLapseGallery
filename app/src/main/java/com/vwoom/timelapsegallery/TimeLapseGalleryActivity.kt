@@ -23,10 +23,6 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         FileUtils.deleteTempFiles(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES))
-    }
-
-    override fun onStop() {
-        super.onStop()
         UpdateWidgetService.startActionUpdateWidgets(this)
     }
 }
