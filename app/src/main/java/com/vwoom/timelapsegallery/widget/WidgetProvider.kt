@@ -16,18 +16,6 @@ class WidgetProvider : AppWidgetProvider() {
         UpdateWidgetService.startActionUpdateWidgets(context)
     }
 
-    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
-        super.onDeleted(context, appWidgetIds)
-    }
-
-    override fun onEnabled(context: Context) {
-        super.onEnabled(context)
-    }
-
-    override fun onDisabled(context: Context) {
-        super.onDisabled(context)
-    }
-
     companion object {
         val TAG = WidgetProvider::class.java.simpleName
 
@@ -60,7 +48,10 @@ class WidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.widget_layout)
             val adapterIntent = Intent(context, WidgetGridRemoteViewsService::class.java)
             views.setRemoteAdapter(R.id.widget_list_view, adapterIntent)
-            // TODO navigate to detail fragment
+            
+
+            // TODO launch gallery filtered by schedule on clicking widget
+            // TODO simplify widget to a simple preview of scheduled projects
             val appIntent = Intent(context, TimeLapseGalleryActivity::class.java)
             val appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             views.setPendingIntentTemplate(R.id.widget_list_view, appPendingIntent)
