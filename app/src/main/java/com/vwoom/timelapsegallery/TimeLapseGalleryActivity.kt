@@ -7,6 +7,7 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.initialization.InitializationStatus
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener
 import com.vwoom.timelapsegallery.utils.FileUtils
+import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 
 class TimeLapseGalleryActivity : AppCompatActivity() {
 
@@ -22,5 +23,10 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         FileUtils.deleteTempFiles(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        UpdateWidgetService.startActionUpdateWidgets(this)
     }
 }

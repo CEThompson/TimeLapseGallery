@@ -29,6 +29,8 @@ class WidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
+        val TAG = WidgetProvider::class.java.simpleName
+
         @JvmStatic
         fun updateWidgets(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, projects: List<ProjectEntry>) {
             for (appWidgetId in appWidgetIds) {
@@ -39,7 +41,7 @@ class WidgetProvider : AppWidgetProvider() {
         private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, projects: List<ProjectEntry>) {
             val views: RemoteViews
             // If there are no projects handle the layout here
-            if (projects.size == 0) {
+            if (projects.isEmpty()) {
                 views = RemoteViews(context.packageName, R.layout.widget_layout)
                 views.setTextViewText(R.id.widget_text_view, context.getString(R.string.no_projects_for_today))
                 views.setViewVisibility(R.id.widget_text_view, View.VISIBLE)

@@ -5,10 +5,8 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.text.format.DateUtils
 import android.util.Log
-import com.vwoom.timelapsegallery.data.repository.ProjectRepository
-import com.vwoom.timelapsegallery.data.repository.ProjectScheduleRepository
+import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.widget.WidgetProvider.Companion.updateWidgets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,9 +14,7 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 // TODO test widget
-class UpdateWidgetService(
-        private val projectRepository: ProjectRepository,
-        private val projectScheduleRepository: ProjectScheduleRepository)
+class UpdateWidgetService
     : IntentService("UpdateWidgetService"), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -34,28 +30,21 @@ class UpdateWidgetService(
     }
 
     private fun updateWidgets() {
-        val context = this
+        val context = applicationContext
         launch {
-                // Retrieve the database
+            // Retrieve the database
+            val projectRepository = InjectorUtils.getProjectRepository(context)
+            // Get the list of all scheduled projects from the database
+            val allScheduledProjects = projectRepository.getScheduledProjects()
 
-                // Get the list of all scheduled projects from the database
-                val allScheduledProjects = projectRepository.getScheduledProjects()
-
-                // TODO figure out better way to get projects scheduled for today
-                // Create the list of projects scheduled for today
-                val projectsScheduledForToday = allScheduledProjects.filter {
-                    val schedule = projectScheduleRepository.getProjectSchedule(it.id)
-                    if (schedule?.schedule_time == null) return@filter false
-                    else return@filter DateUtils.isToday(schedule?.schedule_time!!)
-                }
-                // Update the widgets
-                val appWidgetManager = AppWidgetManager.getInstance(context)
-                val appWidgetIds = appWidgetManager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java))
-                updateWidgets(
-                        context,
-                        appWidgetManager,
-                        appWidgetIds,
-                        projectsScheduledForToday) // Send the list of projects scheduled for today
+            // Update the widgets
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val appWidgetIds: IntArray = appWidgetManager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java))
+            updateWidgets(
+                    context,
+                    appWidgetManager,
+                    appWidgetIds,
+                    allScheduledProjects) // Send the list of projects scheduled for today
 
         }
     }
@@ -64,7 +53,7 @@ class UpdateWidgetService(
         const val ACTION_UPDATE_WIDGETS = "com.example.android.timelapsegallery.UPDATE_WIDGETS"
         private val TAG = UpdateWidgetService::class.java.simpleName
         fun startActionUpdateWidgets(context: Context) {
-            Log.d(TAG, "starting service to update widgets")
+            Log.d(TAG, "WidgetTracker: starting service to update widgets")
             val intent = Intent(context, UpdateWidgetService::class.java)
             intent.action = ACTION_UPDATE_WIDGETS
             context.startService(intent)

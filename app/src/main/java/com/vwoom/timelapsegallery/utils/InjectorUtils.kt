@@ -26,7 +26,7 @@ object InjectorUtils {
                 TimeLapseDatabase.getInstance(context.applicationContext).coverPhotoDao())
     }
 
-    private fun getProjectRepository(context: Context): ProjectRepository {
+    fun getProjectRepository(context: Context): ProjectRepository {
         return ProjectRepository.getInstance(
                 TimeLapseDatabase.getInstance(context.applicationContext).projectDao(),
                 TimeLapseDatabase.getInstance(context.applicationContext).photoDao(),

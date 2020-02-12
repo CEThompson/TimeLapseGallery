@@ -5,13 +5,10 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Environment
-import android.text.format.DateUtils
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService.RemoteViewsFactory
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.data.TimeLapseDatabase
-import com.vwoom.timelapsegallery.data.TimeLapseDatabase.Companion.getInstance
 import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
@@ -20,7 +17,6 @@ import com.vwoom.timelapsegallery.data.repository.CoverPhotoRepository
 import com.vwoom.timelapsegallery.data.repository.PhotoRepository
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.ProjectScheduleRepository
-import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.FileUtils.getPhotoUrl
 import com.vwoom.timelapsegallery.utils.PhotoUtils.decodeSampledBitmapFromPath
 import com.vwoom.timelapsegallery.utils.PhotoUtils.getOrientationFromImagePath
@@ -45,15 +41,7 @@ class WidgetGridRemoteViewsFactory(
 
     override fun onDataSetChanged() {
         // Load the projects for the day
-        var projects = projectRepository.getScheduledProjects()
-
-        // Filter scheduled projects for today
-        projects = projects.filter {
-            val schedule = projectScheduleRepository.getProjectScheduleNonSuspend(it.id)
-            if (schedule?.schedule_time == null) return@filter false
-            else return@filter DateUtils.isToday(schedule?.schedule_time!!)
-        }
-        mProjects = projects
+        mProjects = projectRepository.getScheduledProjects()
     }
 
     override fun onDestroy() {}
@@ -62,12 +50,12 @@ class WidgetGridRemoteViewsFactory(
     }
 
     override fun getViewAt(i: Int): RemoteViews { // Get the current project
-        val currentProject: ProjectEntry = mProjects!![i]
+        val currentProject: ProjectEntry = mProjects[i]
         val projectSchedule: ProjectScheduleEntry? = projectScheduleRepository.getProjectScheduleNonSuspend(currentProject.id)
         val coverPhoto: CoverPhotoEntry = coverPhotoRepository.getCoverPhoto(currentProject.id)
         val photoEntry: PhotoEntry = photoRepository.getPhoto(currentProject.id, coverPhoto.photo_id)
 
-        val nextSubmissionTime = getNextScheduledSubmission(projectSchedule?.schedule_time!!, projectSchedule?.interval_days!!)
+        val nextSubmissionTime = getNextScheduledSubmission(projectSchedule?.schedule_time!!, projectSchedule.interval_days!!)
         // Get strings
         val nextSubmissionTimeString = getTimeFromTimestamp(nextSubmissionTime)
         // Create the remote views

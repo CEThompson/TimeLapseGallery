@@ -9,6 +9,7 @@ import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
+import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
