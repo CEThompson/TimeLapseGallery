@@ -66,6 +66,19 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         tagJob?.cancel()
     }
 
+    override fun onDestroyView() {
+        // Prevent gallery recycler view from leaking by nullifying the adapter on detach
+        // This is necessary because of transition animations
+        mGalleryRecyclerView?.addOnAttachStateChangeListener(object: View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View?) {
+            }
+            override fun onViewDetachedFromWindow(v: View?) {
+                mGalleryRecyclerView?.adapter = null
+            }
+        })
+        super.onDestroyView()
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         //if (mBinding == null) postponeEnterTransition()
