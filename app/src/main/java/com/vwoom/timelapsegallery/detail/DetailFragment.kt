@@ -255,10 +255,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 startActivity(Intent.createChooser(shareIntent, "Share Image"))
                 true
             }
-            R.id.edit_project -> {
-                mProjectInfoDialog?.show()
-                true
-            }
             R.id.delete_photo -> {
                 if (mPhotos?.size == 1) {
                     verifyLastPhotoDeletion()

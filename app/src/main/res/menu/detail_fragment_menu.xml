@@ -7,10 +7,6 @@
         android:icon="@drawable/ic_share_white_24dp"
         app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/edit_project"
-        android:title="@string/edit_project"
-        app:showAsAction="never"/>
-
     <item android:id="@+id/delete_photo"
         android:title="@string/delete_photo"
         app:showAsAction="never"/>
