@@ -173,7 +173,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         val searchEditText = mFilterDialog?.findViewById<EditText>(R.id.search_edit_text)
         searchEditText?.setText(mGalleryViewModel.searchName)   // recover current search term
         searchEditText?.addTextChangedListener {
-            mSearchName = it.toString()
+            mSearchName = it.toString().trim()
             updateSearchFilter()
         }
     }
