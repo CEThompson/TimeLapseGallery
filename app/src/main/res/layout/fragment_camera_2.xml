@@ -32,6 +32,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="40dp"
             android:src="@drawable/ic_add_a_photo_white_24dp"
+            app:fabCustomSize="@dimen/fab_large"
+            app:maxImageSize="@dimen/fab_max_image_size"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
