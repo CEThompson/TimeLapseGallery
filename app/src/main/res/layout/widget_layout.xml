@@ -5,9 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
-        android:id="@+id/widget_list_view"
+    <GridView
+        android:id="@+id/widget_grid_view"
         android:visibility="invisible"
+        android:numColumns="auto_fit"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/detail_small_margin"/>

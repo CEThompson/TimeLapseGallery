@@ -33,11 +33,11 @@ class WidgetProvider : AppWidgetProvider() {
                 views = RemoteViews(context.packageName, R.layout.widget_layout)
                 views.setTextViewText(R.id.widget_text_view, context.getString(R.string.no_projects_for_today))
                 views.setViewVisibility(R.id.widget_text_view, View.VISIBLE)
-                views.setViewVisibility(R.id.widget_list_view, View.INVISIBLE)
+                views.setViewVisibility(R.id.widget_grid_view, View.INVISIBLE)
             } else {
                 views = getGridRemoteViews(context)
                 views.setViewVisibility(R.id.widget_text_view, View.INVISIBLE)
-                views.setViewVisibility(R.id.widget_list_view, View.VISIBLE)
+                views.setViewVisibility(R.id.widget_grid_view, View.VISIBLE)
             }
             // Update the widget
             appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -47,14 +47,14 @@ class WidgetProvider : AppWidgetProvider() {
         private fun getGridRemoteViews(context: Context): RemoteViews {
             val views = RemoteViews(context.packageName, R.layout.widget_layout)
             val adapterIntent = Intent(context, WidgetGridRemoteViewsService::class.java)
-            views.setRemoteAdapter(R.id.widget_list_view, adapterIntent)
+            views.setRemoteAdapter(R.id.widget_grid_view, adapterIntent)
 
 
             // TODO launch gallery filtered by schedule on clicking widget
             // TODO simplify widget to a simple preview of scheduled projects
             val appIntent = Intent(context, TimeLapseGalleryActivity::class.java)
             val appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-            views.setPendingIntentTemplate(R.id.widget_list_view, appPendingIntent)
+            views.setPendingIntentTemplate(R.id.widget_grid_view, appPendingIntent)
             return views
         }
     }
