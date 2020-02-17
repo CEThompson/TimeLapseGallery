@@ -178,4 +178,8 @@ object ProjectUtils {
             }
         }
     }
+
+    private suspend fun importProjectSchedules(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry){
+        // TODO implement recovery of schedules from text file
+    }
 }

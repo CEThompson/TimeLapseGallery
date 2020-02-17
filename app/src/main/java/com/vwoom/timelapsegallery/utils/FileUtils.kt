@@ -11,6 +11,7 @@ object FileUtils {
     const val ReservedChars = "|\\?*<\":>+[]/'"
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
     private const val META_FILE_SUBDIRECTORY = "meta"
+    private const val SCHEDULE_TEXT_FILE = "schedule.txt"
     const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
     private const val ERROR_TIMESTAMP_TO_PHOTO = "error retrieving photo from timestamp"
 
@@ -246,5 +247,27 @@ object FileUtils {
         outputStreamWriter.flush()
         output.fd.sync()
         outputStreamWriter.close()
+    }
+
+    // TODO persist schedules for projects
+    fun scheduleProject(externalFilesDir: File, project: Project){
+        val projectDir = getProjectFolder(externalFilesDir, project)
+        val metaDir = File(projectDir, META_FILE_SUBDIRECTORY)
+        if (!metaDir.exists()) metaDir.mkdir()
+        val scheduleFile = File(metaDir, SCHEDULE_TEXT_FILE)
+
+        // Remove the schedule text file if unscheduled
+        if (project.interval_days == 0 || project.interval_days == null){
+            scheduleFile.delete()
+        }
+        // Otherwise add it
+        else {
+            val output = FileOutputStream(scheduleFile)
+            val outputStreamWriter = OutputStreamWriter(output)
+            outputStreamWriter.write(project.interval_days)
+            outputStreamWriter.flush()
+            output.fd.sync()
+            outputStreamWriter.close()
+        }
     }
 }

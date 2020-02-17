@@ -183,7 +183,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             findNavController().navigate(action)
         }
         binding.playAsVideoFab.setOnClickListener { playSetOfImages() }
-        binding.projectScheduleFab.setOnClickListener { detailViewModel.toggleSchedule(mCurrentProject!!) }
+        binding.projectScheduleFab.setOnClickListener {
+            detailViewModel.toggleSchedule(mExternalFilesDir!!, mCurrentProject!!)
+        }
         binding.projectTagFab.setOnClickListener { mProjectTagDialog?.show() }
         binding.projectInformationFab.setOnClickListener {mProjectInfoDialog?.show()}
         binding.fullscreenFab.setOnClickListener {
