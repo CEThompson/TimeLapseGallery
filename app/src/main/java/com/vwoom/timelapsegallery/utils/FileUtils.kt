@@ -14,7 +14,7 @@ object FileUtils {
     private val TAG = FileUtils::class.java.simpleName
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
     private const val META_FILE_SUBDIRECTORY = "meta"
-    private const val SCHEDULE_TEXT_FILE = "schedule.txt"
+    const val SCHEDULE_TEXT_FILE = "schedule.txt"
     const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
     private const val ERROR_TIMESTAMP_TO_PHOTO = "error retrieving photo from timestamp"
 

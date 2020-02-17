@@ -6,14 +6,9 @@ import android.util.Log
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase.Companion.getInstance
-import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
-import com.vwoom.timelapsegallery.data.entry.ProjectEntry
-import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
-import com.vwoom.timelapsegallery.data.entry.TagEntry
-import java.io.BufferedReader
+import com.vwoom.timelapsegallery.data.entry.*
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileReader
 import java.util.*
 
 object ProjectUtils {
@@ -119,7 +114,7 @@ object ProjectUtils {
                         importProjectPhotos(storageDir, db, currentProject)
 
                         // TODO import the tags for the project
-                        importProjectTags(storageDir, db, currentProject)
+                        importProjectMetaData(storageDir, db, currentProject)
                     }
                 }
             }
@@ -145,12 +140,13 @@ object ProjectUtils {
         }
     }
 
-    private suspend fun importProjectTags(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry) {
+    private suspend fun importProjectMetaData(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry) {
         val metaDir = FileUtils.getMetaDirectoryForProject(externalFilesDir, currentProject)
         val tagsFile = File(metaDir, FileUtils.TAGS_DEFINITION_TEXT_FILE)
+        val scheduleFile = File(metaDir, FileUtils.SCHEDULE_TEXT_FILE)
 
-        // Only import tags if the file exists
-        if (metaDir.exists() && tagsFile.exists()){
+        // Import tags
+        if (tagsFile.exists()){
             Log.d(TAG, "importing project tags for $currentProject")
 
             val inputAsString = FileInputStream(tagsFile).bufferedReader().use { it.readText() }
@@ -177,9 +173,13 @@ object ProjectUtils {
                 Log.d(TAG, "inserted $projectTagEntry")
             }
         }
-    }
 
-    private suspend fun importProjectSchedules(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry){
-        // TODO implement recovery of schedules from text file
+        // Import schedule
+        if (scheduleFile.exists()){
+            // TODO implement different day intervals for schedule?
+            //val inputAsString = FileInputStream(scheduleFile).bufferedReader().use { it.readText() }
+            val projectScheduleEntry = ProjectScheduleEntry(currentProject.id, null, 1)
+            db.projectScheduleDao().insertProjectSchedule(projectScheduleEntry)
+        }
     }
 }
