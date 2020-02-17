@@ -1,7 +1,9 @@
 package com.vwoom.timelapsegallery.utils
 
+import android.util.Log
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import java.io.*
@@ -9,6 +11,7 @@ import java.util.*
 
 object FileUtils {
     const val ReservedChars = "|\\?*<\":>+[]/'"
+    private val TAG = FileUtils::class.java.simpleName
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
     private const val META_FILE_SUBDIRECTORY = "meta"
     private const val SCHEDULE_TEXT_FILE = "schedule.txt"
@@ -249,22 +252,23 @@ object FileUtils {
         outputStreamWriter.close()
     }
 
-    // TODO persist schedules for projects
-    fun scheduleProject(externalFilesDir: File, project: Project){
+    fun scheduleProject(externalFilesDir: File, project: Project, projectScheduleEntry: ProjectScheduleEntry){
         val projectDir = getProjectFolder(externalFilesDir, project)
         val metaDir = File(projectDir, META_FILE_SUBDIRECTORY)
         if (!metaDir.exists()) metaDir.mkdir()
         val scheduleFile = File(metaDir, SCHEDULE_TEXT_FILE)
 
         // Remove the schedule text file if unscheduled
-        if (project.interval_days == 0 || project.interval_days == null){
+        if (projectScheduleEntry.interval_days == null || projectScheduleEntry.interval_days == 0){
             scheduleFile.delete()
+            Log.d(TAG, "deleting schedule file")
         }
         // Otherwise add it
         else {
+            Log.d(TAG, "writing schedule file")
             val output = FileOutputStream(scheduleFile)
             val outputStreamWriter = OutputStreamWriter(output)
-            outputStreamWriter.write(project.interval_days)
+            outputStreamWriter.write(projectScheduleEntry.interval_days!!)
             outputStreamWriter.flush()
             output.fd.sync()
             outputStreamWriter.close()

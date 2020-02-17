@@ -38,10 +38,7 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
             var projectScheduleEntry: ProjectScheduleEntry? = projectScheduleRepository.getProjectSchedule(project.project_id)
             if (projectScheduleEntry == null)
                 projectScheduleEntry = ProjectScheduleEntry(project.project_id,0, 0)
-            projectScheduleRepository.setProjectSchedule(projectScheduleEntry)
-
-            // Handle the file representation of the schedule
-            FileUtils.scheduleProject(externalFilesDir, project)
+            projectScheduleRepository.setProjectSchedule(externalFilesDir, project, projectScheduleEntry)
         }
     }
 
