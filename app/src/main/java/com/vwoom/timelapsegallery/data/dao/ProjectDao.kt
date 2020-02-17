@@ -15,13 +15,13 @@ interface ProjectDao {
             "INNER JOIN project_schedule " +
             "ON project.id = project_schedule.project_id " +
             "WHERE project_schedule.interval_days != 0")
-    fun getScheduledProjects(): List<ProjectEntry>
+    suspend fun getScheduledProjects(): List<ProjectEntry>
 
     @Query("SELECT * FROM project " +
             "INNER JOIN project_schedule " +
             "ON project.id = project_schedule.project_id " +
-            "WHERE project_schedule.interval_days = 0")
-    fun getUnscheduledProjects(): List<ProjectEntry>
+            "WHERE project_schedule.interval_days != 0")
+    fun getScheduledProjectsNonSuspend(): List<ProjectEntry>
 
     @Query("SELECT * FROM project " +
             "WHERE project_name LIKE '%' || :search || '%'")

@@ -42,7 +42,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     // Search variables
     private var mFilterTags: ArrayList<TagEntry> = arrayListOf()
-    private var mTodaySearch: Boolean = false
     private var mScheduledSearch: Boolean = false
     private var mUnscheduledSearch: Boolean = false
     private var mSearchName: String? = null
@@ -131,7 +130,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             findNavController().navigate(action)
         }
 
-        initializeFilterDialog()
+        initializeSearchDialog()
 
         setupViewModel()
 
@@ -166,7 +165,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
-    private fun initializeFilterDialog() {
+    private fun initializeSearchDialog() {
         mFilterDialog = Dialog(requireContext())
         mFilterDialog?.setContentView(R.layout.dialog_search)
         mFilterDialog?.setOnCancelListener { mGalleryViewModel.filterDialogShowing = false }
@@ -176,11 +175,26 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mSearchName = it.toString().trim()
             updateSearchFilter()
         }
+
+        val scheduledCheckbox = mFilterDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)
+        val unscheduledCheckbox = mFilterDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)
+
+        // Handle search selection of scheduled / unscheduled projects
+        scheduledCheckbox?.setOnCheckedChangeListener { _, isChecked ->
+            unscheduledCheckbox?.isEnabled = !isChecked
+            mScheduledSearch = isChecked
+            updateSearchFilter()
+        }
+        unscheduledCheckbox?.setOnCheckedChangeListener { _, isChecked ->
+            scheduledCheckbox?.isEnabled = !isChecked
+            mUnscheduledSearch = isChecked
+            updateSearchFilter()
+        }
     }
 
     private fun updateSearchFilter() {
         tagJob?.cancel()
-        mGalleryViewModel.setFilter(mFilterTags, mSearchName, mTodaySearch, mScheduledSearch, mUnscheduledSearch)
+        mGalleryViewModel.setFilter(mFilterTags, mSearchName, mScheduledSearch, mUnscheduledSearch)
         tagJob = mGalleryViewModel.viewModelScope.launch {
             val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
             mGalleryAdapter?.setProjectData(filteredProjects)

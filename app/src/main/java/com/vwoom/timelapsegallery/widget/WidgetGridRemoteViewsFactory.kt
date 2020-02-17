@@ -41,7 +41,7 @@ class WidgetGridRemoteViewsFactory(
 
     override fun onDataSetChanged() {
         // Load the projects for the day
-        mProjects = projectRepository.getScheduledProjects()
+        mProjects = projectRepository.getScheduledProjectsNonSuspend()
     }
 
     override fun onDestroy() {}

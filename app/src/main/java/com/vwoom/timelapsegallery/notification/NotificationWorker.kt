@@ -21,7 +21,7 @@ class NotificationWorker(context: Context, params: WorkerParameters,
         Log.d(TAG, "Notification Tracker: Executing work")
 
         // Get all the scheduled projects from the repo
-        val scheduledProjects = projectRepository.getScheduledProjects()
+        val scheduledProjects = projectRepository.getScheduledProjectsNonSuspend()
         val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val notificationsEnabled = prefs.getBoolean(applicationContext.getString(R.string.key_notifications_enabled), true)
         Log.d(TAG, "Notification Tracker: notificationsEnabled == $notificationsEnabled")
@@ -42,7 +42,7 @@ class NotificationWorker(context: Context, params: WorkerParameters,
                 Log.d(TAG, "Notification Tracker: Processing alarm for project named " + scheduledProject.project_name)
 
                 val nextSubmissionTime = schedule?.schedule_time!!
-                val dayInterval = schedule?.interval_days!!.toLong()
+                val dayInterval = schedule.interval_days!!.toLong()
                 // Schedule a notification for tomorrow
 // If any project has a daily schedule create the notification
                 if (dayInterval == 1L) {

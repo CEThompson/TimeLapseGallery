@@ -16,21 +16,19 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
     val projects: LiveData<List<Project>> = projectRepository.getProjectViews()
     val tags: LiveData<List<TagEntry>> = tagRepository.getTags()
 
-    var projectFilter: List<TagEntry> = listOf()
+    private var projectFilter: List<TagEntry> = listOf()
 
     var searchName: String? = null
-    var todaySearch: Boolean = false
-    var scheduleSearch: Boolean = false
-    var unscheduledSearch: Boolean = false
+    private var scheduleSearch: Boolean = false
+    private var unscheduledSearch: Boolean = false
 
     var returnPosition: Int = 0
 
     var filterDialogShowing = false
 
-    fun setFilter(filter: List<TagEntry>, name: String?, today: Boolean, scheduled: Boolean, unscheduled: Boolean) {
+    fun setFilter(filter: List<TagEntry>, name: String?, scheduled: Boolean, unscheduled: Boolean) {
         projectFilter = filter
         searchName = name
-        todaySearch = today
         scheduleSearch = scheduled
         unscheduledSearch = unscheduled
     }
@@ -61,19 +59,13 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
         }
         Log.d(TAG, "search term is $searchName")
         Log.d(TAG, "after name filter $result")
-        if (todaySearch){
-            val projectsScheduledToday = convertEntriesToProjects(projectRepository.getScheduledProjects())
-            result = result.intersect(projectsScheduledToday).toList()
-        }
-        Log.d(TAG, "after today filter $result")
+
         if (scheduleSearch){
             val scheduledProjects = convertEntriesToProjects(projectRepository.getScheduledProjects())
             result = result.intersect(scheduledProjects).toList()
-        }
-        Log.d(TAG, "after schedule filter $result")
-        if (unscheduledSearch){
-            val unscheduledProjects = convertEntriesToProjects(projectRepository.getUnscheduledProjects())
-            result = result.intersect(unscheduledProjects).toList()
+        } else if (unscheduledSearch) {
+            val scheduledProjects = convertEntriesToProjects(projectRepository.getScheduledProjects())
+            result = result.subtract(scheduledProjects).toList()
         }
         Log.d(TAG, "after unscheduled filter $result")
         return result

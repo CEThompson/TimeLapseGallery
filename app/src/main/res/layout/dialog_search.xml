@@ -108,16 +108,13 @@
         app:layout_constraintTop_toBottomOf="@id/search_by_schedule_label">
 
         <androidx.appcompat.widget.AppCompatCheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/today" />
-
-        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/search_scheduled_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/scheduled" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/search_unscheduled_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/unscheduled" />
