@@ -14,8 +14,8 @@
     <string name="project_name_label">Project Name: </string>
 
     <string name="by_name">search by name</string>
-    <string name="by_tag">filter by tag</string>
-    <string name="by_schedule">filter by schedule</string>
+    <string name="by_tag">search by tag</string>
+    <string name="by_schedule">search by schedule</string>
 
     <!-- Tracking -->
     <string name="submit_project">Submit Project</string>
