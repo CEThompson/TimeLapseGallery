@@ -60,12 +60,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
         if (settingsViewModel.syncing) {
             executeSync()
         }
-        else if (settingsViewModel.showingSyncDialog) {
+
+        if (settingsViewModel.showingSyncDialog) {
             updateSyncDialog(settingsViewModel.response)
             mSyncDialog?.show()
         }
-        else if (settingsViewModel.showingFileModDialog) showFileModificationDialog()
-        else if (settingsViewModel.showingVerifySyncDialog) showVerifyProjectImportDialog()
+
+        if (settingsViewModel.showingFileModDialog) showFileModificationDialog()
+        if (settingsViewModel.showingVerifySyncDialog) showVerifyProjectImportDialog()
 
         // TODO remove firebase?
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
@@ -102,15 +104,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
             Log.d("settings activity", "Notification listener activitating for key = $key")
 
             // TODO remove ads from application
-            if (key.equals(this.getString(R.string.key_ads_disabled))){
+            if (key == this.getString(R.string.key_ads_disabled)){
                 val adsDisabled = prefs.getBoolean(context?.getString(R.string.key_ads_disabled), false)
                 if (adsDisabled)
                     mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_ads_disabled)!!, null)
             }
 
             // If the user changes the notifications enabled preference trigger the notification worker to update any alarms
-            if (key.equals(this.getString(R.string.key_notifications_enabled))) {
-                NotificationUtils.scheduleNotificationWorker(requireContext());
+            if (key == this.getString(R.string.key_notifications_enabled)) {
+                NotificationUtils.scheduleNotificationWorker(requireContext())
 
                 // Log notifications
                 val notificationsEnabled = prefs.getBoolean(activity?.getString(R.string.key_notifications_enabled), true)
@@ -119,7 +121,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
 
             // Same for notification time
-            if (key.equals(this.getString(R.string.key_notification_time))) {
+            if (key == this.getString(R.string.key_notification_time)) {
                 NotificationUtils.scheduleNotificationWorker(requireContext())
 
                 // Log notification time selection
@@ -130,7 +132,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
 
             // Track playback interval selection
-            if (key.equals(getString(R.string.key_playback_interval))){
+            if (key == getString(R.string.key_playback_interval)){
                 val interval = prefs.getString(getString(R.string.key_playback_interval), "50");
                 val params = Bundle()
                 params.putString(context?.getString(R.string.analytics_playback_interval)!!, interval)
@@ -138,7 +140,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
 
             // If the user enables manual file mSyncing give some info
-            if (key.equals(getString(R.string.key_sync_allowed))){
+            if (key == getString(R.string.key_sync_allowed)){
                 val isSyncAllowed = prefs.getBoolean(key, false)
                 if (isSyncAllowed) {
                     showFileModificationDialog()
@@ -216,11 +218,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
     // Updates the dialog showing progress on synchronization
     private fun updateSyncDialog(response: String){
         Log.d(TAG, "updating sync dialog")
-        val success = (response.equals(getString(R.string.valid_file_structure)))
+        val success = (response == getString(R.string.valid_file_structure))
 
         // Set the response
         val responseView = mSyncDialog?.findViewById(R.id.sync_response) as TextView
-        responseView.setText(response)
+        responseView.text = response
 
         val progress = mSyncDialog?.findViewById(R.id.sync_progress) as ProgressBar
 
@@ -228,7 +230,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val imageFeedback = mSyncDialog?.findViewById(R.id.sync_feedback_image) as ImageView
         if (success) {
             imageFeedback.setImageResource(R.drawable.ic_check_green_40dp)
-            responseView.setText(getString(R.string.executing_sync_complete))
+            responseView.text = getString(R.string.executing_sync_complete)
         }
         else imageFeedback.setImageResource(R.drawable.ic_error_red_40dp)
 

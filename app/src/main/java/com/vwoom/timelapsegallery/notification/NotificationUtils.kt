@@ -90,7 +90,7 @@ object NotificationUtils {
     * The notification workers checks each day to set a notification for tomorrow. */
     fun scheduleNotificationWorker(context: Context) {
         WorkManager.getInstance(context).cancelAllWorkByTag(NotificationWorker.TAG)
-        Log.d(TAG, "Notification Tracker: Creating and enqueuing work reqeust")
+        Log.d(TAG, "Notification Tracker: Creating and enqueuing work request")
         val constraints = Constraints.Builder()
                 .setRequiresBatteryNotLow(true)
                 .build()

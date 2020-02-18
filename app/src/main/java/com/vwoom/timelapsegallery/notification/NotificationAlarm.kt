@@ -55,7 +55,7 @@ class NotificationAlarm : BroadcastReceiver() {
     }
 
     /* Cancels an alarm by the day of year */
-    fun cancelAlarmByDay(context: Context, dayOfYear: Int) {
+    private fun cancelAlarmByDay(context: Context, dayOfYear: Int) {
         Log.d(TAG, "Notification Tracker: Canceling alarm for day $dayOfYear")
         // Set up the alarm manager
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager

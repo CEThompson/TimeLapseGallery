@@ -1,16 +1,16 @@
 package com.vwoom.timelapsegallery.data.repository
 
-import android.util.Log
 import com.vwoom.timelapsegallery.data.dao.ProjectScheduleDao
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
 import java.io.File
 
-class ProjectScheduleRepository private constructor(private val projectScheduleDao: ProjectScheduleDao){
+class ProjectScheduleRepository private constructor(private val projectScheduleDao: ProjectScheduleDao) {
 
     companion object {
-        @Volatile private var instance: ProjectScheduleRepository? = null
+        @Volatile
+        private var instance: ProjectScheduleRepository? = null
 
         fun getInstance(projectScheduleDao: ProjectScheduleDao) =
                 instance ?: synchronized(this) {
@@ -22,15 +22,14 @@ class ProjectScheduleRepository private constructor(private val projectScheduleD
 
     fun getProjectScheduleNonSuspend(projectId: Long): ProjectScheduleEntry? = projectScheduleDao.getProjectScheduleByProjectIdNonSuspend(projectId)
 
-    suspend fun setProjectSchedule(externalFilesDir: File, project: Project, projectScheduleEntry: ProjectScheduleEntry){
+    suspend fun setProjectSchedule(externalFilesDir: File, project: Project, projectScheduleEntry: ProjectScheduleEntry) {
         // Toggle the project schedule
-        if (projectScheduleEntry.interval_days == null || projectScheduleEntry.interval_days == 0){
+        if (projectScheduleEntry.interval_days == null || projectScheduleEntry.interval_days == 0) {
             projectScheduleEntry.interval_days = 1
         } else {
             projectScheduleEntry.interval_days = 0
         }
         projectScheduleDao.insertProjectSchedule(projectScheduleEntry)
-
 
         // Handle the file representation of the schedule
         FileUtils.scheduleProject(externalFilesDir, project, projectScheduleEntry)
