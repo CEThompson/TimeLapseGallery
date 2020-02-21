@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Environment
+import android.os.SystemClock
 import android.view.*
 import android.widget.CheckBox
 import android.widget.EditText
@@ -54,6 +55,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private val mGalleryViewModel: GalleryViewModel by viewModels {
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
     }
+
+    private var mLastClickTime: Long? = null
 
     override fun onPause() {
         super.onPause()
@@ -246,8 +249,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             tagLayout?.addView(tagCheckBox)
         }
     }
-
+    
     override fun onClick(clickedProject: Project, projectImageView: ImageView, projectCardView: CardView, position: Int) {
+        // Prevents multiple clicks which cause a crash
+        if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 1000) return
+        mLastClickTime = SystemClock.elapsedRealtime()
+
         // Save the position of the first visible item in the gallery
         val firstItems = IntArray(mNumberOfColumns)
         mGridLayoutManager?.findFirstCompletelyVisibleItemPositions(firstItems)
