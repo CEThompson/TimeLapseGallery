@@ -36,6 +36,7 @@ import java.util.*
 // TODO gallery slows down with usage, figure out why
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
+    // TODO lazily handle filter dialog
     private var mFilterDialog: Dialog? = null
 
     private lateinit var mGalleryAdapter: GalleryAdapter
