@@ -249,7 +249,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             tagLayout?.addView(tagCheckBox)
         }
     }
-    
+
     override fun onClick(clickedProject: Project, projectImageView: ImageView, projectCardView: CardView, position: Int) {
         // Prevents multiple clicks which cause a crash
         if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 1000) return

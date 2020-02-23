@@ -424,7 +424,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     private fun scheduleLoadPhoto(position: Int, interval: Long) {
-        Log.e("DetailsFragment", "schedule loading position $position")
+        Log.d("DetailsFragment", "schedule loading position $position")
         if (position < 0 || position >= mPhotos!!.size) {
             mPlaying = false
             binding.playAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp)
