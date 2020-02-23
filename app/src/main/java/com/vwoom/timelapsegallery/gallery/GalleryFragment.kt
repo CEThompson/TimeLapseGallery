@@ -42,7 +42,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mProjects: List<Project>? = null
 
     // Search variables
-    private var mFilterTags: ArrayList<TagEntry> = arrayListOf()
+    private var mSearchTags: ArrayList<TagEntry> = arrayListOf()
     private var mScheduledSearch: Boolean = false
     private var mUnscheduledSearch: Boolean = false
     private var mSearchName: String? = null
@@ -197,7 +197,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     private fun updateSearchFilter() {
         tagJob?.cancel()
-        mGalleryViewModel.setFilter(mFilterTags, mSearchName, mScheduledSearch, mUnscheduledSearch)
+        mGalleryViewModel.setFilter(mSearchTags, mSearchName, mScheduledSearch, mUnscheduledSearch)
         tagJob = mGalleryViewModel.viewModelScope.launch {
             val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
             mGalleryAdapter?.setProjectData(filteredProjects)
@@ -242,8 +242,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             tagCheckBox.text = getString(R.string.hashtag, tag.tag)
             tagCheckBox.isChecked = mGalleryViewModel.tagSelected(tag)
             tagCheckBox.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) mFilterTags.add(tag)
-                else mFilterTags.remove(tag)
+                if (isChecked) mSearchTags.add(tag)
+                else mSearchTags.remove(tag)
                 updateSearchFilter()
             }
             tagLayout?.addView(tagCheckBox)
