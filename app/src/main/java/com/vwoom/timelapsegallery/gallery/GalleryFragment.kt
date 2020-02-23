@@ -35,13 +35,13 @@ import java.util.*
 // TODO fix gallery leak
 // TODO gallery slows down with usage, figure out why
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
-
-    // TODO lazily handle filter dialog
+    
     private var mFilterDialog: Dialog? = null
 
     private lateinit var mGalleryAdapter: GalleryAdapter
     private lateinit var mGridLayoutManager: StaggeredGridLayoutManager
     private var mProjects: List<Project> = emptyList()
+    private var mTags: List<TagEntry> = emptyList()
 
     // Search variables
     private var mSearchTags: ArrayList<TagEntry> = arrayListOf()
@@ -133,8 +133,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             findNavController().navigate(action)
         }
 
-        initializeSearchDialog()
-
         setupViewModel()
 
         return binding.root
@@ -153,6 +151,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.search_option -> {
+                if (mFilterDialog == null) initializeSearchDialog()
                 mFilterDialog?.show()
                 mGalleryViewModel.filterDialogShowing = true
                 true
@@ -193,6 +192,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mUnscheduledSearch = isChecked
             updateSearchFilter()
         }
+
+        setTags(mTags)
     }
 
     private fun updateSearchFilter() {
@@ -216,7 +217,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         })
 
         mGalleryViewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
-            setTags(tags.sortedBy { it.tag.toLowerCase(Locale.getDefault()) })
+            mTags = tags.sortedBy {it.tag.toLowerCase(Locale.getDefault())}
         })
     }
 
