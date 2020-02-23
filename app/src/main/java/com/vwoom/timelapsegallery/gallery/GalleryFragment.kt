@@ -37,20 +37,21 @@ import java.util.*
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private var mFilterDialog: Dialog? = null
-    private var mGalleryAdapter: GalleryAdapter? = null
-    private var mGridLayoutManager: StaggeredGridLayoutManager? = null
-    private var mProjects: List<Project>? = null
+
+    private lateinit var mGalleryAdapter: GalleryAdapter
+    private lateinit var mGridLayoutManager: StaggeredGridLayoutManager
+    private var mProjects: List<Project> = emptyList()
 
     // Search variables
     private var mSearchTags: ArrayList<TagEntry> = arrayListOf()
     private var mScheduledSearch: Boolean = false
     private var mUnscheduledSearch: Boolean = false
-    private var mSearchName: String? = null
+    private var mSearchName: String = ""
 
     private var tagJob: Job? = null
 
-    private var mGalleryRecyclerView: RecyclerView? = null
-    private var mAddProjectFAB: FloatingActionButton? = null
+    private lateinit var mGalleryRecyclerView: RecyclerView
+    private lateinit var mAddProjectFAB: FloatingActionButton
 
     private val mGalleryViewModel: GalleryViewModel by viewModels {
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
@@ -71,11 +72,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     override fun onDestroyView() {
         // Prevent gallery recycler view from leaking by nullifying the adapter on detach
         // This is necessary because of transition animations
-        mGalleryRecyclerView?.addOnAttachStateChangeListener(object: View.OnAttachStateChangeListener {
+        mGalleryRecyclerView.addOnAttachStateChangeListener(object: View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View?) {
             }
             override fun onViewDetachedFromWindow(v: View?) {
-                mGalleryRecyclerView?.adapter = null
+                mGalleryRecyclerView.adapter = null
             }
         })
         super.onDestroyView()
@@ -89,9 +90,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
         // Set up options menu
         setHasOptionsMenu(true)
-        val toolbar = binding?.galleryFragmentToolbar
+        val toolbar = binding.galleryFragmentToolbar
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
-        toolbar?.title = getString(R.string.app_name)
+        toolbar.title = getString(R.string.app_name)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
 
         // Increase columns for horizontal orientation
@@ -106,8 +107,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Set up the recycler view
         mGridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
-        mGalleryRecyclerView = binding?.galleryRecyclerView
-        mGalleryRecyclerView?.apply {
+        mGalleryRecyclerView = binding.galleryRecyclerView
+        mGalleryRecyclerView.apply {
             layoutManager = mGridLayoutManager
             setHasFixedSize(false)
             adapter = mGalleryAdapter
@@ -116,18 +117,16 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Start the postponed transition after layout
         // TODO transition element breaks when filtering
-        mGalleryRecyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        mGalleryRecyclerView.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 startPostponedEnterTransition()
-                mGalleryRecyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+                mGalleryRecyclerView.viewTreeObserver?.removeOnGlobalLayoutListener(this)
             }
         })
 
         // Set up navigation to add new projects
         mAddProjectFAB = binding.addProjectFAB
-        mAddProjectFAB?.setOnClickListener {
-            // TODO: Determine if there is a better way to handle leaking toolbar references
-            // Note: navigating from gallery to detail results in activity leaking toolbar as reference
+        mAddProjectFAB.setOnClickListener {
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
             val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null, null)
             findNavController().navigate(action)
@@ -137,7 +136,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         setupViewModel()
 
-        return binding?.root
+        return binding.root
     }
 
     override fun onResume() {
@@ -199,8 +198,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         tagJob?.cancel()
         mGalleryViewModel.setFilter(mSearchTags, mSearchName, mScheduledSearch, mUnscheduledSearch)
         tagJob = mGalleryViewModel.viewModelScope.launch {
-            val filteredProjects = mGalleryViewModel.filterProjects(mProjects!!)
-            mGalleryAdapter?.setProjectData(filteredProjects)
+            val filteredProjects = mGalleryViewModel.filterProjects(mProjects)
+            mGalleryAdapter.setProjectData(filteredProjects)
         }
     }
 
@@ -210,8 +209,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mGalleryViewModel.viewModelScope.launch {
                 mProjects = projects
                 val filteredProjects = mGalleryViewModel.filterProjects(projects)
-                mGalleryAdapter?.setProjectData(filteredProjects)
-                mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.returnPosition)
+                mGalleryAdapter.setProjectData(filteredProjects)
+                mGalleryRecyclerView.scrollToPosition(mGalleryViewModel.returnPosition)
             }
         })
 
@@ -257,7 +256,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Save the position of the first visible item in the gallery
         val firstItems = IntArray(mNumberOfColumns)
-        mGridLayoutManager?.findFirstCompletelyVisibleItemPositions(firstItems)
+        mGridLayoutManager.findFirstCompletelyVisibleItemPositions(firstItems)
         mGalleryViewModel.returnPosition = firstItems[0]
 
         // Navigate to the detail fragment
