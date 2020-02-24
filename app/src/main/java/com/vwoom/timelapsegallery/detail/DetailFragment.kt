@@ -541,7 +541,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Binds project and photos to database
     private fun setupViewModel() {
         // Observe the current selected project
-        detailViewModel.currentProject.observe(this, Observer { currentProject: Project ->
+        detailViewModel.currentProject.observe(viewLifecycleOwner, Observer { currentProject: Project ->
             mCurrentProject = currentProject
 
             // Set id
@@ -601,7 +601,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         })
 
         // Observe the list of photos
-        detailViewModel.photos.observe(this, Observer<List<PhotoEntry>> { photoEntries: List<PhotoEntry> ->
+        detailViewModel.photos.observe(viewLifecycleOwner, Observer<List<PhotoEntry>> { photoEntries: List<PhotoEntry> ->
             // Save the list of photos
             mPhotos = photoEntries
 
@@ -646,7 +646,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         })
 
         // Load the ui based on the current photo
-        detailViewModel.currentPhoto.observe(this, Observer { currentPhoto: PhotoEntry? ->
+        detailViewModel.currentPhoto.observe(viewLifecycleOwner, Observer { currentPhoto: PhotoEntry? ->
             mCurrentPhoto = currentPhoto
             if (currentPhoto != null) {
                 loadUi(currentPhoto)
@@ -654,7 +654,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         })
 
         // Observe the tags
-        detailViewModel.projectTags.observe(this, Observer<List<ProjectTagEntry>> { projectTagEntries: List<ProjectTagEntry> ->
+        detailViewModel.projectTags.observe(viewLifecycleOwner, Observer<List<ProjectTagEntry>> { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 // Update project information dialog
                 mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
@@ -686,7 +686,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         })
 
 
-        detailViewModel.tags.observe(this, Observer<List<TagEntry>> {tagEntries: List<TagEntry> ->
+        detailViewModel.tags.observe(viewLifecycleOwner, Observer<List<TagEntry>> {tagEntries: List<TagEntry> ->
             mAllTags = tagEntries.sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
             setProjectTagDialogTags()
         })

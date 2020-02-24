@@ -207,7 +207,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     private fun setupViewModel() {
         // Observe projects
-        mGalleryViewModel.projects.observe(this, Observer { projects: List<Project> ->
+        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer { projects: List<Project> ->
             mGalleryViewModel.viewModelScope.launch {
                 mProjects = projects
                 val filteredProjects = mGalleryViewModel.filterProjects(projects)
@@ -216,7 +216,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
         })
 
-        mGalleryViewModel.tags.observe(this, Observer { tags: List<TagEntry> ->
+        mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer { tags: List<TagEntry> ->
             mTags = tags.sortedBy {it.tag.toLowerCase(Locale.getDefault())}
         })
     }
