@@ -50,38 +50,40 @@
             app:layout_constraintTop_toBottomOf="@id/search_edit_text" />
 
         <!-- empty tags label -->
-        <TextView
-            android:id="@+id/empty_tags_label"
+        <FrameLayout
+            android:id="@+id/dialog_search_tags_layout_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/no_projects_tagged"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search_by_tag_label" />
-
-        <!-- layout for tags -->
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/dialog_search_tags_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"
-            app:alignContent="stretch"
-            app:alignItems="stretch"
-            app:flexWrap="wrap"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_by_tag_label">
-            <!-- Example checkbox for layout -->
-            <CheckBox
+            <TextView
+                android:id="@+id/empty_tags_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="example checkbox" />
-        </com.google.android.flexbox.FlexboxLayout>
+                android:layout_marginTop="8dp"
+                android:layout_gravity="center"
+                android:text="@string/no_projects_tagged"
+                android:visibility="invisible" />
+
+            <!-- layout for tags -->
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/dialog_search_tags_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                app:alignContent="stretch"
+                app:alignItems="stretch"
+                app:flexWrap="wrap">
+                <!-- Example checkbox for layout -->
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="example checkbox" />
+            </com.google.android.flexbox.FlexboxLayout>
+        </FrameLayout>
 
         <TextView
             android:id="@+id/search_by_schedule_label"
@@ -94,7 +96,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dialog_search_tags_layout"
+            app:layout_constraintTop_toBottomOf="@id/dialog_search_tags_layout_container"
             tools:text="filter by schedule" />
 
         <LinearLayout
