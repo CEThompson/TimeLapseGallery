@@ -28,11 +28,9 @@ import com.vwoom.timelapsegallery.detail.Camera2ViewModel
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.Exception
 
 // Arbitrary number to keep track of permission request
 private const val REQUEST_CODE_PERMISSIONS = 10
