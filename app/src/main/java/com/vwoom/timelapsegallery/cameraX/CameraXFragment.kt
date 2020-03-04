@@ -2,14 +2,15 @@ package com.vwoom.timelapsegallery.cameraX
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Matrix
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.camera.core.*
-import androidx.camera.core.impl.ImageCaptureConfig
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
@@ -46,7 +47,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private val executor = Executors.newSingleThreadExecutor()
 
-    private var takePictureJob : Job? = null
+    private var takePictureJob: Job? = null
 
     private val args: CameraXFragmentArgs by navArgs()
 
@@ -159,17 +160,28 @@ class CameraXFragment : Fragment(), LifecycleOwner {
                     })
         }
 
-
         cameraProviderFuture.addListener(Runnable {
             val cameraProvider = cameraProviderFuture.get()
             cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, imageCapture, preview)
-            //cameraProvider.bindToLifeCycle(this as LifecycleOwner, cameraSelector, preview, imageAnalysis)
         }, ContextCompat.getMainExecutor(requireContext()))
-
-        //val cameraProvider = cameraProviderFuture.get()
-        //cameraProvider.bindToLifeCycle(this as LifecycleOwner, cameraSelector, preview, imageAnalysis)
-        //CameraX.bindToLifecycle(this, preview)
     }
+    
+    // TODO set up tap to focus
+    /*
+    private fun setUpTapToFocus() {
+        previewView.setOnTouchListener { _, event ->
+            if (event.action != MotionEvent.ACTION_UP) {
+                return@setOnTouchListener false
+            }
+
+            val factory = TextureViewMeteringPointFactory(previewView)
+            val point = factory.createPoint(event.x, event.y)
+            val action = FocusMeteringAction.Builder.from(point).build()
+            cameraControl.startFocusAndMetering(action)
+            return@setOnTouchListener true
+        }
+    }
+     */
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
