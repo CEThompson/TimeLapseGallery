@@ -38,6 +38,7 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
 
+// TODO determine if point to focus is now supported in beta
 class CameraXFragment : Fragment(), LifecycleOwner {
 
     private lateinit var mTakePictureFab: FloatingActionButton
@@ -121,6 +122,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         // Build the image capture use case and attach button click listener
         val imageCapture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+                .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                 //TODO .setTargetRotation(windowManager.defaultDisplay.rotation)
                 .build()
 
