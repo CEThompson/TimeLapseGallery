@@ -30,18 +30,27 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
+            <ImageView
+                android:id="@+id/project_gradient"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@drawable/gradient_overlay_bottom_up"
+                />
+
             <!-- clock showing if the project has been scheduled -->
             <ImageView
                 android:id="@+id/schedule_indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/schedule_indicator_content_description"
-                android:src="@drawable/ic_schedule_indicator_40dp"
+                android:src="@drawable/ic_schedule_indicator_pending_24dp"
                 android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
-            <!-- x or check mark drawable to indicate if photo has been taken today -->
+            <!-- check mark to indicate if photo has been taken today -->
             <ImageView
                 android:id="@+id/schedule_indicator_check"
                 android:layout_width="wrap_content"
@@ -49,7 +58,7 @@
                 android:contentDescription="@string/schedule_indicator_check_content_description"
                 android:src="@drawable/ic_check_schedule_green_40dp"
                 android:visibility="invisible"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/schedule_indicator"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

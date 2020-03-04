@@ -69,15 +69,18 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         // Display a check if a picture was taken today
         if (DateUtils.isToday(project.cover_photo_timestamp)){
             holder.binding.scheduleIndicatorCheck.visibility = View.VISIBLE
-            holder.binding.scheduleIndicator.visibility = View.INVISIBLE
+        } else {
+            holder.binding.scheduleIndicatorCheck.visibility = View.GONE
+        }
+
+        // Display if the project is scheduled or not
+        if (project.interval_days != null && project.interval_days != 0) {
+            holder.binding.scheduleIndicator.visibility = View.VISIBLE
+            holder.binding.projectGradient.visibility = View.VISIBLE
         }
         else {
-            holder.binding.scheduleIndicatorCheck.visibility = View.INVISIBLE
-            // Show if the project is scheduled
-            if (project.interval_days != null && project.interval_days != 0)
-                holder.binding.scheduleIndicator.visibility = View.VISIBLE
-            else
-                holder.binding.scheduleIndicator.visibility = View.INVISIBLE
+            holder.binding.scheduleIndicator.visibility = View.GONE
+            holder.binding.projectGradient.visibility = View.GONE
         }
 
 
