@@ -24,7 +24,7 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
-import com.vwoom.timelapsegallery.detail.Camera2ViewModel
+import com.vwoom.timelapsegallery.camera2.Camera2ViewModel
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.coroutines.Job

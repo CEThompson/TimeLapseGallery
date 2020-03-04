@@ -1,18 +1,19 @@
-package com.vwoom.timelapsegallery.camera2
+package com.vwoom.timelapsegallery.cameraX
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider.NewInstanceFactory
+import androidx.lifecycle.ViewModelProvider
+import com.vwoom.timelapsegallery.camera2.Camera2ViewModel
 import com.vwoom.timelapsegallery.data.repository.PhotoRepository
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 
-class Camera2ViewModelFactory(private val projectRepository: ProjectRepository,
+class CameraXViewModelFactory(private val projectRepository: ProjectRepository,
                               private val photoRepository: PhotoRepository,
                               private val photo: Photo?,
-                              private val project: Project?) : NewInstanceFactory() {
+                              private val project: Project?) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return Camera2ViewModel(
+        return CameraXViewModel(
                 projectRepository,
                 photoRepository,
                 photo,

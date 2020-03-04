@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.camera2
+package com.vwoom.timelapsegallery.cameraX
 
 import androidx.lifecycle.ViewModel
 import com.vwoom.timelapsegallery.data.repository.PhotoRepository
@@ -7,7 +7,7 @@ import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 import java.io.File
 
-class Camera2ViewModel(
+class CameraXViewModel(
         private val projectRepository: ProjectRepository,
         private val photoRepository: PhotoRepository,
         val photo: Photo?,
