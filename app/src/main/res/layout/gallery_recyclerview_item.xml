@@ -31,7 +31,7 @@
                 app:layout_constraintTop_toTopOf="parent"/>
 
             <ImageView
-                android:id="@+id/project_gradient"
+                android:id="@+id/project_image_gradient"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -39,9 +39,20 @@
                 android:src="@drawable/gradient_overlay_bottom_up"
                 />
 
-            <!-- clock showing if the project has been scheduled -->
+            <!-- clock showing if the project has been scheduled and if its due -->
             <ImageView
-                android:id="@+id/schedule_indicator"
+                android:id="@+id/schedule_indicator_due"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/schedule_indicator_content_description"
+                android:src="@drawable/ic_schedule_indicator_due_24dp"
+                android:visibility="invisible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <!-- clock showing if the project has been scheduled and if its pending -->
+            <ImageView
+                android:id="@+id/schedule_indicator_pending"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/schedule_indicator_content_description"
@@ -49,6 +60,7 @@
                 android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
+
 
             <!-- check mark to indicate if photo has been taken today -->
             <ImageView
@@ -58,7 +70,7 @@
                 android:contentDescription="@string/schedule_indicator_check_content_description"
                 android:src="@drawable/ic_check_schedule_green_40dp"
                 android:visibility="invisible"
-                app:layout_constraintStart_toEndOf="@id/schedule_indicator"
+                app:layout_constraintStart_toEndOf="@id/schedule_indicator_pending"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -67,7 +67,8 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
         // Display a check if a picture was taken today
-        if (DateUtils.isToday(project.cover_photo_timestamp)){
+        val photoTakenToday = DateUtils.isToday(project.cover_photo_timestamp)
+        if (photoTakenToday){
             holder.binding.scheduleIndicatorCheck.visibility = View.VISIBLE
         } else {
             holder.binding.scheduleIndicatorCheck.visibility = View.GONE
@@ -75,14 +76,25 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
 
         // Display if the project is scheduled or not
         if (project.interval_days != null && project.interval_days != 0) {
-            holder.binding.scheduleIndicator.visibility = View.VISIBLE
-            holder.binding.projectGradient.visibility = View.VISIBLE
+            // Display the correctly colored schedule indicator
+            if (photoTakenToday) {
+                // Green if a photo was taken today
+                holder.binding.scheduleIndicatorPending.visibility = View.VISIBLE
+                holder.binding.scheduleIndicatorDue.visibility = View.GONE
+            }
+            else {
+                // Red if a photo needs to be taken today
+                holder.binding.scheduleIndicatorDue.visibility = View.VISIBLE
+                holder.binding.scheduleIndicatorPending.visibility = View.GONE
+            }
+            // Display the gradient for readability
+            holder.binding.projectImageGradient.visibility = View.VISIBLE
         }
         else {
-            holder.binding.scheduleIndicator.visibility = View.GONE
-            holder.binding.projectGradient.visibility = View.GONE
+            holder.binding.scheduleIndicatorDue.visibility = View.GONE
+            holder.binding.scheduleIndicatorPending.visibility = View.GONE
+            holder.binding.projectImageGradient.visibility = View.GONE
         }
-
 
         // Set transition targets
         val imageTransitionName = project.project_id.toString()
