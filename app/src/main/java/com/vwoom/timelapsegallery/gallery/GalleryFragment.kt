@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -136,11 +137,19 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mGalleryViewModel.scheduleSearch = false
             mGalleryViewModel.unscheduledSearch = false
             updateSearchFilter()
-
-            // Update tags
-            // TODO optimize this
-            if (mGalleryViewModel.tags.value != null)
-                setTags(mGalleryViewModel.tags.value!!)
+            
+            // Reset search dialog
+            mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)?.setText("")
+            val tagsLayout = mSearchDialog?.findViewById<FlexboxLayout>(R.id.dialog_search_tags_layout)
+            if (tagsLayout!=null) {
+                val children = tagsLayout.children
+                for (child in children){
+                    val checkbox = child as CheckBox
+                    checkbox.isChecked = false
+                }
+            }
+            mSearchDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)?.isChecked = false
+            mSearchDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)?.isChecked = false
         }
         
         setupViewModel()
