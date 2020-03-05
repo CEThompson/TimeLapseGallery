@@ -36,18 +36,10 @@ import java.util.*
 // TODO gallery slows down with usage, figure out why
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
     
-    private var mFilterDialog: Dialog? = null
+    private var mSearchDialog: Dialog? = null
 
     private lateinit var mGalleryAdapter: GalleryAdapter
     private lateinit var mGridLayoutManager: StaggeredGridLayoutManager
-    private var mProjects: List<Project> = emptyList()
-    private var mTags: List<TagEntry> = emptyList()
-
-    // Search variables
-    private var mSearchTags: ArrayList<TagEntry> = arrayListOf()
-    private var mScheduledSearch: Boolean = false
-    private var mUnscheduledSearch: Boolean = false
-    private var mSearchName: String = ""
 
     private var tagJob: Job? = null
 
@@ -58,11 +50,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
     }
 
+    // prevent doubleclicking
     private var mLastClickTime: Long? = null
 
     override fun onPause() {
         super.onPause()
-        mFilterDialog?.dismiss()
+        mSearchDialog?.dismiss()
     }
 
     override fun onStop() {
@@ -85,7 +78,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        //if (mBinding == null) postponeEnterTransition()
         val binding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
@@ -116,7 +108,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             postponeEnterTransition()
         }
 
-        // Start the postponed transition after layout
+        // TODO better handle transitioning during search filtration, this solution seems hacky
+        if (mGalleryViewModel.currentProjects.isNotEmpty()) mGalleryAdapter.setProjectData(mGalleryViewModel.currentProjects)
+
         // TODO transition element breaks when filtering
         mGalleryRecyclerView.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -140,7 +134,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onResume() {
         super.onResume()
-        if (mGalleryViewModel.filterDialogShowing) mFilterDialog?.show()
+        if (mGalleryViewModel.searchDialogShowing) mSearchDialog?.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -151,9 +145,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.search_option -> {
-                if (mFilterDialog == null) initializeSearchDialog()
-                mFilterDialog?.show()
-                mGalleryViewModel.filterDialogShowing = true
+                if (mSearchDialog == null) initializeSearchDialog()
+                mSearchDialog?.show()
+                mGalleryViewModel.searchDialogShowing = true
                 true
             }
             R.id.settings_option -> {
@@ -168,40 +162,49 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     private fun initializeSearchDialog() {
-        mFilterDialog = Dialog(requireContext())
-        mFilterDialog?.setContentView(R.layout.dialog_search)
-        mFilterDialog?.setOnCancelListener { mGalleryViewModel.filterDialogShowing = false }
-        val searchEditText = mFilterDialog?.findViewById<EditText>(R.id.search_edit_text)
+        mSearchDialog = Dialog(requireContext())
+        mSearchDialog?.setContentView(R.layout.dialog_search)
+        mSearchDialog?.setOnCancelListener { mGalleryViewModel.searchDialogShowing = false }
+
+        val scheduledCheckbox = mSearchDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)
+        val unscheduledCheckbox = mSearchDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)
+        val searchEditText = mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)
         searchEditText?.setText(mGalleryViewModel.searchName)   // recover current search term
+
         searchEditText?.addTextChangedListener {
-            mSearchName = it.toString().trim()
+            val searchName = it.toString().trim()
+            mGalleryViewModel.searchName = searchName
+            // TODO re-evaluate use of search filter
             updateSearchFilter()
         }
-
-        val scheduledCheckbox = mFilterDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)
-        val unscheduledCheckbox = mFilterDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)
 
         // Handle search selection of scheduled / unscheduled projects
         scheduledCheckbox?.setOnCheckedChangeListener { _, isChecked ->
             unscheduledCheckbox?.isEnabled = !isChecked
-            mScheduledSearch = isChecked
-            updateSearchFilter()
-        }
-        unscheduledCheckbox?.setOnCheckedChangeListener { _, isChecked ->
-            scheduledCheckbox?.isEnabled = !isChecked
-            mUnscheduledSearch = isChecked
+            mGalleryViewModel.scheduleSearch = isChecked
+            // TODO re-evaluate use of search filter
             updateSearchFilter()
         }
 
-        setTags(mTags)
+        unscheduledCheckbox?.setOnCheckedChangeListener { _, isChecked ->
+            scheduledCheckbox?.isEnabled = !isChecked
+            mGalleryViewModel.unscheduledSearch = isChecked
+            // TODO re-evaluate use of search filter
+            updateSearchFilter()
+        }
+
+        if (mGalleryViewModel.tags.value!=null){
+            val tags = mGalleryViewModel.tags.value!!
+            val sortedTags: List<TagEntry> = tags.sortedBy {it.tag.toLowerCase(Locale.getDefault())}
+            setTags(sortedTags)
+        }
     }
 
     private fun updateSearchFilter() {
         tagJob?.cancel()
-        mGalleryViewModel.setFilter(mSearchTags, mSearchName, mScheduledSearch, mUnscheduledSearch)
         tagJob = mGalleryViewModel.viewModelScope.launch {
-            val filteredProjects = mGalleryViewModel.filterProjects(mProjects)
-            mGalleryAdapter.setProjectData(filteredProjects)
+            mGalleryViewModel.currentProjects = mGalleryViewModel.filterProjects()
+            mGalleryAdapter.setProjectData(mGalleryViewModel.currentProjects)
         }
     }
 
@@ -209,23 +212,24 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Observe projects
         mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer { projects: List<Project> ->
             mGalleryViewModel.viewModelScope.launch {
-                mProjects = projects
-                val filteredProjects = mGalleryViewModel.filterProjects(projects)
-                mGalleryAdapter.setProjectData(filteredProjects)
+                mGalleryViewModel.allProjects = projects
+                mGalleryViewModel.currentProjects = mGalleryViewModel.filterProjects()
+                mGalleryAdapter.setProjectData(mGalleryViewModel.currentProjects)
                 mGalleryRecyclerView.scrollToPosition(mGalleryViewModel.returnPosition)
             }
         })
 
         mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer { tags: List<TagEntry> ->
-            mTags = tags.sortedBy {it.tag.toLowerCase(Locale.getDefault())}
+            val sortedTags = tags.sortedBy {it.tag.toLowerCase(Locale.getDefault())}
+            setTags(sortedTags)
         })
     }
 
     // Updates the dialog with all tags in the database for filtration
     private fun setTags(tags: List<TagEntry>) {
         // Clear the tag layout
-        val tagLayout = mFilterDialog?.findViewById<FlexboxLayout>(R.id.dialog_search_tags_layout)
-        val emptyListIndicator = mFilterDialog?.findViewById<TextView>(R.id.empty_tags_label)
+        val tagLayout = mSearchDialog?.findViewById<FlexboxLayout>(R.id.dialog_search_tags_layout)
+        val emptyListIndicator = mSearchDialog?.findViewById<TextView>(R.id.empty_tags_label)
         tagLayout?.removeAllViews()
 
         if (tags.isEmpty()) {
@@ -243,8 +247,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             tagCheckBox.text = getString(R.string.hashtag, tag.tag)
             tagCheckBox.isChecked = mGalleryViewModel.tagSelected(tag)
             tagCheckBox.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) mSearchTags.add(tag)
-                else mSearchTags.remove(tag)
+                if (isChecked) mGalleryViewModel.searchTags.add(tag)
+                else mGalleryViewModel.searchTags.remove(tag)
                 updateSearchFilter()
             }
             tagLayout?.addView(tagCheckBox)
