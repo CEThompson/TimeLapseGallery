@@ -37,8 +37,6 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
-
-// TODO determine if point to focus is now supported in beta
 class CameraXFragment : Fragment(), LifecycleOwner {
 
     private lateinit var mTakePictureFab: FloatingActionButton
@@ -126,7 +124,6 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         val imageCapture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                 .setTargetAspectRatio(AspectRatio.RATIO_16_9)
-                //TODO .setTargetRotation(windowManager.defaultDisplay.rotation)
                 .build()
 
         mTakePictureFab.setOnClickListener {
@@ -134,7 +131,6 @@ class CameraXFragment : Fragment(), LifecycleOwner {
             val photoFile = FileUtils.createTemporaryImageFile(externalFilesDir)
 
             val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile)
-                    // TODO handle metadata: .setMetadata(metadata)
                     .build()
 
             imageCapture.takePicture(outputOptions, executor,
@@ -170,7 +166,6 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
-    // TODO set up tap to focus
     private fun setUpTapToFocus(display: Display, cameraSelector: CameraSelector, camera: Camera) {
 
         @Suppress("ClickableViewAccessibility")
