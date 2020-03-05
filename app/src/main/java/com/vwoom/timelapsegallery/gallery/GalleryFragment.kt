@@ -45,6 +45,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     private lateinit var mGalleryRecyclerView: RecyclerView
     private lateinit var mAddProjectFAB: FloatingActionButton
+    private lateinit var mSearchActiveFAB: FloatingActionButton
 
     private val mGalleryViewModel: GalleryViewModel by viewModels {
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
@@ -127,6 +128,21 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             findNavController().navigate(action)
         }
 
+        mSearchActiveFAB = binding.searchActiveIndicator
+        mSearchActiveFAB.setOnClickListener {
+            // Clear search
+            mGalleryViewModel.searchName = ""
+            mGalleryViewModel.searchTags.clear()
+            mGalleryViewModel.scheduleSearch = false
+            mGalleryViewModel.unscheduledSearch = false
+            updateSearchFilter()
+
+            // Update tags
+            // TODO optimize this
+            if (mGalleryViewModel.tags.value != null)
+                setTags(mGalleryViewModel.tags.value!!)
+        }
+        
         setupViewModel()
 
         return binding.root
@@ -205,7 +221,20 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         tagJob = mGalleryViewModel.viewModelScope.launch {
             mGalleryViewModel.currentProjects = mGalleryViewModel.filterProjects()
             mGalleryAdapter.setProjectData(mGalleryViewModel.currentProjects)
+
+            // show search fab if actively searching
+            if (userIsNotSearching())
+                mSearchActiveFAB.visibility = View.INVISIBLE
+            else
+                mSearchActiveFAB.visibility = View.VISIBLE
         }
+    }
+
+    private fun userIsNotSearching(): Boolean{
+        return mGalleryViewModel.searchTags.isEmpty()
+                && !mGalleryViewModel.scheduleSearch
+                && !mGalleryViewModel.unscheduledSearch
+                && mGalleryViewModel.searchName.isBlank()
     }
 
     private fun setupViewModel() {

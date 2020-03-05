@@ -29,25 +29,33 @@
             android:contentDescription="@string/projects_recycler_view_content_description"
             android:paddingTop="?attr/actionBarSize" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <!-- FAB to create a new project -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_project_FAB"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom">
+            android:layout_margin="@dimen/fab_margin"
+            android:contentDescription="@string/add_project_FAB_content_description"
+            android:src="@drawable/ic_add_white_24dp"
+            android:transitionName="add_fab"
+            app:fabSize="normal"
+            android:layout_gravity="bottom|end"
+            />
 
-            <!-- FAB to create a new project -->
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/add_project_FAB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:contentDescription="@string/add_project_FAB_content_description"
-                android:src="@drawable/ic_add_white_24dp"
-                android:transitionName="add_fab"
-                app:fabSize="normal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+        <!-- indicator for active search -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/search_active_indicator"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:layout_width="wrap_content"
+            android:visibility="invisible"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_search_cancel_24dp"
+            android:backgroundTint="@color/white"
+            app:fabSize="mini"
+            android:layout_gravity="top|end"
+            />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
