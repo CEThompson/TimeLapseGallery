@@ -35,8 +35,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:src="@drawable/gradient_overlay_bottom_up"
+                app:layout_constraintTop_toTopOf="parent"
+                android:src="@drawable/gradient_overlay_top_down"
                 />
 
             <!-- clock showing if the project has been scheduled and if its due -->
@@ -48,7 +48,7 @@
                 android:src="@drawable/ic_schedule_indicator_due_24dp"
                 android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- clock showing if the project has been scheduled and if its pending -->
             <ImageView
@@ -59,7 +59,7 @@
                 android:src="@drawable/ic_schedule_indicator_pending_24dp"
                 android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintTop_toTopOf="parent" />
 
 
             <!-- check mark to indicate if photo has been taken today -->
@@ -70,7 +70,7 @@
                 android:contentDescription="@string/schedule_indicator_check_content_description"
                 android:src="@drawable/ic_check_schedule_green_40dp"
                 android:visibility="invisible"
-                app:layout_constraintStart_toEndOf="@id/schedule_indicator_pending"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
