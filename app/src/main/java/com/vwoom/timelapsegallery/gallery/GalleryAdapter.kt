@@ -54,7 +54,6 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         return GalleryAdapterViewHolder(binding)
     }
 
-    // TODO create daily picture indicator and remove previous schedule info?
     override fun onBindViewHolder(holder: GalleryAdapterViewHolder, position: Int) {
         // Get project information
         val project = mProjectData!![position]
