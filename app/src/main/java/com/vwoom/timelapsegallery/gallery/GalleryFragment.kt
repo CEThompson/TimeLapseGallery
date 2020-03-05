@@ -113,7 +113,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // TODO better handle transitioning during search filtration, this solution seems hacky
         if (mGalleryViewModel.currentProjects.isNotEmpty()) mGalleryAdapter.setProjectData(mGalleryViewModel.currentProjects)
 
-        // TODO transition element breaks when filtering
         mGalleryRecyclerView.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 startPostponedEnterTransition()
@@ -201,7 +200,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         searchEditText?.addTextChangedListener {
             val searchName = it.toString().trim()
             mGalleryViewModel.searchName = searchName
-            // TODO re-evaluate use of search filter
             updateSearchFilter()
         }
 
@@ -209,14 +207,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         scheduledCheckbox?.setOnCheckedChangeListener { _, isChecked ->
             unscheduledCheckbox?.isEnabled = !isChecked
             mGalleryViewModel.scheduleSearch = isChecked
-            // TODO re-evaluate use of search filter
             updateSearchFilter()
         }
 
         unscheduledCheckbox?.setOnCheckedChangeListener { _, isChecked ->
             scheduledCheckbox?.isEnabled = !isChecked
             mGalleryViewModel.unscheduledSearch = isChecked
-            // TODO re-evaluate use of search filter
             updateSearchFilter()
         }
 
@@ -227,6 +223,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
+    // TODO re-evaluate use of search filter
     private fun updateSearchFilter() {
         tagJob?.cancel()
         tagJob = mGalleryViewModel.viewModelScope.launch {

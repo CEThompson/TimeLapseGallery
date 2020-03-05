@@ -110,10 +110,10 @@ object ProjectUtils {
                         // Insert the project - this updates on conflict
                         db.projectDao().insertProject(currentProject);
 
-                        /* import the photos for the project */
+                        // Recover photos
                         importProjectPhotos(storageDir, db, currentProject)
 
-                        // TODO import the tags for the project
+                        // Recover tags
                         importProjectMetaData(storageDir, db, currentProject)
                     }
                 }
