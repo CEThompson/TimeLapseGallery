@@ -54,6 +54,8 @@ import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
 
+// TODO use NDK to implement converting photosets to .gif and .mp4/.mov etc
+
 // TODO implement pinch zoom on fullscreen image
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
