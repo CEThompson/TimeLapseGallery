@@ -137,7 +137,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mGalleryViewModel.scheduleSearch = false
             mGalleryViewModel.unscheduledSearch = false
             updateSearchFilter()
-            
+
             // Reset search dialog
             mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)?.setText("")
             val tagsLayout = mSearchDialog?.findViewById<FlexboxLayout>(R.id.dialog_search_tags_layout)
@@ -151,7 +151,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mSearchDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)?.isChecked = false
             mSearchDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)?.isChecked = false
         }
-        
+        if (!userIsNotSearching()) mSearchActiveFAB.show()
+        else mSearchActiveFAB.hide()
+
         setupViewModel()
 
         return binding.root
@@ -233,9 +235,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
             // show search fab if actively searching
             if (userIsNotSearching())
-                mSearchActiveFAB.visibility = View.INVISIBLE
+                mSearchActiveFAB.hide()
             else
-                mSearchActiveFAB.visibility = View.VISIBLE
+                mSearchActiveFAB.show()
         }
     }
 
