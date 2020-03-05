@@ -1,14 +1,13 @@
 package com.vwoom.timelapsegallery.cameraX
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
+import android.os.SystemClock
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -46,6 +45,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
     private lateinit var previewView: PreviewView
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private val executor = Executors.newSingleThreadExecutor()
+    private lateinit var camera: Camera
 
     private var takePictureJob: Job? = null
 
@@ -54,6 +54,8 @@ class CameraXFragment : Fragment(), LifecycleOwner {
     private val cameraViewModel: CameraXViewModel by viewModels {
         InjectorUtils.provideCameraXViewModelFactory(requireActivity(), args.photo, args.project)
     }
+
+    private var mLastClickTime: Long? = null
 
     override fun onStop() {
         super.onStop()
@@ -160,28 +162,33 @@ class CameraXFragment : Fragment(), LifecycleOwner {
                     })
         }
 
+        val display = requireActivity().windowManager.defaultDisplay
         cameraProviderFuture.addListener(Runnable {
             val cameraProvider = cameraProviderFuture.get()
-            cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, imageCapture, preview)
+            camera = cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, imageCapture, preview)
+            setUpTapToFocus(display, cameraSelector, camera)
         }, ContextCompat.getMainExecutor(requireContext()))
     }
-    
-    // TODO set up tap to focus
-    /*
-    private fun setUpTapToFocus() {
-        previewView.setOnTouchListener { _, event ->
-            if (event.action != MotionEvent.ACTION_UP) {
-                return@setOnTouchListener false
-            }
 
-            val factory = TextureViewMeteringPointFactory(previewView)
+    // TODO set up tap to focus
+    private fun setUpTapToFocus(display: Display, cameraSelector: CameraSelector, camera: Camera) {
+
+        @Suppress("ClickableViewAccessibility")
+        previewView.setOnTouchListener { _, event ->
+            // Only allow metering action once per second
+            if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 1000) return@setOnTouchListener false
+            mLastClickTime = SystemClock.elapsedRealtime()
+
+            val factory = DisplayOrientedMeteringPointFactory(
+                    display,
+                    cameraSelector,
+                    previewView.width.toFloat(), previewView.height.toFloat())
             val point = factory.createPoint(event.x, event.y)
-            val action = FocusMeteringAction.Builder.from(point).build()
-            cameraControl.startFocusAndMetering(action)
+            val action = FocusMeteringAction.Builder(point).build()
+            camera.cameraControl.startFocusAndMetering(action)
             return@setOnTouchListener true
         }
     }
-     */
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
@@ -196,5 +203,9 @@ class CameraXFragment : Fragment(), LifecycleOwner {
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
                 requireContext(), it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    companion object {
+        val TAG = CameraXFragment::class.java.simpleName
     }
 }
