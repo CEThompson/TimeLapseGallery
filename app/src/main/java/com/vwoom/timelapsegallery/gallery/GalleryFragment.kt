@@ -52,7 +52,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
     }
 
-    // prevent doubleclicking
+    // prevent double clicking
     private var mLastClickTime: Long? = null
 
     override fun onPause() {
@@ -297,7 +297,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onClick(clickedProject: Project, projectImageView: ImageView, projectCardView: CardView, position: Int) {
         // Prevents multiple clicks which cause a crash
-        if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 1000) return
+        if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 500) return
         mLastClickTime = SystemClock.elapsedRealtime()
 
         // Save the position of the first visible item in the gallery
