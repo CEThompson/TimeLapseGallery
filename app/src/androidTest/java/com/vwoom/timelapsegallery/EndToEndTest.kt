@@ -6,6 +6,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.util.Log
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
@@ -68,6 +69,18 @@ class EndToEndTest {
 
         onView(withId(R.id.gallery_recycler_view)).perform(
                 RecyclerViewActions.actionOnItemAtPosition<GalleryAdapter.GalleryAdapterViewHolder>(0, click()))
+
+        onView(withId(R.id.add_photo_fab)).perform(click())
+
+        sleep(1000)
+
+        onView(withId(R.id.take_picture_fab)).perform(click())
+
+        sleep(2000)
+
+        val itemCount = mTimeLapseGalleryActivityTestRule.activity
+                .findViewById<RecyclerView>(R.id.details_recyclerview).adapter?.itemCount
+        assert(itemCount == 2)
 
         /*
         // TODO click on new project fab: onView(withId(R.id.project_name_edit_text)).perform(replaceText("verticalTestProject"));
