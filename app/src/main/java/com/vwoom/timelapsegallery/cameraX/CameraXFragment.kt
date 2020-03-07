@@ -161,13 +161,12 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         val display = requireActivity().windowManager.defaultDisplay
         cameraProviderFuture.addListener(Runnable {
             val cameraProvider = cameraProviderFuture.get()
-            camera = cameraProvider.bindToLifecycle(viewLifecycleOwner, cameraSelector, imageCapture, preview)
+            camera = cameraProvider.bindToLifecycle(this, cameraSelector, imageCapture, preview)
             setUpTapToFocus(display, cameraSelector, camera)
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
     private fun setUpTapToFocus(display: Display, cameraSelector: CameraSelector, camera: Camera) {
-
         @Suppress("ClickableViewAccessibility")
         previewView.setOnTouchListener { _, event ->
             // Only allow metering action once per second
