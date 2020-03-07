@@ -3,11 +3,15 @@ package com.vwoom.timelapsegallery
 import android.app.Activity
 import android.app.Instrumentation.ActivityResult
 import android.content.Context
+import android.os.Build
 import android.os.Environment
 import android.util.Log
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.rule.IntentsTestRule
@@ -16,8 +20,12 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.rule.GrantPermissionRule
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
+import com.google.firebase.annotations.PublicApi
+import com.vwoom.timelapsegallery.gallery.GalleryAdapter
 import com.vwoom.timelapsegallery.utils.FileUtils.createTemporaryImageFile
 import org.junit.Assert
 import org.junit.Rule
@@ -26,27 +34,42 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
+import java.lang.Thread.sleep
 
 /*
-* This test adds a new project with a test photo bypassing the implicit camera intent.
+* This test adds a new project.
 * A new photo is added to the project and the project is deleted.
-* This represents the overall basic workflow of the application.
+* This should represent the overall basic workflow of the application.
  */
 @LargeTest
 class EndToEndTest {
 
-    private var mContext: Context? = null
+    private lateinit var mContext: Context
 
     @Rule
+    @JvmField
     var mTimeLapseGalleryActivityTestRule = IntentsTestRule(TimeLapseGalleryActivity::class.java)
+
+    // bypasses permission
+    @get:Rule var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA)
 
     // TODO refactor end to end for navigation flow
     @Test
     fun endToEndTest() {
         mContext = mTimeLapseGalleryActivityTestRule.activity
         val externalFilesDir = mContext?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        Espresso.onView(ViewMatchers.withId(R.id.add_project_FAB)).perform(ViewActions.click())
+        onView(withId(R.id.add_project_FAB)).perform(click())
 
+        sleep(1000)
+
+        onView(withId(R.id.take_picture_fab)).perform(click())
+
+        sleep(2000)
+
+        onView(withId(R.id.gallery_recycler_view)).perform(
+                RecyclerViewActions.actionOnItemAtPosition<GalleryAdapter.GalleryAdapterViewHolder>(0, click()))
+
+        /*
         // TODO click on new project fab: onView(withId(R.id.project_name_edit_text)).perform(replaceText("verticalTestProject"));
         // Create a test photo file
         var temp: File? = null
@@ -102,6 +125,8 @@ class EndToEndTest {
                 .inRoot(RootMatchers.isDialog())
                 .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
                 .perform(ViewActions.click())
+
+         */
     }
 
     /* Copies a drawable to a file */
@@ -119,6 +144,27 @@ class EndToEndTest {
             if (e.message != null) Log.d(TAG, e.message)
         }
     }
+
+    // TODO actually click permission dialog
+    /*
+    fun allowPermissionsIfNeeded(permissionNeeded: String) {
+    try {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !hasNeededPermission(permissionNeeded)) {
+        sleep(PERMISSIONS_DIALOG_DELAY)
+        val device: UiDevice = UiDevice.getInstance(getInstrumentation())
+        val allowPermissions: UiObject = device.findObject(UiSelector()
+          .clickable(true)
+          .checkable(false)
+          .index(GRANT_BUTTON_INDEX))
+        if (allowPermissions.exists()) {
+          allowPermissions.click()
+        }
+      }
+    } catch (e: UiObjectNotFoundException) {
+      System.out.println("There is no permissions dialog to interact with");
+    }
+  }
+ */
 
     companion object {
         private const val TAG = "EndToEnd"
