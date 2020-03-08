@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions
@@ -78,9 +79,40 @@ class EndToEndTest {
 
         sleep(2000)
 
-        val itemCount = mTimeLapseGalleryActivityTestRule.activity
+        var itemCount = mTimeLapseGalleryActivityTestRule.activity
                 .findViewById<RecyclerView>(R.id.details_recyclerview).adapter?.itemCount
         assert(itemCount == 2)
+
+        // Use overflow to delete a photo from the project
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(ViewMatchers.withText(R.string.delete_photo)).perform(click())
+        onView(ViewMatchers.withText(android.R.string.yes))
+                .inRoot(RootMatchers.isDialog())
+                .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+                .perform(click())
+
+        // Assert the item was deleted
+        itemCount = mTimeLapseGalleryActivityTestRule.activity
+                .findViewById<RecyclerView>(R.id.details_recyclerview).adapter?.itemCount
+        assert(itemCount == 1)
+
+        // Use overflow to delete the project
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(ViewMatchers.withText(R.string.delete_project)).perform(click())
+        onView(ViewMatchers.withText(android.R.string.yes))
+                .inRoot(RootMatchers.isDialog())
+                .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+                .perform(click())
+        onView(ViewMatchers.withText(android.R.string.yes))
+                .inRoot(RootMatchers.isDialog())
+                .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+                .perform(click())
+
+        // Assert project was deleted
+        itemCount = mTimeLapseGalleryActivityTestRule.activity
+                .findViewById<RecyclerView>(R.id.gallery_recycler_view).adapter?.itemCount
+        assert(itemCount == 0)
+
 
         /*
         // TODO click on new project fab: onView(withId(R.id.project_name_edit_text)).perform(replaceText("verticalTestProject"));
