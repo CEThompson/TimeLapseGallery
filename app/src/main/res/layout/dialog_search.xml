@@ -64,6 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:layout_gravity="center"
+                android:textStyle="italic"
                 android:text="@string/no_projects_tagged"
                 android:visibility="invisible" />
 
