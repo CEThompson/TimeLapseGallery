@@ -160,7 +160,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onResume() {
         super.onResume()
-        if (mGalleryViewModel.searchDialogShowing) mSearchDialog?.show()
+        if (mGalleryViewModel.searchDialogShowing) {
+            initializeSearchDialog()
+            mSearchDialog?.show()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
