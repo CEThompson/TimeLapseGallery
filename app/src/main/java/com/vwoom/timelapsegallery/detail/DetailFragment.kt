@@ -826,7 +826,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         val color = R.color.colorPrimary
         when(mCurrentProject?.interval_days){
-            null -> {}
+            null -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_none)?.setBackgroundResource(color)}
             0 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_none)?.setBackgroundResource(color)}
             1 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_one)?.setBackgroundResource(color)}
             2 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_two)?.setBackgroundResource(color)}
