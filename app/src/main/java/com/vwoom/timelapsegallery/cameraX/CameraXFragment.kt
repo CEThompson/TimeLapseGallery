@@ -137,19 +137,13 @@ class CameraXFragment : Fragment(), LifecycleOwner {
                     object : ImageCapture.OnImageSavedCallback {
                         override fun onError(exception: ImageCaptureException) {
                             val msg = "Photo capture failed: ${exception.localizedMessage}"
-                            Log.e("CameraXApp", msg, exception)
+                            Log.e(TAG, msg, exception)
                             previewView.post {
                                 Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                             }
                         }
 
                         override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                            val msg = "Photo capture succeeded: ${outputFileResults.savedUri}"
-                            Log.d("CameraXApp", msg)
-                            previewView.post {
-                                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-                            }
-
                             takePictureJob = cameraViewModel.viewModelScope.launch {
                                 cameraViewModel.handleFile(photoFile, externalFilesDir)
                                 findNavController().popBackStack()
