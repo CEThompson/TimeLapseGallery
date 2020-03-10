@@ -177,11 +177,14 @@ object ProjectUtils {
         // Import schedule
         if (scheduleFile.exists()){
             // TODO test this
-            val fileContents = scheduleFile.readText()
-            val interval = fileContents.toInt()
-            //val inputAsString = FileInputStream(scheduleFile).bufferedReader().use { it.readText() }
-            val projectScheduleEntry = ProjectScheduleEntry(currentProject.id, null, interval)
-            db.projectScheduleDao().insertProjectSchedule(projectScheduleEntry)
+            val inputAsString = FileInputStream(scheduleFile).bufferedReader().use { it.readText() }
+            val projectScheduleEntry = ProjectScheduleEntry(currentProject.id, null, null)
+            try {
+                projectScheduleEntry.interval_days = inputAsString.toInt()
+                db.projectScheduleDao().insertProjectSchedule(projectScheduleEntry)
+            } catch (e: Exception){
+                Log.e(TAG, "error importing schedule for $currentProject")
+            }
         }
     }
 }

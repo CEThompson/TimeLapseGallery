@@ -547,6 +547,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             val interval = it.toString()
             if (interval.isNotEmpty()){
                 detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, interval.toInt())
+            } else {
+                detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 0)
             }
         }
         setScheduleInformation()

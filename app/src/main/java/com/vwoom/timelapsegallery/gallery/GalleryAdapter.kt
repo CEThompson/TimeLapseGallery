@@ -66,6 +66,10 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         constraintSet.setDimensionRatio(holder.binding.projectImage.id, ratio)
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
+        // TODO display days until due where check mark is!
+        //val daysUntilDue = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp)
+        //holder.binding.galleryItemScheduleIndicatorDays.text = daysUntilDue.toString()
+
         // Display a check if a picture was taken today
         val photoTakenToday = DateUtils.isToday(project.cover_photo_timestamp)
         if (photoTakenToday){
@@ -87,9 +91,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
                 // Red if a photo needs to be taken today
                 holder.binding.scheduleIndicatorDue.visibility = View.VISIBLE
                 holder.binding.scheduleIndicatorPending.visibility = View.GONE
-                // TODO calc days until due
-                val daysUntilDue = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp)
-                holder.binding.galleryItemScheduleIndicatorDays.text = daysUntilDue.toString()
+                holder.binding.galleryItemScheduleIndicatorDays.text = project.interval_days.toString()
             }
             // Display the gradient for readability
             holder.binding.galleryItemScheduleIndicatorDays.visibility = View.VISIBLE

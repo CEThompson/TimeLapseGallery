@@ -268,7 +268,7 @@ object FileUtils {
             Log.d(TAG, "writing schedule file")
             val output = FileOutputStream(scheduleFile)
             val outputStreamWriter = OutputStreamWriter(output)
-            outputStreamWriter.write(projectScheduleEntry.interval_days!!)
+            outputStreamWriter.write(projectScheduleEntry.interval_days!!.toString())
             outputStreamWriter.flush()
             output.fd.sync()
             outputStreamWriter.close()
