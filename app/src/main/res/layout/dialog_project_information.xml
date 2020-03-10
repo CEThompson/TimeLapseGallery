@@ -105,7 +105,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/medium"
-        android:textColor="@color/colorTag"
         app:layout_constraintStart_toEndOf="@id/dialog_tags_label"
         app:layout_constraintTop_toTopOf="@id/dialog_tags_label"
         tools:text="#tag"
