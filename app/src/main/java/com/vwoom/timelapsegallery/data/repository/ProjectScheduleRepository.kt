@@ -23,12 +23,7 @@ class ProjectScheduleRepository private constructor(private val projectScheduleD
     fun getProjectScheduleNonSuspend(projectId: Long): ProjectScheduleEntry? = projectScheduleDao.getProjectScheduleByProjectIdNonSuspend(projectId)
 
     suspend fun setProjectSchedule(externalFilesDir: File, project: Project, projectScheduleEntry: ProjectScheduleEntry) {
-        // Toggle the project schedule
-        if (projectScheduleEntry.interval_days == null || projectScheduleEntry.interval_days == 0) {
-            projectScheduleEntry.interval_days = 1
-        } else {
-            projectScheduleEntry.interval_days = 0
-        }
+        // Write the project schedule to the database
         projectScheduleDao.insertProjectSchedule(projectScheduleEntry)
 
         // Handle the file representation of the schedule

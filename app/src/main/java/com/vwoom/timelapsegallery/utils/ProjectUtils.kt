@@ -176,9 +176,11 @@ object ProjectUtils {
 
         // Import schedule
         if (scheduleFile.exists()){
-            // TODO implement different day intervals for schedule?
+            // TODO test this
+            val fileContents = scheduleFile.readText()
+            val interval = fileContents.toInt()
             //val inputAsString = FileInputStream(scheduleFile).bufferedReader().use { it.readText() }
-            val projectScheduleEntry = ProjectScheduleEntry(currentProject.id, null, 1)
+            val projectScheduleEntry = ProjectScheduleEntry(currentProject.id, null, interval)
             db.projectScheduleDao().insertProjectSchedule(projectScheduleEntry)
         }
     }

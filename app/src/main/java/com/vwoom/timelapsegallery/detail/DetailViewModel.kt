@@ -22,30 +22,29 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
                       private val tagRepository: TagRepository,
                       private val projectScheduleRepository: ProjectScheduleRepository,
                       projectId: Long) : ViewModel() {
+    // Project & Photo
+    val currentProject: LiveData<Project> = projectRepository.getProjectView(projectId)
+    val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
+    var lastPhoto: Photo? = null
     val photos: LiveData<List<PhotoEntry>> = photoRepository.getPhotos(projectId)
     val projectTags: LiveData<List<ProjectTagEntry>> = projectTagRepository.getProjectTags(projectId)
     val tags: LiveData<List<TagEntry>> = tagRepository.getTags()
 
-    val currentProject: LiveData<Project> = projectRepository.getProjectView(projectId)
-    val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
+    // Dialog state
+    var fullscreenDialogShowing: Boolean = false
+    var scheduleDialogShowing: Boolean = false
+    var infoDialogShowing: Boolean = false
+    var tagDialogShowing: Boolean = false
 
+    // Play state
     private var isPlaying: Boolean = false
-    var fullscreenIsShowing: Boolean = false
 
-    var lastPhoto: Photo? = null
-
-    fun toggleSchedule(externalFilesDir: File, project: Project){
+    fun setSchedule(externalFilesDir: File, project: Project, intervalInDays: Int){
         viewModelScope.launch {
             var projectScheduleEntry: ProjectScheduleEntry? = projectScheduleRepository.getProjectSchedule(project.project_id)
             if (projectScheduleEntry == null)
-                projectScheduleEntry = ProjectScheduleEntry(project.project_id,0, 0)
+                projectScheduleEntry = ProjectScheduleEntry(project.project_id,0, intervalInDays)
             projectScheduleRepository.setProjectSchedule(externalFilesDir, project, projectScheduleEntry)
-        }
-    }
-
-    fun deleteTags(tags: ArrayList<String>, project: Project){
-        viewModelScope.launch {
-            projectTagRepository.deleteTags(tags, project)
         }
     }
 

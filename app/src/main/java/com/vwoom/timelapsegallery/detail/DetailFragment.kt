@@ -77,8 +77,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Views for fullscreen and dialogs
     private var mFullscreenImage: ImageView? = null
     private var mFullscreenImageDialog: Dialog? = null
-    private var mProjectTagDialog: Dialog? = null
-    private var mProjectInfoDialog: Dialog? = null
+    private var mTagDialog: Dialog? = null
+    private var mInfoDialog: Dialog? = null
+    private var mScheduleDialog: Dialog? = null
 
     // For playing timelapse
     private var mPlaying = false
@@ -103,27 +104,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         mCurrentProject = args.clickedProject
-
         mExternalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-
-        // Prepare analytics
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
-
         sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
         sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
-
         enterTransition = TransitionInflater.from(context).inflateTransition(R.transition.details_enter_transition)
-
         postponeEnterTransition()
     }
-
-    override fun onStop() {
-        super.onStop()
-        binding.detailsFragmentToolbar.setNavigationOnClickListener(null)
-    }
-
 
     override fun onStart() {
         super.onStart()
@@ -132,24 +120,45 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        playJob?.cancel()
-        tagJob?.cancel()
-        mProjectInfoDialog?.dismiss()
-        mFullscreenImageDialog?.dismiss()
-        mProjectTagDialog?.dismiss()
-    }
-
     override fun onResume() {
         super.onResume()
-        if (detailViewModel.fullscreenIsShowing){
+        if (detailViewModel.fullscreenDialogShowing){
+            if (mFullscreenImageDialog == null) initializeFullscreenImageDialog()
             mFullscreenImageDialog?.show()
+        }
+        if (detailViewModel.infoDialogShowing){
+            if (mInfoDialog == null) initializeInfoDialog()
+            mInfoDialog?.show()
+        }
+        if (detailViewModel.scheduleDialogShowing){
+            if (mScheduleDialog == null) initializeScheduleDialog()
+            mScheduleDialog?.show()
+        }
+        if (detailViewModel.tagDialogShowing){
+            if (mTagDialog == null) initializeTagDialog()
+            mTagDialog?.show()
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onPause() {
+        super.onPause()
+        // Cancel any jobs
+        playJob?.cancel()
+        tagJob?.cancel()
 
+        // Dismiss any dialogs
+        mInfoDialog?.dismiss()
+        mFullscreenImageDialog?.dismiss()
+        mTagDialog?.dismiss()
+        mScheduleDialog?.dismiss()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        binding.detailsFragmentToolbar.setNavigationOnClickListener(null)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentDetailBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
@@ -186,14 +195,25 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         binding.playAsVideoFab.setOnClickListener { playSetOfImages() }
         binding.projectScheduleFab.setOnClickListener {
-            detailViewModel.toggleSchedule(mExternalFilesDir!!, mCurrentProject!!)
+            if (mScheduleDialog == null) initializeScheduleDialog()
+            mScheduleDialog?.show()
+            detailViewModel.scheduleDialogShowing = true
         }
-        binding.projectTagFab.setOnClickListener { mProjectTagDialog?.show() }
-        binding.projectInformationFab.setOnClickListener {mProjectInfoDialog?.show()}
+        binding.projectTagFab.setOnClickListener {
+            if (mTagDialog == null) initializeTagDialog()
+            mTagDialog?.show()
+            detailViewModel.tagDialogShowing = true
+        }
+        binding.projectInformationFab.setOnClickListener {
+            if (mInfoDialog == null) initializeInfoDialog()
+            mInfoDialog?.show()
+            detailViewModel.infoDialogShowing = true
+        }
         binding.fullscreenFab.setOnClickListener {
+            if (mFullscreenImageDialog == null) initializeFullscreenImageDialog()
             if (!mPlaying) {
                 mFullscreenImageDialog?.show()
-                detailViewModel.fullscreenIsShowing = true
+                detailViewModel.fullscreenDialogShowing = true
             }
         }
 
@@ -201,11 +221,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
         @Suppress("ClickableViewAccessibility")
         binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener)
-
-        // Initialize dialogs
-        initializeFullscreenImageDialog()
-        initializeProjectInformationDialog()
-        initializeProjectTagDialog()
 
         // Set the transition name for the image
         val imageTransitionName= "${mCurrentProject?.project_id}"
@@ -456,28 +471,25 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.setPhoto(clickedPhoto)
     }
 
-    private fun initializeProjectInformationDialog(){
-        mProjectInfoDialog = Dialog(requireContext())
-        mProjectInfoDialog?.setContentView(R.layout.dialog_project_information)
-
+    private fun initializeInfoDialog(){
+        mInfoDialog = Dialog(requireContext())
+        mInfoDialog?.setContentView(R.layout.dialog_project_information)
+        mInfoDialog?.setOnCancelListener { detailViewModel.infoDialogShowing = false }
         // Get Views
-        val editNameButton = mProjectInfoDialog?.findViewById<ImageView>(R.id.edit_project_name_button)
-
+        val editNameButton = mInfoDialog?.findViewById<ImageView>(R.id.edit_project_name_button)
         // Set fab colors
         editNameButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-
-        editNameButton?.setOnClickListener {
-            editName()
-        }
+        editNameButton?.setOnClickListener { editName() }
     }
 
-    private fun initializeProjectTagDialog(){
-        mProjectTagDialog = Dialog(requireContext())
-        mProjectTagDialog?.setContentView(R.layout.dialog_project_tag)
+    private fun initializeTagDialog(){
+        mTagDialog = Dialog(requireContext())
+        mTagDialog?.setContentView(R.layout.dialog_project_tag)
+        mTagDialog?.setOnCancelListener { detailViewModel.tagDialogShowing = false }
 
         // set add tag fab
-        val editText = mProjectTagDialog?.findViewById<EditText>(R.id.add_tag_dialog_edit_text)
-        val addTagFab = mProjectTagDialog?.findViewById<FloatingActionButton>(R.id.add_tag_fab)
+        val editText = mTagDialog?.findViewById<EditText>(R.id.add_tag_dialog_edit_text)
+        val addTagFab = mTagDialog?.findViewById<FloatingActionButton>(R.id.add_tag_fab)
         addTagFab?.setOnClickListener {
             // TODO validate tags?
             val tagText = editText?.text.toString().trim()
@@ -487,8 +499,19 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             }
         }
 
-        val okTextView = mProjectTagDialog?.findViewById<TextView>(R.id.dialog_project_tag_dismiss)
-        okTextView?.setOnClickListener { mProjectTagDialog?.dismiss() }
+        val okTextView = mTagDialog?.findViewById<TextView>(R.id.dialog_project_tag_dismiss)
+        okTextView?.setOnClickListener { mTagDialog?.dismiss() }
+    }
+
+    private fun initializeScheduleDialog(){
+        mScheduleDialog = Dialog(requireContext())
+        mScheduleDialog?.setContentView(R.layout.dialog_schedule)
+        mScheduleDialog?.setOnCancelListener { detailViewModel.scheduleDialogShowing = false }
+
+        val numberPicker = mScheduleDialog?.findViewById<NumberPicker>(R.id.schedule_number_picker)
+        numberPicker?.setOnValueChangedListener { picker, oldVal, newVal ->
+            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, newVal)
+        }
     }
 
     private fun initializeFullscreenImageDialog() {
@@ -506,17 +529,17 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Display the dialog on clicking the image
         mFullscreenBackFab?.setOnClickListener {
             mFullscreenImageDialog?.dismiss()
-            detailViewModel.fullscreenIsShowing = false
+            detailViewModel.fullscreenDialogShowing = false
         }
         mFullscreenExitFab?.setOnClickListener {
             mFullscreenImageDialog?.dismiss()
-            detailViewModel.fullscreenIsShowing = false
+            detailViewModel.fullscreenDialogShowing = false
         }
 
         mFullscreenImageDialog?.setOnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 mFullscreenImageDialog?.dismiss()
-                detailViewModel.fullscreenIsShowing = false
+                detailViewModel.fullscreenDialogShowing = false
             }
             true
         }
@@ -548,11 +571,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
             // Set id
             binding.projectInformationLayout.detailsProjectId.text = mCurrentProject?.project_id.toString()
-            val projectInfoDialogId = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_label)
+            val projectInfoDialogId = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_label)
             projectInfoDialogId?.text = getString(R.string.project_id_label, currentProject.project_id)
 
             // Set the dialog name
-            val projectInfoNameTv = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
+            val projectInfoNameTv = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
 
             // Set name for both the dialog and the project info card view
             val name = mCurrentProject?.project_name
@@ -587,11 +610,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             // Begin set schedule information
             //
             if (currentProject.interval_days == 0 || currentProject.interval_days == null) {
-                mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.none)
+                mInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.none)
                 binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
                 binding.detailScheduleIndicator.visibility = INVISIBLE
             } else {
-                mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)
+                mInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)
                         ?.text = getString(R.string.scheduled)
                 binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
                 binding.detailScheduleIndicator.visibility = VISIBLE
@@ -603,7 +626,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         })
 
         // Observe the list of photos
-        detailViewModel.photos.observe(viewLifecycleOwner, Observer<List<PhotoEntry>> { photoEntries: List<PhotoEntry> ->
+        detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
             // Save the list of photos
             mPhotos = photoEntries
 
@@ -656,7 +679,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         })
 
         // Observe the tags
-        detailViewModel.projectTags.observe(viewLifecycleOwner, Observer<List<ProjectTagEntry>> { projectTagEntries: List<ProjectTagEntry> ->
+        detailViewModel.projectTags.observe(viewLifecycleOwner, Observer { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 // Update project information dialog
                 mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
@@ -670,7 +693,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     // Concatenate a string for non-interactive output
                     tagsText = tagsText.plus("#${tag.tag}  ")
                 }
-                val tagsTextView = mProjectInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
+                val tagsTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
                 if (tagsText.isEmpty()) tagsTextView?.text = getString(R.string.none)
                 else tagsTextView?.text = tagsText
 
@@ -688,14 +711,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         })
 
 
-        detailViewModel.tags.observe(viewLifecycleOwner, Observer<List<TagEntry>> {tagEntries: List<TagEntry> ->
+        detailViewModel.tags.observe(viewLifecycleOwner, Observer {tagEntries: List<TagEntry> ->
             mAllTags = tagEntries.sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
             setProjectTagDialogTags()
         })
     }
 
     private fun setProjectTagDialogTags() {
-        val availableTagsLayout = mProjectTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_available_tags_layout)
+        val availableTagsLayout = mTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_available_tags_layout)
         availableTagsLayout?.removeAllViews()
         // Set up the available tags in the project information dialog
         if (mAllTags != null) {
