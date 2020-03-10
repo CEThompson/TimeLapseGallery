@@ -41,9 +41,7 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
 
     fun setSchedule(externalFilesDir: File, project: Project, intervalInDays: Int){
         viewModelScope.launch {
-            var projectScheduleEntry: ProjectScheduleEntry? = projectScheduleRepository.getProjectSchedule(project.project_id)
-            if (projectScheduleEntry == null)
-                projectScheduleEntry = ProjectScheduleEntry(project.project_id,0, intervalInDays)
+            val projectScheduleEntry = ProjectScheduleEntry(project.project_id,0, intervalInDays)
             projectScheduleRepository.setProjectSchedule(externalFilesDir, project, projectScheduleEntry)
         }
     }

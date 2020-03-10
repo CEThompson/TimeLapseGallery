@@ -1,11 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/large">
 
-    <NumberPicker
-        android:id="@+id/schedule_number_picker"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        >
+        <TextView
+            android:id="@+id/schedule_selector_none"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/none"
+            style="@style/ScheduleStyle"/>
+        <TextView
+            android:id="@+id/schedule_selector_one"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            style="@style/ScheduleStyle"/>
+        <TextView
+            android:id="@+id/schedule_selector_two"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2"
+            style="@style/ScheduleStyle"/>
+        <TextView
+            android:id="@+id/schedule_selector_three"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3"
+            style="@style/ScheduleStyle"/>
+        <TextView
+            android:id="@+id/schedule_selector_four"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4"
+            style="@style/ScheduleStyle"/>
+        <TextView
+            android:id="@+id/schedule_selector_five"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5"
+            style="@style/ScheduleStyle"/>
+        <TextView
+            android:id="@+id/schedule_selector_six"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="6"
+            style="@style/ScheduleStyle"/>
+        <TextView
+            android:id="@+id/schedule_selector_seven"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="7"
+            style="@style/ScheduleStyle"/>
+    </LinearLayout>
 
-</FrameLayout>
+    <EditText
+        android:id="@+id/custom_schedule_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="custom interval in days"
+    />
+</LinearLayout>

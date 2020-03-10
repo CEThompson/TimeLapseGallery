@@ -5,6 +5,7 @@ import android.text.format.DateUtils
 import com.vwoom.timelapsegallery.R
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 // TODO determine if time utils should be removed: depends on scheduling system usage overall
 object TimeUtils {
@@ -72,6 +73,11 @@ object TimeUtils {
 
     fun getDayFromTimestamp(timestamp: Long): String {
         return SimpleDateFormat("EEEE", Locale.getDefault()).format(Date(timestamp))
+    }
+
+    fun getDaysSinceTimeStamp(timestamp: Long): Long {
+        val timeDifference = System.currentTimeMillis() - timestamp
+        return TimeUnit.MILLISECONDS.toDays(timeDifference)
     }
 
     @JvmStatic

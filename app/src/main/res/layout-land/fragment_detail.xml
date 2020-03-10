@@ -175,6 +175,16 @@
                         app:layout_constraintTop_toTopOf="@id/detail_current_image"
                         app:layout_constraintEnd_toEndOf="@id/detail_current_image"/>
 
+                    <!-- Gradient for contrasting schedule information -->
+                    <ImageView
+                        android:id="@+id/schedule_gradient_image"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:src="@drawable/gradient_overlay_top_down"
+                        />
                     <!-- Schedule indicator -->
                     <ImageView
                         android:contentDescription="@string/schedule_indicator_content_description"
@@ -185,7 +195,14 @@
                         android:visibility="invisible"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintStart_toStartOf="parent"/>
-
+                    <TextView
+                        android:id="@+id/schedule_interval_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toEndOf="@id/detail_schedule_indicator"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:textColor="@color/white"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 

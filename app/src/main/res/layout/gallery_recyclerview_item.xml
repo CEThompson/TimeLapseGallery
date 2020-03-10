@@ -60,7 +60,14 @@
                 android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
+            <TextView
+                android:id="@+id/gallery_item_schedule_indicator_days"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@id/schedule_indicator_due"
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
             <!-- check mark to indicate if photo has been taken today -->
             <ImageView

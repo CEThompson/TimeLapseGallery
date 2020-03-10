@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -20,6 +21,7 @@ import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -517,9 +519,35 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mScheduleDialog?.setContentView(R.layout.dialog_schedule)
         mScheduleDialog?.setOnCancelListener { detailViewModel.scheduleDialogShowing = false }
 
-        val numberPicker = mScheduleDialog?.findViewById<NumberPicker>(R.id.schedule_number_picker)
-        numberPicker?.setOnValueChangedListener { picker, oldVal, newVal ->
-            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, newVal)
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_none)?.setOnClickListener {
+            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 0)
+        }
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_one)?.setOnClickListener {
+            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 1)
+        }
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_two)?.setOnClickListener {
+            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 2)
+        }
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_three)?.setOnClickListener {
+            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 3)
+        }
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_four)?.setOnClickListener {
+            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 4)
+        }
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_five)?.setOnClickListener {
+            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 5)
+        }
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_six)?.setOnClickListener {
+            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 6)
+        }
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_seven)?.setOnClickListener {
+            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 7)
+        }
+        mScheduleDialog?.findViewById<EditText>(R.id.custom_schedule_input)?.addTextChangedListener {
+            val interval = it.toString()
+            if (interval.isNotEmpty()){
+                detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, interval.toInt())
+            }
         }
         setScheduleInformation()
     }
@@ -614,13 +642,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             if (currentProject.interval_days == 0 || currentProject.interval_days == null) {
                 binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
                 binding.detailScheduleIndicator.visibility = INVISIBLE
+                binding.scheduleIntervalTv.visibility = INVISIBLE
             } else {
                 binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
                 binding.detailScheduleIndicator.visibility = VISIBLE
+                binding.scheduleIntervalTv.text = currentProject.interval_days.toString()
+                binding.scheduleIntervalTv.visibility = VISIBLE
             }
 
             setInfoDialog()
-            // TODO update schedule
+            setScheduleInformation()
         })
 
         // Observe the list of photos
@@ -777,9 +808,32 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
+    // TODO find a way to get rid of all this terrible boiler plate
     fun setScheduleInformation(){
         // TODO update time interval display
         // TODO update dialog
+        if (mScheduleDialog == null) return
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_none)?.setBackgroundResource(R.color.colorAccent)
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_one)?.setBackgroundResource(R.color.colorAccent)
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_two)?.setBackgroundResource(R.color.colorAccent)
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_three)?.setBackgroundResource(R.color.colorAccent)
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_four)?.setBackgroundResource(R.color.colorAccent)
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_five)?.setBackgroundResource(R.color.colorAccent)
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_six)?.setBackgroundResource(R.color.colorAccent)
+        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_seven)?.setBackgroundResource(R.color.colorAccent)
+
+        val color = R.color.colorPrimary
+        when(mCurrentProject?.interval_days){
+            null -> {}
+            0 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_none)?.setBackgroundResource(color)}
+            1 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_one)?.setBackgroundResource(color)}
+            2 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_two)?.setBackgroundResource(color)}
+            3 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_three)?.setBackgroundResource(color)}
+            4 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_four)?.setBackgroundResource(color)}
+            5 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_five)?.setBackgroundResource(color)}
+            6 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_six)?.setBackgroundResource(color)}
+            7 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_seven)?.setBackgroundResource(color)}
+        }
     }
 
     // Changes photo on swipe

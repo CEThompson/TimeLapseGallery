@@ -14,6 +14,7 @@ import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.gallery.GalleryAdapter.GalleryAdapterViewHolder
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
+import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 import java.util.*
 
@@ -73,26 +74,33 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
             holder.binding.scheduleIndicatorCheck.visibility = View.GONE
         }
 
-        // Display if the project is scheduled or not
+        // If the project is scheduled
         if (project.interval_days != null && project.interval_days != 0) {
             // Display the correctly colored schedule indicator
             if (photoTakenToday) {
                 // Green if a photo was taken today
                 holder.binding.scheduleIndicatorPending.visibility = View.VISIBLE
                 holder.binding.scheduleIndicatorDue.visibility = View.GONE
+                holder.binding.galleryItemScheduleIndicatorDays.text = project.interval_days.toString()
             }
             else {
                 // Red if a photo needs to be taken today
                 holder.binding.scheduleIndicatorDue.visibility = View.VISIBLE
                 holder.binding.scheduleIndicatorPending.visibility = View.GONE
+                // TODO calc days until due
+                val daysUntilDue = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp)
+                holder.binding.galleryItemScheduleIndicatorDays.text = daysUntilDue.toString()
             }
             // Display the gradient for readability
+            holder.binding.galleryItemScheduleIndicatorDays.visibility = View.VISIBLE
             holder.binding.projectImageGradient.visibility = View.VISIBLE
         }
+        // If the project is not scheduled
         else {
             holder.binding.scheduleIndicatorDue.visibility = View.GONE
             holder.binding.scheduleIndicatorPending.visibility = View.GONE
             holder.binding.projectImageGradient.visibility = View.GONE
+            holder.binding.galleryItemScheduleIndicatorDays.visibility = View.GONE
         }
 
         // Set transition targets
