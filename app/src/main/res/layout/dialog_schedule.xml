@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="@dimen/large">
 
-    <LinearLayout
+    <com.google.android.flexbox.FlexboxLayout
         android:orientation="horizontal"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
+        app:alignContent="stretch"
+        app:alignItems="stretch"
+        app:flexWrap="wrap"
         >
         <TextView
             android:id="@+id/schedule_selector_none"
@@ -59,7 +62,7 @@
             android:layout_height="wrap_content"
             android:text="7"
             style="@style/ScheduleStyle"/>
-    </LinearLayout>
+    </com.google.android.flexbox.FlexboxLayout>
 
     <EditText
         android:id="@+id/custom_schedule_input"
