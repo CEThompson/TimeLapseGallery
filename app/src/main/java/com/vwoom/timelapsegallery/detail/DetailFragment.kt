@@ -123,7 +123,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onResume() {
         super.onResume()
         if (detailViewModel.fullscreenDialogShowing){
-            if (mFullscreenImageDialog == null) initializeFullscreenImageDialog()
+            if (mFullscreenImageDialog == null) {
+                initializeFullscreenImageDialog()
+            }
             mFullscreenImageDialog?.show()
         }
         if (detailViewModel.infoDialogShowing){
@@ -211,6 +213,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         binding.fullscreenFab.setOnClickListener {
             if (mFullscreenImageDialog == null) initializeFullscreenImageDialog()
+
             if (!mPlaying) {
                 mFullscreenImageDialog?.show()
                 detailViewModel.fullscreenDialogShowing = true
@@ -291,7 +294,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     private fun loadUi(photoEntry: PhotoEntry) { // Set the fullscreen image dialogue to the current photo
-        if (!mPlaying) preloadFullscreenImage()
+        if (!mPlaying) setFullscreenImage()
         // Notify the adapter
         mDetailAdapter?.setCurrentPhoto(photoEntry)
         // Load the current image
@@ -480,6 +483,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Set fab colors
         editNameButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
         editNameButton?.setOnClickListener { editName() }
+        setInfoDialog()
+        setInfoTags()
     }
 
     private fun initializeTagDialog(){
@@ -500,7 +505,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
 
         val okTextView = mTagDialog?.findViewById<TextView>(R.id.dialog_project_tag_dismiss)
-        okTextView?.setOnClickListener { mTagDialog?.dismiss() }
+        okTextView?.setOnClickListener {
+            mTagDialog?.dismiss()
+            detailViewModel.tagDialogShowing = false
+        }
+        setTagDialog()
     }
 
     private fun initializeScheduleDialog(){
@@ -512,6 +521,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         numberPicker?.setOnValueChangedListener { picker, oldVal, newVal ->
             detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, newVal)
         }
+        setScheduleInformation()
     }
 
     private fun initializeFullscreenImageDialog() {
@@ -548,13 +558,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Note: this may be preferable as a viewpager instead
         @Suppress("ClickableViewAccessibility")
         mFullscreenImage?.setOnTouchListener(mOnSwipeTouchListener)
+
+        setFullscreenImage()
     }
 
     //Shared elements method
     // UI methods
     // TODO (update) implement dual loading solution for smooth transition between fullscreen images
     // Pre loads the selected image into the hidden dialogue so that display appears immediate
-    private fun preloadFullscreenImage() {
+    private fun setFullscreenImage() {
+        if (mFullscreenImageDialog == null) return
         if (mCurrentPhoto == null) return
         val path = FileUtils.getPhotoUrl(mExternalFilesDir!!, mCurrentProject!!, mCurrentPhoto!!)
         val current = File(path)
@@ -571,11 +584,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
             // Set id
             binding.projectInformationLayout.detailsProjectId.text = mCurrentProject?.project_id.toString()
-            val projectInfoDialogId = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_label)
-            projectInfoDialogId?.text = getString(R.string.project_id_label, currentProject.project_id)
-
-            // Set the dialog name
-            val projectInfoNameTv = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
 
             // Set name for both the dialog and the project info card view
             val name = mCurrentProject?.project_name
@@ -590,8 +598,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 binding.projectInformationLayout
                         .detailsProjectNameTextView
                         .setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-                // Set the dialog
-                projectInfoNameTv?.text = getString(R.string.unnamed)
             }
             else {
                 // Set the card view
@@ -602,27 +608,19 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 binding.projectInformationLayout
                         .detailsProjectNameTextView
                         .setTypeface(binding.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.BOLD)
-                // Set the dialog
-                projectInfoNameTv?.text = currentProject.project_name
             }
 
-            //
             // Begin set schedule information
-            //
             if (currentProject.interval_days == 0 || currentProject.interval_days == null) {
-                mInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.none)
                 binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
                 binding.detailScheduleIndicator.visibility = INVISIBLE
             } else {
-                mInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)
-                        ?.text = getString(R.string.scheduled)
                 binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
                 binding.detailScheduleIndicator.visibility = VISIBLE
             }
 
-            //
-            // End set schedule information
-            //
+            setInfoDialog()
+            // TODO update schedule
         })
 
         // Observe the list of photos
@@ -685,17 +683,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
 
                 // Set the tags for the project tag dialog
-                setProjectTagDialogTags()
-
-                // Update the tags in the project information dialog
-                var tagsText = ""
-                for (tag in mProjectTags!!){
-                    // Concatenate a string for non-interactive output
-                    tagsText = tagsText.plus("#${tag.tag}  ")
-                }
-                val tagsTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
-                if (tagsText.isEmpty()) tagsTextView?.text = getString(R.string.none)
-                else tagsTextView?.text = tagsText
+                setTagDialog()
+                var tagsText = setInfoTags()
 
                 // Update the tags in the project info card
                 if (mProjectTags!!.isEmpty()) {
@@ -713,11 +702,46 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         detailViewModel.tags.observe(viewLifecycleOwner, Observer {tagEntries: List<TagEntry> ->
             mAllTags = tagEntries.sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
-            setProjectTagDialogTags()
+            setTagDialog()
         })
     }
 
-    private fun setProjectTagDialogTags() {
+    private fun setInfoTags(): String {
+        // Update the tags in the project information dialog
+        var tagsText = ""
+        for (tag in mProjectTags!!) {
+            // Concatenate a string for non-interactive output
+            tagsText = tagsText.plus("#${tag.tag}  ")
+        }
+        val tagsTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
+        if (tagsText.isEmpty()) tagsTextView?.text = getString(R.string.none)
+        else tagsTextView?.text = tagsText
+        return tagsText
+    }
+
+    private fun setInfoDialog() {
+        if (mInfoDialog == null) return
+
+        // Set info dialog fields
+        val projectInfoDialogId = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_label)
+        projectInfoDialogId?.text = getString(R.string.project_id_label, mCurrentProject!!.project_id)
+        val projectInfoNameTv = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
+        if (mCurrentProject?.project_name == null || mCurrentProject?.project_name!!.isEmpty()) {
+            projectInfoNameTv?.text = getString(R.string.unnamed)
+        } else projectInfoNameTv?.text = mCurrentProject!!.project_name
+
+        if (mCurrentProject!!.interval_days == 0 || mCurrentProject!!.interval_days == null) {
+            mInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.none)
+        } else {
+            mInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.scheduled)
+        }
+
+        // TODO set project tags
+    }
+
+    private fun setTagDialog() {
+        if (mTagDialog == null) return
+
         val availableTagsLayout = mTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_available_tags_layout)
         availableTagsLayout?.removeAllViews()
         // Set up the available tags in the project information dialog
@@ -751,6 +775,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 availableTagsLayout?.addView(textView)
             }
         }
+    }
+
+    fun setScheduleInformation(){
+        // TODO update time interval display
+        // TODO update dialog
     }
 
     // Changes photo on swipe
