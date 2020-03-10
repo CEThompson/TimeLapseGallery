@@ -63,7 +63,7 @@
                     android:src="@drawable/ic_schedule_indicator_pending_24dp"
                     android:visibility="invisible" />
             </FrameLayout>
-            
+
             <TextView
                 android:id="@+id/gallery_item_schedule_indicator_days"
                 android:layout_width="wrap_content"
