@@ -79,9 +79,9 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         // Handle Check Display
         val photoTakenToday = DateUtils.isToday(project.cover_photo_timestamp)
         if (photoTakenToday) {
-            holder.binding.galleryCheckmarkLayout.visibility = VISIBLE
+            holder.binding.galleryCheckLayout.visibility = VISIBLE
         } else {
-            holder.binding.galleryCheckmarkLayout.visibility = INVISIBLE
+            holder.binding.galleryCheckLayout.visibility = INVISIBLE
         }
 
         // Set transition targets

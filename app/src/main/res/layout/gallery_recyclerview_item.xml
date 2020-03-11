@@ -105,22 +105,20 @@
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Layout showing a checkmark if a photo is taken today -->
+            <!-- Layout showing a check if a photo is taken today -->
             <FrameLayout
-                android:id="@+id/gallery_checkmark_layout"
+                android:id="@+id/gallery_check_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="60dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintStart_toStartOf="parent">
                 <!-- Bottom gradient -->
                 <ImageView
                     android:id="@+id/gallery_bottom_gradient"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     android:src="@drawable/gradient_overlay_bottom_up"
                     />
                 <!-- check mark to indicate if photo has been taken today -->
@@ -130,9 +128,7 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/schedule_indicator_check_content_description"
                     android:src="@drawable/ic_check_schedule_green_40dp"
-                    android:visibility="invisible"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
+                    android:layout_gravity="bottom|start" />
             </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
