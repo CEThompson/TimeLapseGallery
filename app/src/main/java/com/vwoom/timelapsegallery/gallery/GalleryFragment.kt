@@ -190,6 +190,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
+    // TODO add search option to search for projects due today!
     private fun initializeSearchDialog() {
         mSearchDialog = Dialog(requireContext())
         mSearchDialog?.setContentView(R.layout.dialog_search)
