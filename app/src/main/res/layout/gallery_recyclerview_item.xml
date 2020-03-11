@@ -75,7 +75,7 @@
                 />
 
             <ImageView
-                android:id="@+id/days_until_due_gradient"
+                android:id="@+id/gallery_bottom_gradient"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -88,8 +88,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
                 <TextView
                     android:id="@+id/days_until_due_text_view"
                     android:layout_width="wrap_content"
@@ -114,7 +114,7 @@
                 android:contentDescription="@string/schedule_indicator_check_content_description"
                 android:src="@drawable/ic_check_schedule_green_40dp"
                 android:visibility="invisible"
-                app:layout_constraintStart_toEndOf="@id/days_until_due_layout"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

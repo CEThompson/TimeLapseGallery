@@ -76,22 +76,25 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
             val daysUntilDue = project.interval_days!! - daysSinceTimestamp
 
             holder.binding.daysUntilDueTextView.text = daysUntilDue.toString()
-            if (daysUntilDue <= 0) holder.binding.daysUntilDueTextView.setTextColor(
-                    ContextCompat.getColor(holder.itemView.context, R.color.colorSubtleRedAccent))
-            else ContextCompat.getColor(holder.itemView.context, R.color.white)
+            if (daysUntilDue <= 0) holder.binding.daysUntilDueTextView
+                    .setTextColor(ContextCompat
+                            .getColor(holder.itemView.context, R.color.colorSubtleRedAccent))
+            else holder.binding.daysUntilDueTextView
+                    .setTextColor(ContextCompat
+                            .getColor(holder.itemView.context, R.color.colorGreen))
             holder.binding.daysUntilDueLayout.visibility = View.VISIBLE
-            holder.binding.daysUntilDueGradient.visibility = View.VISIBLE
         } else {
             holder.binding.daysUntilDueLayout.visibility = View.GONE
-            holder.binding.daysUntilDueGradient.visibility = View.GONE
         }
 
         // Display a check if a picture was taken today
         val photoTakenToday = DateUtils.isToday(project.cover_photo_timestamp)
         if (photoTakenToday){
             holder.binding.scheduleIndicatorCheck.visibility = View.VISIBLE
+            holder.binding.galleryBottomGradient.visibility = View.VISIBLE
         } else {
             holder.binding.scheduleIndicatorCheck.visibility = View.GONE
+            holder.binding.galleryBottomGradient.visibility = View.GONE
         }
 
         // If the project is scheduled
