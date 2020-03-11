@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.gallery
 
+import android.graphics.Color
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +8,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.gallery.GalleryAdapter.GalleryAdapterViewHolder
@@ -67,8 +70,21 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
         // TODO display days until due where check mark is!
-        //val daysUntilDue = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp)
-        //holder.binding.galleryItemScheduleIndicatorDays.text = daysUntilDue.toString()
+        val projectIsScheduled = (project.interval_days != null && project.interval_days != 0)
+        if (projectIsScheduled){
+            val daysSinceTimestamp = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp)
+            val daysUntilDue = project.interval_days!! - daysSinceTimestamp
+
+            holder.binding.daysUntilDueTextView.text = daysUntilDue.toString()
+            if (daysUntilDue <= 0) holder.binding.daysUntilDueTextView.setTextColor(
+                    ContextCompat.getColor(holder.itemView.context, R.color.colorSubtleRedAccent))
+            else ContextCompat.getColor(holder.itemView.context, R.color.white)
+            holder.binding.daysUntilDueLayout.visibility = View.VISIBLE
+            holder.binding.daysUntilDueGradient.visibility = View.VISIBLE
+        } else {
+            holder.binding.daysUntilDueLayout.visibility = View.GONE
+            holder.binding.daysUntilDueGradient.visibility = View.GONE
+        }
 
         // Display a check if a picture was taken today
         val photoTakenToday = DateUtils.isToday(project.cover_photo_timestamp)
@@ -79,15 +95,14 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         }
 
         // If the project is scheduled
-        if (project.interval_days != null && project.interval_days != 0) {
+        if (projectIsScheduled) {
             // Display the correctly colored schedule indicator
             if (photoTakenToday) {
                 // Green if a photo was taken today
                 holder.binding.scheduleIndicatorPending.visibility = View.VISIBLE
                 holder.binding.scheduleIndicatorDue.visibility = View.GONE
                 holder.binding.galleryItemScheduleIndicatorDays.text = project.interval_days.toString()
-            }
-            else {
+            } else {
                 // Red if a photo needs to be taken today
                 holder.binding.scheduleIndicatorDue.visibility = View.VISIBLE
                 holder.binding.scheduleIndicatorPending.visibility = View.GONE

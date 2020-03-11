@@ -30,6 +30,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
+            <!-- Gradient for schedule type display -->
             <ImageView
                 android:id="@+id/project_image_gradient"
                 android:layout_width="match_parent"
@@ -73,6 +74,36 @@
                 app:layout_constraintTop_toTopOf="parent"
                 />
 
+            <ImageView
+                android:id="@+id/days_until_due_gradient"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@drawable/gradient_overlay_bottom_up"
+                />
+
+            <LinearLayout
+                android:id="@+id/days_until_due_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+                <TextView
+                    android:id="@+id/days_until_due_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:layout_marginStart="@dimen/small"
+                    android:layout_marginBottom="@dimen/small"
+                    />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_wb_sunny_white_24dp"/>
+            </LinearLayout>
+
             <!-- check mark to indicate if photo has been taken today -->
             <ImageView
                 android:id="@+id/schedule_indicator_check"
@@ -81,7 +112,7 @@
                 android:contentDescription="@string/schedule_indicator_check_content_description"
                 android:src="@drawable/ic_check_schedule_green_40dp"
                 android:visibility="invisible"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/days_until_due_layout"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
