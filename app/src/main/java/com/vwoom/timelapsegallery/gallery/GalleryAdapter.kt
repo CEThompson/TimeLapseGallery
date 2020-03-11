@@ -34,7 +34,6 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
 
     inner class GalleryAdapterViewHolder(var binding: GalleryRecyclerviewItemBinding)
         : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
-
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
             val clickedProject = mProjectData!![adapterPosition]
@@ -44,7 +43,6 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
                     binding.projectCardView,
                     adapterPosition)
         }
-
         init {
             binding.root.setOnClickListener(this)
         }
@@ -70,45 +68,20 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         constraintSet.setDimensionRatio(holder.binding.projectImage.id, ratio)
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
-        // TODO simplify layout organization and control
         val projectIsScheduled = (project.interval_days != null && project.interval_days != 0)
-        // Handle Schedule Display
-        if (projectIsScheduled) {
-            val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp)
-            val daysUntilDue = project.interval_days!! - daysSinceLastPhoto
-
-            holder.binding.daysUntilDueTextView.text = daysUntilDue.toString()
-            if (daysUntilDue <= 0) {
-                holder.binding.daysUntilDueTextView
-                        .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.colorSubtleRedAccent))
-                holder.binding.scheduleIndicatorDue.visibility = VISIBLE
-                holder.binding.scheduleIndicatorPending.visibility = INVISIBLE
-            } else {
-                holder.binding.daysUntilDueTextView
-                        .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.colorGreen))
-                holder.binding.scheduleIndicatorDue.visibility = INVISIBLE
-                holder.binding.scheduleIndicatorPending.visibility = VISIBLE
-            }
-            holder.binding.daysUntilDueLayout.visibility = VISIBLE
-            holder.binding.galleryItemScheduleIndicatorDays.text = project.interval_days.toString()
-            holder.binding.galleryItemScheduleIndicatorDays.visibility = VISIBLE
-            holder.binding.projectImageGradient.visibility = VISIBLE
+        if (projectIsScheduled){
+            setScheduleInformation(project, holder, project.interval_days!!)
+            holder.binding.scheduleLayout.visibility = VISIBLE
         } else {
-            holder.binding.daysUntilDueLayout.visibility = INVISIBLE
-            holder.binding.scheduleIndicatorPending.visibility = INVISIBLE
-            holder.binding.scheduleIndicatorDue.visibility = INVISIBLE
-            holder.binding.galleryItemScheduleIndicatorDays.visibility = INVISIBLE
-            holder.binding.projectImageGradient.visibility = INVISIBLE
+            holder.binding.scheduleLayout.visibility = INVISIBLE
         }
 
         // Handle Check Display
         val photoTakenToday = DateUtils.isToday(project.cover_photo_timestamp)
         if (photoTakenToday) {
-            holder.binding.scheduleIndicatorCheck.visibility = View.VISIBLE
-            holder.binding.galleryBottomGradient.visibility = View.VISIBLE
+            holder.binding.galleryCheckmarkLayout.visibility = VISIBLE
         } else {
-            holder.binding.scheduleIndicatorCheck.visibility = View.GONE
-            holder.binding.galleryBottomGradient.visibility = View.GONE
+            holder.binding.galleryCheckmarkLayout.visibility = INVISIBLE
         }
 
         // Set transition targets
@@ -129,7 +102,6 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
 
     fun setProjectData(projectData: List<Project>) {
         mProjectData = projectData
-
         // TODO convert this to a diff util?
         mProjectsToCoverPhotos.clear()
         for (project in projectData) {
@@ -139,8 +111,28 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
             mProjectsToCoverPhotos.apply { put(project, file) }
             mCoverPhotosToRatios.apply { put(file, ratio) }
         }
-
         notifyDataSetChanged()
+    }
+
+    // Updates the UI for the schedule layout
+    private fun setScheduleInformation(project: Project, holder: GalleryAdapterViewHolder, interval_days: Int) {
+        // Calc the days until project is due
+        val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp)
+        val daysUntilDue = project.interval_days!! - daysSinceLastPhoto
+        holder.binding.daysUntilDueTextView.text = daysUntilDue.toString() // set days until due text
+        holder.binding.galleryItemScheduleIndicatorDays.text = interval_days.toString() // set schedule interval
+        // Style depending upon due state
+        if (daysUntilDue <= 0) {
+            holder.binding.daysUntilDueTextView
+                    .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.colorSubtleRedAccent))
+            holder.binding.scheduleIconDue.visibility = VISIBLE
+            holder.binding.scheduleIconPending.visibility = INVISIBLE
+        } else {
+            holder.binding.daysUntilDueTextView
+                    .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.colorGreen))
+            holder.binding.scheduleIconDue.visibility = INVISIBLE
+            holder.binding.scheduleIconPending.visibility = VISIBLE
+        }
     }
 
     companion object {

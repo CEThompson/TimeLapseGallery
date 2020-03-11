@@ -30,91 +30,110 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
-            <!-- Gradient for schedule type display -->
-            <ImageView
-                android:id="@+id/project_image_gradient"
+            <!-- Layout containing schedule information -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/schedule_layout"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:src="@drawable/gradient_overlay_top_down"
-                />
-            <FrameLayout
-                android:id="@+id/schedule_icon_container"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="60dp"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
-                <!-- clock showing if the project has been scheduled and if its due -->
+
+                <!-- Gradient for schedule type display -->
                 <ImageView
-                    android:id="@+id/schedule_indicator_due"
+                    android:id="@+id/gallery_gradient_top_down"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:src="@drawable/gradient_overlay_top_down"
+                    />
+                <FrameLayout
+                    android:id="@+id/schedule_icon_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/schedule_indicator_content_description"
-                    android:src="@drawable/ic_schedule_indicator_due_24dp"
-                    android:visibility="invisible" />
-                <!-- clock showing if the project has been scheduled and if its pending -->
-                <ImageView
-                    android:id="@+id/schedule_indicator_pending"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/schedule_indicator_content_description"
-                    android:src="@drawable/ic_schedule_indicator_pending_24dp"
-                    android:visibility="invisible" />
-            </FrameLayout>
-            <TextView
-                android:id="@+id/gallery_item_schedule_indicator_days"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                app:layout_constraintStart_toEndOf="@id/schedule_icon_container"
-                app:layout_constraintTop_toTopOf="parent"
-                />
-
-            <ImageView
-                android:id="@+id/gallery_bottom_gradient"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:src="@drawable/gradient_overlay_bottom_up"
-                />
-
-            <LinearLayout
-                android:id="@+id/days_until_due_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+                    <!-- clock showing if the project has been scheduled and if its due -->
+                    <ImageView
+                        android:id="@+id/schedule_icon_due"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/schedule_indicator_content_description"
+                        android:src="@drawable/ic_schedule_indicator_due_24dp"
+                        android:visibility="invisible" />
+                    <!-- clock showing if the project has been scheduled and if its pending -->
+                    <ImageView
+                        android:id="@+id/schedule_icon_pending"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/schedule_indicator_content_description"
+                        android:src="@drawable/ic_schedule_indicator_pending_24dp"
+                        android:visibility="invisible" />
+                </FrameLayout>
                 <TextView
-                    android:id="@+id/days_until_due_text_view"
+                    android:id="@+id/gallery_item_schedule_indicator_days"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
-                    android:layout_marginStart="@dimen/small"
-                    android:layout_marginBottom="@dimen/small"
-                    android:layout_marginEnd="2dp"
+                    app:layout_constraintStart_toEndOf="@id/schedule_icon_container"
+                    app:layout_constraintTop_toTopOf="parent"
                     />
-                <ImageView
-                    android:layout_marginBottom="2dp"
+
+                <LinearLayout
+                    android:id="@+id/days_until_due_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_wb_sunny_white_24dp"/>
-            </LinearLayout>
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+                    <TextView
+                        android:id="@+id/days_until_due_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:layout_marginStart="@dimen/small"
+                        android:layout_marginBottom="@dimen/small"
+                        android:layout_marginEnd="2dp"
+                        />
+                    <ImageView
+                        android:layout_marginBottom="2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_wb_sunny_white_24dp"/>
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- check mark to indicate if photo has been taken today -->
-            <ImageView
-                android:id="@+id/schedule_indicator_check"
-                android:layout_width="wrap_content"
+            <!-- Layout showing a checkmark if a photo is taken today -->
+            <FrameLayout
+                android:id="@+id/gallery_checkmark_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/schedule_indicator_check_content_description"
-                android:src="@drawable/ic_check_schedule_green_40dp"
-                android:visibility="invisible"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
+                android:minHeight="60dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <!-- Bottom gradient -->
+                <ImageView
+                    android:id="@+id/gallery_bottom_gradient"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:src="@drawable/gradient_overlay_bottom_up"
+                    />
+                <!-- check mark to indicate if photo has been taken today -->
+                <ImageView
+                    android:id="@+id/schedule_indicator_check"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/schedule_indicator_check_content_description"
+                    android:src="@drawable/ic_check_schedule_green_40dp"
+                    android:visibility="invisible"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+            </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.cardview.widget.CardView>
 </layout>
