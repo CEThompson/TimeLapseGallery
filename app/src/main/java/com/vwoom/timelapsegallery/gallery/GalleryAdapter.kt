@@ -1,9 +1,10 @@
 package com.vwoom.timelapsegallery.gallery
 
-import android.graphics.Color
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.cardview.widget.CardView
@@ -69,58 +70,45 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         constraintSet.setDimensionRatio(holder.binding.projectImage.id, ratio)
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
-        // TODO display days until due where check mark is!
+        // TODO simplify layout organization and control
         val projectIsScheduled = (project.interval_days != null && project.interval_days != 0)
-        if (projectIsScheduled){
-            val daysSinceTimestamp = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp)
-            val daysUntilDue = project.interval_days!! - daysSinceTimestamp
+        // Handle Schedule Display
+        if (projectIsScheduled) {
+            val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp)
+            val daysUntilDue = project.interval_days!! - daysSinceLastPhoto
 
             holder.binding.daysUntilDueTextView.text = daysUntilDue.toString()
-            if (daysUntilDue <= 0) holder.binding.daysUntilDueTextView
-                    .setTextColor(ContextCompat
-                            .getColor(holder.itemView.context, R.color.colorSubtleRedAccent))
-            else holder.binding.daysUntilDueTextView
-                    .setTextColor(ContextCompat
-                            .getColor(holder.itemView.context, R.color.colorGreen))
-            holder.binding.daysUntilDueLayout.visibility = View.VISIBLE
+            if (daysUntilDue <= 0) {
+                holder.binding.daysUntilDueTextView
+                        .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.colorSubtleRedAccent))
+                holder.binding.scheduleIndicatorDue.visibility = VISIBLE
+                holder.binding.scheduleIndicatorPending.visibility = INVISIBLE
+            } else {
+                holder.binding.daysUntilDueTextView
+                        .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.colorGreen))
+                holder.binding.scheduleIndicatorDue.visibility = INVISIBLE
+                holder.binding.scheduleIndicatorPending.visibility = VISIBLE
+            }
+            holder.binding.daysUntilDueLayout.visibility = VISIBLE
+            holder.binding.galleryItemScheduleIndicatorDays.text = project.interval_days.toString()
+            holder.binding.galleryItemScheduleIndicatorDays.visibility = VISIBLE
+            holder.binding.projectImageGradient.visibility = VISIBLE
         } else {
-            holder.binding.daysUntilDueLayout.visibility = View.GONE
+            holder.binding.daysUntilDueLayout.visibility = INVISIBLE
+            holder.binding.scheduleIndicatorPending.visibility = INVISIBLE
+            holder.binding.scheduleIndicatorDue.visibility = INVISIBLE
+            holder.binding.galleryItemScheduleIndicatorDays.visibility = INVISIBLE
+            holder.binding.projectImageGradient.visibility = INVISIBLE
         }
 
-        // Display a check if a picture was taken today
+        // Handle Check Display
         val photoTakenToday = DateUtils.isToday(project.cover_photo_timestamp)
-        if (photoTakenToday){
+        if (photoTakenToday) {
             holder.binding.scheduleIndicatorCheck.visibility = View.VISIBLE
             holder.binding.galleryBottomGradient.visibility = View.VISIBLE
         } else {
             holder.binding.scheduleIndicatorCheck.visibility = View.GONE
             holder.binding.galleryBottomGradient.visibility = View.GONE
-        }
-
-        // If the project is scheduled
-        if (projectIsScheduled) {
-            // Display the correctly colored schedule indicator
-            if (photoTakenToday) {
-                // Green if a photo was taken today
-                holder.binding.scheduleIndicatorPending.visibility = View.VISIBLE
-                holder.binding.scheduleIndicatorDue.visibility = View.GONE
-                holder.binding.galleryItemScheduleIndicatorDays.text = project.interval_days.toString()
-            } else {
-                // Red if a photo needs to be taken today
-                holder.binding.scheduleIndicatorDue.visibility = View.VISIBLE
-                holder.binding.scheduleIndicatorPending.visibility = View.GONE
-                holder.binding.galleryItemScheduleIndicatorDays.text = project.interval_days.toString()
-            }
-            // Display the gradient for readability
-            holder.binding.galleryItemScheduleIndicatorDays.visibility = View.VISIBLE
-            holder.binding.projectImageGradient.visibility = View.VISIBLE
-        }
-        // If the project is not scheduled
-        else {
-            holder.binding.scheduleIndicatorDue.visibility = View.GONE
-            holder.binding.scheduleIndicatorPending.visibility = View.GONE
-            holder.binding.projectImageGradient.visibility = View.GONE
-            holder.binding.galleryItemScheduleIndicatorDays.visibility = View.GONE
         }
 
         // Set transition targets
@@ -144,12 +132,12 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
 
         // TODO convert this to a diff util?
         mProjectsToCoverPhotos.clear()
-        for (project in projectData){
+        for (project in projectData) {
             val photoUrl = FileUtils.getCoverPhotoUrl(externalFilesDir, project)
             val ratio = PhotoUtils.getAspectRatioFromImagePath(photoUrl)
             val file = File(photoUrl)
-            mProjectsToCoverPhotos.apply {put(project, file)}
-            mCoverPhotosToRatios.apply{put(file, ratio)}
+            mProjectsToCoverPhotos.apply { put(project, file) }
+            mCoverPhotosToRatios.apply { put(file, ratio) }
         }
 
         notifyDataSetChanged()
