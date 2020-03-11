@@ -114,6 +114,12 @@
             app:layout_constraintBottom_toBottomOf="parent">
 
             <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/search_due_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/due" />
+
+            <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/search_scheduled_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

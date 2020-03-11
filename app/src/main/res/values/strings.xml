@@ -108,11 +108,11 @@
     <!-- Notifications -->
     <string name="projects_scheduled_today">You have projects scheduled today.</string>
 
-
     <!-- Photo / Project information -->
     <string name="details_photo_number_out_of" translatable="false">%1$d / %2$d</string>
     <string name="today">Today</string>
     <string name="scheduled">Scheduled</string>
+    <string name="due">Due</string>
     <string name="unscheduled">Unscheduled</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="number_of_days">In %1$d Days</string>

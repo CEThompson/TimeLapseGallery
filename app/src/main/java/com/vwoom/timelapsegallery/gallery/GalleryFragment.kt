@@ -11,7 +11,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -135,21 +134,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mGalleryViewModel.searchTags.clear()
             mGalleryViewModel.scheduleSearch = false
             mGalleryViewModel.unscheduledSearch = false
+            mGalleryViewModel.dueSearch = false
             updateSearchFilter()
-
-            // Reset search dialog
-            mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)?.setText("")
-            val tagsLayout = mSearchDialog?.findViewById<FlexboxLayout>(R.id.dialog_search_tags_layout)
-            if (tagsLayout!=null) {
-                val children = tagsLayout.children
-                for (child in children){
-                    val checkbox = child as CheckBox
-                    checkbox.isChecked = false
-                }
-            }
-            mSearchDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)?.isChecked = false
-            mSearchDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)?.isChecked = false
+            updateSearchDialog()
         }
+
         if (!userIsNotSearching()) mSearchActiveFAB.show()
         else mSearchActiveFAB.hide()
 
@@ -196,6 +185,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mSearchDialog?.setContentView(R.layout.dialog_search)
         mSearchDialog?.setOnCancelListener { mGalleryViewModel.searchDialogShowing = false }
 
+        val dueCheckbox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_checkbox)
         val scheduledCheckbox = mSearchDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)
         val unscheduledCheckbox = mSearchDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)
         val searchEditText = mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)
@@ -208,23 +198,26 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // Handle search selection of scheduled / unscheduled projects
+        dueCheckbox?.setOnCheckedChangeListener { _, isChecked ->
+            unscheduledCheckbox?.isEnabled = !isChecked
+            scheduledCheckbox?.isEnabled = !isChecked
+            mGalleryViewModel.dueSearch = isChecked
+            updateSearchFilter()
+        }
         scheduledCheckbox?.setOnCheckedChangeListener { _, isChecked ->
             unscheduledCheckbox?.isEnabled = !isChecked
+            dueCheckbox?.isEnabled = !isChecked
             mGalleryViewModel.scheduleSearch = isChecked
             updateSearchFilter()
         }
-
         unscheduledCheckbox?.setOnCheckedChangeListener { _, isChecked ->
             scheduledCheckbox?.isEnabled = !isChecked
+            dueCheckbox?.isEnabled = !isChecked
             mGalleryViewModel.unscheduledSearch = isChecked
             updateSearchFilter()
         }
 
-        if (mGalleryViewModel.tags.value!=null){
-            val tags = mGalleryViewModel.tags.value!!
-            val sortedTags: List<TagEntry> = tags.sortedBy {it.tag.toLowerCase(Locale.getDefault())}
-            setTags(sortedTags)
-        }
+        updateSearchDialog()
     }
 
     // TODO re-evaluate use of search filter
@@ -261,18 +254,27 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         })
 
         mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer { tags: List<TagEntry> ->
-            val sortedTags = tags.sortedBy {it.tag.toLowerCase(Locale.getDefault())}
-            setTags(sortedTags)
+            updateSearchDialog()
         })
     }
 
     // Updates the dialog with all tags in the database for filtration
-    private fun setTags(tags: List<TagEntry>) {
+    private fun updateSearchDialog() {
+        if (mSearchDialog == null) return
+
+        // Handle state of search by name
+        mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)?.setText(mGalleryViewModel.searchName)
+
+        // Handle tag state
+        var tags: List<TagEntry> = listOf()
+        if (mGalleryViewModel.tags.value!=null){
+            tags = mGalleryViewModel.tags.value!!.sortedBy {it.tag.toLowerCase(Locale.getDefault())}
+        }
         // Clear the tag layout
         val tagLayout = mSearchDialog?.findViewById<FlexboxLayout>(R.id.dialog_search_tags_layout)
         val emptyListIndicator = mSearchDialog?.findViewById<TextView>(R.id.empty_tags_label)
         tagLayout?.removeAllViews()
-
+        // Show no tag indicator
         if (tags.isEmpty()) {
             emptyListIndicator?.visibility = View.VISIBLE
             tagLayout?.visibility = View.GONE
@@ -281,7 +283,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             tagLayout?.visibility = View.VISIBLE
             emptyListIndicator?.visibility = View.GONE
         }
-
         // Create the tag views
         for (tag in tags) {
             val tagCheckBox = CheckBox(requireContext())
@@ -293,6 +294,28 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 updateSearchFilter()
             }
             tagLayout?.addView(tagCheckBox)
+        }
+
+        // Update the state of search by schedule layout
+        val dueCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_checkbox)
+        val scheduledCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)
+        val unscheduledCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)
+        when {
+            mGalleryViewModel.dueSearch -> {
+                dueCheckBox?.isChecked = true
+                scheduledCheckBox?.isEnabled = false
+                unscheduledCheckBox?.isEnabled = false
+            }
+            mGalleryViewModel.unscheduledSearch -> {
+                unscheduledCheckBox?.isChecked = true
+                scheduledCheckBox?.isEnabled = false
+                dueCheckBox?.isEnabled = false
+            }
+            mGalleryViewModel.scheduleSearch -> {
+                scheduledCheckBox?.isChecked = true
+                unscheduledCheckBox?.isEnabled = false
+                dueCheckBox?.isEnabled = false
+            }
         }
     }
 

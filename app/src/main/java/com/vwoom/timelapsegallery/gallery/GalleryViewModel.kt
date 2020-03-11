@@ -8,6 +8,7 @@ import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.ProjectTagRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.utils.TimeUtils
 
 class GalleryViewModel internal constructor(private val projectRepository: ProjectRepository,
                                             private val tagRepository: TagRepository,
@@ -20,6 +21,7 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
     var searchName: String = ""
     var scheduleSearch: Boolean = false
     var unscheduledSearch: Boolean = false
+    var dueSearch: Boolean = false
 
     var allProjects: List<Project> = listOf()
     var currentProjects: List<Project> = listOf()
@@ -55,17 +57,30 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
             }
         }
 
-        if (scheduleSearch){
-            resultProjects = resultProjects.filter {
-                if (it.interval_days == null) return@filter false
-                if (it.interval_days == 0) return@filter false
-                return@filter true
+        // TODO simplify search
+        when {
+            scheduleSearch -> {
+                resultProjects = resultProjects.filter {
+                    if (it.interval_days == null) return@filter false
+                    if (it.interval_days == 0) return@filter false
+                    return@filter true
+                }
             }
-        } else if (unscheduledSearch) {
-            resultProjects = resultProjects.filter {
-                if (it.interval_days == null) return@filter true
-                if (it.interval_days == 0) return@filter true
-                return@filter false
+            unscheduledSearch -> {
+                resultProjects = resultProjects.filter {
+                    if (it.interval_days == null) return@filter true
+                    if (it.interval_days == 0) return@filter true
+                    return@filter false
+                }
+            }
+            dueSearch -> {
+                resultProjects = resultProjects.filter {
+                    if (it.interval_days == null || it.interval_days == 0) return@filter false
+                    val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(it.cover_photo_timestamp)
+                    val interval: Int = it.interval_days
+                    val daysUntilDue = interval - daysSinceLastPhotoTaken
+                    return@filter daysUntilDue <= 0
+                }
             }
         }
         return resultProjects
