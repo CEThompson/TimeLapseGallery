@@ -245,6 +245,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 mGalleryViewModel.allProjects = projects
                 mGalleryViewModel.currentProjects = mGalleryViewModel.filterProjects()
                 mGalleryAdapter?.setProjectData(mGalleryViewModel.currentProjects)
+                // TODO implement scrolling to exact previous recycler view position
                 mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.returnPosition)
             }
         })
