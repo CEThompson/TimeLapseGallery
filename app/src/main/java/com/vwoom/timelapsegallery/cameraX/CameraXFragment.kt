@@ -43,7 +43,6 @@ class CameraXFragment : Fragment(), LifecycleOwner {
     private lateinit var previewView: PreviewView
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private val executor = Executors.newSingleThreadExecutor()
-    private lateinit var camera: Camera
 
     private var takePictureJob: Job? = null
 
@@ -59,6 +58,13 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         super.onStop()
         takePictureJob?.cancel()
     }
+
+    // TODO hunt down memory leaks in fragment
+    /*
+    override fun onDestroyView() {
+        super.onDestroyView()
+        previewView.setOnTouchListener(null)
+    }*/
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentCameraXBinding.inflate(inflater, container, false).apply {
@@ -155,7 +161,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         val display = requireActivity().windowManager.defaultDisplay
         cameraProviderFuture.addListener(Runnable {
             val cameraProvider = cameraProviderFuture.get()
-            camera = cameraProvider.bindToLifecycle(this, cameraSelector, imageCapture, preview)
+            val camera = cameraProvider.bindToLifecycle(this, cameraSelector, imageCapture, preview)
             setUpTapToFocus(display, cameraSelector, camera)
         }, ContextCompat.getMainExecutor(requireContext()))
     }
