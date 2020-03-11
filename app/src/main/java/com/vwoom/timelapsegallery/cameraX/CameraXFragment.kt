@@ -39,10 +39,11 @@ private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
 class CameraXFragment : Fragment(), LifecycleOwner {
 
-    private lateinit var mTakePictureFab: FloatingActionButton
-    private lateinit var previewView: PreviewView
+    private var mTakePictureFab: FloatingActionButton? = null
+    private var previewView: PreviewView? = null
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private val executor = Executors.newSingleThreadExecutor()
+    var preview: Preview? = null
 
     private var takePictureJob: Job? = null
 
@@ -57,14 +58,18 @@ class CameraXFragment : Fragment(), LifecycleOwner {
     override fun onStop() {
         super.onStop()
         takePictureJob?.cancel()
+        executor.shutdown()
     }
 
     // TODO hunt down memory leaks in fragment
-    /*
     override fun onDestroyView() {
         super.onDestroyView()
-        previewView.setOnTouchListener(null)
-    }*/
+        previewView?.setOnTouchListener(null)
+        previewView = null
+        preview?.setSurfaceProvider(null)
+        preview = null
+        mTakePictureFab = null
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentCameraXBinding.inflate(inflater, container, false).apply {
@@ -77,7 +82,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
 
         // Request camera permissions & start on success
         if (allPermissionsGranted()) {
-            previewView.post { startCamera() }
+            startCamera()
         } else {
             requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
@@ -120,11 +125,11 @@ class CameraXFragment : Fragment(), LifecycleOwner {
                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                 .build()
 
-        val preview = Preview.Builder()
+        preview = Preview.Builder()
                 .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                 .build()
 
-        preview.setSurfaceProvider(previewView.previewSurfaceProvider)
+        preview?.setSurfaceProvider(previewView?.previewSurfaceProvider)
 
         // Build the image capture use case and attach button click listener
         val imageCapture = ImageCapture.Builder()
@@ -132,7 +137,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
                 .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                 .build()
 
-        mTakePictureFab.setOnClickListener {
+        mTakePictureFab?.setOnClickListener {
             val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
             val photoFile = FileUtils.createTemporaryImageFile(externalFilesDir)
 
@@ -144,9 +149,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
                         override fun onError(exception: ImageCaptureException) {
                             val msg = "Photo capture failed: ${exception.localizedMessage}"
                             Log.e(TAG, msg, exception)
-                            previewView.post {
-                                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-                            }
+                            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                         }
 
                         override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
@@ -168,7 +171,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
 
     private fun setUpTapToFocus(display: Display, cameraSelector: CameraSelector, camera: Camera) {
         @Suppress("ClickableViewAccessibility")
-        previewView.setOnTouchListener { _, event ->
+        previewView?.setOnTouchListener { _, event ->
             // Only allow metering action once per second
             if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 1000) return@setOnTouchListener false
             mLastClickTime = SystemClock.elapsedRealtime()
@@ -176,7 +179,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
             val factory = DisplayOrientedMeteringPointFactory(
                     display,
                     cameraSelector,
-                    previewView.width.toFloat(), previewView.height.toFloat())
+                    previewView!!.width.toFloat(), previewView!!.height.toFloat())
             val point = factory.createPoint(event.x, event.y)
             val action = FocusMeteringAction.Builder(point).build()
             camera.cameraControl.startFocusAndMetering(action)
@@ -187,7 +190,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                previewView.post { startCamera() }
+                startCamera()
             } else {
                 Toast.makeText(requireContext(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
             }

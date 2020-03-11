@@ -38,14 +38,14 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     
     private var mSearchDialog: Dialog? = null
 
-    private lateinit var mGalleryAdapter: GalleryAdapter
-    private lateinit var mGridLayoutManager: StaggeredGridLayoutManager
+    private var mGalleryAdapter: GalleryAdapter? = null
+    private var mGridLayoutManager: StaggeredGridLayoutManager? = null
 
     private var tagJob: Job? = null
 
-    private lateinit var mGalleryRecyclerView: RecyclerView
-    private lateinit var mAddProjectFAB: FloatingActionButton
-    private lateinit var mSearchActiveFAB: FloatingActionButton
+    private var mGalleryRecyclerView: RecyclerView? = null
+    private var mAddProjectFAB: FloatingActionButton? = null
+    private var mSearchActiveFAB: FloatingActionButton? = null
 
     private val mGalleryViewModel: GalleryViewModel by viewModels {
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
@@ -65,16 +65,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     override fun onDestroyView() {
-        // Prevent gallery recycler view from leaking by nullifying the adapter on detach
-        // This is necessary because of transition animations
-        mGalleryRecyclerView.addOnAttachStateChangeListener(object: View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(v: View?) {
-            }
-            override fun onViewDetachedFromWindow(v: View?) {
-                mGalleryRecyclerView.adapter = null
-            }
-        })
         super.onDestroyView()
+        mGalleryRecyclerView = null
+        mAddProjectFAB = null
+        mSearchActiveFAB = null
+        mGridLayoutManager = null
+        mGalleryAdapter = null
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -102,7 +98,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Set up the recycler view
         mGridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
         mGalleryRecyclerView = binding.galleryRecyclerView
-        mGalleryRecyclerView.apply {
+        mGalleryRecyclerView?.apply {
             layoutManager = mGridLayoutManager
             setHasFixedSize(false)
             adapter = mGalleryAdapter
@@ -110,25 +106,25 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // TODO better handle transitioning during search filtration, this solution seems hacky
-        if (mGalleryViewModel.currentProjects.isNotEmpty()) mGalleryAdapter.setProjectData(mGalleryViewModel.currentProjects)
+        if (mGalleryViewModel.currentProjects.isNotEmpty()) mGalleryAdapter?.setProjectData(mGalleryViewModel.currentProjects)
 
-        mGalleryRecyclerView.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        mGalleryRecyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 startPostponedEnterTransition()
-                mGalleryRecyclerView.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+                mGalleryRecyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
             }
         })
 
         // Set up navigation to add new projects
         mAddProjectFAB = binding.addProjectFAB
-        mAddProjectFAB.setOnClickListener {
+        mAddProjectFAB?.setOnClickListener {
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
             val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null, null)
             findNavController().navigate(action)
         }
 
         mSearchActiveFAB = binding.searchActiveIndicator
-        mSearchActiveFAB.setOnClickListener {
+        mSearchActiveFAB?.setOnClickListener {
             // Clear search
             mGalleryViewModel.searchName = ""
             mGalleryViewModel.searchTags.clear()
@@ -139,8 +135,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             updateSearchDialog()
         }
 
-        if (!userIsNotSearching()) mSearchActiveFAB.show()
-        else mSearchActiveFAB.hide()
+        if (!userIsNotSearching()) mSearchActiveFAB?.show()
+        else mSearchActiveFAB?.hide()
 
         setupViewModel()
 
@@ -225,13 +221,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         tagJob?.cancel()
         tagJob = mGalleryViewModel.viewModelScope.launch {
             mGalleryViewModel.currentProjects = mGalleryViewModel.filterProjects()
-            mGalleryAdapter.setProjectData(mGalleryViewModel.currentProjects)
+            mGalleryAdapter?.setProjectData(mGalleryViewModel.currentProjects)
 
             // show search fab if actively searching
             if (userIsNotSearching())
-                mSearchActiveFAB.hide()
+                mSearchActiveFAB?.hide()
             else
-                mSearchActiveFAB.show()
+                mSearchActiveFAB?.show()
         }
     }
 
@@ -248,8 +244,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mGalleryViewModel.viewModelScope.launch {
                 mGalleryViewModel.allProjects = projects
                 mGalleryViewModel.currentProjects = mGalleryViewModel.filterProjects()
-                mGalleryAdapter.setProjectData(mGalleryViewModel.currentProjects)
-                mGalleryRecyclerView.scrollToPosition(mGalleryViewModel.returnPosition)
+                mGalleryAdapter?.setProjectData(mGalleryViewModel.currentProjects)
+                mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.returnPosition)
             }
         })
 
@@ -326,7 +322,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Save the position of the first visible item in the gallery
         val firstItems = IntArray(mNumberOfColumns)
-        mGridLayoutManager.findFirstCompletelyVisibleItemPositions(firstItems)
+        mGridLayoutManager?.findFirstCompletelyVisibleItemPositions(firstItems)
         mGalleryViewModel.returnPosition = firstItems[0]
 
         // Navigate to the detail fragment

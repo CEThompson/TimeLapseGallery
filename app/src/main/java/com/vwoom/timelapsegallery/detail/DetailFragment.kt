@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -61,7 +60,7 @@ import kotlin.math.absoluteValue
 // TODO implement pinch zoom on fullscreen image
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
-    lateinit var binding: FragmentDetailBinding
+    private var binding: FragmentDetailBinding? = null
 
     private var mDetailAdapter: DetailAdapter? = null
 
@@ -117,7 +116,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     override fun onStart() {
         super.onStart()
-        binding.detailsFragmentToolbar.setNavigationOnClickListener {
+        binding?.detailsFragmentToolbar?.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
     }
@@ -159,7 +158,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     override fun onStop() {
         super.onStop()
-        binding.detailsFragmentToolbar.setNavigationOnClickListener(null)
+        binding?.detailsFragmentToolbar?.setNavigationOnClickListener(null)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+        mTagDialog = null
+        mScheduleDialog = null
+        mInfoDialog = null
+        mFullscreenImageDialog = null
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -169,9 +177,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // Set up toolbar
         setHasOptionsMenu(true)
-        val toolbar = binding.detailsFragmentToolbar
+        val toolbar = binding?.detailsFragmentToolbar
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
-        toolbar.title = getString(R.string.project_details)
+        toolbar?.title = getString(R.string.project_details)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Set up adapter and recycler view
@@ -179,41 +187,41 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val linearLayoutManager
                 = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        binding.detailsRecyclerview.layoutManager = linearLayoutManager
-        binding.detailsRecyclerview.adapter = mDetailAdapter
+        binding?.detailsRecyclerview?.layoutManager = linearLayoutManager
+        binding?.detailsRecyclerview?.adapter = mDetailAdapter
 
         // Set up fabs:
         // 1. Initialize the color of the play as video fab
         // NOTE: this is not set in XML because setting by xml seems to lock the value of the color
-        binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-        binding.playAsVideoFab.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
+        binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
+        binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
 
 
         // 2. Set the click listeners
-        binding.addPhotoFab.setOnClickListener {
+        binding?.addPhotoFab?.setOnClickListener {
             // TODO: Determine if there is a better way to handle leaking toolbar references
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
             val action = DetailFragmentDirections
                     .actionDetailsFragmentToCameraFragment(detailViewModel.lastPhoto, mCurrentProject)
             findNavController().navigate(action)
         }
-        binding.playAsVideoFab.setOnClickListener { playSetOfImages() }
-        binding.projectScheduleFab.setOnClickListener {
+        binding?.playAsVideoFab?.setOnClickListener { playSetOfImages() }
+        binding?.projectScheduleFab?.setOnClickListener {
             if (mScheduleDialog == null) initializeScheduleDialog()
             mScheduleDialog?.show()
             detailViewModel.scheduleDialogShowing = true
         }
-        binding.projectTagFab.setOnClickListener {
+        binding?.projectTagFab?.setOnClickListener {
             if (mTagDialog == null) initializeTagDialog()
             mTagDialog?.show()
             detailViewModel.tagDialogShowing = true
         }
-        binding.projectInformationFab.setOnClickListener {
+        binding?.projectInformationFab?.setOnClickListener {
             if (mInfoDialog == null) initializeInfoDialog()
             mInfoDialog?.show()
             detailViewModel.infoDialogShowing = true
         }
-        binding.fullscreenFab.setOnClickListener {
+        binding?.fullscreenFab?.setOnClickListener {
             if (mFullscreenImageDialog == null) initializeFullscreenImageDialog()
 
             if (!mPlaying) {
@@ -225,40 +233,18 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Set a swipe listener for the image
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
         @Suppress("ClickableViewAccessibility")
-        binding.detailCurrentImage.setOnTouchListener(mOnSwipeTouchListener)
+        binding?.detailCurrentImage?.setOnTouchListener(mOnSwipeTouchListener)
 
         // Set the transition name for the image
         val imageTransitionName= "${mCurrentProject?.project_id}"
         val cardTransitionName = imageTransitionName + "card"
-        binding.detailCurrentImage.transitionName = imageTransitionName
-        binding.detailsCardContainer.transitionName = cardTransitionName
+        binding?.detailCurrentImage?.transitionName = imageTransitionName
+        binding?.detailsCardContainer?.transitionName = cardTransitionName
         Log.d(TAG, "tracking transition: detail fragment $imageTransitionName & $cardTransitionName")
 
         setupViewModel()
 
-        showPhotoInformation()
-
-        return binding.root
-    }
-
-    private fun showPhotoInformation() {
-        val shortAnimationDuration = resources.getInteger(
-                android.R.integer.config_shortAnimTime).toLong()
-        binding.fullscreenFab.show()
-        // Fade in gradient overlay
-        binding.detailsGradientOverlay.alpha = 0f
-        binding.detailsGradientOverlay.visibility = VISIBLE
-        binding.detailsGradientOverlay.animate()
-                .alpha(1f)
-                .setDuration(shortAnimationDuration)
-                .setListener(null)
-        // Fade in photo information
-        binding.photoInformationLayout.alpha = 0f
-        binding.photoInformationLayout.visibility = VISIBLE
-        binding.photoInformationLayout.animate()
-                .alpha(1f)
-                .setDuration(shortAnimationDuration)
-                .setListener(null)
+        return binding?.root
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -312,12 +298,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val date = TimeUtils.getDateFromTimestamp(timestamp)
         val time = TimeUtils.getTimeFromTimestamp(timestamp)
         // Set the info
-        binding.detailsPhotoNumberTv.text = photoNumberString
-        binding.detailsPhotoDateTv.text = date
-        binding.detailsPhotoTimeTv.text = time
+        binding?.detailsPhotoNumberTv?.text = photoNumberString
+        binding?.detailsPhotoDateTv?.text = date
+        binding?.detailsPhotoTimeTv?.text = time
         val position = mPhotos!!.indexOf(photoEntry)
-        binding.detailsRecyclerview.scrollToPosition(position)
-        binding.imageLoadingProgress.progress = photoNumber - 1
+        binding?.detailsRecyclerview?.scrollToPosition(position)
+        binding?.imageLoadingProgress?.progress = photoNumber - 1
     }
 
     // Loads an image into the main photo view
@@ -328,20 +314,20 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val isImageLandscape = PhotoUtils.isLandscape(imagePath)
 
         // Set cardview constraints depending upon if photo is landscape or portrait
-        val layoutParams = binding.detailsCardContainer.layoutParams
+        val layoutParams = binding?.detailsCardContainer?.layoutParams
 
         // If landscape set height to wrap content
         // Set width to be measured
         if (isImageLandscape) {
-            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            layoutParams.width = 0
+            layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            layoutParams?.width = 0
         } else {
-            layoutParams.height = 0
-            layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+            layoutParams?.height = 0
+            layoutParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
         }
         // Resize the constraint layout
         val constraintSet = ConstraintSet()
-        val constraintLayout: ConstraintLayout = binding.detailsCurrentImageConstraintLayout
+        val constraintLayout: ConstraintLayout = binding!!.detailsCurrentImageConstraintLayout
         constraintSet.clone(constraintLayout)
         constraintSet.setDimensionRatio(R.id.detail_current_image, ratio)
         constraintSet.setDimensionRatio(R.id.detail_next_image, ratio)
@@ -362,7 +348,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     }
 
                     override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
-                        binding.detailNextImage.visibility = VISIBLE
+                        binding?.detailNextImage?.visibility = VISIBLE
                         Glide.with(requireContext())
                                 .load(f)
                                 .listener(object : RequestListener<Drawable?> {
@@ -375,16 +361,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
                                     override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
                                         startPostponedEnterTransition()
-                                        binding.detailNextImage.visibility = INVISIBLE
+                                        binding?.detailNextImage?.visibility = INVISIBLE
                                         mImageIsLoaded = true
                                         return false
                                     }
                                 })
-                                .into(binding.detailCurrentImage)
+                                .into(binding!!.detailCurrentImage)
                         return false
                     }
                 })
-                .into(binding.detailNextImage)
+                .into(binding!!.detailNextImage)
     }
 
 
@@ -399,17 +385,17 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // If not enough photos give user feedback
         if (mPhotos!!.size <= 1) {
-            Snackbar.make(binding.detailsCoordinatorLayout, R.string.add_more_photos,
+            Snackbar.make(binding!!.detailsCoordinatorLayout, R.string.add_more_photos,
                     Snackbar.LENGTH_LONG)
                     .show()
             return
         }
 
         // Handle UI
-        binding.fullscreenFab.hide()
-        binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
-        binding.playAsVideoFab.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
-        binding.playAsVideoFab.setImageResource(R.drawable.ic_stop_white_24dp)
+        binding?.fullscreenFab?.hide()
+        binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
+        binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
+        binding?.playAsVideoFab?.setImageResource(R.drawable.ic_stop_white_24dp)
 
         // Handle play state
         mPlaying = true
@@ -427,7 +413,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
 
         // Actually schedule the sequence via recursive function
-        binding.imageLoadingProgress.progress = mCurrentPlayPosition!!
+        binding?.imageLoadingProgress?.progress = mCurrentPlayPosition!!
         scheduleLoadPhoto(mCurrentPlayPosition!!, playbackInterval) // Recursively loads the rest of set from beginning
 
         // Track play button interaction
@@ -439,21 +425,21 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         playJob?.cancel()
         mPlaying = false
 
-        binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-        binding.playAsVideoFab.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
-        binding.playAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp)
-        binding.fullscreenFab.show()
+        binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
+        binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
+        binding?.playAsVideoFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
+        binding?.fullscreenFab?.show()
     }
 
     private fun scheduleLoadPhoto(position: Int, interval: Long) {
         Log.d("DetailsFragment", "schedule loading position $position")
         if (position < 0 || position >= mPhotos!!.size) {
             mPlaying = false
-            binding.playAsVideoFab.setImageResource(R.drawable.ic_play_arrow_white_24dp)
-            binding.imageLoadingProgress.progress = position
-            binding.playAsVideoFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-            binding.playAsVideoFab.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
-            binding.fullscreenFab.show()
+            binding?.playAsVideoFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
+            binding?.imageLoadingProgress?.progress = position
+            binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
+            binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
+            binding?.fullscreenFab?.show()
             return
         }
 
@@ -464,7 +450,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             // If image is loaded load the next photo
             if (mImageIsLoaded) {
                 detailViewModel.nextPhoto()
-                binding.imageLoadingProgress.progress = position + 1
+                binding?.imageLoadingProgress?.progress = position + 1
                 scheduleLoadPhoto(position + 1, interval)
             } else {
                 scheduleLoadPhoto(position, interval)
@@ -613,43 +599,45 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mCurrentProject = currentProject
 
             // Set id
-            binding.projectInformationLayout.detailsProjectId.text = mCurrentProject?.project_id.toString()
+            binding?.projectInformationLayout?.detailsProjectId?.text = mCurrentProject?.project_id.toString()
 
             // Set name for both the dialog and the project info card view
             val name = mCurrentProject?.project_name
             if (name == null || name.isEmpty()) {
                 // Set the layout card view
-                binding.projectInformationLayout
-                        .detailsProjectNameTextView
-                        .text = getString(R.string.unnamed)
-                binding.projectInformationLayout
-                        .detailsProjectNameTextView
-                        .setTypeface(binding.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.ITALIC)
-                binding.projectInformationLayout
-                        .detailsProjectNameTextView
-                        .setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.text = getString(R.string.unnamed)
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.setTypeface(binding!!.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.ITALIC)
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
             }
             else {
                 // Set the card view
-                binding.projectInformationLayout
-                        .detailsProjectNameTextView.text = name
-                binding.projectInformationLayout
-                        .detailsProjectNameTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-                binding.projectInformationLayout
-                        .detailsProjectNameTextView
-                        .setTypeface(binding.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.BOLD)
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.text = name
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.setTypeface(binding!!.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.BOLD)
             }
 
             // Begin set schedule information
             if (currentProject.interval_days == 0 || currentProject.interval_days == null) {
-                binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-                binding.detailScheduleIndicator.visibility = INVISIBLE
-                binding.scheduleIntervalTv.visibility = INVISIBLE
+                binding?.projectScheduleFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+                binding?.detailScheduleIndicator?.visibility = INVISIBLE
+                binding?.scheduleIntervalTv?.visibility = INVISIBLE
             } else {
-                binding.projectScheduleFab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
-                binding.detailScheduleIndicator.visibility = VISIBLE
-                binding.scheduleIntervalTv.text = currentProject.interval_days.toString()
-                binding.scheduleIntervalTv.visibility = VISIBLE
+                binding?.projectScheduleFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
+                binding?.detailScheduleIndicator?.visibility = VISIBLE
+                binding?.scheduleIntervalTv?.text = currentProject.interval_days.toString()
+                binding?.scheduleIntervalTv?.visibility = VISIBLE
             }
 
             setInfoDialog()
@@ -688,11 +676,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             val firstProjectDateString = TimeUtils.getShortDateFromTimestamp(firstTimestamp!!)
             val lastTimestamp = mPhotos?.get(mPhotos!!.size - 1)?.timestamp
             val lastProjectDateString = TimeUtils.getShortDateFromTimestamp(lastTimestamp!!)
-            binding.projectInformationLayout
-                    .detailsProjectTimespanTextview.text = getString(R.string.timespan, firstProjectDateString, lastProjectDateString)
+            binding?.projectInformationLayout
+                    ?.detailsProjectTimespanTextview?.text = getString(R.string.timespan, firstProjectDateString, lastProjectDateString)
 
             // Set max for progress bar
-            binding.imageLoadingProgress.max = mPhotos!!.size - 1
+            binding?.imageLoadingProgress?.max = mPhotos!!.size - 1
 
             // If current photo isn't set, set it to the last photo
             if (detailViewModel.currentPhoto.value == null) {
@@ -721,11 +709,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
                 // Update the tags in the project info card
                 if (mProjectTags!!.isEmpty()) {
-                    binding.projectInformationLayout.detailsProjectTagsTextview.visibility = GONE
+                    binding?.projectInformationLayout?.detailsProjectTagsTextview?.visibility = GONE
                 }
                 else {
-                    binding.projectInformationLayout.detailsProjectTagsTextview.text = tagsText
-                    binding.projectInformationLayout.detailsProjectTagsTextview.visibility = VISIBLE
+                    binding?.projectInformationLayout?.detailsProjectTagsTextview?.text = tagsText
+                    binding?.projectInformationLayout?.detailsProjectTagsTextview?.visibility = VISIBLE
                 }
 
                 FileUtils.addTagToProject(mExternalFilesDir!!, mCurrentProject!!, mProjectTags)
