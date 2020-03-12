@@ -122,7 +122,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mAddProjectFAB?.setOnClickListener {
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
             // TODO set CameraX / Camera2 switch here
-            val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null, null)
+            //val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null, null)
+            val action = GalleryFragmentDirections.actionGalleryFragmentToCamera2Fragment(null, null)
             findNavController().navigate(action)
         }
 

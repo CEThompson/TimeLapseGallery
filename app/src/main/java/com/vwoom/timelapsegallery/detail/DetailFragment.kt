@@ -203,7 +203,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             // TODO: Determine if there is a better way to handle leaking toolbar references
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
             val action = DetailFragmentDirections
-                    .actionDetailsFragmentToCameraFragment(detailViewModel.lastPhoto, mCurrentProject)
+                    .actionDetailsFragmentToCamera2Fragment(detailViewModel.lastPhoto, mCurrentProject)
             findNavController().navigate(action)
         }
         binding?.playAsVideoFab?.setOnClickListener { playSetOfImages() }
