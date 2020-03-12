@@ -38,7 +38,7 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
-// TODO create settings switch between camera x and camera 2 implementations
+// TODO handle horizontal preview, currently stretches incorrectly
 class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val cameraManager: CameraManager by lazy {
