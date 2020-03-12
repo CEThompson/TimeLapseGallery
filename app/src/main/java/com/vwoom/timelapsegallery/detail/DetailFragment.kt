@@ -168,6 +168,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mScheduleDialog = null
         mInfoDialog = null
         mFullscreenImageDialog = null
+        mDetailAdapter = null
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
