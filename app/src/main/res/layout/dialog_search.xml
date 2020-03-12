@@ -58,14 +58,15 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_by_tag_label">
+
             <TextView
                 android:id="@+id/empty_tags_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
                 android:layout_gravity="center"
-                android:textStyle="italic"
+                android:layout_margin="8dp"
                 android:text="@string/no_projects_tagged"
+                android:textStyle="italic"
                 android:visibility="invisible" />
 
             <!-- layout for tags -->
@@ -100,36 +101,45 @@
             app:layout_constraintTop_toBottomOf="@id/dialog_search_tags_layout_container"
             tools:text="filter by schedule" />
 
-        <LinearLayout
+        <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/filter_by_schedule_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/medium"
             android:layout_marginBottom="@dimen/medium"
-            android:orientation="horizontal"
+            app:alignContent="stretch"
+            app:alignItems="stretch"
+            app:flexWrap="wrap"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search_by_schedule_label"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/search_by_schedule_label">
 
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/search_due_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/due" />
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/search_due_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/due" />
 
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/search_scheduled_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/scheduled" />
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/search_pending_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pending" />
 
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/search_unscheduled_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/unscheduled" />
-        </LinearLayout>
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/search_scheduled_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/scheduled" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/search_unscheduled_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unscheduled" />
+
+        </com.google.android.flexbox.FlexboxLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -10,6 +10,12 @@ import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.TimeUtils
 
+const val SEARCH_TYPE_NONE = "none"
+const val SEARCH_TYPE_DUE = "due"
+const val SEARCH_TYPE_PENDING = "pending"
+const val SEARCH_TYPE_SCHEDULED = "scheduled"
+const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
+
 class GalleryViewModel internal constructor(private val projectRepository: ProjectRepository,
                                             private val tagRepository: TagRepository,
                                             private val projectTagRepository: ProjectTagRepository) : ViewModel() {
@@ -19,12 +25,9 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
     // search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
     var searchName: String = ""
-    var scheduleSearch: Boolean = false
-    var unscheduledSearch: Boolean = false
-    var dueSearch: Boolean = false
+    var searchType: String = SEARCH_TYPE_NONE
 
-    var allProjects: List<Project> = listOf()
-    var currentProjects: List<Project> = listOf()
+    var displayedProjects: List<Project> = listOf()
 
     var searchDialogShowing = false
 
@@ -33,7 +36,8 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
     }
 
     suspend fun filterProjects(): List<Project> {
-        var resultProjects = allProjects
+        if (projects.value == null) return listOf()
+        var resultProjects = projects.value!!
 
         if (searchTags.isNotEmpty()) {
             resultProjects = resultProjects.filter {
@@ -57,27 +61,36 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
 
         // TODO simplify search
         when {
-            scheduleSearch -> {
+            searchType == SEARCH_TYPE_SCHEDULED -> {
                 resultProjects = resultProjects.filter {
                     if (it.interval_days == null) return@filter false
                     if (it.interval_days == 0) return@filter false
                     return@filter true
                 }
             }
-            unscheduledSearch -> {
+            searchType == SEARCH_TYPE_UNSCHEDULED -> {
                 resultProjects = resultProjects.filter {
                     if (it.interval_days == null) return@filter true
                     if (it.interval_days == 0) return@filter true
                     return@filter false
                 }
             }
-            dueSearch -> {
+            searchType == SEARCH_TYPE_DUE -> {
                 resultProjects = resultProjects.filter {
                     if (it.interval_days == null || it.interval_days == 0) return@filter false
                     val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(it.cover_photo_timestamp)
                     val interval: Int = it.interval_days
                     val daysUntilDue = interval - daysSinceLastPhotoTaken
                     return@filter daysUntilDue <= 0
+                }
+            }
+            searchType == SEARCH_TYPE_PENDING -> {
+                resultProjects = resultProjects.filter {
+                    if (it.interval_days == null || it.interval_days == 0) return@filter false
+                    val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(it.cover_photo_timestamp)
+                    val interval: Int = it.interval_days
+                    val daysUntilDue = interval - daysSinceLastPhotoTaken
+                    return@filter daysUntilDue > 0
                 }
             }
         }

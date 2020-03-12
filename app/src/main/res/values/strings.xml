@@ -113,6 +113,7 @@
     <string name="today">Today</string>
     <string name="scheduled">Scheduled</string>
     <string name="due">Due</string>
+    <string name="pending">Pending</string>
     <string name="unscheduled">Unscheduled</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="number_of_days">In %1$d Days</string>
