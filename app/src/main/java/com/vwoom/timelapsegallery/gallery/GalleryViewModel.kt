@@ -26,8 +26,6 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
     var allProjects: List<Project> = listOf()
     var currentProjects: List<Project> = listOf()
 
-    var returnPosition: Int = 0
-
     var searchDialogShowing = false
 
     fun tagSelected(tag: TagEntry): Boolean {

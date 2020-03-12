@@ -1,10 +1,10 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.app.Dialog
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Environment
+import android.os.Parcelable
 import android.os.SystemClock
 import android.view.*
 import android.widget.CheckBox
@@ -19,7 +19,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
@@ -249,8 +248,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 mGalleryViewModel.allProjects = projects
                 mGalleryViewModel.currentProjects = mGalleryViewModel.filterProjects()
                 mGalleryAdapter?.setProjectData(mGalleryViewModel.currentProjects)
-                // TODO implement scrolling to exact previous recycler view position
-                mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.returnPosition)
             }
         })
 
@@ -325,11 +322,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 500) return
         mLastClickTime = SystemClock.elapsedRealtime()
 
-        // Save the position of the first visible item in the gallery
-        val firstItems = IntArray(mNumberOfColumns)
-        mGridLayoutManager?.findFirstCompletelyVisibleItemPositions(firstItems)
-        mGalleryViewModel.returnPosition = firstItems[0]
-
         // Navigate to the detail fragment
         val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProject, position)
         val extras = FragmentNavigatorExtras(
@@ -340,8 +332,22 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         findNavController().navigate(action, extras)
     }
 
+    // Restore recycler view state
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        val recyclerState: Parcelable? = savedInstanceState?.getParcelable(BUNDLE_RECYCLER_LAYOUT)
+        mGalleryRecyclerView?.layoutManager?.onRestoreInstanceState(recyclerState)
+    }
+
+    // Save recycler view state
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mGalleryRecyclerView?.layoutManager?.onSaveInstanceState());
+    }
+
     companion object {
         private var mNumberOfColumns = 3
         private val TAG = GalleryFragment::class.java.simpleName
+        private const val BUNDLE_RECYCLER_LAYOUT = "recycler_layout_key"
     }
 }
