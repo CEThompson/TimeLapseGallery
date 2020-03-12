@@ -103,10 +103,10 @@
 
     <string name="hashtag">#%1$s</string>
 
-    <string name="no_projects_for_today">No projects scheduled for today.</string>
+    <string name="no_projects_for_today">No projects due today.</string>
 
     <!-- Notifications -->
-    <string name="projects_scheduled_today">You have projects scheduled today.</string>
+    <string name="projects_due_today">You have projects due today.</string>
 
     <!-- Photo / Project information -->
     <string name="details_photo_number_out_of" translatable="false">%1$d / %2$d</string>

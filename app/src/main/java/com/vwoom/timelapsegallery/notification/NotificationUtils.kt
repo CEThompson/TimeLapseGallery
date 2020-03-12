@@ -28,7 +28,7 @@ object NotificationUtils {
     fun notifyUserOfScheduledProjects(context: Context, requestCode: Int) {
         Log.d(TAG, "Notification Tracker: Notifying user of scheduled projects for request code $requestCode")
         val title = context.getString(R.string.app_name)
-        val content = context.getString(R.string.projects_scheduled_today)
+        val content = context.getString(R.string.projects_due_today)
         // Create the pending intent to take the user to the relevant project on click
         val intent = Intent(context, TimeLapseGalleryActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

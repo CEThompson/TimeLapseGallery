@@ -21,7 +21,10 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
 
     fun getProjectViews() = projectDao.getProjectViewsLiveData()
 
+    fun getScheduledProjectViews() = projectDao.getScheduledProjectViews()
+
     fun getProjectView(projectId: Long) = projectDao.getProjectViewLiveData(projectId)
+
     suspend fun getProjectViewById(projectId: Long) = projectDao.getProjectViewById(projectId)
 
     suspend fun getScheduledProjects(): List<ProjectEntry> { return projectDao.getScheduledProjects() }

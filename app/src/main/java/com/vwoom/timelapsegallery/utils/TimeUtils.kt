@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.utils
 import android.content.Context
 import android.text.format.DateUtils
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.data.view.Project
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit

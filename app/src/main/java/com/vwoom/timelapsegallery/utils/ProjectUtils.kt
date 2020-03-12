@@ -7,6 +7,7 @@ import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase.Companion.getInstance
 import com.vwoom.timelapsegallery.data.entry.*
+import com.vwoom.timelapsegallery.data.view.Project
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
@@ -187,4 +188,12 @@ object ProjectUtils {
             }
         }
     }
+
+    fun isProjectDue(project: Project): Boolean {
+        if (project.interval_days == null || project.interval_days == 0) return false
+        val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp)
+        val daysUntilDue = project.interval_days - daysSinceLastPhoto
+        return daysUntilDue <= 0
+    }
+
 }
