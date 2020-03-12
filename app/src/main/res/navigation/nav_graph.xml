@@ -14,8 +14,11 @@
             android:id="@+id/action_galleryFragment_to_detailsFragment"
             app:destination="@id/detailsFragment" />
         <action
-            android:id="@+id/action_galleryFragment_to_cameraFragment"
+            android:id="@+id/action_galleryFragment_to_cameraXFragment"
             app:destination="@id/cameraXFragment" />
+        <action
+            android:id="@+id/action_galleryFragment_to_camera2Fragment"
+            app:destination="@id/camera2Fragment" />
         <action
             android:id="@+id/action_galleryFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
@@ -27,8 +30,11 @@
         android:label="fragment_details"
         tools:layout="@layout/fragment_detail">
         <action
-            android:id="@+id/action_detailsFragment_to_cameraFragment"
+            android:id="@+id/action_detailsFragment_to_cameraXFragment"
             app:destination="@id/cameraXFragment" />
+        <action
+            android:id="@+id/action_detailsFragment_to_camera2Fragment"
+            app:destination="@id/camera2Fragment" />
         <argument
             android:name="clickedProject"
             app:argType="com.vwoom.timelapsegallery.data.view.Project" />
