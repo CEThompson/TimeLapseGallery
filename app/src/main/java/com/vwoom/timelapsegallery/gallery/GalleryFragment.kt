@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.app.Dialog
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Environment
@@ -18,6 +19,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
@@ -119,6 +121,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mAddProjectFAB = binding.addProjectFAB
         mAddProjectFAB?.setOnClickListener {
             (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
+            // TODO set CameraX / Camera2 switch here
             val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null, null)
             findNavController().navigate(action)
         }
