@@ -64,7 +64,7 @@ class WidgetGridRemoteViewsFactory(
             val bitmapOrientation = getOrientationFromImagePath(coverPhotoPath)
             bitmap = rotateBitmap(bitmap!!, bitmapOrientation)
         } catch (e: IOException) {
-            if (e.message != null) Log.e(TAG, e.message)
+            if (e.message != null) Log.e(TAG, e.message!!)
         }
         // Set the view strings
         views.setImageViewBitmap(R.id.widget_grid_item_image_view, bitmap)

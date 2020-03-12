@@ -54,7 +54,7 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
         if (searchName.isNotEmpty()) {
             resultProjects = resultProjects.filter {
                 if (it.project_name == null) return@filter false
-                if (it.project_name!!.contains(searchName)) return@filter true
+                if (it.project_name.contains(searchName)) return@filter true
                 return@filter false
             }
         }

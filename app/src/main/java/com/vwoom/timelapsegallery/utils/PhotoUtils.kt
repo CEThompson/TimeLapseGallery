@@ -71,7 +71,7 @@ object PhotoUtils {
             bitmap.recycle()
             bmRotated
         } catch (e: OutOfMemoryError) {
-            if (e.message != null) Log.e(TAG, e.message)
+            if (e.message != null) Log.e(TAG, e.message!!)
             null
         }
     }
