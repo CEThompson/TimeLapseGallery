@@ -117,7 +117,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
     // Updates the UI for the schedule layout
     private fun setScheduleInformation(project: Project, holder: GalleryAdapterViewHolder, interval_days: Int) {
         // Calc the days until project is due
-        val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp)
+        val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
         val daysUntilDue = project.interval_days!! - daysSinceLastPhoto
         holder.binding.daysUntilDueTextView.text = daysUntilDue.toString() // set days until due text
         holder.binding.galleryItemScheduleIndicatorDays.text = interval_days.toString() // set schedule interval

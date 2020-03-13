@@ -3,13 +3,13 @@ package com.vwoom.timelapsegallery.utils
 import android.content.Context
 import android.text.format.DateUtils
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.data.view.Project
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
+import kotlin.math.roundToLong
 
 // TODO determine if time utils should be removed: depends on scheduling system usage overall
 object TimeUtils {
+    private val TAG = TimeUtils::class.java.simpleName
     private var DAY_IN_MILLISECONDS = (1000 * 60 * 60 * 24).toLong()
     private var WEEK_IN_MILLISECONDS = (1000 * 60 * 60 * 24 * 7).toLong()
     private var SCHEDULE_NONE = 0
@@ -76,9 +76,22 @@ object TimeUtils {
         return SimpleDateFormat("EEEE", Locale.getDefault()).format(Date(timestamp))
     }
 
-    fun getDaysSinceTimeStamp(timestamp: Long): Long {
-        val timeDifference = System.currentTimeMillis() - timestamp
-        return TimeUnit.MILLISECONDS.toDays(timeDifference)
+    // TODO unit test this
+    fun getDaysSinceTimeStamp(timestampPhoto: Long, timestampNow: Long): Long {
+        if (timestampNow < timestampPhoto) return -1 // ERROR CASE
+
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = timestampPhoto
+        calendar[Calendar.HOUR] = 0
+        val startOfPhotoDay = calendar.timeInMillis
+
+        calendar.timeInMillis = timestampNow
+        calendar[Calendar.HOUR] = 0
+        val startOfNow = calendar.timeInMillis
+
+        //return TimeUnit.MILLISECONDS.toDays(startOfNow - startOfPhotoDay)
+        val days: Double = ((startOfNow.toDouble() - startOfPhotoDay.toDouble()) / DAY_IN_MILLISECONDS.toDouble())
+        return days.roundToLong()
     }
 
     @JvmStatic
