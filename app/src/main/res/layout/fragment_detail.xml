@@ -130,7 +130,7 @@
                         android:layout_margin="@dimen/detail_margin"
                         android:orientation="vertical"
                         app:layout_constraintBottom_toBottomOf="@id/detail_current_image"
-                        app:layout_constraintEnd_toEndOf="@id/detail_current_image"
+                        app:layout_constraintEnd_toStartOf="@id/fullscreen_fab"
                         app:layout_constraintStart_toStartOf="@id/detail_current_image">
                         <!-- Displays the photo number as a fraction of the set -->
                         <TextView
@@ -167,7 +167,7 @@
                         app:backgroundTint="@color/darkImagePlaceHolder"
                         app:fabSize="mini"
                         app:layout_constraintEnd_toEndOf="@id/detail_current_image"
-                        app:layout_constraintTop_toTopOf="@id/detail_current_image" />
+                        app:layout_constraintBottom_toBottomOf="@id/detail_current_image" />
 
                     <!-- Gradient for contrasting schedule information -->
                     <ImageView
