@@ -5,6 +5,7 @@ import android.text.format.DateUtils
 import com.vwoom.timelapsegallery.R
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.math.roundToLong
 
 // TODO determine if time utils should be removed: depends on scheduling system usage overall
@@ -80,18 +81,23 @@ object TimeUtils {
     fun getDaysSinceTimeStamp(timestampPhoto: Long, timestampNow: Long): Long {
         if (timestampNow < timestampPhoto) return -1 // ERROR CASE
 
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = timestampPhoto
-        calendar[Calendar.HOUR] = 0
-        val startOfPhotoDay = calendar.timeInMillis
+        val photoStartOfDay = getTimestampStartOfDay(timestampPhoto)
+        val nowStartOfDay = getTimestampStartOfDay(timestampNow)
 
-        calendar.timeInMillis = timestampNow
-        calendar[Calendar.HOUR] = 0
-        val startOfNow = calendar.timeInMillis
-
-        //return TimeUnit.MILLISECONDS.toDays(startOfNow - startOfPhotoDay)
-        val days: Double = ((startOfNow.toDouble() - startOfPhotoDay.toDouble()) / DAY_IN_MILLISECONDS.toDouble())
+        //return TimeUnit.MILLISECONDS.toDays(nowStartOfDay - photoStartOfDay)
+        val days: Double = ((nowStartOfDay.toDouble() - photoStartOfDay.toDouble()) / DAY_IN_MILLISECONDS.toDouble())
         return days.roundToLong()
+    }
+
+    fun getTimestampStartOfDay(timestamp: Long): Long{
+        val calendar = Calendar.getInstance(Locale.getDefault())
+        calendar.timeInMillis = timestamp
+        calendar[Calendar.HOUR] = 0
+        calendar[Calendar.HOUR_OF_DAY] = 0
+        calendar[Calendar.MINUTE] = 0
+        calendar[Calendar.SECOND] = 0
+        calendar[Calendar.MILLISECOND] = 0
+        return calendar.timeInMillis
     }
 
     @JvmStatic
