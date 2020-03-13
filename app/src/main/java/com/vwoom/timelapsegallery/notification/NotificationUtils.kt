@@ -18,6 +18,7 @@ import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+// TODO implement intent launching application filtering to DUE projects
 object NotificationUtils {
     private const val PROJECT_NOTIFICATION_CHANNEL_ID = "project_channel_id"
     private const val CHANNEL_NAME = "channel_name"
