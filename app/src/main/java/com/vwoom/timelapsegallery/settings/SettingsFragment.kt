@@ -19,7 +19,7 @@ import androidx.preference.PreferenceManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.notification.NotificationUtils
-import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 
@@ -216,13 +216,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
         mSyncDialog?.show()
     }
     // Updates the dialog showing progress on synchronization
-    private fun updateSyncDialog(response: String){
+    private fun updateSyncDialog(response: Int){
         Log.d(TAG, "updating sync dialog")
-        val success = (response == getString(R.string.valid_file_structure))
+        val success = (response == VALID_DIRECTORY_STRUCTURE)
 
         // Set the response
         val responseView = mSyncDialog?.findViewById(R.id.sync_response) as TextView
-        responseView.text = response
+
+        when(response){
+            FILE_VALIDATION_RESPONSE_WAITING -> {responseView.text = requireContext().getString(R.string.waiting)}
+            NO_FILES_IN_DIRECTORY_ERROR -> {responseView.text = requireContext().getString(R.string.no_files_in_directory_error)}
+            INVALID_CHARACTER_ERROR -> {responseView.text = requireContext().getString(R.string.invalid_character_error)}
+            DUPLICATE_ID_ERROR -> {responseView.text = requireContext().getString(R.string.duplicate_id_error)}
+            INVALID_PHOTO_FILE_ERROR -> {responseView.text = requireContext().getString(R.string.invalid_photo_file_error)}
+        }
 
         val progress = mSyncDialog?.findViewById(R.id.sync_progress) as ProgressBar
 

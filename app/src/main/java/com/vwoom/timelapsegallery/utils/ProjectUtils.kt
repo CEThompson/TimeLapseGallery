@@ -12,13 +12,19 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
+const val FILE_VALIDATION_RESPONSE_WAITING = 0
+const val NO_FILES_IN_DIRECTORY_ERROR = 1
+const val DUPLICATE_ID_ERROR = 2
+const val INVALID_CHARACTER_ERROR = 3
+const val INVALID_PHOTO_FILE_ERROR = 4
+const val VALID_DIRECTORY_STRUCTURE = 5
+
 object ProjectUtils {
     private val TAG = ProjectUtils::class.java.simpleName
-    fun validateFileStructure(context: Context): String {
-        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                ?: return context.getString(R.string.no_files_error)
-        val files = storageDir.listFiles()
-                ?: return context.getString(R.string.no_files_in_directory_error, storageDir.absolutePath)
+
+    fun validateFileStructure(externalFilesDir: File): Int {
+        val files = externalFilesDir.listFiles()
+        if (files == null || files.isEmpty()) return NO_FILES_IN_DIRECTORY_ERROR
         val projectIds = HashSet<Long>()
         for (child in files) { // Get the filename of the project
             val url = child.absolutePath
@@ -34,7 +40,7 @@ object ProjectUtils {
 
             /* Ensure ids are unique */
             val longId = java.lang.Long.valueOf(id)
-            if (projectIds.contains(longId)) return context.getString(R.string.duplicate_id_error, projectFilename) else projectIds.add(longId)
+            if (projectIds.contains(longId)) DUPLICATE_ID_ERROR
 
             // Determine name of project
             var projectName: String? = null
@@ -44,7 +50,7 @@ object ProjectUtils {
 
             /* Ensure names do not contain reserved characters */
             if (projectName != null
-                    && FileUtils.pathContainsReservedCharacter(projectName)) return context.getString(R.string.invalid_character_error, projectFilename, FileUtils.ReservedChars)
+                    && FileUtils.pathContainsReservedCharacter(projectName)) return INVALID_CHARACTER_ERROR
 
             // Get the files within the directory
             val projectFiles = child.listFiles()
@@ -58,12 +64,12 @@ object ProjectUtils {
                     try {
                         java.lang.Long.valueOf(photoFilename.replaceFirst("[.][^.]+$".toRegex(), ""))
                     } catch (e: Exception) {
-                        return context.getString(R.string.invalid_photo_file_error, photoFilename, projectName)
+                        return INVALID_PHOTO_FILE_ERROR
                     }
                 }
             }
         }
-        return context.getString(R.string.valid_file_structure)
+        return VALID_DIRECTORY_STRUCTURE
     }
 
     /* Helper to scan through folders and import projects */

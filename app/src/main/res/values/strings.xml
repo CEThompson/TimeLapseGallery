@@ -184,6 +184,7 @@
 
 
     <!-- Sync errors -->
+    <string name="waiting">Waiting</string>
     <string name="no_files_error">No files to synchronize</string>
     <string name="no_files_in_directory_error">No files to synchronize for directory: %1$s</string>
     <string name="duplicate_id_error">Duplicate ID for project: %1$s</string>
