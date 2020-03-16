@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.utils
 import androidx.test.platform.app.InstrumentationRegistry
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.view.Project
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -118,7 +119,7 @@ class ProjectUtilsTest {
         val projectFolderTwo = File(externalFilesTestDir, "2_test project")
         projectFolderTwo.mkdirs()
         File(projectFolderTwo, "2345671.jpeg").createNewFile()
-        
+
         // When
         val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
 
@@ -126,15 +127,29 @@ class ProjectUtilsTest {
         assert(response == VALID_DIRECTORY_STRUCTURE)
     }
 
+    // TODO implement test for importing projects.
     @Test
     fun importProjects() {
     }
 
     @Test
     fun isProjectDueToday() {
+        // Given
+        val timestampTwoDaysAgo = System.currentTimeMillis() - (DAY_IN_MILLISECONDS*2)
+        val project = Project(1, null, null, 2, 1, timestampTwoDaysAgo)
+        // When
+        val isProjectDueToday = ProjectUtils.isProjectDueToday(project)
+        // Then
+        assertTrue(isProjectDueToday)
     }
 
     @Test
     fun isProjectDueTomorrow() {
+        // Given
+        val project = Project(1, null, null, 1, 1, System.currentTimeMillis())
+        // When
+        val isProjectDueTomorrow = ProjectUtils.isProjectDueTomorrow(project)
+        // Then
+        assertTrue(isProjectDueTomorrow)
     }
 }

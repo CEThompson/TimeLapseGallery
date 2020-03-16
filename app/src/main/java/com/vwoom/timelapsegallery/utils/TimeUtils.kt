@@ -4,8 +4,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToLong
 
+const val DAY_IN_MILLISECONDS: Long = (1000 * 60 * 60 * 24).toLong()
+
 object TimeUtils {
-    private var DAY_IN_MILLISECONDS = (1000 * 60 * 60 * 24).toLong()
+
 
     fun getShortDateFromTimestamp(timestamp: Long): String {
         return SimpleDateFormat("M/d/y", Locale.getDefault()).format(Date(timestamp))
