@@ -13,7 +13,7 @@ class SettingsViewModel : ViewModel() {
     var showingSyncDialog: Boolean = false
     var showingFileModDialog: Boolean = false
     var showingVerifySyncDialog: Boolean = false
-    var response: Int = FILE_VALIDATION_RESPONSE_WAITING
+    var response: String = FILE_VALIDATION_RESPONSE_WAITING
 
     suspend fun executeSync(context: Context) {
         response = FILE_VALIDATION_RESPONSE_WAITING

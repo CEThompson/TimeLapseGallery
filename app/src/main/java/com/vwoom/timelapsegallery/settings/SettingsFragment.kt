@@ -216,7 +216,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         mSyncDialog?.show()
     }
     // Updates the dialog showing progress on synchronization
-    private fun updateSyncDialog(response: Int){
+    private fun updateSyncDialog(response: String){
         Log.d(TAG, "updating sync dialog")
         val success = (response == VALID_DIRECTORY_STRUCTURE)
 

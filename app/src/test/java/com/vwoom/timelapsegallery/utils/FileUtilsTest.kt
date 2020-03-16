@@ -44,8 +44,9 @@ class FileUtilsTest {
         // Create files in the directory
         File(projectFolder, "99999999.jpg").createNewFile()
         File(projectFolder, "11111111.jpg").createNewFile()
-        File(projectFolder, "videos").mkdir()
-        File(projectFolder, "tags.txt").createNewFile()
+        val metaFolder = File(projectFolder, "meta")
+        metaFolder.mkdir()
+        File(metaFolder, "tags.txt").createNewFile()
 
         /* Actually use the method we are testing with mocked data */
         /* When */

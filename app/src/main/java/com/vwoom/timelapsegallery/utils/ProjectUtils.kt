@@ -12,23 +12,27 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
-const val FILE_VALIDATION_RESPONSE_WAITING = 0
-const val NO_FILES_IN_DIRECTORY_ERROR = 1
-const val DUPLICATE_ID_ERROR = 2
-const val INVALID_CHARACTER_ERROR = 3
-const val INVALID_PHOTO_FILE_ERROR = 4
-const val VALID_DIRECTORY_STRUCTURE = 5
+const val FILE_VALIDATION_RESPONSE_WAITING = "WAITING FOR RESPONSE"
+const val NO_FILES_IN_DIRECTORY_ERROR = "NO FILES IN DIRECTORY"
+const val DUPLICATE_ID_ERROR = "DUPLICATE IDS"
+const val INVALID_CHARACTER_ERROR = "INVALID CHARACTER(S)"
+const val INVALID_PHOTO_FILE_ERROR = "INVALID PHOTO FILE(S)"
+const val VALID_DIRECTORY_STRUCTURE = "VALID DIRECTORY STRUCTURE"
 
 object ProjectUtils {
     private val TAG = ProjectUtils::class.java.simpleName
 
-    fun validateFileStructure(externalFilesDir: File): Int {
+    fun validateFileStructure(externalFilesDir: File): String {
         val files = externalFilesDir.listFiles()
         if (files == null || files.isEmpty()) return NO_FILES_IN_DIRECTORY_ERROR
+
         val projectIds = HashSet<Long>()
-        for (child in files) { // Get the filename of the project
+
+        // Get project directories
+        for (child in files) {
+            // Get the filename of the project
             val url = child.absolutePath
-            val projectFilename = url.substring(url.lastIndexOf("/") + 1)
+            val projectFilename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
 
             // Skip Temporary Images
             if (projectFilename == FileUtils.TEMP_FILE_SUBDIRECTORY) continue
@@ -36,11 +40,11 @@ object ProjectUtils {
             // Determine ID of project
             val id = if (projectFilename.lastIndexOf("_") == -1) projectFilename
             else projectFilename.substring(0, projectFilename.lastIndexOf("_"))
-            //Log.d(TAG, "deriving project id = $id")
 
             /* Ensure ids are unique */
-            val longId = java.lang.Long.valueOf(id)
-            if (projectIds.contains(longId)) DUPLICATE_ID_ERROR
+            val currentId = java.lang.Long.valueOf(id)
+            if (projectIds.contains(currentId)) return DUPLICATE_ID_ERROR
+            projectIds.add(currentId)
 
             // Determine name of project
             var projectName: String? = null
@@ -60,7 +64,7 @@ object ProjectUtils {
                 for (file in projectFiles) {
                     if (file.isDirectory) continue  // skips the meta subfolder
                     val photoUrl = file.absolutePath
-                    val photoFilename = photoUrl.substring(photoUrl.lastIndexOf("/") + 1)
+                    val photoFilename = photoUrl.substring(photoUrl.lastIndexOf(File.separatorChar) + 1)
                     try {
                         java.lang.Long.valueOf(photoFilename.replaceFirst("[.][^.]+$".toRegex(), ""))
                     } catch (e: Exception) {
@@ -88,7 +92,7 @@ object ProjectUtils {
                 for (child in files) {
                     // Get the filename of the project
                     val url = child.absolutePath
-                    val filename = url.substring(url.lastIndexOf("/") + 1)
+                    val filename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
 
                     // Skip Temporary Images
                     if (filename == FileUtils.TEMP_FILE_SUBDIRECTORY) continue

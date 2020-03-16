@@ -9,8 +9,9 @@ import com.vwoom.timelapsegallery.data.view.Project
 import java.io.*
 import java.util.*
 
+const val RESERVED_CHARACTERS = "|\\?*<\":>+[]/'"
+
 object FileUtils {
-    const val ReservedChars = "|\\?*<\":>+[]/'"
     private val TAG = FileUtils::class.java.simpleName
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
     private const val META_FILE_SUBDIRECTORY = "meta"
@@ -42,7 +43,8 @@ object FileUtils {
     }
 
     // Creates a list of photo entries in a project folder sorted by timestamp
-    fun getPhotoEntriesInProjectDirectory(externalFilesDir: File, projectEntry: ProjectEntry): List<PhotoEntry>? {
+    fun getPhotoEntriesInProjectDirectory(externalFilesDir: File,
+                                          projectEntry: ProjectEntry): List<PhotoEntry>? {
         val photos: MutableList<PhotoEntry> = ArrayList()
         val projectFolder = getProjectFolder(externalFilesDir, projectEntry)
         val files = projectFolder.listFiles()
@@ -53,7 +55,7 @@ object FileUtils {
 
                 // Get the timestamp from the url
                 val url = child.absolutePath
-                val filename = url.substring(url.lastIndexOf("/") + 1)
+                val filename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
                 val filenameParts = filename.split(".").toTypedArray()
                 val timestamp = filenameParts[0].toLong()
 
@@ -161,7 +163,7 @@ object FileUtils {
 
     // Returns true if a path contain a reserved character
     fun pathContainsReservedCharacter(path: String): Boolean {
-        for (character in ReservedChars){
+        for (character in RESERVED_CHARACTERS){
             if (path.contains(character)) return true
         }
         return false
