@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.utils
 
-import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.settings.ValidationResult
 import org.junit.Test
@@ -127,24 +126,11 @@ class ProjectUtilsTest {
         assert(response is ValidationResult.Success<Nothing>)
     }
 
-    // TODO implement test for importing projects.
-    @Test
-    fun importProjects() {
-        // given
-        // TODO implement fake database
-        /*
-        val fakeDatabase = Any()
-        // when
-        ProjectUtils.importProjects(fakeDatabase, externalFilesTestDir)
-        // then
-        // TODO fake database*/
-    }
-
     @Test
     fun isProjectDueToday() {
         // Given
         val timestampTwoDaysAgo = System.currentTimeMillis() - (DAY_IN_MILLISECONDS*2)
-        val project = Project(1, null, null, 2, 1, timestampTwoDaysAgo)
+        val project = Project(1, null, 2, 1, timestampTwoDaysAgo)
         // When
         val isProjectDueToday = ProjectUtils.isProjectDueToday(project)
         // Then
@@ -154,7 +140,7 @@ class ProjectUtilsTest {
     @Test
     fun isProjectDueTomorrow() {
         // Given
-        val project = Project(1, null, null, 1, 1, System.currentTimeMillis())
+        val project = Project(1, null, 1, 1, System.currentTimeMillis())
         // When
         val isProjectDueTomorrow = ProjectUtils.isProjectDueTomorrow(project)
         // Then
