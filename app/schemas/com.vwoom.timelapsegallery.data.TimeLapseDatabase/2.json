@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "db460818f165da59beef2a6aa0454405",
+    "identityHash": "c3e1e389acb5b09f8ca2d4641326242e",
     "entities": [
       {
         "tableName": "project",
@@ -183,7 +183,7 @@
       },
       {
         "tableName": "project_schedule",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`project_id` INTEGER NOT NULL, `schedule_time` INTEGER, `interval_days` INTEGER, PRIMARY KEY(`project_id`), FOREIGN KEY(`project_id`) REFERENCES `project`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`project_id` INTEGER NOT NULL, `interval_days` INTEGER NOT NULL, PRIMARY KEY(`project_id`), FOREIGN KEY(`project_id`) REFERENCES `project`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "project_id",
@@ -192,16 +192,10 @@
             "notNull": true
           },
           {
-            "fieldPath": "schedule_time",
-            "columnName": "schedule_time",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
             "fieldPath": "interval_days",
             "columnName": "interval_days",
             "affinity": "INTEGER",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -295,7 +289,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'db460818f165da59beef2a6aa0454405')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c3e1e389acb5b09f8ca2d4641326242e')"
     ]
   }
 }

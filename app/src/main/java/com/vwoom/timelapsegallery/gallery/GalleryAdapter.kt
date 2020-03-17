@@ -68,9 +68,9 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         constraintSet.setDimensionRatio(holder.binding.projectImage.id, ratio)
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
-        val projectIsScheduled = (project.interval_days != null && project.interval_days != 0)
+        val projectIsScheduled = (project.interval_days != 0)
         if (projectIsScheduled){
-            setScheduleInformation(project, holder, project.interval_days!!)
+            setScheduleInformation(project, holder, project.interval_days)
             holder.binding.scheduleLayout.visibility = VISIBLE
         } else {
             holder.binding.scheduleLayout.visibility = INVISIBLE
@@ -118,7 +118,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
     private fun setScheduleInformation(project: Project, holder: GalleryAdapterViewHolder, interval_days: Int) {
         // Calc the days until project is due
         val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
-        val daysUntilDue = project.interval_days!! - daysSinceLastPhoto
+        val daysUntilDue = project.interval_days - daysSinceLastPhoto
         holder.binding.daysUntilDueTextView.text = daysUntilDue.toString() // set days until due text
         holder.binding.galleryItemScheduleIndicatorDays.text = interval_days.toString() // set schedule interval
         // Style depending upon due state

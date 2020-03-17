@@ -630,7 +630,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             }
 
             // Begin set schedule information
-            if (currentProject.interval_days == 0 || currentProject.interval_days == null) {
+            if (currentProject.interval_days == 0) {
                 binding?.projectScheduleFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
                 binding?.detailScheduleIndicator?.visibility = INVISIBLE
                 binding?.scheduleIntervalTv?.visibility = INVISIBLE
@@ -752,7 +752,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             projectInfoNameTv?.text = getString(R.string.unnamed)
         } else projectInfoNameTv?.text = mCurrentProject!!.project_name
 
-        if (mCurrentProject!!.interval_days == 0 || mCurrentProject!!.interval_days == null) {
+        if (mCurrentProject!!.interval_days == 0) {
             mInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.none)
         } else {
             mInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.scheduled)
@@ -936,7 +936,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     detailViewModel.deleteCurrentProject(mExternalFilesDir!!)
                     // If current project had a schedule remove the notification and update widgets
-                    if (mCurrentProject?.schedule_time != null && mCurrentProject?.interval_days != null) {
+                    if (mCurrentProject?.interval_days != 0) {
                         NotificationUtils.scheduleNotificationWorker(requireContext())
                         UpdateWidgetService.startActionUpdateWidgets(requireContext())
                     }

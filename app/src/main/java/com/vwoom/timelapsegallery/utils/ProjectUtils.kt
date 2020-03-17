@@ -177,9 +177,8 @@ object ProjectUtils {
         if (scheduleFile.exists()) {
             // TODO test this
             val inputAsString = FileInputStream(scheduleFile).bufferedReader().use { it.readText() }
-            val projectScheduleEntry = ProjectScheduleEntry(currentProject.id, null, null)
             try {
-                projectScheduleEntry.interval_days = inputAsString.toInt()
+                val projectScheduleEntry = ProjectScheduleEntry(currentProject.id, inputAsString.toInt())
                 db.projectScheduleDao().insertProjectSchedule(projectScheduleEntry)
             } catch (e: Exception) {
                 Log.e(TAG, "error importing schedule for $currentProject")
@@ -188,14 +187,14 @@ object ProjectUtils {
     }
 
     fun isProjectDueToday(project: Project): Boolean {
-        if (project.interval_days == null || project.interval_days == 0) return false
+        if (project.interval_days == 0) return false
         val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
         val daysUntilDue = project.interval_days - daysSinceLastPhoto
         return daysUntilDue <= 0
     }
 
     fun isProjectDueTomorrow(project: Project): Boolean {
-        if (project.interval_days == null || project.interval_days == 0) return false
+        if (project.interval_days == 0) return false
         val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
         val daysUntilDue = project.interval_days - daysSinceLastPhoto
         return daysUntilDue == 1.toLong()

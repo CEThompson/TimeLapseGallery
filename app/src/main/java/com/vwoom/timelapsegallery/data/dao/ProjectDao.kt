@@ -49,7 +49,6 @@ interface ProjectDao {
     @Query("SELECT " +
             "project.id AS project_id, " +
             "project.project_name AS project_name, " +
-            "project_schedule.schedule_time AS schedule_time, " +
             "project_schedule.interval_days AS interval_days, " +
             "cover_photo.photo_id AS cover_photo_id, " +
             "photo.timestamp AS cover_photo_timestamp " +
@@ -62,7 +61,6 @@ interface ProjectDao {
     @Query("SELECT " +
             "project.id AS project_id, " +
             "project.project_name AS project_name, " +
-            "project_schedule.schedule_time AS schedule_time, " +
             "project_schedule.interval_days AS interval_days, " +
             "cover_photo.photo_id AS cover_photo_id, " +
             "photo.timestamp AS cover_photo_timestamp " +
@@ -76,7 +74,6 @@ interface ProjectDao {
     @Query("SELECT " +
             "project.id AS project_id, " +
             "project.project_name AS project_name, " +
-            "project_schedule.schedule_time AS schedule_time, " +
             "project_schedule.interval_days AS interval_days, " +
             "cover_photo.photo_id AS cover_photo_id, " +
             "photo.timestamp AS cover_photo_timestamp " +
@@ -90,7 +87,6 @@ interface ProjectDao {
     @Query("SELECT " +
             "project.id AS project_id, " +
             "project.project_name AS project_name, " +
-            "project_schedule.schedule_time AS schedule_time, " +
             "project_schedule.interval_days AS interval_days, " +
             "cover_photo.photo_id AS cover_photo_id, " +
             "photo.timestamp AS cover_photo_timestamp " +

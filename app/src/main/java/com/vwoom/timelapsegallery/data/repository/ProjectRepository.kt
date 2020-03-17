@@ -43,7 +43,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
         }
     }
 
-    suspend fun newProject(file: File, externalFilesDir: File){
+    suspend fun newProject(file: File, externalFilesDir: File, scheduleInterval: Int = 0){
         // Create database entries
         val timestamp = System.currentTimeMillis()
 
@@ -59,7 +59,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
 
         // Create cover photo and schedule then insert
         val coverPhotoEntry = CoverPhotoEntry(projectId, photoId)
-        val projectScheduleEntry = ProjectScheduleEntry(projectId, null, null)
+        val projectScheduleEntry = ProjectScheduleEntry(projectId, scheduleInterval)
         coverPhotoDao.insertPhoto(coverPhotoEntry)
         projectScheduleDao.insertProjectSchedule(projectScheduleEntry)
 

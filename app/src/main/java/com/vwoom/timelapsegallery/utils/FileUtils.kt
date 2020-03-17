@@ -261,7 +261,7 @@ object FileUtils {
         val scheduleFile = File(metaDir, SCHEDULE_TEXT_FILE)
 
         // Remove the schedule text file if unscheduled
-        if (projectScheduleEntry.interval_days == null || projectScheduleEntry.interval_days == 0){
+        if (projectScheduleEntry.interval_days == 0){
             scheduleFile.delete()
             Log.d(TAG, "deleting schedule file")
         }
@@ -270,7 +270,7 @@ object FileUtils {
             Log.d(TAG, "writing schedule file")
             val output = FileOutputStream(scheduleFile)
             val outputStreamWriter = OutputStreamWriter(output)
-            outputStreamWriter.write(projectScheduleEntry.interval_days!!.toString())
+            outputStreamWriter.write(projectScheduleEntry.interval_days.toString())
             outputStreamWriter.flush()
             output.fd.sync()
             outputStreamWriter.close()

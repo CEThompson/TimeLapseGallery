@@ -63,21 +63,19 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
         when(searchType) {
             SEARCH_TYPE_SCHEDULED -> {
                 resultProjects = resultProjects.filter {
-                    if (it.interval_days == null) return@filter false
                     if (it.interval_days == 0) return@filter false
                     return@filter true
                 }
             }
             SEARCH_TYPE_UNSCHEDULED -> {
                 resultProjects = resultProjects.filter {
-                    if (it.interval_days == null) return@filter true
                     if (it.interval_days == 0) return@filter true
                     return@filter false
                 }
             }
             SEARCH_TYPE_DUE -> {
                 resultProjects = resultProjects.filter {
-                    if (it.interval_days == null || it.interval_days == 0) return@filter false
+                    if (it.interval_days == 0) return@filter false
                     val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(it.cover_photo_timestamp, System.currentTimeMillis())
                     val interval: Int = it.interval_days
                     val daysUntilDue = interval - daysSinceLastPhotoTaken
@@ -86,7 +84,7 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
             }
             SEARCH_TYPE_PENDING -> {
                 resultProjects = resultProjects.filter {
-                    if (it.interval_days == null || it.interval_days == 0) return@filter false
+                    if (it.interval_days == 0) return@filter false
                     val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(it.cover_photo_timestamp, System.currentTimeMillis())
                     val interval: Int = it.interval_days
                     val daysUntilDue = interval - daysSinceLastPhotoTaken

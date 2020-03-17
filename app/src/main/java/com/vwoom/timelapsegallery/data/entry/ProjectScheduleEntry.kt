@@ -9,4 +9,4 @@ import androidx.room.ForeignKey
                 parentColumns = ["id"],
                 childColumns = ["project_id"],
                 onDelete = ForeignKey.CASCADE)])
-data class ProjectScheduleEntry(var project_id: Long, var schedule_time: Long?, var interval_days: Int?)
+data class ProjectScheduleEntry(var project_id: Long, var interval_days: Int)
