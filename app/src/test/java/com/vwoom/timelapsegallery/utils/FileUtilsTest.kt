@@ -262,7 +262,7 @@ class FileUtilsTest {
         first.createNewFile()
 
         val photoEntry = PhotoEntry(id, id, timestamp)
-        val project = Project(id, projectName, 0, 0, id, timestamp)
+        val project = Project(id, projectName, 0, id, timestamp)
 
         // When - utilities gets the entry
         val photoUrl = FileUtils.getPhotoUrl(externalFilesTestDir, project, photoEntry)
@@ -312,7 +312,7 @@ class FileUtilsTest {
         val first = File(projectFolder, "${timestamp}.jpg")
         first.createNewFile()
 
-        val project = Project(id, projectName, 0, 0, id, timestamp)
+        val project = Project(id, projectName,0, id, timestamp)
 
         // When - utility is called
         val url = FileUtils.getCoverPhotoUrl(externalFilesTestDir, project)
