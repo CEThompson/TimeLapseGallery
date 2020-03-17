@@ -8,23 +8,18 @@ import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase.Companion.getInstance
 import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.settings.ValidationResult
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
-const val FILE_VALIDATION_RESPONSE_WAITING = "WAITING FOR RESPONSE"
-const val NO_FILES_IN_DIRECTORY_ERROR = "NO FILES IN DIRECTORY"
-const val DUPLICATE_ID_ERROR = "DUPLICATE IDS"
-const val INVALID_CHARACTER_ERROR = "INVALID CHARACTER(S)"
-const val INVALID_PHOTO_FILE_ERROR = "INVALID PHOTO FILE(S)"
-const val VALID_DIRECTORY_STRUCTURE = "VALID DIRECTORY STRUCTURE"
-
 object ProjectUtils {
     private val TAG = ProjectUtils::class.java.simpleName
 
-    fun validateFileStructure(externalFilesDir: File): String {
+    fun validateFileStructure(externalFilesDir: File): ValidationResult<Nothing> {
         val files = externalFilesDir.listFiles()
-        if (files == null || files.isEmpty()) return NO_FILES_IN_DIRECTORY_ERROR
+        if (files == null || files.isEmpty())
+            return ValidationResult.Error.NoFilesError(null, externalFilesDir.absolutePath)
 
         val projectIds = HashSet<Long>()
 
@@ -43,7 +38,8 @@ object ProjectUtils {
 
             /* Ensure ids are unique */
             val currentId = java.lang.Long.valueOf(id)
-            if (projectIds.contains(currentId)) return DUPLICATE_ID_ERROR
+            if (projectIds.contains(currentId))
+                return ValidationResult.Error.DuplicateIdError(null, projectFilename)
             projectIds.add(currentId)
 
             // Determine name of project
@@ -53,8 +49,8 @@ object ProjectUtils {
             //Log.d(TAG, "deriving project name = $projectName")
 
             /* Ensure names do not contain reserved characters */
-            if (projectName != null
-                    && FileUtils.pathContainsReservedCharacter(projectName)) return INVALID_CHARACTER_ERROR
+            if (projectName != null && FileUtils.pathContainsReservedCharacter(projectName))
+                return ValidationResult.Error.InvalidCharacterError(null, projectName)
 
             // Get the files within the directory
             val projectFiles = child.listFiles()
@@ -68,12 +64,12 @@ object ProjectUtils {
                     try {
                         java.lang.Long.valueOf(photoFilename.replaceFirst("[.][^.]+$".toRegex(), ""))
                     } catch (e: Exception) {
-                        return INVALID_PHOTO_FILE_ERROR
+                        return ValidationResult.Error.InvalidPhotoFileError(e, photoUrl, projectName)
                     }
                 }
             }
         }
-        return VALID_DIRECTORY_STRUCTURE
+        return ValidationResult.Success()
     }
 
     /* Helper to scan through folders and import projects */

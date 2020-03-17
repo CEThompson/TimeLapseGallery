@@ -216,32 +216,44 @@ class SettingsFragment : PreferenceFragmentCompat() {
         mSyncDialog?.show()
     }
     // Updates the dialog showing progress on synchronization
-    private fun updateSyncDialog(response: String){
+    private fun updateSyncDialog(result: ValidationResult<Nothing>){
         Log.d(TAG, "updating sync dialog")
-        val success = (response == VALID_DIRECTORY_STRUCTURE)
-
         // Set the response
         val responseView = mSyncDialog?.findViewById(R.id.sync_response) as TextView
-
-        when(response){
-            FILE_VALIDATION_RESPONSE_WAITING -> {responseView.text = requireContext().getString(R.string.waiting)}
-            NO_FILES_IN_DIRECTORY_ERROR -> {responseView.text = requireContext().getString(R.string.no_files_in_directory_error)}
-            INVALID_CHARACTER_ERROR -> {responseView.text = requireContext().getString(R.string.invalid_character_error)}
-            DUPLICATE_ID_ERROR -> {responseView.text = requireContext().getString(R.string.duplicate_id_error)}
-            INVALID_PHOTO_FILE_ERROR -> {responseView.text = requireContext().getString(R.string.invalid_photo_file_error)}
-        }
-
         val progress = mSyncDialog?.findViewById(R.id.sync_progress) as ProgressBar
-
-        /// Set the image feedback
         val imageFeedback = mSyncDialog?.findViewById(R.id.sync_feedback_image) as ImageView
-        if (success) {
-            imageFeedback.setImageResource(R.drawable.ic_check_green_40dp)
-            responseView.text = getString(R.string.executing_sync_complete)
-        }
-        else imageFeedback.setImageResource(R.drawable.ic_error_red_40dp)
-
         val button = mSyncDialog?.findViewById(R.id.sync_verification_button) as androidx.appcompat.widget.AppCompatButton
+
+        imageFeedback.setImageResource(R.drawable.ic_error_red_40dp)
+        when(result){
+            is ValidationResult.InProgress -> {
+                responseView.text = requireContext().getString(R.string.waiting)
+            }
+            is ValidationResult.Error.NoFilesError -> {
+                responseView.text = requireContext()
+                        .getString(R.string.no_files_in_directory_error,
+                                result.directoryUrl)
+            }
+            is ValidationResult.Error.InvalidCharacterError -> {
+                responseView.text = requireContext()
+                        .getString(R.string.invalid_character_error,
+                        result.projectName,
+                        RESERVED_CHARACTERS)
+            }
+            is ValidationResult.Error.DuplicateIdError -> {
+                responseView.text = requireContext().getString(R.string.duplicate_id_error, result.projectName)
+            }
+            is ValidationResult.Error.InvalidPhotoFileError -> {
+                responseView.text = requireContext()
+                        .getString(R.string.invalid_photo_file_error,
+                                result.photoUrl,
+                                result.projectName)
+            }
+            is ValidationResult.Success -> {
+                imageFeedback.setImageResource(R.drawable.ic_check_green_40dp)
+                responseView.text = getString(R.string.executing_sync_complete)
+            }
+        }
 
         // Show the updated views
         progress.visibility = View.INVISIBLE
