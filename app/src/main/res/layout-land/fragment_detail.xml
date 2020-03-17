@@ -252,7 +252,6 @@
             android:layout_gravity="bottom|end"
             android:layout_marginBottom="@dimen/fab_detail_plus_add_margin_bottom"
             android:layout_marginEnd="@dimen/fab_margin"
-            android:backgroundTint="@color/colorGreen"
             android:contentDescription="@string/play_as_video_fab_content_description"
             android:src="@drawable/ic_play_arrow_white_24dp"
             app:borderWidth="0dp"
