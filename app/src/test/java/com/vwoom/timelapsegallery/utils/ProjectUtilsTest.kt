@@ -1,9 +1,8 @@
 package com.vwoom.timelapsegallery.utils
 
-import androidx.test.platform.app.InstrumentationRegistry
-import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.settings.ValidationResult
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -25,6 +24,7 @@ class ProjectUtilsTest {
         externalFilesTestDir = testFolder.newFolder("pictures")
     }
 
+    // TODO add assertions for appropriate string output errors for users
     @Test
     fun validateFileStructure_emptyFileStructure_returnsNoFilesInDirectory() {
         // Given
@@ -34,7 +34,7 @@ class ProjectUtilsTest {
         val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
 
         // Then
-        assert(response == NO_FILES_IN_DIRECTORY_ERROR)
+        assert(response is ValidationResult.Error.NoFilesError)
     }
 
     @Test
@@ -50,7 +50,7 @@ class ProjectUtilsTest {
         val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
 
         // Then
-        assert(response == INVALID_PHOTO_FILE_ERROR)
+        assert(response is ValidationResult.Error.InvalidPhotoFileError)
     }
 
     @Test
@@ -72,7 +72,7 @@ class ProjectUtilsTest {
         val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
         println(response)
         // Then
-        assert(response == DUPLICATE_ID_ERROR)
+        assert(response is ValidationResult.Error.DuplicateIdError)
     }
 
     @Test
@@ -103,7 +103,7 @@ class ProjectUtilsTest {
 
             // Then
             println(response)
-            assert(response == INVALID_CHARACTER_ERROR)
+            assert(response is ValidationResult.Error.InvalidCharacterError)
         }
     }
 
@@ -124,7 +124,7 @@ class ProjectUtilsTest {
         val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
 
         // Then
-        assert(response == VALID_DIRECTORY_STRUCTURE)
+        assert(response is ValidationResult.Success<Nothing>)
     }
 
     // TODO implement test for importing projects.
