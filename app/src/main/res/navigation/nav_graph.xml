@@ -22,6 +22,10 @@
         <action
             android:id="@+id/action_galleryFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <argument
+            android:name="search_launch_due"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
 
     <fragment

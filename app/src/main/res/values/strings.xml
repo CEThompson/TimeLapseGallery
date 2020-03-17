@@ -238,4 +238,5 @@
     <!-- Shared preference -->
     <string name="key_add_transition" translatable="false">add</string>
 
+    <string name="search_launch_due" translatable="false">search_launch_due</string>
 </resources>

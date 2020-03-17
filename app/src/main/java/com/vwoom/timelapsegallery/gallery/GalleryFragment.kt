@@ -7,7 +7,10 @@ import android.os.Environment
 import android.os.Parcelable
 import android.os.SystemClock
 import android.view.*
-import android.widget.*
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -16,6 +19,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
@@ -30,16 +34,16 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
-// TODO fix gallery leak
-// TODO gallery slows down with usage, figure out why
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
-    
+
     private var mSearchDialog: Dialog? = null
 
     private var mGalleryAdapter: GalleryAdapter? = null
     private var mGridLayoutManager: StaggeredGridLayoutManager? = null
 
     private var tagJob: Job? = null
+
+    private val args: GalleryFragmentArgs by navArgs()
 
     private var mGalleryRecyclerView: RecyclerView? = null
     private var mAddProjectFAB: FloatingActionButton? = null
@@ -76,6 +80,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         val binding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
+
         // Set up options menu
         setHasOptionsMenu(true)
         val toolbar = binding.galleryFragmentToolbar
@@ -133,10 +138,16 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             updateSearchDialog()
         }
 
+        setupViewModel()
+
+        // Launch with search filter if set from the notification
+        if (args.searchLaunchDue) {
+            mGalleryViewModel.searchType = SEARCH_TYPE_DUE
+        }
+
+        // Hide or show search cancel fab depending upon whether or not the user is searching
         if (!userIsNotSearching()) mSearchActiveFAB?.show()
         else mSearchActiveFAB?.hide()
-
-        setupViewModel()
 
         return binding.root
     }
@@ -210,7 +221,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             updateSearchByScheduleCheckboxes()
             updateSearchFilter()
         }
-        scheduledCheckBox?.setOnClickListener{
+        scheduledCheckBox?.setOnClickListener {
             val checked = (it as CheckBox).isChecked
             if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_SCHEDULED
             else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
@@ -242,7 +253,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
-    private fun userIsNotSearching(): Boolean{
+    private fun userIsNotSearching(): Boolean {
         return mGalleryViewModel.searchTags.isEmpty()
                 && mGalleryViewModel.searchType == SEARCH_TYPE_NONE
                 && mGalleryViewModel.searchName.isBlank()
@@ -271,8 +282,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Handle tag state
         var tags: List<TagEntry> = listOf()
-        if (mGalleryViewModel.tags.value!=null){
-            tags = mGalleryViewModel.tags.value!!.sortedBy {it.tag.toLowerCase(Locale.getDefault())}
+        if (mGalleryViewModel.tags.value != null) {
+            tags = mGalleryViewModel.tags.value!!.sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
         }
         // Clear the tag layout
         val tagLayout = mSearchDialog?.findViewById<FlexboxLayout>(R.id.dialog_search_tags_layout)

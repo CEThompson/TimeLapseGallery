@@ -2,13 +2,13 @@ package com.vwoom.timelapsegallery.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.preference.PreferenceManager
 import androidx.work.Constraints
 import androidx.work.PeriodicWorkRequest
@@ -18,22 +18,31 @@ import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-// TODO implement intent launching application filtering to DUE projects
 object NotificationUtils {
     private const val PROJECT_NOTIFICATION_CHANNEL_ID = "project_channel_id"
     private const val CHANNEL_NAME = "channel_name"
     private const val CHANNEL_DESCRIPTION = "channel_description"
     private val TAG = NotificationUtils::class.java.simpleName
+
     /* Creates a notification that launches the main activity and filters by todays scheduled projects */
     @JvmStatic
     fun notifyUserOfScheduledProjects(context: Context, requestCode: Int) {
         Log.d(TAG, "Notification Tracker: Notifying user of scheduled projects for request code $requestCode")
         val title = context.getString(R.string.app_name)
         val content = context.getString(R.string.projects_due_today)
-        // Create the pending intent to take the user to the relevant project on click
-        val intent = Intent(context, TimeLapseGalleryActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        val pendingIntent = PendingIntent.getActivity(context, requestCode, intent, 0)
+
+        // Create a bundle to set the nav arg for the gallery fragment to search for projects due today
+        val bundle = Bundle()
+        bundle.putBoolean(context.getString(R.string.search_launch_due), true)
+
+        // Create the pending intent to nav to the gallery with the argument
+        val pendingIntent = NavDeepLinkBuilder(context)
+                .setComponentName(TimeLapseGalleryActivity::class.java)
+                .setGraph(R.navigation.nav_graph)
+                .setDestination(R.id.galleryFragment)
+                .setArguments(bundle)
+                .createPendingIntent()
+
         // Create the notification
         val builder = NotificationCompat.Builder(context, PROJECT_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_add_a_photo_white_24dp)
