@@ -14,7 +14,7 @@ const val RESERVED_CHARACTERS = "|\\?*<\":>+[]/'"
 object FileUtils {
     private val TAG = FileUtils::class.java.simpleName
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
-    private const val META_FILE_SUBDIRECTORY = "meta"
+    const val META_FILE_SUBDIRECTORY = "meta"
     const val SCHEDULE_TEXT_FILE = "schedule.txt"
     const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
     private const val ERROR_TIMESTAMP_TO_PHOTO = "error retrieving photo from timestamp"
@@ -231,6 +231,7 @@ object FileUtils {
         return arrayOf("$timestamp.jpg","$timestamp.png","$timestamp.jpeg")
     }
 
+    // TODO add tests for uncovered functions
     fun addTagToProject(externalFilesDir: File, project: Project, tags: List<TagEntry>?){
         if (tags == null) return // If no tags no need to write file
 

@@ -8,6 +8,9 @@ import com.vwoom.timelapsegallery.data.view.Project
 
 @Dao
 interface ProjectDao {
+    @Query("SELECT * FROM project")
+    fun getProjects(): List<ProjectEntry>
+
     @Query("SELECT * FROM project ORDER BY id")
     fun getProjectsLiveData(): LiveData<List<ProjectEntry>>
 

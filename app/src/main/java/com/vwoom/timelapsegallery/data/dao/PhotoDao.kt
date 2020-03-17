@@ -7,6 +7,9 @@ import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 
 @Dao
 interface PhotoDao {
+    @Query("SELECT * FROM photo")
+    fun getPhotos(): List<PhotoEntry>
+
     @Query("SELECT * FROM photo WHERE project_id = :project_id ORDER BY timestamp")
     fun getPhotosLiveDataByProjectId(project_id: Long): LiveData<List<PhotoEntry>>
 
