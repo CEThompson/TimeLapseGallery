@@ -239,5 +239,8 @@
     <!-- Shared preference -->
     <string name="key_add_transition" translatable="false">add</string>
 
+    <string name="playback_interval_default" translatable="false">50</string>
+    <string name="notification_time_default" translatable="false">7</string>
+
     <string name="search_launch_due" translatable="false">search_launch_due</string>
 </resources>

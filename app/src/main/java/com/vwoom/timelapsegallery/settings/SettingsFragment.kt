@@ -125,7 +125,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 NotificationUtils.scheduleNotificationWorker(requireContext())
 
                 // Log notification time selection
-                val notificationTime = prefs.getString(activity?.getString(R.string.key_notification_time), "7")
+                val notificationTime = prefs.getString(activity?.getString(R.string.key_notification_time), getString(R.string.notification_time_default))
                 val params = Bundle()
                 params.putString(context?.getString(R.string.analytics_notification_time)!!, notificationTime)
                 mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_select_notification_time)!!, params)
@@ -133,7 +133,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
             // Track playback interval selection
             if (key == getString(R.string.key_playback_interval)){
-                val interval = prefs.getString(getString(R.string.key_playback_interval), "50");
+                val interval = prefs.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default));
                 val params = Bundle()
                 params.putString(context?.getString(R.string.analytics_playback_interval)!!, interval)
                 mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_select_playback_interval)!!, params)
@@ -166,7 +166,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 .setTitle(R.string.warning)
                 .setMessage(R.string.database_sync_warning)
                 .setPositiveButton(R.string.ok) { _, _ ->
-                    Log.d("settings activity", "Launching database sync asynct task")
+                    Log.d("settings activity", "Launching database sync async task")
                     settingsViewModel.showingVerifySyncDialog = false
                     executeSync()
                 }

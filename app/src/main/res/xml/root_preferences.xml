@@ -45,7 +45,7 @@
             app:entries="@array/notification_time_entries"
             app:entryValues="@array/notification_time_values"
             app:dependency="@string/key_notifications_enabled"
-            app:defaultValue="7"
+            app:defaultValue="@string/notification_time_default"
             app:summary="%s"/>
 
     </PreferenceCategory>
@@ -59,7 +59,7 @@
             app:title="@string/playback_interval_title"
             app:entries="@array/playback_interval_entries"
             app:entryValues="@array/playback_interval_values"
-            app:defaultValue="50"
+            app:defaultValue="@string/playback_interval_default"
             app:summary="%s"/>
 
     </PreferenceCategory>
