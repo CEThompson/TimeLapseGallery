@@ -1,11 +1,8 @@
 package com.vwoom.timelapsegallery.utils
 
-import android.content.Context
 import android.os.Environment
 import android.util.Log
-import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
-import com.vwoom.timelapsegallery.data.TimeLapseDatabase.Companion.getInstance
 import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.settings.ValidationResult
@@ -73,57 +70,52 @@ object ProjectUtils {
     }
 
     /* Helper to scan through folders and import projects */
-    suspend fun importProjects(context: Context) {
-        val db = getInstance(context)
+    // Todo: Implement test for project import
+    suspend fun importProjects(db: TimeLapseDatabase, externalFilesDir: File) {
 
         // Delete projects and tags in the database: should clear all tables by cascade
         db.projectDao().deleteAllProjects()
         db.tagDao().deleteAllTags()
 
         // Add all project references from the file structure
-        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        if (storageDir != null) {
-            val files = storageDir.listFiles()
-            if (files != null) { // For each file generate a project
-                for (child in files) {
-                    // Get the filename of the project
-                    val url = child.absolutePath
-                    val filename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
+        val files = externalFilesDir.listFiles()
+        for (child in files!!) {
+            // Get the filename of the project
+            val url = child.absolutePath
+            val filename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
 
-                    // Skip Temporary Images
-                    if (filename == FileUtils.TEMP_FILE_SUBDIRECTORY) continue
+            // Skip Temporary Images
+            if (filename == FileUtils.TEMP_FILE_SUBDIRECTORY) continue
 
-                    // Determine ID of project
-                    val id = if (filename.lastIndexOf("_") == -1) filename
-                    else filename.substring(0, filename.lastIndexOf("_"))
-                    Log.d(TAG, "deriving project id = $id")
+            // Determine ID of project
+            val id = if (filename.lastIndexOf("_") == -1) filename
+            else filename.substring(0, filename.lastIndexOf("_"))
+            Log.d(TAG, "deriving project id = $id")
 
-                    // Determine name of project
-                    var projectName: String? = null
-                    if (filename.lastIndexOf("_") >= 0)
-                        projectName = filename.substring(filename.lastIndexOf("_") + 1)
-                    Log.d(TAG, "deriving project name = $projectName")
+            // Determine name of project
+            var projectName: String? = null
+            if (filename.lastIndexOf("_") >= 0)
+                projectName = filename.substring(filename.lastIndexOf("_") + 1)
+            Log.d(TAG, "deriving project name = $projectName")
 
-                    // Get the files within the directory
-                    val projectDir = File(storageDir, filename)
-                    val projectFiles = projectDir.listFiles()
+            // Get the files within the directory
+            val projectDir = File(externalFilesDir, filename)
+            val projectFiles = projectDir.listFiles()
 
-                    if (projectFiles != null) {
-                        // Create the project entry
-                        val currentProject = ProjectEntry(
-                                java.lang.Long.valueOf(id),
-                                projectName)
-                        Log.d(TAG, "inserting project = $currentProject")
-                        // Insert the project - this updates on conflict
-                        db.projectDao().insertProject(currentProject);
+            if (projectFiles != null) {
+                // Create the project entry
+                val currentProject = ProjectEntry(
+                        java.lang.Long.valueOf(id),
+                        projectName)
+                Log.d(TAG, "inserting project = $currentProject")
+                // Insert the project - this updates on conflict
+                db.projectDao().insertProject(currentProject);
 
-                        // Recover photos
-                        importProjectPhotos(storageDir, db, currentProject)
+                // Recover photos
+                importProjectPhotos(externalFilesDir, db, currentProject)
 
-                        // Recover tags
-                        importProjectMetaData(storageDir, db, currentProject)
-                    }
-                }
+                // Recover tags
+                importProjectMetaData(externalFilesDir, db, currentProject)
             }
         }
     }
