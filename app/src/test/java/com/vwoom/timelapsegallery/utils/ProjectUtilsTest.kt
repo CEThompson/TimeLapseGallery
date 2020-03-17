@@ -130,6 +130,14 @@ class ProjectUtilsTest {
     // TODO implement test for importing projects.
     @Test
     fun importProjects() {
+        // given
+        // TODO implement fake database
+        /*
+        val fakeDatabase = Any()
+        // when
+        ProjectUtils.importProjects(fakeDatabase, externalFilesTestDir)
+        // then
+        // TODO fake database*/
     }
 
     @Test
