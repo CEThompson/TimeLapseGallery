@@ -13,27 +13,32 @@ class PhotoUtilsTest {
 
     @Test
     fun getAspectRatioFromImagePath() {
-
+        // TODO implement me!
     }
 
     @Test
     fun getOrientationFromImagePath() {
+        // TODO implement me!
     }
 
     @Test
     fun rotateBitmap() {
+        // TODO implement me!
     }
 
     @Test
     fun isLandscape() {
+        // TODO implement me!
     }
 
     @Test
     fun decodeSampledBitmapFromPath() {
+        // TODO implement me!
     }
 
     @Test
     fun calculateInSampleSize() {
+        // TODO implement me!
     }
 
 }
