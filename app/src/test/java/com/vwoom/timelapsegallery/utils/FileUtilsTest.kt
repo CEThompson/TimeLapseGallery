@@ -350,6 +350,21 @@ class FileUtilsTest {
         assert(filenames[2] == "$timestamp.jpeg")
     }
 
+    @Test
+    fun getMetaDirectoryForProject() {
+        // TODO implement me!
+    }
+
+    @Test
+    fun addTagToProject() {
+        // TODO implement me!
+    }
+
+    @Test
+    fun scheduleProject(){
+        // TODO implement me!
+    }
+
     companion object {
         private val TAG = FileUtilsTest::class.java.simpleName
     }

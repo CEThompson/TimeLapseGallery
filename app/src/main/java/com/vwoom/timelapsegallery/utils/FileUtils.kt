@@ -192,7 +192,7 @@ object FileUtils {
             photoFile = File(projectDir, fileName)
             if (photoFile.exists()) return photoFile.absolutePath
         }
-        // TODO handle error case better
+        // TODO: Convert to sealed result class!
         return ERROR_TIMESTAMP_TO_PHOTO
     }
 
@@ -207,6 +207,7 @@ object FileUtils {
             photoFile = File(projectDir, fileName)
             if (photoFile.exists()) return photoFile.absolutePath
         }
+        // TODO: Convert to sealed result class!
         return ERROR_TIMESTAMP_TO_PHOTO
     }
 
