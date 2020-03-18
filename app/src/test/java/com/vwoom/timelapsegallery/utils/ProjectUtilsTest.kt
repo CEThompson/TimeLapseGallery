@@ -23,7 +23,6 @@ class ProjectUtilsTest {
         externalFilesTestDir = testFolder.newFolder("pictures")
     }
 
-    // TODO add assertions for appropriate string output errors for users
     @Test
     fun validateFileStructure_emptyFileStructure_returnsNoFilesInDirectory() {
         // Given
@@ -35,6 +34,21 @@ class ProjectUtilsTest {
         // Then
         assert(response is ValidationResult.Error.NoFilesError)
     }
+
+    @Test
+    fun validateFileStructure_invalidFolder_returnsInvalidFolderError() {
+        // Given
+        externalFilesTestDir.deleteRecursively()
+        val projectFile = File(externalFilesTestDir, "project with no ID")
+        projectFile.mkdirs()
+
+        // When
+        val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
+
+        // Then
+        assert(response is ValidationResult.Error.InvalidFolder)
+    }
+
 
     @Test
     fun validateFileStructure_fileNotTimestamp_returnsInvalidPhotoFileError() {

@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.utils
 
-import android.os.Environment
 import android.util.Log
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.entry.*
@@ -27,23 +26,30 @@ object ProjectUtils {
             val projectFilename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
 
             // Skip Temporary Images
-            if (projectFilename == FileUtils.TEMP_FILE_SUBDIRECTORY) continue
+            if (projectFilename == FileUtils.TEMP_FILE_SUBDIRECTORY
+                    || projectFilename == FileUtils.META_FILE_SUBDIRECTORY) continue
 
             // Determine ID of project
-            val id = if (projectFilename.lastIndexOf("_") == -1) projectFilename
-            else projectFilename.substring(0, projectFilename.lastIndexOf("_"))
+            val idString: String =
+                    if (projectFilename.lastIndexOf("_") == -1) projectFilename
+                    else projectFilename.substring(0, projectFilename.lastIndexOf("_"))
 
             /* Ensure ids are unique */
-            val currentId = java.lang.Long.valueOf(id)
-            if (projectIds.contains(currentId))
-                return ValidationResult.Error.DuplicateIdError(null, projectFilename)
-            projectIds.add(currentId)
+            var currentId: Long? = null
+            try {
+                currentId = idString.toLong()
+                if (projectIds.contains(currentId))
+                    return ValidationResult.Error.DuplicateIdError(null, projectFilename)
+                projectIds.add(currentId)
+            } catch (e: NumberFormatException) {
+                return ValidationResult.Error.InvalidFolder(e, projectFilename)
+            }
 
             // Determine name of project
             var projectName: String? = null
-            if (projectFilename.lastIndexOf("_") >= 0)
-                projectName = projectFilename.substring(projectFilename.lastIndexOf("_") + 1)
-            //Log.d(TAG, "deriving project name = $projectName")
+            val indexOfIdNameSeparator = projectFilename.lastIndexOf("_")
+            if (indexOfIdNameSeparator > 0)
+                projectName = projectFilename.substring(indexOfIdNameSeparator + 1)
 
             /* Ensure names do not contain reserved characters */
             if (projectName != null && FileUtils.pathContainsReservedCharacter(projectName))
@@ -70,7 +76,6 @@ object ProjectUtils {
     }
 
     /* Helper to scan through folders and import projects */
-    // Todo: Implement test for project import
     suspend fun importProjects(db: TimeLapseDatabase, externalFilesDir: File) {
 
         // Delete projects and tags in the database: should clear all tables by cascade

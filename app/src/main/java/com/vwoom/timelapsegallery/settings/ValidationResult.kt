@@ -15,6 +15,7 @@ sealed class ValidationResult<out T : Any> {
         class InvalidPhotoFileError(exception: Exception? = null,
                                     val photoUrl: String,
                                     val projectName: String?) : Error(exception)
+        class InvalidFolder(exception: Exception, val url: String): Error(exception)
     }
 
     object InProgress : ValidationResult<Nothing>()

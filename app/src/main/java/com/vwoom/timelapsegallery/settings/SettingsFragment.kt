@@ -226,9 +226,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         imageFeedback.setImageResource(R.drawable.ic_error_red_40dp)
         when(result){
-            is ValidationResult.InProgress -> {
-                responseView.text = requireContext().getString(R.string.waiting)
-            }
             is ValidationResult.Error.NoFilesError -> {
                 responseView.text = requireContext()
                         .getString(R.string.no_files_in_directory_error,
@@ -248,6 +245,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         .getString(R.string.invalid_photo_file_error,
                                 result.photoUrl,
                                 result.projectName)
+            }
+            is ValidationResult.Error.InvalidFolder -> {
+                responseView.text = getString(R.string.invalid_folder_error,
+                        result.url,
+                        result.exception?.localizedMessage)
             }
             is ValidationResult.Success -> {
                 imageFeedback.setImageResource(R.drawable.ic_check_green_40dp)
