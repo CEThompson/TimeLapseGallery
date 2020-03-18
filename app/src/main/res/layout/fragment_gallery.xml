@@ -56,10 +56,9 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_search_cancel_24dp"
             android:backgroundTint="@color/white"
-            app:fabSize="mini"
-            android:layout_gravity="top|end"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/appbar_layout"
+            app:fabSize="normal"
+            app:layout_constraintEnd_toStartOf="@id/add_project_FAB"
+            app:layout_constraintBottom_toBottomOf="parent"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
