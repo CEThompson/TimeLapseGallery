@@ -702,7 +702,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.projectTags.observe(viewLifecycleOwner, Observer { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 // Update project information dialog
-                mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
+                mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.text.toLowerCase(Locale.getDefault()) }
 
                 // Set the tags for the project tag dialog
                 setTagDialog()
@@ -723,7 +723,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
 
         detailViewModel.tags.observe(viewLifecycleOwner, Observer {tagEntries: List<TagEntry> ->
-            mAllTags = tagEntries.sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
+            mAllTags = tagEntries.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
             setTagDialog()
         })
     }
@@ -733,7 +733,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         var tagsText = ""
         for (tag in mProjectTags!!) {
             // Concatenate a string for non-interactive output
-            tagsText = tagsText.plus("#${tag.tag}  ")
+            tagsText = tagsText.plus("#${tag.text}  ")
         }
         val tagsTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
         if (tagsText.isEmpty()) tagsTextView?.text = getString(R.string.none)
@@ -778,13 +778,13 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
                 val textView: TextView = layoutInflater.inflate(R.layout.tag_text_view, availableTagsLayout, false) as TextView
 
-                textView.text = getString(R.string.hashtag, tagEntry.tag)
+                textView.text = getString(R.string.hashtag, tagEntry.text)
                 if (tagInProject) textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
                 else textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
 
                 // Set the textview to remove or add the tag depending on whether the tag is in the project
                 if (tagInProject) textView.setOnClickListener { detailViewModel.deleteTagFromProject(tagEntry, mCurrentProject!!) }
-                else textView.setOnClickListener { detailViewModel.addTag(tagEntry.tag, mCurrentProject!!) }
+                else textView.setOnClickListener { detailViewModel.addTag(tagEntry.text, mCurrentProject!!) }
 
 
                 // Set the textview to delete tag on long click

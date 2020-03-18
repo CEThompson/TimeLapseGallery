@@ -108,7 +108,7 @@ class ProjectUtilsImportTest {
             var tags = db.projectTagDao().getProjectTagsByProjectId(1)
             assert(tags.size==1)
             var tag = db.tagDao().getTagById(tags[0].tag_id)
-            assert(tag.tag == "c")
+            assert(tag.text == "c")
             var projectSchedule = db.projectScheduleDao().getProjectScheduleByProjectId(1)
             assert(projectSchedule?.interval_days == 1)
 
@@ -120,7 +120,7 @@ class ProjectUtilsImportTest {
             tags = db.projectTagDao().getProjectTagsByProjectId(3)
             assert(tags.size==1)
             tag = db.tagDao().getTagById(tags[0].tag_id)
-            assert(tag.tag=="d")
+            assert(tag.text=="d")
             projectSchedule = db.projectScheduleDao().getProjectScheduleByProjectId(3)
             assert(projectSchedule?.interval_days == 3)
 

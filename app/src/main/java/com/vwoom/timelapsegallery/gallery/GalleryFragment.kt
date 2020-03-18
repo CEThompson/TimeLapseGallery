@@ -283,7 +283,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Handle tag state
         var tags: List<TagEntry> = listOf()
         if (mGalleryViewModel.tags.value != null) {
-            tags = mGalleryViewModel.tags.value!!.sortedBy { it.tag.toLowerCase(Locale.getDefault()) }
+            tags = mGalleryViewModel.tags.value!!.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
         }
         // Clear the tag layout
         val tagLayout = mSearchDialog?.findViewById<FlexboxLayout>(R.id.dialog_search_tags_layout)
@@ -301,7 +301,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Create the tag views
         for (tag in tags) {
             val tagCheckBox = CheckBox(requireContext())
-            tagCheckBox.text = getString(R.string.hashtag, tag.tag)
+            tagCheckBox.text = getString(R.string.hashtag, tag.text)
             tagCheckBox.isChecked = mGalleryViewModel.tagSelected(tag)
             tagCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) mGalleryViewModel.searchTags.add(tag)

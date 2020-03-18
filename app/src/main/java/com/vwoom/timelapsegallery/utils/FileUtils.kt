@@ -249,7 +249,7 @@ object FileUtils {
         val outputStreamWriter = OutputStreamWriter(output)
 
         for (tag in tags) {
-            outputStreamWriter.write(tag.tag + "\n")
+            outputStreamWriter.write(tag.text + "\n")
         }
         outputStreamWriter.flush()
         output.fd.sync()

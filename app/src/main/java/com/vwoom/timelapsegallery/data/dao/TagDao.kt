@@ -15,7 +15,7 @@ interface TagDao {
     @Query("SELECT * FROM tag WHERE id = :id")
     suspend fun getTagById(id: Long): TagEntry
 
-    @Query("SELECT * FROM tag WHERE tag = :text")
+    @Query("SELECT * FROM tag WHERE text = :text")
     suspend fun getTagByText(text: String): TagEntry?
 
     @Insert
