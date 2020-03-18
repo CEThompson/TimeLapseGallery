@@ -11,7 +11,8 @@ import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.TimeUtils
 
 const val SEARCH_TYPE_NONE = "none"
-const val SEARCH_TYPE_DUE = "due"
+const val SEARCH_TYPE_DUE_TODAY = "due_today"
+const val SEARCH_TYPE_DUE_TOMORROW = "due_tomorrow"
 const val SEARCH_TYPE_PENDING = "pending"
 const val SEARCH_TYPE_SCHEDULED = "scheduled"
 const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
@@ -73,13 +74,22 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
                     return@filter false
                 }
             }
-            SEARCH_TYPE_DUE -> {
+            SEARCH_TYPE_DUE_TODAY -> {
                 resultProjects = resultProjects.filter {
                     if (it.interval_days == 0) return@filter false
                     val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(it.cover_photo_timestamp, System.currentTimeMillis())
                     val interval: Int = it.interval_days
                     val daysUntilDue = interval - daysSinceLastPhotoTaken
                     return@filter daysUntilDue <= 0
+                }
+            }
+            SEARCH_TYPE_DUE_TOMORROW -> {
+                resultProjects = resultProjects.filter {
+                    if (it.interval_days == 0) return@filter false
+                    val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(it.cover_photo_timestamp, System.currentTimeMillis())
+                    val interval: Int = it.interval_days
+                    val daysUntilDue = interval - daysSinceLastPhotoTaken
+                    return@filter daysUntilDue == 1.toLong()
                 }
             }
             SEARCH_TYPE_PENDING -> {

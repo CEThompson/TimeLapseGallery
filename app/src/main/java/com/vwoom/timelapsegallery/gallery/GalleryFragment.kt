@@ -142,7 +142,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Launch with search filter if set from the notification
         if (args.searchLaunchDue) {
-            mGalleryViewModel.searchType = SEARCH_TYPE_DUE
+            mGalleryViewModel.searchType = SEARCH_TYPE_DUE_TODAY
         }
 
         // Hide or show search cancel fab depending upon whether or not the user is searching
@@ -184,7 +184,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
-    // TODO add search option to search for projects due today!
     private fun initializeSearchDialog() {
         mSearchDialog = Dialog(requireContext())
         mSearchDialog?.setContentView(R.layout.dialog_search)
@@ -192,7 +191,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         val searchEditText = mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)
 
-        val dueCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_checkbox)
+        val dueTodayCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_today_checkbox)
+        val dueTomorrowCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_tomorrow_checkbox)
         val pendingCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_pending_checkbox)
         val scheduledCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)
         val unscheduledCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)
@@ -205,11 +205,17 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             updateSearchFilter()
         }
 
-        // TODO convert to radio button!
         // Handle search selection of scheduled / unscheduled projects
-        dueCheckBox?.setOnClickListener {
+        dueTodayCheckBox?.setOnClickListener {
             val checked = (it as CheckBox).isChecked
-            if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_DUE
+            if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_DUE_TODAY
+            else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
+            updateSearchByScheduleCheckboxes()
+            updateSearchFilter()
+        }
+        dueTomorrowCheckBox?.setOnClickListener {
+            val checked = (it as CheckBox).isChecked
+            if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_DUE_TOMORROW
             else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
             updateSearchByScheduleCheckboxes()
             updateSearchFilter()
@@ -316,11 +322,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     private fun updateSearchByScheduleCheckboxes() {
         // Update the state of search by schedule layout
-        val dueCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_checkbox)
+        val dueTodayCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_today_checkbox)
+        val dueTomorrowCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_tomorrow_checkbox)
         val pendingCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_pending_checkbox)
         val scheduledCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)
         val unscheduledCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)
-        dueCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_DUE
+        dueTodayCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_DUE_TODAY
+        dueTomorrowCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_DUE_TOMORROW
         pendingCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_PENDING
         scheduledCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_SCHEDULED
         unscheduledCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_UNSCHEDULED

@@ -11,43 +11,42 @@
         android:layout_margin="@dimen/medium"
         android:orientation="vertical">
 
-        <!-- search by name -->
-        <TextView
-            android:id="@+id/search_by_name_label"
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/search_due_today_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/by_name"
-            android:textStyle="italic"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            android:text="@string/due_today"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintEnd_toStartOf="@id/search_due_tomorrow_checkbox"/>
 
-        <EditText
-            android:id="@+id/search_edit_text"
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/search_due_tomorrow_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:hint="@string/project_name"
+            android:text="@string/due_tomorrow"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/search_due_today_checkbox"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search_by_name_label" />
+            app:layout_constraintHorizontal_bias="0.5"/>
+
 
         <!-- search by tag -->
         <TextView
             android:id="@+id/search_by_tag_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/large"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="32dp"
             android:text="@string/by_tag"
             android:textStyle="italic"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search_edit_text" />
+            app:layout_constraintTop_toBottomOf="@id/search_due_today_checkbox" />
 
         <!-- empty tags label -->
         <FrameLayout
@@ -55,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_by_tag_label">
 
@@ -64,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_margin="8dp"
+                android:layout_margin="@dimen/medium"
                 android:text="@string/no_projects_tagged"
                 android:textStyle="italic"
                 android:visibility="invisible" />
@@ -75,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/medium"
                 app:alignContent="stretch"
                 app:alignItems="stretch"
                 app:flexWrap="wrap">
@@ -96,10 +95,10 @@
             android:text="@string/by_schedule"
             android:textStyle="italic"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dialog_search_tags_layout_container"
-            tools:text="filter by schedule" />
+            tools:text="search by schedule" />
 
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/filter_by_schedule_layout"
@@ -110,17 +109,10 @@
             app:alignContent="stretch"
             app:alignItems="stretch"
             app:flexWrap="wrap"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_by_schedule_label">
-
-                <androidx.appcompat.widget.AppCompatCheckBox
-                    android:id="@+id/search_due_checkbox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/due" />
 
                 <androidx.appcompat.widget.AppCompatCheckBox
                     android:id="@+id/search_pending_checkbox"
@@ -141,5 +133,31 @@
                     android:text="@string/unscheduled" />
 
         </com.google.android.flexbox.FlexboxLayout>
+
+        <!-- search by name -->
+        <TextView
+            android:id="@+id/search_by_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/large"
+            android:text="@string/by_name"
+            android:textStyle="italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/filter_by_schedule_layout" />
+
+        <EditText
+            android:id="@+id/search_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:hint="@string/project_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/search_by_name_label"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
