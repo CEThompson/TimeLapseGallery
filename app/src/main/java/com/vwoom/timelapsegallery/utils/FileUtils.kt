@@ -238,7 +238,6 @@ object FileUtils {
         return arrayOf("$timestamp.jpg","$timestamp.png","$timestamp.jpeg")
     }
 
-    // TODO add tests for uncovered functions
     fun addTagToProject(externalFilesDir: File, project: Project, tags: List<TagEntry>?){
         if (tags == null) return // If no tags no need to write file
 

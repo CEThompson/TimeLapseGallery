@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.utils
 
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
@@ -352,12 +353,37 @@ class FileUtilsTest {
 
     @Test
     fun getMetaDirectoryForProject() {
-        // TODO implement me!
+        // given a project
+        val project = ProjectEntry(5, "test name")
+
+        // when we get the directory for the project
+        val metaDir = FileUtils.getMetaDirectoryForProject(externalFilesTestDir, project.id)
+
+        // Then
+        val absPath = metaDir.absolutePath
+        val relPath = absPath.substring(metaDir.absolutePath.lastIndexOf(File.separatorChar)+1)
+        println(metaDir.absolutePath)
+        println(relPath)
+        // the directory exists &&
+        assert(metaDir.exists())
+        // the subdirectory is equal to the project ID
+        assert(relPath == project.id.toString())
     }
 
     @Test
     fun addTagToProject() {
         // TODO implement me!
+        /*
+        // given a project
+        externalFilesTestDir.deleteRecursively()
+        val project = Project(1, null, 1, 1, 200)
+        val tags = listOf(TagEntry(1, "test one"), TagEntry(2, "test two"))
+
+        // when
+        FileUtils.addTagToProject(externalFilesTestDir, project, tags)
+
+        // then text file should
+         */
     }
 
     @Test
