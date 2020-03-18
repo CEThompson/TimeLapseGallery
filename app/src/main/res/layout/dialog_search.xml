@@ -1,52 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_margin="@dimen/medium"
         android:orientation="vertical">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/search_dialog_exit_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|top"
+            android:layout_margin="@dimen/medium"
+            android:src="@drawable/ic_clear_white_24dp"
+            app:backgroundTint="@color/colorSubtleRedAccent"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/search_due_today_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/due_today"
-            android:textStyle="bold"
             android:textSize="20sp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/search_dialog_exit_fab"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintEnd_toStartOf="@id/search_due_tomorrow_checkbox"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/search_dialog_exit_fab" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/search_due_tomorrow_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/due_tomorrow"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/search_due_today_checkbox"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"/>
-
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="@id/search_due_today_checkbox"
+            app:layout_constraintTop_toBottomOf="@id/search_due_today_checkbox" />
 
         <!-- search by tag -->
         <TextView
             android:id="@+id/search_by_tag_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/large"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/large"
             android:text="@string/by_tag"
             android:textStyle="italic"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search_due_today_checkbox" />
+            app:layout_constraintTop_toBottomOf="@id/search_due_tomorrow_checkbox" />
 
         <!-- empty tags label -->
         <FrameLayout
@@ -73,21 +85,22 @@
                 android:id="@+id/dialog_search_tags_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/medium"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/medium"
                 app:alignContent="stretch"
                 app:alignItems="stretch"
                 app:flexWrap="wrap">
                 <!-- Example checkbox for layout -->
                 <CheckBox
+                    tools:text="example checkbox"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="example checkbox" />
+                    android:layout_height="wrap_content" />
             </com.google.android.flexbox.FlexboxLayout>
         </FrameLayout>
 
         <TextView
             android:id="@+id/search_by_schedule_label"
+            tools:text="search by schedule"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -97,15 +110,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dialog_search_tags_layout_container"
-            tools:text="search by schedule" />
+            app:layout_constraintTop_toBottomOf="@id/dialog_search_tags_layout_container" />
 
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/filter_by_schedule_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/medium"
-            android:layout_marginBottom="@dimen/medium"
+            android:layout_margin="@dimen/medium"
             app:alignContent="stretch"
             app:alignItems="stretch"
             app:flexWrap="wrap"
@@ -114,23 +125,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_by_schedule_label">
 
-                <androidx.appcompat.widget.AppCompatCheckBox
-                    android:id="@+id/search_pending_checkbox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/pending" />
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/search_pending_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pending" />
 
-                <androidx.appcompat.widget.AppCompatCheckBox
-                    android:id="@+id/search_scheduled_checkbox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/scheduled" />
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/search_scheduled_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/scheduled" />
 
-                <androidx.appcompat.widget.AppCompatCheckBox
-                    android:id="@+id/search_unscheduled_checkbox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/unscheduled" />
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/search_unscheduled_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/unscheduled" />
 
         </com.google.android.flexbox.FlexboxLayout>
 
@@ -152,12 +163,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
+            android:layout_margin="@dimen/medium"
             android:hint="@string/project_name"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search_by_name_label"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@id/search_by_name_label" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

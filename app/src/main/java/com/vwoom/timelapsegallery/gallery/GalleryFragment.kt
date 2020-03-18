@@ -191,6 +191,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         val searchEditText = mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)
 
+        val dismissFab = mSearchDialog?.findViewById<FloatingActionButton>(R.id.search_dialog_exit_fab)
+        dismissFab?.setOnClickListener {
+            mGalleryViewModel.searchDialogShowing = false
+            mSearchDialog?.dismiss()
+        }
+
         val dueTodayCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_today_checkbox)
         val dueTomorrowCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_tomorrow_checkbox)
         val pendingCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_pending_checkbox)
