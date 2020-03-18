@@ -14,7 +14,7 @@ const val RESERVED_CHARACTERS = "|\\?*<\":>+[]/'"
 object FileUtils {
     private val TAG = FileUtils::class.java.simpleName
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
-    const val META_FILE_SUBDIRECTORY = "meta"
+    const val META_FILE_SUBDIRECTORY = "Meta"
     const val SCHEDULE_TEXT_FILE = "schedule.txt"
     const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
     private const val ERROR_TIMESTAMP_TO_PHOTO = "error retrieving photo from timestamp"
@@ -37,9 +37,11 @@ object FileUtils {
         return File(externalFilesDir, projectPath)
     }
 
-    fun getMetaDirectoryForProject(externalFilesDir: File, projectEntry: ProjectEntry): File{
-        val projectDir = getProjectFolder(externalFilesDir, projectEntry)
-        return File(projectDir, META_FILE_SUBDIRECTORY)
+    fun getMetaDirectoryForProject(externalFilesDir: File, projectId: Long): File{
+        val metaDir = File(externalFilesDir, META_FILE_SUBDIRECTORY)
+        val projectSubfolder = File(metaDir, projectId.toString())
+        projectSubfolder.mkdirs()
+        return projectSubfolder
     }
 
     // Creates a list of photo entries in a project folder sorted by timestamp
@@ -152,7 +154,11 @@ object FileUtils {
     fun deleteProject(externalFilesDir: File, projectEntry: ProjectEntry) {
         val projectDirectoryPath = getProjectDirectoryPath(projectEntry)
         val projectDirectory = File(externalFilesDir, projectDirectoryPath)
+        val metaProjectDirectory = getMetaDirectoryForProject(externalFilesDir, projectEntry.id)
+        // Delete the project photo files
         deleteRecursive(projectDirectory)
+        // Delete the metadata for the project
+        deleteRecursive(metaProjectDirectory)
     }
 
     // Deletes file referred to in photo entry by project view
@@ -236,10 +242,7 @@ object FileUtils {
     fun addTagToProject(externalFilesDir: File, project: Project, tags: List<TagEntry>?){
         if (tags == null) return // If no tags no need to write file
 
-        val projectDir = getProjectFolder(externalFilesDir, project)
-        val metaDir = File(projectDir, META_FILE_SUBDIRECTORY)
-
-        if (!metaDir.exists()) metaDir.mkdir()
+        val metaDir = getMetaDirectoryForProject(externalFilesDir, project.project_id)
 
         val tagsFile = File(metaDir, TAGS_DEFINITION_TEXT_FILE)
 
@@ -257,9 +260,7 @@ object FileUtils {
     }
 
     fun scheduleProject(externalFilesDir: File, project: Project, projectScheduleEntry: ProjectScheduleEntry){
-        val projectDir = getProjectFolder(externalFilesDir, project)
-        val metaDir = File(projectDir, META_FILE_SUBDIRECTORY)
-        if (!metaDir.exists()) metaDir.mkdir()
+        val metaDir = getMetaDirectoryForProject(externalFilesDir, project.project_id)
         val scheduleFile = File(metaDir, SCHEDULE_TEXT_FILE)
 
         // Remove the schedule text file if unscheduled

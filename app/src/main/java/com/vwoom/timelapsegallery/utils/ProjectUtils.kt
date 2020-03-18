@@ -85,7 +85,8 @@ object ProjectUtils {
             val filename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
 
             // Skip Temporary Images
-            if (filename == FileUtils.TEMP_FILE_SUBDIRECTORY) continue
+            if (filename == FileUtils.TEMP_FILE_SUBDIRECTORY
+                    || filename == FileUtils.META_FILE_SUBDIRECTORY) continue
 
             // Determine ID of project
             val id = if (filename.lastIndexOf("_") == -1) filename
@@ -140,7 +141,7 @@ object ProjectUtils {
     }
 
     private suspend fun importProjectMetaData(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry) {
-        val metaDir = FileUtils.getMetaDirectoryForProject(externalFilesDir, currentProject)
+        val metaDir = FileUtils.getMetaDirectoryForProject(externalFilesDir, currentProject.id)
         val tagsFile = File(metaDir, FileUtils.TAGS_DEFINITION_TEXT_FILE)
         val scheduleFile = File(metaDir, FileUtils.SCHEDULE_TEXT_FILE)
 
