@@ -2,19 +2,15 @@ package com.vwoom.timelapsegallery
 
 import android.os.Bundle
 import android.os.Environment
-import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.initialization.InitializationStatus
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener
 import com.vwoom.timelapsegallery.notification.NotificationUtils
-import com.vwoom.timelapsegallery.testing.SimpleIdlingResource
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 
 class TimeLapseGalleryActivity : AppCompatActivity() {
-
-    private lateinit var idlingResource: SimpleIdlingResource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,9 +28,4 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
         NotificationUtils.scheduleNotificationWorker(this)
     }
 
-    @VisibleForTesting
-    fun getIdlingResource(): SimpleIdlingResource {
-        if (!::idlingResource.isInitialized) idlingResource = SimpleIdlingResource()
-        return idlingResource
-    }
 }
