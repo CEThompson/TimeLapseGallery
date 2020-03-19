@@ -21,12 +21,6 @@ interface ProjectDao {
     suspend fun getScheduledProjects(): List<ProjectEntry>
 
     @Query("SELECT * FROM project " +
-            "INNER JOIN project_schedule " +
-            "ON project.id = project_schedule.project_id " +
-            "WHERE project_schedule.interval_days != 0")
-    fun getScheduledProjectsNonSuspend(): List<ProjectEntry>
-
-    @Query("SELECT * FROM project " +
             "WHERE project_name LIKE '%' || :search || '%'")
     suspend fun getProjectsByName(search: String): List<ProjectEntry>
 
@@ -48,7 +42,7 @@ interface ProjectDao {
     @Query("DELETE FROM project")
     suspend fun deleteAllProjects()
 
-    /* Returns a livedata object for observing projects view */
+    /* Returns a live data object for observing projects view */
     @Query("SELECT " +
             "project.id AS project_id, " +
             "project.project_name AS project_name, " +

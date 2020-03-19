@@ -20,6 +20,7 @@ import com.vwoom.timelapsegallery.utils.FileUtils.getPhotoUrl
 import com.vwoom.timelapsegallery.utils.PhotoUtils.decodeSampledBitmapFromPath
 import com.vwoom.timelapsegallery.utils.PhotoUtils.getOrientationFromImagePath
 import com.vwoom.timelapsegallery.utils.PhotoUtils.rotateBitmap
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.IOException
 
@@ -38,7 +39,7 @@ class WidgetGridRemoteViewsFactory(
 
     override fun onDataSetChanged() {
         // Load the projects for the day
-        mProjects = projectRepository.getScheduledProjectsNonSuspend()
+        mProjects = runBlocking { projectRepository.getScheduledProjects() }
     }
 
     override fun onDestroy() {}
