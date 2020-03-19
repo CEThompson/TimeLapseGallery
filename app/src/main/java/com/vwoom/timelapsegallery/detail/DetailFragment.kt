@@ -487,11 +487,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val editText = mTagDialog?.findViewById<EditText>(R.id.add_tag_dialog_edit_text)
         val addTagFab = mTagDialog?.findViewById<FloatingActionButton>(R.id.add_tag_fab)
         addTagFab?.setOnClickListener {
-            // TODO validate tags?
             val tagText = editText?.text.toString().trim()
-            if (tagText.isNotEmpty()) {
-                detailViewModel.addTag(tagText, mCurrentProject!!)
-                editText?.text?.clear()
+            when {
+                tagText.isEmpty() -> showTagValidationAlertDialog(getString(R.string.invalid_tag_empty))
+                tagText.contains(' ') -> showTagValidationAlertDialog(getString(R.string.invalid_tag_one_word))
+                tagText.length > 14 -> showTagValidationAlertDialog(getString(R.string.invalid_tag_length))
+                else -> {
+                    detailViewModel.addTag(tagText, mCurrentProject!!)
+                    editText?.text?.clear()
+                }
             }
         }
 
@@ -501,6 +505,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             detailViewModel.tagDialogShowing = false
         }
         setTagDialog()
+    }
+
+    private fun showTagValidationAlertDialog(message: String) {
+        AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.invalid_tag))
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok) { _, _: Int ->
+                }.show()
     }
 
     private fun initializeScheduleDialog(){
@@ -874,7 +887,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val input = EditText(requireContext())
         input.inputType = InputType.TYPE_CLASS_TEXT
         AlertDialog.Builder(requireContext())
-                .setTitle("Edit Name")
+                .setTitle(getString(R.string.edit_name))
                 .setView(input)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     val nameText = input.text.toString().trim()

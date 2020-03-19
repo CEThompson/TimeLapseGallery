@@ -95,11 +95,17 @@
 
     <!-- Dialog resources -->
     <string name="edit_tags"><u>edit tags</u></string>
+    <string name="edit_name">Edit Name</string>
     <string name="manage_tags">Manage tags</string>
     <string name="add_tag">Add Tag</string>
     <string name="delete">delete</string>
     <string name="project_id_label">Project ID:</string>
     <string name="new_tag_text">#newtag</string>
+    <string name="invalid_tag">Invalid Tag</string>
+    <string name="invalid_tag_empty">Tags must not be empty.</string>
+    <string name="invalid_tag_length">Tags must not be longer than 14 characters.</string>
+    <string name="invalid_tag_one_word">Tags must be one word.</string>
+
 
     <string name="hashtag">#%1$s</string>
 
