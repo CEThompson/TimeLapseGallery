@@ -706,7 +706,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
                 // Set the tags for the project tag dialog
                 setTagDialog()
-                var tagsText = setInfoTags()
+                val tagsText = setInfoTags()
 
                 // Update the tags in the project info card
                 if (mProjectTags!!.isEmpty()) {
@@ -745,8 +745,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         if (mInfoDialog == null) return
 
         // Set info dialog fields
-        val projectInfoDialogId = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_label)
-        projectInfoDialogId?.text = getString(R.string.project_id_label, mCurrentProject!!.project_id)
+        val projectInfoDialogId = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_field)
+        projectInfoDialogId?.text = mCurrentProject!!.project_id.toString()
         val projectInfoNameTv = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
         if (mCurrentProject?.project_name == null || mCurrentProject?.project_name!!.isEmpty()) {
             projectInfoNameTv?.text = getString(R.string.unnamed)
@@ -755,10 +755,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         if (mCurrentProject!!.interval_days == 0) {
             mInfoDialog?.findViewById<TextView>(R.id.info_dialog_schedule_description)?.text = getString(R.string.none)
         } else {
-            mInfoDialog?.findViewById<TextView>(R.id.info_dialog_schedule_description)?.text = getString(R.string.every_x_days, mCurrentProject!!.interval_days)
+            mInfoDialog?.findViewById<TextView>(R.id.info_dialog_schedule_description)?.text =
+                    getString(R.string.every_x_days, mCurrentProject!!.interval_days.toString())
         }
-
-        // TODO set project tags
     }
 
     private fun setTagDialog() {

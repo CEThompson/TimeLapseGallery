@@ -98,7 +98,7 @@
     <string name="manage_tags">Manage tags</string>
     <string name="add_tag">Add Tag</string>
     <string name="delete">delete</string>
-    <string name="project_id_label">Project ID: %1$d</string>
+    <string name="project_id_label">Project ID:</string>
     <string name="new_tag_text">#newtag</string>
 
     <string name="hashtag">#%1$s</string>
