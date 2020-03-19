@@ -17,6 +17,7 @@ import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.*
 import android.widget.*
+import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -81,6 +82,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mTagDialog: Dialog? = null
     private var mInfoDialog: Dialog? = null
     private var mScheduleDialog: Dialog? = null
+
+    private var toolbar: Toolbar? = null
 
     // For playing timelapse
     private var mPlaying = false
@@ -169,6 +172,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mInfoDialog = null
         mFullscreenImageDialog = null
         mDetailAdapter = null
+        toolbar = null
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -178,7 +182,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // Set up toolbar
         setHasOptionsMenu(true)
-        val toolbar = binding?.detailsFragmentToolbar
+        toolbar = binding?.detailsFragmentToolbar
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar?.title = getString(R.string.project_details)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -200,8 +204,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // 2. Set the click listeners
         binding?.addPhotoFab?.setOnClickListener {
-            // TODO: Determine if there is a better way to handle leaking toolbar references
-            (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
             val action = DetailFragmentDirections
                     .actionDetailsFragmentToCamera2Fragment(detailViewModel.lastPhoto, mCurrentProject)
             findNavController().navigate(action)
