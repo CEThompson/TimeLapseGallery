@@ -6,6 +6,6 @@ import com.vwoom.timelapsegallery.utils.InjectorUtils
 
 class WidgetGridRemoteViewsService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return InjectorUtils.provideWidgetGridRemoteViewsFactory(this.applicationContext, intent)
+        return InjectorUtils.provideWidgetGridRemoteViewsFactory(this.applicationContext)
     }
 }

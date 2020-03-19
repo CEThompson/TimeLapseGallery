@@ -102,9 +102,8 @@ object InjectorUtils {
         return SettingsViewModelFactory()
     }
 
-    fun provideWidgetGridRemoteViewsFactory(context: Context, intent: Intent): WidgetGridRemoteViewsFactory {
+    fun provideWidgetGridRemoteViewsFactory(context: Context): WidgetGridRemoteViewsFactory {
         val projectRepository = getProjectRepository(context)
-        val projectScheduleRepository = getProjectScheduleRepository(context)
         val coverPhotoRepository = getCoverPhotoRepository(context)
         val photoRepository = getPhotoRepository(context)
         return WidgetGridRemoteViewsFactory(
