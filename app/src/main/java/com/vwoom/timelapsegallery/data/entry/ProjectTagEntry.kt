@@ -2,7 +2,6 @@ package com.vwoom.timelapsegallery.data.entry
 
 import androidx.room.*
 
-// TODO verify cascade deletion works appropriately
 @Entity(tableName = "project_tag",
         foreignKeys = [
         ForeignKey(entity = ProjectEntry::class,
