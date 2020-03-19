@@ -27,4 +27,5 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
         UpdateWidgetService.startActionUpdateWidgets(this)
         NotificationUtils.scheduleNotificationWorker(this)
     }
+
 }

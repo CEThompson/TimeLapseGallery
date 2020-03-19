@@ -18,17 +18,17 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
-import com.vwoom.timelapsegallery.camera2.Camera2ViewModel
+import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 
@@ -53,7 +53,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val args: Camera2FragmentArgs by navArgs()
 
-    private val cameraViewModel: Camera2ViewModel by viewModels {
+    private val camera2ViewModel: Camera2ViewModel by viewModels {
         InjectorUtils.provideCamera2ViewModelFactory(requireActivity(), args.photo, args.project)
     }
 
@@ -61,8 +61,10 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private var cameraCaptureSession: CameraCaptureSession? = null
     private var cameraDevice: CameraDevice? = null
-    private var cameraThread: HandlerThread? = null
-    private var cameraHandler: Handler? = null
+
+    private val cameraThread = HandlerThread("CameraThread").apply { start() }
+    private val cameraHandler: Handler = Handler(cameraThread.looper)
+
     private var captureRequestBuilder: CaptureRequest.Builder? = null
 
     private var previewSize: Size? = null
@@ -71,14 +73,11 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
             setupCamera()
         }
-
         override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
         }
-
         override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
             return false
         }
-
         override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
         }
     }
@@ -88,12 +87,10 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
             cameraDevice = camera
             createPreviewSession()
         }
-
         override fun onDisconnected(camera: CameraDevice) {
             camera.close()
             cameraDevice = null
         }
-
         override fun onError(camera: CameraDevice, error: Int) {
             camera.close()
             cameraDevice = null
@@ -111,8 +108,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         setTakePictureFab() // Set take photo function
 
         // Loads the last photo from a project into the compare view if available
-        if (cameraViewModel.photo != null) {
-            val file = File(cameraViewModel.photo?.photo_url!!)
+        if (camera2ViewModel.photo != null) {
+            val file = File(camera2ViewModel.photo?.photo_url!!)
             Glide.with(requireContext())
                     .load(file).into(binding.previousPhoto)
         }
@@ -150,14 +147,17 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         } else {
             requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
-
     }
 
     override fun onStop() {
         super.onStop()
         takePictureJob?.cancel()
         closeCamera()
-        closeBackgroundThread()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraThread.quitSafely()
     }
 
     private fun closeCamera() {
@@ -167,20 +167,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         cameraDevice = null
     }
 
-    private fun closeBackgroundThread() {
-        cameraThread?.quitSafely()
-        cameraThread = null
-        cameraHandler = null
-    }
-
-    private fun openBackGroundThread() {
-        cameraThread = HandlerThread("camera_handler")
-        cameraThread?.start()
-        cameraHandler = Handler(cameraThread!!.looper)
-    }
-
-    private fun setupCamera() {
-        openBackGroundThread()
+    private fun setupCamera() = lifecycleScope.launchIdling {
         lateinit var cameraIdToSet: String
         try {
             for (cameraId in cameraManager.cameraIdList) {
@@ -208,14 +195,14 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         @Suppress("ClickableViewAccessibility")
         if (cameraCharacteristics != null
             && captureRequestBuilder != null
-            && cameraCaptureSession != null
-            && cameraHandler != null)
+            && cameraCaptureSession != null)
         {
+            Log.d(TAG, "setting up tap to focus")
             camera2Preview.setOnTouchListener(CameraFocusOnTouchHandler(
                     cameraCharacteristics!!,
                     captureRequestBuilder!!,
                     cameraCaptureSession!!,
-                    cameraHandler!!))
+                    cameraHandler))
         }
     }
 
@@ -228,8 +215,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 outputPhoto = FileOutputStream(file)
                 camera2Preview.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
 
-                takePictureJob = cameraViewModel.viewModelScope.launch {
-                    cameraViewModel.handleFile(file, externalFilesDir)
+                takePictureJob = camera2ViewModel.viewModelScope.launchIdling {
+                    camera2ViewModel.handleFile(file, externalFilesDir)
                     findNavController().popBackStack()
                 }
             } catch(e: Exception) {
