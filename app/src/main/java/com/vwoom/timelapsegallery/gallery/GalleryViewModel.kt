@@ -45,6 +45,7 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
                 val projectTags: List<ProjectTagEntry> = projectTagRepository.getProjectTags_nonLiveData(it.project_id)
                 val tagEntriesForProject: List<TagEntry> = tagRepository.getTagsFromProjectTags(projectTags)
 
+                // Include projects with tags included in the search filter
                 for (tag in searchTags)
                     if (tagEntriesForProject.contains(tag)) return@filter true
 
@@ -60,49 +61,44 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
             }
         }
 
-        // TODO simplify search
         when(searchType) {
             SEARCH_TYPE_SCHEDULED -> {
                 resultProjects = resultProjects.filter {
-                    if (it.interval_days == 0) return@filter false
-                    return@filter true
+                    return@filter it.interval_days > 0
                 }
             }
             SEARCH_TYPE_UNSCHEDULED -> {
                 resultProjects = resultProjects.filter {
-                    if (it.interval_days == 0) return@filter true
-                    return@filter false
+                    return@filter it.interval_days == 0
                 }
             }
             SEARCH_TYPE_DUE_TODAY -> {
                 resultProjects = resultProjects.filter {
                     if (it.interval_days == 0) return@filter false
-                    val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(it.cover_photo_timestamp, System.currentTimeMillis())
-                    val interval: Int = it.interval_days
-                    val daysUntilDue = interval - daysSinceLastPhotoTaken
-                    return@filter daysUntilDue <= 0
+                    return@filter daysUntilDue(it) <= 0
                 }
             }
             SEARCH_TYPE_DUE_TOMORROW -> {
                 resultProjects = resultProjects.filter {
                     if (it.interval_days == 0) return@filter false
-                    val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(it.cover_photo_timestamp, System.currentTimeMillis())
-                    val interval: Int = it.interval_days
-                    val daysUntilDue = interval - daysSinceLastPhotoTaken
-                    return@filter daysUntilDue == 1.toLong()
+                    return@filter daysUntilDue(it) == 1.toLong()
                 }
             }
             SEARCH_TYPE_PENDING -> {
                 resultProjects = resultProjects.filter {
                     if (it.interval_days == 0) return@filter false
-                    val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(it.cover_photo_timestamp, System.currentTimeMillis())
-                    val interval: Int = it.interval_days
-                    val daysUntilDue = interval - daysSinceLastPhotoTaken
-                    return@filter daysUntilDue > 0
+                    return@filter daysUntilDue(it) > 0
                 }
+                resultProjects = resultProjects.sortedBy { daysUntilDue(it) } // show projects due earlier first
             }
         }
         return resultProjects
+    }
+
+    private fun daysUntilDue(project: Project): Long {
+        val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
+        val interval: Int = project.interval_days
+        return interval - daysSinceLastPhotoTaken
     }
 
     companion object {
