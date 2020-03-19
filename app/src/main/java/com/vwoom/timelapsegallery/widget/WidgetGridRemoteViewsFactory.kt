@@ -26,9 +26,7 @@ import java.io.IOException
 
 class WidgetGridRemoteViewsFactory(
         private val mContext: Context,
-        intent: Intent?,
         private val projectRepository: ProjectRepository,
-        private val projectScheduleRepository: ProjectScheduleRepository,
         private val coverPhotoRepository: CoverPhotoRepository,
         private val photoRepository: PhotoRepository) : RemoteViewsFactory {
 
@@ -71,8 +69,8 @@ class WidgetGridRemoteViewsFactory(
         views.setImageViewBitmap(R.id.widget_grid_item_image_view, bitmap)
         // Send the project in an intent
         val extras = Bundle()
-        // TODO determine what to pass here so that clicking widget takes user to project
-        // TODO determine how this is different from usage in widget provider
+
+        // TODO: determine what I want to do with this dang widget!
         //extras.putParcelable(Keys.PROJECT, currentProject);
         val fillInIntent = Intent()
         fillInIntent.putExtras(extras)

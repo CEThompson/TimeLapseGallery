@@ -108,9 +108,7 @@ object InjectorUtils {
         val coverPhotoRepository = getCoverPhotoRepository(context)
         val photoRepository = getPhotoRepository(context)
         return WidgetGridRemoteViewsFactory(
-                context,
-                intent, projectRepository,
-                projectScheduleRepository,
+                context, projectRepository,
                 coverPhotoRepository,
                 photoRepository)
     }

@@ -5,8 +5,10 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
+import androidx.navigation.NavDeepLinkBuilder
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
@@ -50,11 +52,22 @@ class WidgetProvider : AppWidgetProvider() {
             views.setRemoteAdapter(R.id.widget_grid_view, adapterIntent)
 
 
-            // TODO launch gallery filtered by schedule on clicking widget
-            // TODO simplify widget to a simple preview of scheduled projects
-            val appIntent = Intent(context, TimeLapseGalleryActivity::class.java)
-            val appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-            views.setPendingIntentTemplate(R.id.widget_grid_view, appPendingIntent)
+            // TODO: Lock down widget!
+            //val appIntent = Intent(context, TimeLapseGalleryActivity::class.java)
+
+            // Create the nav pending intent
+            val bundle = Bundle()
+            bundle.putBoolean(context.getString(R.string.search_launch_due), true)
+            // Create the pending intent to nav to the gallery with the argument
+            val pendingIntent = NavDeepLinkBuilder(context)
+                    .setComponentName(TimeLapseGalleryActivity::class.java)
+                    .setGraph(R.navigation.nav_graph)
+                    .setDestination(R.id.galleryFragment)
+                    .setArguments(bundle)
+                    .createPendingIntent()
+
+            //val appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT)//
+            views.setPendingIntentTemplate(R.id.widget_grid_view, pendingIntent)
             return views
         }
     }
