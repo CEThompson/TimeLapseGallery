@@ -16,12 +16,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|top"
-            android:layout_margin="@dimen/medium"
+            android:layout_margin="@dimen/small"
             android:src="@drawable/ic_clear_white_24dp"
             app:backgroundTint="@color/colorSubtleRedAccent"
             app:fabSize="mini"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
+
+        <!-- search by due -->
+        <TextView
+            android:id="@+id/search_by_due_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/medium"
+            android:text="@string/by_due"
+            android:textStyle="italic"
+            app:layout_constraintEnd_toStartOf="@id/search_dialog_exit_fab"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/search_due_today_checkbox"
@@ -31,18 +45,20 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/search_dialog_exit_fab"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/search_dialog_exit_fab" />
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/search_by_due_label"
+            app:layout_constraintTop_toBottomOf="@id/search_by_due_label" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/search_due_tomorrow_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/due_tomorrow"
-            android:textSize="16sp"
-            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="@color/grey"
+            android:textStyle="italic|bold"
             app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintEnd_toStartOf="@id/search_dialog_exit_fab"
             app:layout_constraintStart_toStartOf="@id/search_due_today_checkbox"
             app:layout_constraintTop_toBottomOf="@id/search_due_today_checkbox" />
 
@@ -52,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/large"
+            android:layout_marginTop="@dimen/medium"
             android:text="@string/by_tag"
             android:textStyle="italic"
             app:layout_constraintEnd_toEndOf="parent"
@@ -104,7 +120,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="@dimen/medium"
             android:text="@string/by_schedule"
             android:textStyle="italic"
             app:layout_constraintEnd_toEndOf="parent"
