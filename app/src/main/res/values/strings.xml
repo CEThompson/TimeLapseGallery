@@ -11,7 +11,7 @@
     <string name="tags_for_project">Tags for project %1$s</string>
     <string name="schedule_label">Schedule: </string>
     <string name="tags_label">Tags: </string>
-    <string name="project_name_label">Project Name: </string>
+    <string name="project_name_label">Name: </string>
 
     <string name="by_name">by name:</string>
     <string name="by_tag">by tag:</string>
@@ -98,8 +98,7 @@
     <string name="manage_tags">Manage tags</string>
     <string name="add_tag">Add Tag</string>
     <string name="delete">delete</string>
-    <string name="project_information">Project Information</string>
-    <string name="project_id_label">Id: %1$d</string>
+    <string name="project_id_label">Project ID: %1$d</string>
     <string name="new_tag_text">#newtag</string>
 
     <string name="hashtag">#%1$s</string>
@@ -113,6 +112,7 @@
     <string name="details_photo_number_out_of" translatable="false">%1$d / %2$d</string>
     <string name="today">Today</string>
     <string name="scheduled">Scheduled</string>
+    <string name="every_x_days">Every %1$s day(s)</string>
     <string name="due">Due</string>
     <string name="due_today">Due Today</string>
     <string name="due_tomorrow">Due Tomorrow</string>

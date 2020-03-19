@@ -468,7 +468,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mInfoDialog?.setContentView(R.layout.dialog_project_information)
         mInfoDialog?.setOnCancelListener { detailViewModel.infoDialogShowing = false }
         // Get Views
-        val editNameButton = mInfoDialog?.findViewById<ImageView>(R.id.edit_project_name_button)
+        val editNameButton = mInfoDialog?.findViewById<ImageButton>(R.id.edit_project_name_button)
         // Set fab colors
         editNameButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
         editNameButton?.setOnClickListener { editName() }
@@ -753,9 +753,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         } else projectInfoNameTv?.text = mCurrentProject!!.project_name
 
         if (mCurrentProject!!.interval_days == 0) {
-            mInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.none)
+            mInfoDialog?.findViewById<TextView>(R.id.info_dialog_schedule_description)?.text = getString(R.string.none)
         } else {
-            mInfoDialog?.findViewById<TextView>(R.id.dialog_edit_schedule_textview_description)?.text = getString(R.string.scheduled)
+            mInfoDialog?.findViewById<TextView>(R.id.info_dialog_schedule_description)?.text = getString(R.string.every_x_days, mCurrentProject!!.interval_days)
         }
 
         // TODO set project tags
