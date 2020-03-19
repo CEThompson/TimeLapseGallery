@@ -62,22 +62,22 @@ class EndToEndTest {
         val externalFilesDir = mContext?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         onView(withId(R.id.add_project_FAB)).perform(click())
 
-        sleep(1000)
+        //sleep(1000)
 
         onView(withId(R.id.take_picture_fab)).perform(click())
 
-        sleep(2000)
+        //sleep(2000)
 
         onView(withId(R.id.gallery_recycler_view)).perform(
                 RecyclerViewActions.actionOnItemAtPosition<GalleryAdapter.GalleryAdapterViewHolder>(0, click()))
 
         onView(withId(R.id.add_photo_fab)).perform(click())
 
-        sleep(1000)
+        //sleep(1000)
 
         onView(withId(R.id.take_picture_fab)).perform(click())
 
-        sleep(2000)
+        //sleep(2000)
 
         var itemCount = mTimeLapseGalleryActivityTestRule.activity
                 .findViewById<RecyclerView>(R.id.details_recyclerview).adapter?.itemCount
