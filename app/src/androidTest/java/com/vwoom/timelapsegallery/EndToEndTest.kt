@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions
@@ -23,15 +25,15 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
 import com.google.firebase.annotations.PublicApi
 import com.vwoom.timelapsegallery.gallery.GalleryAdapter
+import com.vwoom.timelapsegallery.testing.SimpleIdlingResource
 import com.vwoom.timelapsegallery.utils.FileUtils.createTemporaryImageFile
-import org.junit.Assert
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -55,29 +57,46 @@ class EndToEndTest {
     // bypasses permission
     @get:Rule var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA)
 
+    /*lateinit var idlingResource: SimpleIdlingResource
+
+    @Before
+    fun setUp(){
+        idlingResource = mTimeLapseGalleryActivityTestRule.activity.getIdlingResource()
+        IdlingRegistry.getInstance().register(idlingResource)
+    }
+
+    @After
+    fun cleanUp(){
+        IdlingRegistry.getInstance().unregister(idlingResource)
+    }*/
+
     // TODO refactor end to end for navigation flow
     @Test
     fun endToEndTest() {
-        mContext = mTimeLapseGalleryActivityTestRule.activity
-        val externalFilesDir = mContext?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        //mContext = mTimeLapseGalleryActivityTestRule.activity
+        //val externalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         onView(withId(R.id.add_project_FAB)).perform(click())
 
-        sleep(1000)
+        // TODO convert to using idling resource
+        //sleep(1000)
 
         onView(withId(R.id.take_picture_fab)).perform(click())
 
-        sleep(2000)
+        // TODO convert to using idling resource
+        //sleep(2000)
 
         onView(withId(R.id.gallery_recycler_view)).perform(
                 RecyclerViewActions.actionOnItemAtPosition<GalleryAdapter.GalleryAdapterViewHolder>(0, click()))
 
         onView(withId(R.id.add_photo_fab)).perform(click())
 
-        sleep(1000)
+        // TODO convert to using idling resource
+        //sleep(1000)
 
         onView(withId(R.id.take_picture_fab)).perform(click())
 
-        sleep(2000)
+        // TODO convert to using idling resource
+        //sleep(2000)
 
         var itemCount = mTimeLapseGalleryActivityTestRule.activity
                 .findViewById<RecyclerView>(R.id.details_recyclerview).adapter?.itemCount
