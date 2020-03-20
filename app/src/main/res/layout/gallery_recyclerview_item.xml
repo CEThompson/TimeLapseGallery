@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/project_card_view"
@@ -30,80 +29,9 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
-            <!-- Layout containing schedule information -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/schedule_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="60dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <!-- Gradient for schedule type display -->
-                <ImageView
-                    android:id="@+id/gallery_gradient_top_down"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:src="@drawable/gradient_overlay_top_down"
-                    />
-                <FrameLayout
-                    android:id="@+id/schedule_icon_container"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-                    <!-- clock showing if the project has been scheduled and if its due -->
-                    <ImageView
-                        android:id="@+id/schedule_icon_due"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/schedule_indicator_content_description"
-                        android:src="@drawable/ic_schedule_indicator_due_24dp"
-                        android:visibility="invisible" />
-                    <!-- clock showing if the project has been scheduled and if its pending -->
-                    <ImageView
-                        android:id="@+id/schedule_icon_pending"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/schedule_indicator_content_description"
-                        android:src="@drawable/ic_schedule_indicator_pending_24dp"
-                        android:visibility="invisible" />
-                </FrameLayout>
-                <TextView
-                    android:id="@+id/gallery_item_schedule_indicator_days"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    app:layout_constraintStart_toEndOf="@id/schedule_icon_container"
-                    app:layout_constraintTop_toTopOf="parent"
-                    />
-
-                <LinearLayout
-                    android:id="@+id/days_until_due_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
-                    <TextView
-                        android:id="@+id/days_until_due_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:layout_marginStart="@dimen/small"
-                        android:layout_marginBottom="@dimen/small"
-                        android:layout_marginEnd="2dp"
-                        />
-                    <ImageView
-                        android:layout_marginBottom="2dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_wb_sunny_white_24dp"/>
-                </LinearLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <include
+                android:id="@+id/gallery_schedule_layout"
+                layout="@layout/schedule_layout" />
 
             <!-- Layout showing a check if a photo is taken today -->
             <FrameLayout

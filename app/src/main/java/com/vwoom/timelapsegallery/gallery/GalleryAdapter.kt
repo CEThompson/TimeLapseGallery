@@ -3,8 +3,7 @@ package com.vwoom.timelapsegallery.gallery
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.cardview.widget.CardView
@@ -69,20 +68,20 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         constraintSet.setDimensionRatio(holder.binding.projectImage.id, ratio)
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
-        val projectIsScheduled = (project.interval_days != 0)
-        if (projectIsScheduled){
-            setScheduleInformation(project, holder, project.interval_days)
-            holder.binding.scheduleLayout.visibility = VISIBLE
-        } else {
-            holder.binding.scheduleLayout.visibility = INVISIBLE
-        }
-
         // Handle Check Display
         val photoTakenToday = DateUtils.isToday(project.cover_photo_timestamp)
         if (photoTakenToday) {
             holder.binding.galleryCheckLayout.visibility = VISIBLE
         } else {
             holder.binding.galleryCheckLayout.visibility = INVISIBLE
+        }
+
+        val projectIsScheduled = (project.interval_days != 0)
+        if (projectIsScheduled){
+            setScheduleInformation(project, holder, project.interval_days)
+            holder.binding.galleryScheduleLayout.scheduleLayout.visibility = VISIBLE
+        } else {
+            holder.binding.galleryScheduleLayout.scheduleLayout.visibility = INVISIBLE
         }
 
         // Set transition targets
@@ -123,19 +122,21 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         // Calc the days until project is due
         val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
         val daysUntilDue = project.interval_days - daysSinceLastPhoto
-        holder.binding.daysUntilDueTextView.text = daysUntilDue.toString() // set days until due text
-        holder.binding.galleryItemScheduleIndicatorDays.text = interval_days.toString() // set schedule interval
+        holder.binding.galleryScheduleLayout.daysUntilDueTextView.text = daysUntilDue.toString() // set days until due text
+        holder.binding.galleryScheduleLayout.galleryItemScheduleIndicatorDays.text = interval_days.toString() // set schedule interval
         // Style depending upon due state
         if (daysUntilDue <= 0) {
-            holder.binding.daysUntilDueTextView
+            holder.binding.galleryScheduleLayout.daysUntilDueTextView
                     .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.colorSubtleRedAccent))
-            holder.binding.scheduleIconDue.visibility = VISIBLE
-            holder.binding.scheduleIconPending.visibility = INVISIBLE
+            holder.binding.galleryScheduleLayout.scheduleIconDue.visibility = VISIBLE
+            holder.binding.galleryScheduleLayout.scheduleIconPending.visibility = INVISIBLE
+            holder.binding.galleryScheduleLayout.dueSunIndicator.visibility = VISIBLE
         } else {
-            holder.binding.daysUntilDueTextView
-                    .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.colorGreen))
-            holder.binding.scheduleIconDue.visibility = INVISIBLE
-            holder.binding.scheduleIconPending.visibility = VISIBLE
+            holder.binding.galleryScheduleLayout.daysUntilDueTextView
+                    .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.white))
+            holder.binding.galleryScheduleLayout.scheduleIconDue.visibility = INVISIBLE
+            holder.binding.galleryScheduleLayout.scheduleIconPending.visibility = VISIBLE
+            holder.binding.galleryScheduleLayout.dueSunIndicator.visibility = GONE
         }
     }
 
