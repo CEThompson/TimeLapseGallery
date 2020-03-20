@@ -814,7 +814,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     // TODO find a way to get rid of all this terrible boiler plate
-    fun setScheduleInformation(){
+    private fun setScheduleInformation(){
         // TODO update time interval display
         // TODO update dialog
         if (mScheduleDialog == null) return
