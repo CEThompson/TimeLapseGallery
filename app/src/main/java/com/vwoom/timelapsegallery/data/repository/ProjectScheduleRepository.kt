@@ -22,6 +22,6 @@ class ProjectScheduleRepository private constructor(private val projectScheduleD
         projectScheduleDao.insertProjectSchedule(projectScheduleEntry)
 
         // Handle the file representation of the schedule
-        FileUtils.scheduleProject(externalFilesDir, project, projectScheduleEntry)
+        FileUtils.scheduleProject(externalFilesDir, project.project_id, projectScheduleEntry)
     }
 }

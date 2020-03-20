@@ -2,6 +2,8 @@ package com.vwoom.timelapsegallery.utils
 
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.entry.TagEntry
+import com.vwoom.timelapsegallery.data.view.Project
 import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
 import org.hamcrest.CoreMatchers.`is`
@@ -261,27 +263,6 @@ class FileUtilsTest {
         assert(metaDir.exists())
         // the relative path is equal to the project ID (ex. "meta/5")
         assert(relPath == project.id.toString())
-    }
-
-    // TODO implement add tag to project test
-    @Test
-    fun addTagToProject() {
-        /*
-        // given a project
-        externalFilesTestDir.deleteRecursively()
-        val project = Project(1, null, 1, 1, 200)
-        val tags = listOf(TagEntry(1, "test one"), TagEntry(2, "test two"))
-
-        // when
-        FileUtils.addTagToProject(externalFilesTestDir, project, tags)
-
-        // then text file should
-         */
-    }
-
-    // TODO implement schedule project test
-    @Test
-    fun scheduleProject(){
     }
 
     companion object {

@@ -72,10 +72,10 @@ class ProjectUtilsImportTest {
         val projectOneDefinition = Project(1,"test",0,1,300)
         FileUtils.addTagToProject(
                 externalFilesTestDir,
-                projectOneDefinition,
+                projectOneDefinition.project_id,
                 listOf(TagEntry(1, "c")))
         FileUtils.scheduleProject(externalFilesTestDir,
-                projectOneDefinition,
+                projectOneDefinition.project_id,
                 ProjectScheduleEntry(1,1))
 
         // Create files for actual project 2
@@ -88,10 +88,10 @@ class ProjectUtilsImportTest {
         val projectTwoDefinition = Project(3,"test two",0,2,400)
         FileUtils.addTagToProject(
                 externalFilesTestDir,
-                projectTwoDefinition,
+                projectTwoDefinition.project_id,
                 listOf(TagEntry(2, "d")))
         FileUtils.scheduleProject(externalFilesTestDir,
-                projectTwoDefinition,
+                projectTwoDefinition.project_id,
                 ProjectScheduleEntry(3,3))
 
         // When: Projects are imported

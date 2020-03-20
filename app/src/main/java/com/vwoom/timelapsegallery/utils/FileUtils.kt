@@ -197,11 +197,8 @@ object FileUtils {
         return arrayOf("$timestamp.jpg","$timestamp.png","$timestamp.jpeg")
     }
 
-    fun addTagToProject(externalFilesDir: File, project: Project, tags: List<TagEntry>?){
-        if (tags == null) return // If no tags no need to write file
-
-        val metaDir = getMetaDirectoryForProject(externalFilesDir, project.project_id)
-
+    fun addTagToProject(externalFilesDir: File, projectId: Long, tags: List<TagEntry>){
+        val metaDir = getMetaDirectoryForProject(externalFilesDir, projectId)
         val tagsFile = File(metaDir, TAGS_DEFINITION_TEXT_FILE)
 
         // Write the tags to a text file
@@ -220,29 +217,21 @@ object FileUtils {
         }
     }
 
-    fun scheduleProject(externalFilesDir: File, project: Project, projectScheduleEntry: ProjectScheduleEntry){
-        val metaDir = getMetaDirectoryForProject(externalFilesDir, project.project_id)
+    fun scheduleProject(externalFilesDir: File, projectId: Long, projectScheduleEntry: ProjectScheduleEntry){
+        val metaDir = getMetaDirectoryForProject(externalFilesDir, projectId)
         val scheduleFile = File(metaDir, SCHEDULE_TEXT_FILE)
 
-        // Remove the schedule text file if unscheduled
-        if (projectScheduleEntry.interval_days == 0){
-            scheduleFile.delete()
-            Log.d(TAG, "deleting schedule file")
-        }
-        // Otherwise add it
-        else {
-            Log.d(TAG, "writing schedule file")
-            // TODO: determine how to handle output stream writer exceptions
-            try {
-                val output = FileOutputStream(scheduleFile)
-                val outputStreamWriter = OutputStreamWriter(output)
-                outputStreamWriter.write(projectScheduleEntry.interval_days.toString())
-                outputStreamWriter.flush()
-                output.fd.sync()
-                outputStreamWriter.close()
-            } catch (exception: IOException) {
-                Log.e(TAG, "error writing schedule to text file: ${exception.message}")
-            }
+        Log.d(TAG, "writing schedule file")
+        // TODO: determine how to handle output stream writer exceptions
+        try {
+            val output = FileOutputStream(scheduleFile)
+            val outputStreamWriter = OutputStreamWriter(output)
+            outputStreamWriter.write(projectScheduleEntry.interval_days.toString())
+            outputStreamWriter.flush()
+            output.fd.sync()
+            outputStreamWriter.close()
+        } catch (exception: IOException) {
+            Log.e(TAG, "error writing schedule to text file: ${exception.message}")
         }
     }
 }

@@ -743,7 +743,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     binding?.projectInformationLayout?.detailsProjectTagsTextview?.visibility = VISIBLE
                 }
 
-                FileUtils.addTagToProject(mExternalFilesDir!!, mCurrentProject!!, mProjectTags)
+                FileUtils.addTagToProject(mExternalFilesDir!!, mCurrentProject!!.project_id, mProjectTags!!)
             }
         })
 
