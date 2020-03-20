@@ -42,7 +42,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mGalleryAdapter: GalleryAdapter? = null
     private var mGridLayoutManager: StaggeredGridLayoutManager? = null
 
-    private var tagJob: Job? = null
+    private var searchJob: Job? = null
 
     private val args: GalleryFragmentArgs by navArgs()
 
@@ -65,7 +65,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onStop() {
         super.onStop()
-        tagJob?.cancel()
+        searchJob?.cancel()
     }
 
     override fun onDestroyView() {
@@ -219,35 +219,35 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             val checked = (it as CheckBox).isChecked
             if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_DUE_TODAY
             else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-            updateSearchByScheduleCheckboxes()
+            updateSearchDialogCheckboxes()
             updateSearchFilter()
         }
         dueTomorrowCheckBox?.setOnClickListener {
             val checked = (it as CheckBox).isChecked
             if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_DUE_TOMORROW
             else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-            updateSearchByScheduleCheckboxes()
+            updateSearchDialogCheckboxes()
             updateSearchFilter()
         }
         pendingCheckBox?.setOnClickListener {
             val checked = (it as CheckBox).isChecked
             if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_PENDING
             else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-            updateSearchByScheduleCheckboxes()
+            updateSearchDialogCheckboxes()
             updateSearchFilter()
         }
         scheduledCheckBox?.setOnClickListener {
             val checked = (it as CheckBox).isChecked
             if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_SCHEDULED
             else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-            updateSearchByScheduleCheckboxes()
+            updateSearchDialogCheckboxes()
             updateSearchFilter()
         }
         unscheduledCheckBox?.setOnClickListener {
             val checked = (it as CheckBox).isChecked
             if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_UNSCHEDULED
             else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-            updateSearchByScheduleCheckboxes()
+            updateSearchDialogCheckboxes()
             updateSearchFilter()
         }
         updateSearchDialog()
@@ -255,11 +255,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     // TODO re-evaluate use of search filter
     private fun updateSearchFilter() {
-        tagJob?.cancel()
-        tagJob = mGalleryViewModel.viewModelScope.launch {
+        searchJob?.cancel()
+        searchJob = mGalleryViewModel.viewModelScope.launch {
             mGalleryViewModel.displayedProjects = mGalleryViewModel.filterProjects()
             mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
-
             // show search fab if actively searching
             if (userIsNotSearching())
                 mSearchActiveFAB?.hide()
@@ -283,6 +282,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
         })
 
+        // Observe tags
         mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer { tags: List<TagEntry> ->
             updateSearchDialog()
         })
@@ -292,10 +292,17 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private fun updateSearchDialog() {
         if (mSearchDialog == null) return
 
-        // Handle state of search by name
+        // 1. Update the name edit text
         mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)?.setText(mGalleryViewModel.searchName)
 
-        // Handle tag state
+        // 2. Update tag state
+        updateSearchDialogTags()
+
+        // 3. Update the the checkboxes
+        updateSearchDialogCheckboxes()
+    }
+
+    private fun updateSearchDialogTags() {
         var tags: List<TagEntry> = listOf()
         if (mGalleryViewModel.tags.value != null) {
             tags = mGalleryViewModel.tags.value!!.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
@@ -308,7 +315,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         if (tags.isEmpty()) {
             emptyListIndicator?.visibility = View.VISIBLE
             tagLayout?.visibility = View.GONE
-            return
         } else {
             tagLayout?.visibility = View.VISIBLE
             emptyListIndicator?.visibility = View.GONE
@@ -325,11 +331,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
             tagLayout?.addView(tagCheckBox)
         }
-
-        updateSearchByScheduleCheckboxes()
     }
 
-    private fun updateSearchByScheduleCheckboxes() {
+    private fun updateSearchDialogCheckboxes() {
         // Update the state of search by schedule layout
         val dueTodayCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_today_checkbox)
         val dueTomorrowCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_tomorrow_checkbox)
@@ -368,7 +372,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     // Save recycler view state
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mGalleryRecyclerView?.layoutManager?.onSaveInstanceState());
+        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mGalleryRecyclerView?.layoutManager?.onSaveInstanceState())
     }
 
     companion object {
