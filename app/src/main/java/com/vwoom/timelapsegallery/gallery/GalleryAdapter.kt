@@ -71,9 +71,9 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         // Handle Check Display
         val photoTakenToday = DateUtils.isToday(project.cover_photo_timestamp)
         if (photoTakenToday) {
-            holder.binding.galleryCheckLayout.visibility = VISIBLE
+            holder.binding.scheduleIndicatorCheck.visibility = VISIBLE
         } else {
-            holder.binding.galleryCheckLayout.visibility = INVISIBLE
+            holder.binding.scheduleIndicatorCheck.visibility = INVISIBLE
         }
 
         val projectIsScheduled = (project.interval_days != 0)

@@ -81,8 +81,8 @@
             android:layout_marginBottom="@dimen/small"
             android:textColor="@color/white"
             android:drawableEnd="@drawable/ic_wb_sunny_white_24dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
