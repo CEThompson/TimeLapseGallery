@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Matrix
+import android.graphics.RectF
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.os.Bundle
@@ -71,7 +73,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val surfaceTextureListener = object : TextureView.SurfaceTextureListener {
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
-            setupCamera()
+            setupCamera(width, height)
+            // TODO: openCamera()
         }
         override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
         }
@@ -140,7 +143,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         super.onResume()
         if (allPermissionsGranted()) {
             if (camera2Preview.isAvailable) {
-                setupCamera()
+                setupCamera(camera2Preview.width, camera2Preview.height)
             } else {
                 camera2Preview.surfaceTextureListener = surfaceTextureListener
             }
@@ -167,7 +170,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         cameraDevice = null
     }
 
-    private fun setupCamera() = lifecycleScope.launchIdling {
+    private fun setupCamera(width: Int, height: Int) = lifecycleScope.launchIdling {
         lateinit var cameraIdToSet: String
         try {
             for (cameraId in cameraManager.cameraIdList) {
@@ -183,6 +186,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
             }
             Log.d(TAG, "opening camera")
             Log.d(TAG, "camera id $cameraIdToSet")
+            transformImage(width, height)
             cameraManager.openCamera(cameraIdToSet, stateCallback, cameraHandler)
         } catch (e: CameraAccessException) {
             Log.d(TAG, "Camera access exception ${e.message}")
@@ -277,7 +281,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
             if (allPermissionsGranted()) {
                 camera2Preview.post {
                     Toast.makeText(this.requireContext(), "Permissions granted, firing up the camera.", Toast.LENGTH_SHORT).show()
-                    setupCamera()
+                    // TODO error check this
+                    setupCamera(camera2Preview.width, camera2Preview.height)
                 }
             } else {
                 Toast.makeText(this.requireContext(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
@@ -288,6 +293,30 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
                 requireContext(), it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun transformImage(viewWidth: Int, viewHeight: Int){
+        if (previewSize == null || !::camera2Preview.isInitialized) return
+        val matrix = Matrix()
+        val rotation = requireActivity().windowManager.defaultDisplay.rotation
+        val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
+        val bufferRect = RectF(0f, 0f, previewSize!!.height.toFloat(), previewSize!!.width.toFloat())
+        val centerX = viewRect.centerX()
+        val centerY = viewRect.centerY()
+
+        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY())
+            val scale = (viewHeight.toFloat() / previewSize!!.height)
+                    .coerceAtLeast(viewWidth.toFloat() / previewSize!!.width)
+            with(matrix) {
+                setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
+                postScale(scale, scale, centerX, centerY)
+                postRotate((90 * (rotation - 2)).toFloat(), centerX, centerY)
+            }
+        } else if (Surface.ROTATION_180 == rotation) {
+            matrix.postRotate(180f, centerX, centerY)
+        }
+        camera2Preview.setTransform(matrix)
     }
 
     companion object {
