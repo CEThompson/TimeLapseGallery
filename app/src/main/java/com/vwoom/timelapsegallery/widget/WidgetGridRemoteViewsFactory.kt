@@ -52,7 +52,7 @@ class WidgetGridRemoteViewsFactory(
 
         // Create the remote views
         val views = RemoteViews(mContext.packageName, R.layout.widget_grid_item)
-        val coverPhotoPath = getPhotoUrl(mExternalFilesDir!!, currentProject, photoEntry)
+        val coverPhotoPath = getPhotoUrl(mExternalFilesDir!!, currentProject, photoEntry.timestamp)
         // Decode the bitmap from path
         var bitmap: Bitmap? = decodeSampledBitmapFromPath(
                 coverPhotoPath,

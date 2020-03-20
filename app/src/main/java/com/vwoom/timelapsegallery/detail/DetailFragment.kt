@@ -48,6 +48,7 @@ import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentDetailBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
+import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -261,7 +262,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 val shareIntent: Intent = Intent().apply{
                     action = Intent.ACTION_SEND
                     type = "image/jpeg"
-                    val photoFile = File(FileUtils.getPhotoUrl(mExternalFilesDir!!, mCurrentProject!!, mCurrentPhoto!!))
+                    val photoFile = File(FileUtils
+                            .getPhotoUrl(
+                                    mExternalFilesDir!!,
+                                    getEntryFromProject(mCurrentProject!!),
+                                    mCurrentPhoto!!.timestamp))
                     Log.d(TAG, photoFile.absolutePath)
                     putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile))
                 }
@@ -289,7 +294,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Notify the adapter
         mDetailAdapter?.setCurrentPhoto(photoEntry)
         // Load the current image
-        val imagePath = FileUtils.getPhotoUrl(mExternalFilesDir!!, mCurrentProject!!, photoEntry)
+        val imagePath = FileUtils.getPhotoUrl(
+                mExternalFilesDir!!,
+                getEntryFromProject(mCurrentProject!!),
+                photoEntry.timestamp)
         loadImage(imagePath)
 
         // Get info for the current photo
@@ -601,7 +609,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private fun setFullscreenImage() {
         if (mFullscreenImageDialog == null) return
         if (mCurrentPhoto == null) return
-        val path = FileUtils.getPhotoUrl(mExternalFilesDir!!, mCurrentProject!!, mCurrentPhoto!!)
+        val path = FileUtils.getPhotoUrl(
+                mExternalFilesDir!!,
+                getEntryFromProject(mCurrentProject!!),
+                mCurrentPhoto!!.timestamp)
         val current = File(path)
         Glide.with(this)
                 .load(current)

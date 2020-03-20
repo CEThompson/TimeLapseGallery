@@ -12,6 +12,8 @@ import java.util.*
 object ProjectUtils {
     private val TAG = ProjectUtils::class.java.simpleName
 
+    fun getEntryFromProject(project: Project): ProjectEntry = ProjectEntry(project.project_id, project.project_name)
+
     fun validateFileStructure(externalFilesDir: File): ValidationResult<Nothing> {
         val files = externalFilesDir.listFiles()
         if (files == null || files.isEmpty())
@@ -35,7 +37,7 @@ object ProjectUtils {
                     else projectFilename.substring(0, projectFilename.lastIndexOf("_"))
 
             /* Ensure ids are unique */
-            var currentId: Long? = null
+            var currentId: Long?
             try {
                 currentId = idString.toLong()
                 if (projectIds.contains(currentId))

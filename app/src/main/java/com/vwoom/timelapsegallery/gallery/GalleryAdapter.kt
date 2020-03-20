@@ -18,6 +18,7 @@ import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.gallery.GalleryAdapter.GalleryAdapterViewHolder
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 import java.util.*
@@ -105,7 +106,10 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         // TODO convert this to a diff util?
         mProjectsToCoverPhotos.clear()
         for (project in projectData) {
-            val photoUrl = FileUtils.getCoverPhotoUrl(externalFilesDir, project)
+            val photoUrl = FileUtils.getPhotoUrl(
+                    externalFilesDir,
+                    getEntryFromProject(project),
+                    project.cover_photo_timestamp)
             val ratio = PhotoUtils.getAspectRatioFromImagePath(photoUrl)
             val file = File(photoUrl)
             mProjectsToCoverPhotos.apply { put(project, file) }

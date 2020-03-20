@@ -17,7 +17,6 @@ import java.io.File
 class FileUtilsTest {
 
     // TODO lock down naming for tests
-    // TODO consider assertion framework
 
     @Rule @JvmField
     val testFolder = TemporaryFolder()
@@ -209,7 +208,7 @@ class FileUtilsTest {
     }
 
     @Test
-    fun pathContainsReservedCharacter_noReservedCharacters_shouldPass() {
+    fun pathContainsReservedCharacter_noReservedCharacters() {
         // Given - a string without any reserved characters
         val testString = "1_Test Project Name"
 
@@ -221,7 +220,7 @@ class FileUtilsTest {
     }
 
     @Test
-    fun pathContainsReservedCharacter_containsReservedCharacters_shouldFail() {
+    fun pathContainsReservedCharacter_containsReservedCharacters() {
         // Given - a string with a reserved character
         val testString = "1_Test?Project Name/"
 
@@ -233,7 +232,7 @@ class FileUtilsTest {
     }
 
     @Test
-    fun getPhotoUrlForPhotoEntryFromProject(){
+    fun getPhotoUrl(){
         // Given - a created photo file, a photo entry and project abstraction
         // Create the project to test
         val projectName = "get photo url test project"
@@ -248,78 +247,13 @@ class FileUtilsTest {
         first.createNewFile()
 
         val photoEntry = PhotoEntry(id, id, timestamp)
-        val project = Project(id, projectName, 0, id, timestamp)
-
-        // When - utilities gets the entry
-        val photoUrl = FileUtils.getPhotoUrl(externalFilesTestDir, project, photoEntry)
-
-        // Then - the returned path should be the same as the created path
-        assert(photoUrl == first.absolutePath)
-    }
-
-    @Test
-    fun getPhotoUrlForPhotoEntryFromProjectEntry(){
-        // Given - a created photo file, a photo entry and project abstraction
-        // Create the project to test
-        val projectName = "get photo url test project"
-        val id: Long = 6
         val projectEntry = ProjectEntry(id, projectName)
 
-        // Create the project directory
-        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
-        projectFolder.mkdir()
-
-        // Create files in the directory
-        val timestamp: Long = 999999999
-        val first = File(projectFolder, "${timestamp}.jpg")
-        first.createNewFile()
-
-        val photoEntry = PhotoEntry(id, id, timestamp)
-
         // When - utilities gets the entry
-        val photoUrl = FileUtils.getPhotoUrl(externalFilesTestDir, projectEntry, photoEntry)
+        val photoUrl = FileUtils.getPhotoUrl(externalFilesTestDir, projectEntry, photoEntry.timestamp)
 
         // Then - the returned path should be the same as the created path
         assert(photoUrl == first.absolutePath)
-    }
-
-    @Test
-    fun getCoverPhotoUrl(){
-        // Given a project with a cover photo
-        // Create the project to test
-        val projectName = "cover photo url test project"
-        val id: Long = 7
-        // Create the project directory
-        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
-        projectFolder.mkdir()
-
-        // Create files in the directory
-        val timestamp: Long = 999999999
-        val first = File(projectFolder, "${timestamp}.jpg")
-        first.createNewFile()
-
-        val project = Project(id, projectName,0, id, timestamp)
-
-        // When - utility is called
-        val url = FileUtils.getCoverPhotoUrl(externalFilesTestDir, project)
-
-        // Then - url matches the created file url
-        assert(url == first.absolutePath)
-    }
-
-    @Test
-    fun getPhotoFileNameFromEntry() {
-        // Given - a photo file
-        val timestamp: Long = 12345
-        val photoEntry = PhotoEntry(1, timestamp)
-
-        // When
-        val filenames = FileUtils.getPhotoFileNames(photoEntry)
-
-        // Then
-        assert(filenames[0] == "$timestamp.jpg")
-        assert(filenames[1] == "$timestamp.png")
-        assert(filenames[2] == "$timestamp.jpeg")
     }
 
     @Test

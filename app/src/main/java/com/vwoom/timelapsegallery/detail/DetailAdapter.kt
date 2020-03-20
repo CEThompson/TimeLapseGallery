@@ -10,9 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.detail.DetailAdapter.DetailAdapterViewHolder
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.DetailRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.FileUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
 import java.io.File
 
 class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<DetailAdapterViewHolder>() {
@@ -50,8 +53,12 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, cont
         val binding = holder.binding
         val context = holder.itemView.context
         val currentPhoto = mPhotos?.get(position)
-        val photoPath = FileUtils.getPhotoUrl(mExternalFilesDir!!, mProject!!, currentPhoto!!)
+        val photoPath = FileUtils.getPhotoUrl(
+                mExternalFilesDir!!,
+                getEntryFromProject(mProject!!),
+                currentPhoto!!.timestamp)
         val f = File(photoPath)
+
         // TODO (update) dynamically resize detail view
         Glide.with(context)
                 .load(f)

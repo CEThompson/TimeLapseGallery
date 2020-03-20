@@ -32,11 +32,6 @@ object FileUtils {
         return File(externalFilesDir, projectPath)
     }
 
-    private fun getProjectFolder(externalFilesDir: File, project: Project): File {
-        val projectPath = getProjectDirectoryPath(project)
-        return File(externalFilesDir, projectPath)
-    }
-
     fun getMetaDirectoryForProject(externalFilesDir: File, projectId: Long): File{
         val metaDir = File(externalFilesDir, META_FILE_SUBDIRECTORY)
         val projectSubfolder = File(metaDir, projectId.toString())
@@ -163,7 +158,7 @@ object FileUtils {
 
     // Deletes file referred to in photo entry by project view
     fun deletePhoto(externalFilesDir: File, projectEntry: ProjectEntry, photoEntry: PhotoEntry) {
-        val photoUrl = getPhotoUrl(externalFilesDir, projectEntry, photoEntry)
+        val photoUrl = getPhotoUrl(externalFilesDir, projectEntry, photoEntry.timestamp)
         if (photoUrl == ERROR_TIMESTAMP_TO_PHOTO) return // photo file does not exist already
         val photoFile = File(photoUrl)
         deleteRecursive(photoFile)
@@ -185,29 +180,9 @@ object FileUtils {
         else projectEntry.id.toString() + "_" + projectEntry.project_name
     }
 
-    private fun getProjectDirectoryPath(project: Project): String {
-        val name = project.project_name
-        return if (name == null) project.project_id.toString()
-        else project.project_id.toString() + "_" + project.project_name
-    }
-
-    fun getPhotoUrl(externalFilesDir: File, projectEntry: ProjectEntry, photoEntry: PhotoEntry): String {
-        val imageFileNames = getPhotoFileNames(photoEntry)
+    fun getPhotoUrl(externalFilesDir: File, projectEntry: ProjectEntry, timestamp: Long): String {
+        val imageFileNames = getPhotoFileNames(timestamp)
         val projectDir = getProjectFolder(externalFilesDir, projectEntry)
-
-        lateinit var photoFile: File
-        for (fileName in imageFileNames){
-            photoFile = File(projectDir, fileName)
-            if (photoFile.exists()) return photoFile.absolutePath
-        }
-        // TODO: Convert to sealed result class!
-        return ERROR_TIMESTAMP_TO_PHOTO
-    }
-
-    // TODO Look into improving photo retrieval
-    fun getPhotoUrl(externalFilesDir: File, project: Project, photoEntry: PhotoEntry): String {
-        val imageFileNames: Array<String> = getPhotoFileNames(photoEntry)
-        val projectDir = getProjectFolder(externalFilesDir, project)
 
         lateinit var photoFile: File
         // Try the timestamp to various file formats, i.e. timestamp.jpeg, timestamp.png, timestamp.jpg
@@ -215,25 +190,7 @@ object FileUtils {
             photoFile = File(projectDir, fileName)
             if (photoFile.exists()) return photoFile.absolutePath
         }
-        // TODO: Convert to sealed result class!
         return ERROR_TIMESTAMP_TO_PHOTO
-    }
-
-    fun getCoverPhotoUrl(externalFilesDir: File, project: Project): String {
-        val imageFileNames = getPhotoFileNames(project.cover_photo_timestamp)
-        val projectDir = getProjectFolder(externalFilesDir, project)
-
-        lateinit var photoFile: File
-        for (fileName in imageFileNames){
-            photoFile = File(projectDir, fileName)
-            if (photoFile.exists()) return photoFile.absolutePath
-        }
-        return ERROR_TIMESTAMP_TO_PHOTO
-    }
-
-    fun getPhotoFileNames(entry: PhotoEntry): Array<String> {
-        val timestamp = entry.timestamp.toString()
-        return arrayOf("$timestamp.jpg","$timestamp.png","$timestamp.jpeg")
     }
 
     fun getPhotoFileNames(timestamp: Long): Array<String> {
@@ -247,17 +204,20 @@ object FileUtils {
 
         val tagsFile = File(metaDir, TAGS_DEFINITION_TEXT_FILE)
 
-        // TODO handle writing in try catch block
         // Write the tags to a text file
-        val output = FileOutputStream(tagsFile)
-        val outputStreamWriter = OutputStreamWriter(output)
-
-        for (tag in tags) {
-            outputStreamWriter.write(tag.text + "\n")
+        // TODO: determine how to handle output stream writer exceptions
+        try {
+            val output = FileOutputStream(tagsFile)
+            val outputStreamWriter = OutputStreamWriter(output)
+            for (tag in tags) {
+                outputStreamWriter.write(tag.text + "\n")
+            }
+            outputStreamWriter.flush()
+            output.fd.sync()
+            outputStreamWriter.close()
+        } catch (exception: IOException) {
+            Log.e(TAG, "error writing tag to text file: ${exception.message}")
         }
-        outputStreamWriter.flush()
-        output.fd.sync()
-        outputStreamWriter.close()
     }
 
     fun scheduleProject(externalFilesDir: File, project: Project, projectScheduleEntry: ProjectScheduleEntry){
@@ -272,12 +232,17 @@ object FileUtils {
         // Otherwise add it
         else {
             Log.d(TAG, "writing schedule file")
-            val output = FileOutputStream(scheduleFile)
-            val outputStreamWriter = OutputStreamWriter(output)
-            outputStreamWriter.write(projectScheduleEntry.interval_days.toString())
-            outputStreamWriter.flush()
-            output.fd.sync()
-            outputStreamWriter.close()
+            // TODO: determine how to handle output stream writer exceptions
+            try {
+                val output = FileOutputStream(scheduleFile)
+                val outputStreamWriter = OutputStreamWriter(output)
+                outputStreamWriter.write(projectScheduleEntry.interval_days.toString())
+                outputStreamWriter.flush()
+                output.fd.sync()
+                outputStreamWriter.close()
+            } catch (exception: IOException) {
+                Log.e(TAG, "error writing schedule to text file: ${exception.message}")
+            }
         }
     }
 }
