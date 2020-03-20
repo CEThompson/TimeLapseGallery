@@ -125,8 +125,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Set up navigation to add new projects
         mAddProjectFAB = binding.addProjectFAB
         mAddProjectFAB?.setOnClickListener {
-            // TODO set CameraX / Camera2 switch here
-            //val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null, null)
             val action = GalleryFragmentDirections.actionGalleryFragmentToCamera2Fragment(null, null)
             findNavController().navigate(action)
         }
