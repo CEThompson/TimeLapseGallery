@@ -34,7 +34,6 @@ class NotificationWorker(context: Context, params: WorkerParameters)
             return Result.success()
         }
 
-        // TODO filter by due projects TOMORROW instead of Today
         val dueProjects = scheduledProjects.filter {
             ProjectUtils.isProjectDueToday(it) || ProjectUtils.isProjectDueTomorrow(it)
         }
