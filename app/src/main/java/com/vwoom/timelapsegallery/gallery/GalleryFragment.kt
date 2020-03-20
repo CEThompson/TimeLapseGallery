@@ -177,8 +177,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 true
             }
             R.id.settings_option -> {
-                // TODO: Determine if there is a better way to handle leaking toolbar references
-                (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
                 val action = GalleryFragmentDirections.actionGalleryFragmentToSettingsFragment()
                 findNavController().navigate(action)
                 true
@@ -252,7 +250,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
         updateSearchDialog()
     }
-    
+
     private fun updateSearchFilter() {
         searchJob?.cancel()
         searchJob = mGalleryViewModel.viewModelScope.launch {
@@ -274,7 +272,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     private fun setupViewModel() {
         // Observe projects
-        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer { projects: List<Project> ->
+        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer {
             mGalleryViewModel.viewModelScope.launch {
                 mGalleryViewModel.displayedProjects = mGalleryViewModel.filterProjects()
                 mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
@@ -282,7 +280,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         })
 
         // Observe tags
-        mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer { tags: List<TagEntry> ->
+        mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer {
             updateSearchDialog()
         })
     }
