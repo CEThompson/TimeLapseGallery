@@ -163,7 +163,9 @@ object FileUtils {
 
     // Deletes file referred to in photo entry by project view
     fun deletePhoto(externalFilesDir: File, projectEntry: ProjectEntry, photoEntry: PhotoEntry) {
-        val photoFile = File(getPhotoUrl(externalFilesDir, projectEntry, photoEntry))
+        val photoUrl = getPhotoUrl(externalFilesDir, projectEntry, photoEntry)
+        if (photoUrl == ERROR_TIMESTAMP_TO_PHOTO) return // photo file does not exist already
+        val photoFile = File(photoUrl)
         deleteRecursive(photoFile)
     }
 
