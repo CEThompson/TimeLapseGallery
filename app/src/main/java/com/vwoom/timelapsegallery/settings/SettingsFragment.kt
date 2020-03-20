@@ -23,7 +23,9 @@ import com.vwoom.timelapsegallery.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 
-// TODO fix shared preference options and dialog content
+// TODO: reevaluate shared preference options and content
+// TODO: create free and paid variants
+// TODO: determine analytics metrics
 class SettingsFragment : PreferenceFragmentCompat() {
     private var prefs: SharedPreferences? = null
     private var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
@@ -39,7 +41,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private var databaseSyncJob: Job? = null
 
-    // TODO remove firebase analytics?
     /* Analytics */
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
@@ -69,7 +70,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         if (settingsViewModel.showingFileModDialog) showFileModificationDialog()
         if (settingsViewModel.showingVerifySyncDialog) showVerifyProjectImportDialog()
 
-        // TODO remove firebase?
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
     }
 
@@ -99,11 +99,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val syncPref: Preference? =  findPreference(getString(R.string.key_sync))
 
         // Listen for changes to shared preferences and update notification worker on change
-        prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        prefs = PreferenceManager.getDefaultSharedPreferences(activity)
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
             Log.d("settings activity", "Notification listener activitating for key = $key")
 
-            // TODO remove ads from application
             if (key == this.getString(R.string.key_ads_disabled)){
                 val adsDisabled = prefs.getBoolean(context?.getString(R.string.key_ads_disabled), false)
                 if (adsDisabled)
@@ -133,7 +132,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
             // Track playback interval selection
             if (key == getString(R.string.key_playback_interval)){
-                val interval = prefs.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default));
+                val interval = prefs.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
                 val params = Bundle()
                 params.putString(context?.getString(R.string.analytics_playback_interval)!!, interval)
                 mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_select_playback_interval)!!, params)
@@ -255,7 +254,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 responseView.text = getString(R.string.executing_sync_complete)
             }
         }
-
         // Show the updated views
         progress.visibility = View.INVISIBLE
         imageFeedback.visibility = View.VISIBLE
@@ -273,7 +271,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     // End Dialog Functions
     //
 
-    // TODO find way to update status of project import
+    // TODO: find way to update status of importing projects
     private fun executeSync(){
         showSyncDialog()
         databaseSyncJob = settingsViewModel.viewModelScope.async {
