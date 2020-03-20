@@ -252,8 +252,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
         updateSearchDialog()
     }
-
-    // TODO re-evaluate use of search filter
+    
     private fun updateSearchFilter() {
         searchJob?.cancel()
         searchJob = mGalleryViewModel.viewModelScope.launch {
