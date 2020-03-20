@@ -25,6 +25,7 @@
     <string name="submitting">Submitting</string>
 
     <!-- Content descriptions -->
+    <string name="gradient_content_description">Gradient to make schedule information more visible.</string>
     <string name="project_image_content_description">Thumbnail image for the time lapse project.</string>
     <string name="detail_photo_content_description">Thumbnail image of one of the frames of a project.</string>
     <string name="detail_current_image_content_description">The currently selected image belonging to the project.</string>

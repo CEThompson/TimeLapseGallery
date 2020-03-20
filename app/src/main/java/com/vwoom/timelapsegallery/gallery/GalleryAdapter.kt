@@ -78,7 +78,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
 
         val projectIsScheduled = (project.interval_days != 0)
         if (projectIsScheduled){
-            setScheduleInformation(project, holder, project.interval_days)
+            setScheduleInformation(project, holder, project.interval_days, photoTakenToday)
             holder.binding.galleryScheduleLayout.scheduleLayout.visibility = VISIBLE
         } else {
             holder.binding.galleryScheduleLayout.scheduleLayout.visibility = INVISIBLE
@@ -118,25 +118,36 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
     }
 
     // Updates the UI for the schedule layout
-    private fun setScheduleInformation(project: Project, holder: GalleryAdapterViewHolder, interval_days: Int) {
+    private fun setScheduleInformation(project: Project, holder: GalleryAdapterViewHolder, interval_days: Int, photoTakenToday: Boolean) {
         // Calc the days until project is due
         val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
         val daysUntilDue = project.interval_days - daysSinceLastPhoto
         holder.binding.galleryScheduleLayout.daysUntilDueTextView.text = daysUntilDue.toString() // set days until due text
         holder.binding.galleryScheduleLayout.galleryItemScheduleIndicatorDays.text = interval_days.toString() // set schedule interval
+
+        // Calc opacity for due date
+        when {
+            photoTakenToday -> holder.binding.galleryScheduleLayout.daysUntilDueTextView.alpha = 0.3f
+            daysUntilDue <= 0 -> holder.binding.galleryScheduleLayout.daysUntilDueTextView.alpha = 1f
+            else -> {
+                val minOpacity = .5f
+                val opacityAdjust = .4f * (1/daysUntilDue).toFloat()
+                val opacity = minOpacity + opacityAdjust
+                holder.binding.galleryScheduleLayout.daysUntilDueTextView.alpha = opacity
+            }
+        }
+
         // Style depending upon due state
         if (daysUntilDue <= 0) {
             holder.binding.galleryScheduleLayout.daysUntilDueTextView
                     .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.colorSubtleRedAccent))
             holder.binding.galleryScheduleLayout.scheduleIconDue.visibility = VISIBLE
             holder.binding.galleryScheduleLayout.scheduleIconPending.visibility = INVISIBLE
-            holder.binding.galleryScheduleLayout.dueSunIndicator.visibility = VISIBLE
         } else {
             holder.binding.galleryScheduleLayout.daysUntilDueTextView
                     .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.white))
             holder.binding.galleryScheduleLayout.scheduleIconDue.visibility = INVISIBLE
             holder.binding.galleryScheduleLayout.scheduleIconPending.visibility = VISIBLE
-            holder.binding.galleryScheduleLayout.dueSunIndicator.visibility = GONE
         }
     }
 

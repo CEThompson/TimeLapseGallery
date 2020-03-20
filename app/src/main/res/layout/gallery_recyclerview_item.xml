@@ -31,6 +31,12 @@
 
             <include
                 android:id="@+id/gallery_schedule_layout"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="@id/project_image"
+                app:layout_constraintEnd_toEndOf="@id/project_image"
+                app:layout_constraintTop_toTopOf="@id/project_image"
+                app:layout_constraintBottom_toBottomOf="@id/project_image"
                 layout="@layout/schedule_layout" />
 
             <!-- Layout showing a check if a photo is taken today -->
@@ -42,13 +48,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
-                <!-- Bottom gradient -->
-                <ImageView
-                    android:id="@+id/gallery_bottom_gradient"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:src="@drawable/gradient_overlay_bottom_up"
-                    />
+
                 <!-- check mark to indicate if photo has been taken today -->
                 <ImageView
                     android:id="@+id/schedule_indicator_check"
