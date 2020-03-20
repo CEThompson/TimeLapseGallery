@@ -2,8 +2,6 @@ package com.vwoom.timelapsegallery.utils
 
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
-import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.data.view.Project
 import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
 import org.hamcrest.CoreMatchers.`is`
@@ -15,8 +13,6 @@ import org.junit.rules.TemporaryFolder
 import java.io.File
 
 class FileUtilsTest {
-
-    // TODO lock down naming for tests
 
     @Rule @JvmField
     val testFolder = TemporaryFolder()
@@ -30,181 +26,163 @@ class FileUtilsTest {
 
     /* Tests retrieving a list of photo entries from a project folder*/
     @Test
-    fun getPhotoEntriesInProjectDirectory_directoryWithImagesTextAndFolder_twoOrderedPhotoEntries() {
-        /* Given */
-        // Create the project to test
+    fun getPhotoEntriesInProjectDirectory_directoryWithData_returnsTwoOrderedPhotoEntries() {
+        // Given:
+        // a project to test
         val projectName = "test project"
         val projectEntry = ProjectEntry(1, projectName)
-
-        // Create the project directory
+        // a project directory
         val projectFolder = File(externalFilesTestDir, "1_$projectName")
         projectFolder.mkdir()
-
-        // Create files in the directory
+        // and files in the directory
         File(projectFolder, "99999999.jpg").createNewFile()
         File(projectFolder, "11111111.jpg").createNewFile()
         val metaFolder = File(projectFolder, "meta")
         metaFolder.mkdir()
         File(metaFolder, "tags.txt").createNewFile()
 
-        /* Actually use the method we are testing with mocked data */
-        /* When */
+        // When we get the photo entries from the method
         val listOfPhotoEntries = FileUtils.getPhotoEntriesInProjectDirectory(externalFilesTestDir, projectEntry)
 
+        // Then assert that the list is as expected
         val expectedList = listOf(
                 PhotoEntry(1,11111111),
                 PhotoEntry(1,99999999))
-
-        /* Then */
-        /* Assert out response is equal to the expectation */
         assertThat(listOfPhotoEntries, `is`(expectedList))
     }
 
     @Test
-    fun createTemporaryImageFile_tempImageFolder_tempFileShouldExist() {
-        /* Given */
-        // Create the project directory
+    fun createTemporaryImageFile_givenTempFolder_tempFileExists() {
+        // Given the project directory
         val tempFolder = File(externalFilesTestDir, FileUtils.TEMP_FILE_SUBDIRECTORY)
         tempFolder.mkdir()
 
-        /* When */
+        // When
         FileUtils.createTemporaryImageFile(tempFolder)
 
-        /* Then */
-        // The temp directory should not be empty
+        // Then the temp directory should not be empty
         assert(tempFolder.listFiles()?.size!=0)
     }
 
     @Test
-    fun createFinalFileFromTempTest_shouldPass() {
-        // Create the pictures directory and temporary_images directory
+    fun createFinalFileFromTemp() {
+        // Given
+        // a pictures directory and temporary_images directory
         val tempFolder = File(externalFilesTestDir, FileUtils.TEMP_FILE_SUBDIRECTORY)
         tempFolder.mkdir()
-
-        // Create the temporary image file
+        // a temporary image file
         val tempFile = FileUtils.createTemporaryImageFile(tempFolder)
         val timestamp = System.currentTimeMillis()
-
-        // Create the project
+        // and a project
         val projectEntry = ProjectEntry("test project")
 
-        // Create the folder for the project
+        // When we create the folder for the project
         val finalFile = FileUtils.createFinalFileFromTemp(externalFilesTestDir, tempFile.absolutePath, projectEntry, timestamp)
 
-        assert(!tempFile.exists()) // make sure temp file was deleted
-        assert(finalFile != null) // make sure final file was created
+        // Then the temp file should have been deleted
+        assert(!tempFile.exists())
+        // And the final file should exist
         assert(finalFile.exists())
-        // TODO make other assertions about the final copied file
     }
 
     @Test
     fun renameProject() {
-        /* Given - A named project that has files */
-        // Create the project to test
+        // Given
+        // a project to test
         val projectName = "second test project"
         val id: Long = 2
         val projectEntry = ProjectEntry(id, projectName)
-
-        // Create the project directory
+        // a project directory
         val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
         projectFolder.mkdir()
+        // files in the directory
+        val children = listOf("99999999.jpg", "11111111.jpg")
+        for (child in children) File(projectFolder, child).createNewFile()
 
-        // Create files in the directory
-        File(projectFolder, "99999999.jpg").createNewFile()
-        File(projectFolder, "11111111.jpg").createNewFile()
-        File(projectFolder, "videos").mkdir()
-        File(projectFolder, "tags.txt").createNewFile()
-
-        // Create the project entry to rename it to
+        // and project entry to rename it to
         val projectRenameString = "test rename"
         val projectEntryToRename = ProjectEntry(id, projectRenameString)
 
-        /* When - We run the function renameProject */
+        // When we run the function renameProject
         FileUtils.renameProject(externalFilesTestDir, projectEntry, projectEntryToRename)
 
-        /* Then - Expect the previous folder to be gone, a new folder with the same files to exist */
-        assert(File(externalFilesTestDir, "${id}_$projectRenameString").exists())
+        // Then we expect the previous folder to be gone
+        assert(!projectFolder.exists())
+        // and the renamed folder to exist
+        val renamedProject = File(externalFilesTestDir, "${id}_$projectRenameString")
+        assert(renamedProject.exists())
+        // with the same children
+        for (child in children) assert(File(renamedProject, child).exists())
     }
 
     @Test
     fun deleteTempFiles() {
-        /* Given - A directory of temp files */
+        // Given a directory of temp files
         val tempFolder = File(externalFilesTestDir, FileUtils.TEMP_FILE_SUBDIRECTORY)
         tempFolder.mkdir()
+        // and a picture in the directory
+        val child = File(tempFolder, "11.jpg")
+        child.createNewFile()
 
-        File(tempFolder, "11.jpg")
-        /* When - deleteTempFiles() is run */
+        // When deleteTempFiles() is run
         FileUtils.deleteTempFiles(externalFilesTestDir)
 
-        /* Then - the directory is empty / gone */
+        // Then the directory is gone
         assert(!tempFolder.exists())
+        // and the child is gone
+        assert(!child.exists())
     }
 
     @Test
     fun deleteProject() {
-        /* Given an existing project */
-        // Create the project to test
+        // Given
+        // a project to test
         val projectName = "delete test project"
         val id: Long = 3
         val projectEntry = ProjectEntry(id, projectName)
-
-        // Create the project directory
+        // a project directory
         val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
         projectFolder.mkdir()
-
-        // Create files in the directory
+        // files in the directory
         val first = File(projectFolder, "99999999.jpg")
         first.createNewFile()
         val second = File(projectFolder, "11111111.jpg")
         second.createNewFile()
-        val third = File(projectFolder, "videos")
-        third.mkdir()
-        val fourth = File(projectFolder, "tags.txt")
-        fourth.createNewFile()
 
-        /* When deleteProject() is run */
+        // When deleteProject() is run
         FileUtils.deleteProject(externalFilesTestDir, projectEntry)
 
-        /* Project folder no longer exists */
+        // Then the project folder and its children no longer exist
         assert(!first.exists())
         assert(!second.exists())
-        assert(!third.exists())
-        assert(!fourth.exists())
         assert(!projectFolder.exists())
     }
 
     @Test
     fun deletePhoto() {
-        // Given - a photo belonging to a project
-        // Create the project to test
+        // Given a project to test
         val projectName = "delete photo test project"
         val id: Long = 4
         val projectEntry = ProjectEntry(id, projectName)
-
-        // Create the project directory
+        // a project directory
         val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
         projectFolder.mkdir()
-
-        // Create files in the directory
-        val deletePhotoTimestamp: Long = 999999999
-        val first = File(projectFolder, "${deletePhotoTimestamp}.jpg")
+        // two photos in the directory
+        val firstPhotoTimestamp: Long = 999999999
+        val first = File(projectFolder, "${firstPhotoTimestamp}.jpg")
         first.createNewFile()
         val second = File(projectFolder, "11111111.jpg")
         second.createNewFile()
-        val third = File(projectFolder, "videos")
-        third.mkdir()
-        val fourth = File(projectFolder, "tags.txt")
-        fourth.createNewFile()
+        // and a photo entry derived for the first photo
+        val firstPhotoEntry = PhotoEntry(projectEntry.id, firstPhotoTimestamp)
 
-        val photoEntry = PhotoEntry(projectEntry.id, deletePhotoTimestamp)
+        // When deleting the photo
+        FileUtils.deletePhoto(externalFilesTestDir, projectEntry, firstPhotoEntry)
 
-        // When deleting photo
-        FileUtils.deletePhoto(externalFilesTestDir, projectEntry, photoEntry)
-
-        // Photo no longer exists
+        // Then first photo no longer exists
         assert(!first.exists())
+        // but the second does exist
         assert(second.exists())
-        assert(third.exists())
     }
 
     @Test
@@ -215,7 +193,7 @@ class FileUtilsTest {
         // When - the utility is called
         val containsReservedCharacters = FileUtils.pathContainsReservedCharacter(testString)
 
-        // Then - the utility should indicate false, the path does not contain a reserved character
+        // Then - the utility should indicate false: the path does not contain a reserved character
         assertFalse(containsReservedCharacters)
     }
 
@@ -233,38 +211,36 @@ class FileUtilsTest {
 
     @Test
     fun getPhotoUrl(){
-        // Given - a created photo file, a photo entry and project abstraction
-        // Create the project to test
+        // Given a project to test
         val projectName = "get photo url test project"
         val id: Long = 5
-        // Create the project directory
+        // a project directory
         val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
         projectFolder.mkdir()
-
-        // Create files in the directory
+        // a photo in the directory
         val timestamp: Long = 999999999
         val first = File(projectFolder, "${timestamp}.jpg")
         first.createNewFile()
-
+        // and entries derived for photo and project
         val photoEntry = PhotoEntry(id, id, timestamp)
         val projectEntry = ProjectEntry(id, projectName)
 
-        // When - utilities gets the entry
+        // When the utility gets the entry
         val photoUrl = FileUtils.getPhotoUrl(externalFilesTestDir, projectEntry, photoEntry.timestamp)
 
-        // Then - the returned path should be the same as the created path
+        // Then the returned path should be the same as the created path
         assert(photoUrl == first.absolutePath)
     }
 
     @Test
-    fun getPhotoFileNameFromTimeStamp() {
-        // Given
+    fun getPhotoFileNamesFromTimeStamp() {
+        // Given a timestamp
         val timestamp: Long = 12345
 
-        // When
+        // When we call the utility
         val filenames = FileUtils.getPhotoFileNames(timestamp)
 
-        // Then
+        // Then an array of three different image extensions should exist
         assert(filenames[0] == "$timestamp.jpg")
         assert(filenames[1] == "$timestamp.png")
         assert(filenames[2] == "$timestamp.jpeg")
@@ -277,21 +253,19 @@ class FileUtilsTest {
 
         // when we get the directory for the project
         val metaDir = FileUtils.getMetaDirectoryForProject(externalFilesTestDir, project.id)
-
-        // Then
+        // and get the relative path
         val absPath = metaDir.absolutePath
         val relPath = absPath.substring(metaDir.absolutePath.lastIndexOf(File.separatorChar)+1)
-        println(metaDir.absolutePath)
-        println(relPath)
-        // the directory exists &&
+
+        // Then the meta directory exists
         assert(metaDir.exists())
-        // the subdirectory is equal to the project ID
+        // the relative path is equal to the project ID (ex. "meta/5")
         assert(relPath == project.id.toString())
     }
 
+    // TODO implement add tag to project test
     @Test
     fun addTagToProject() {
-        // TODO implement me!
         /*
         // given a project
         externalFilesTestDir.deleteRecursively()
@@ -305,9 +279,9 @@ class FileUtilsTest {
          */
     }
 
+    // TODO implement schedule project test
     @Test
     fun scheduleProject(){
-        // TODO implement me!
     }
 
     companion object {
