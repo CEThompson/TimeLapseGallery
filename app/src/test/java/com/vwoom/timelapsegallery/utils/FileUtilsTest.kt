@@ -17,7 +17,6 @@ import java.io.File
 class FileUtilsTest {
 
     // TODO lock down naming for tests
-    // TODO use given/when/then structure for tests
     // TODO consider assertion framework
 
     @Rule @JvmField
@@ -51,7 +50,6 @@ class FileUtilsTest {
 
         /* Actually use the method we are testing with mocked data */
         /* When */
-        // TODO this utility fails when the test environment is a windows system, figure out how to fix this
         val listOfPhotoEntries = FileUtils.getPhotoEntriesInProjectDirectory(externalFilesTestDir, projectEntry)
 
         val expectedList = listOf(
@@ -61,12 +59,6 @@ class FileUtilsTest {
         /* Then */
         /* Assert out response is equal to the expectation */
         assertThat(listOfPhotoEntries, `is`(expectedList))
-
-        // TODO figure out logging for tests
-        //System.out.println("$TAG $projectFolder")
-        //System.out.println("$TAG ${listOfPhotoEntries == null}")
-        //System.out.println("$TAG returned list is $listOfPhotoEntries")
-        //System.out.println("$TAG test list is $assertionList")
     }
 
     @Test
@@ -104,13 +96,6 @@ class FileUtilsTest {
         assert(finalFile != null) // make sure final file was created
         assert(finalFile.exists())
         // TODO make other assertions about the final copied file
-
-        // TODO convert to logs
-        System.out.println("$TAG tempFile path $finalFile")
-        System.out.println("$TAG finalFile path $tempFile")
-        System.out.println("$TAG tempFile exists ${tempFile.exists()}")
-        System.out.println("$TAG finalFile exists ${finalFile.exists()}")
-
     }
 
     @Test

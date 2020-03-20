@@ -181,7 +181,6 @@ object ProjectUtils {
 
         // Import schedule
         if (scheduleFile.exists()) {
-            // TODO test this
             val inputAsString = FileInputStream(scheduleFile).bufferedReader().use { it.readText() }
             try {
                 val projectScheduleEntry = ProjectScheduleEntry(currentProject.id, inputAsString.toInt())

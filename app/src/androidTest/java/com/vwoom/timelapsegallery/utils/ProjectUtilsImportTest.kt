@@ -40,7 +40,6 @@ class ProjectUtilsImportTest {
         db.close()
     }
 
-    // TODO implement test for importing projects.
     @Test
     fun importProjects() {
         // Given: projects in database that do not match file structure
