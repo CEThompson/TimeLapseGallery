@@ -11,6 +11,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -48,6 +49,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mGalleryRecyclerView: RecyclerView? = null
     private var mAddProjectFAB: FloatingActionButton? = null
     private var mSearchActiveFAB: FloatingActionButton? = null
+    private var toolbar: Toolbar? = null
 
     private val mGalleryViewModel: GalleryViewModel by viewModels {
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
@@ -73,6 +75,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mSearchActiveFAB = null
         mGridLayoutManager = null
         mGalleryAdapter = null
+        toolbar = null
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -83,9 +86,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Set up options menu
         setHasOptionsMenu(true)
-        val toolbar = binding.galleryFragmentToolbar
+        toolbar = binding.galleryFragmentToolbar
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
-        toolbar.title = getString(R.string.app_name)
+        toolbar?.title = getString(R.string.app_name)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
 
         // Increase columns for horizontal orientation
@@ -109,7 +112,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // TODO better handle transitioning during search filtration, this solution seems hacky
-        if (mGalleryViewModel.displayedProjects.isNotEmpty()) mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
+        if (mGalleryViewModel.displayedProjects.isNotEmpty())
+            mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
 
         mGalleryRecyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -121,7 +125,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Set up navigation to add new projects
         mAddProjectFAB = binding.addProjectFAB
         mAddProjectFAB?.setOnClickListener {
-            (activity as TimeLapseGalleryActivity).setSupportActionBar(null)
             // TODO set CameraX / Camera2 switch here
             //val action = GalleryFragmentDirections.actionGalleryFragmentToCameraFragment(null, null)
             val action = GalleryFragmentDirections.actionGalleryFragmentToCamera2Fragment(null, null)
