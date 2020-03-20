@@ -150,7 +150,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
 
-        // TODO (update) write unit test for file / database sync
         // Verify the user wants to sync files to the database
         syncPref?.setOnPreferenceClickListener{
             showVerifyProjectImportDialog()
@@ -274,7 +273,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     // End Dialog Functions
     //
 
-    // TODO execute synchronization with work manager?
+    // TODO find way to update status of project import
     private fun executeSync(){
         showSyncDialog()
         databaseSyncJob = settingsViewModel.viewModelScope.async {
