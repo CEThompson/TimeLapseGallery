@@ -344,9 +344,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         constraintSet.setDimensionRatio(R.id.detail_next_image, ratio)
         constraintSet.applyTo(constraintLayout)
 
-        // TODO (update) streamline code for image loading
         // Load the image
         val f = File(imagePath)
+        loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
+    }
+
+    // TODO: (update 1.2) re-evaluate and speed up image loading
+    // This function loads an image into a top view, then loads an image into the bottom view and hides the top view
+    // This makes 'playing' the images look seamless
+    private fun loadImagePair(f: File, bottomImage: ImageView, topImage: ImageView) {
+        // 1. First load the image into the next image view on top of the current
         Glide.with(this)
                 .load(f)
                 .listener(object : RequestListener<Drawable?> {
@@ -357,9 +364,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         toast.show()
                         return false
                     }
-
                     override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
-                        binding?.detailNextImage?.visibility = VISIBLE
+                        // Show the just loaded image on the top
+                        topImage.visibility = VISIBLE
+                        // 2. Then load the image into the current image on the bottom
                         Glide.with(requireContext())
                                 .load(f)
                                 .listener(object : RequestListener<Drawable?> {
@@ -371,17 +379,20 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                                     }
 
                                     override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
-                                        startPostponedEnterTransition()
-                                        binding?.detailNextImage?.visibility = INVISIBLE
+                                        // When complete hide the top image
+                                        topImage.visibility = INVISIBLE
+                                        // Record state
                                         mImageIsLoaded = true
+                                        // And begin the shared element transition if appropriate
+                                        startPostponedEnterTransition()
                                         return false
                                     }
                                 })
-                                .into(binding!!.detailCurrentImage)
+                                .into(bottomImage)
                         return false
                     }
                 })
-                .into(binding!!.detailNextImage)
+                .into(topImage)
     }
 
 
