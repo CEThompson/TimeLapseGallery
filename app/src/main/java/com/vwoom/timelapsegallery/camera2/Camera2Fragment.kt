@@ -40,7 +40,6 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
-// TODO handle horizontal preview, currently stretches incorrectly
 class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val cameraManager: CameraManager by lazy {
@@ -74,7 +73,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private val surfaceTextureListener = object : TextureView.SurfaceTextureListener {
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
             setupCamera(width, height)
-            // TODO: openCamera()
         }
         override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
         }
@@ -281,7 +279,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
             if (allPermissionsGranted()) {
                 camera2Preview.post {
                     Toast.makeText(this.requireContext(), "Permissions granted, firing up the camera.", Toast.LENGTH_SHORT).show()
-                    // TODO error check this
                     setupCamera(camera2Preview.width, camera2Preview.height)
                 }
             } else {
