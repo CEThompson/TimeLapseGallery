@@ -1,7 +1,6 @@
 package com.vwoom.timelapsegallery.cameraX
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
@@ -43,7 +42,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
     private var previewView: PreviewView? = null
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private val executor = Executors.newSingleThreadExecutor()
-    var preview: Preview? = null
+    private var preview: Preview? = null
 
     private var takePictureJob: Job? = null
 
@@ -61,9 +60,9 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         executor.shutdown()
     }
 
-    // TODO hunt down memory leaks in fragment
     override fun onDestroyView() {
         super.onDestroyView()
+        @Suppress("ClickableViewAccessibility")
         previewView?.setOnTouchListener(null)
         previewView = null
         preview?.setSurfaceProvider(null)
