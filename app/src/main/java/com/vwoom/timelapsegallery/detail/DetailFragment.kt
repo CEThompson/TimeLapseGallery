@@ -57,8 +57,7 @@ import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
 
-// TODO use NDK to implement converting photosets to .gif and .mp4/.mov etc
-
+// TODO use NDK to implement converting photo sets to .gif and .mp4/.mov etc
 // TODO implement pinch zoom on fullscreen image
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
@@ -77,8 +76,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mCurrentPlayPosition: Int? = null
     private var mCurrentProject: Project? = null
 
-    // Views for fullscreen and dialogs
-    private var mFullscreenImage: ImageView? = null
+    // Dialogs
     private var mFullscreenImageDialog: Dialog? = null
     private var mTagDialog: Dialog? = null
     private var mInfoDialog: Dialog? = null
@@ -86,7 +84,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private var toolbar: Toolbar? = null
 
-    // For playing timelapse
+    // For playing time lapse
     private var mPlaying = false
     private var mImageIsLoaded = false
 
@@ -196,7 +194,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.detailsRecyclerview?.layoutManager = linearLayoutManager
         binding?.detailsRecyclerview?.adapter = mDetailAdapter
 
-        // Set up fabs:
         // 1. Initialize the color of the play as video fab
         // NOTE: this is not set in XML because setting by xml seems to lock the value of the color
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
@@ -324,7 +321,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val ratio = PhotoUtils.getAspectRatioFromImagePath(imagePath)
         val isImageLandscape = PhotoUtils.isLandscape(imagePath)
 
-        // Set cardview constraints depending upon if photo is landscape or portrait
+        // Set card view constraints depending upon if photo is landscape or portrait
         val layoutParams = binding?.detailsCardContainer?.layoutParams
 
         // If landscape set height to wrap content
@@ -484,6 +481,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.setPhoto(clickedPhoto)
     }
 
+    /**
+     * Dialog Methods
+     */
     private fun initializeInfoDialog(){
         mInfoDialog = Dialog(requireContext())
         mInfoDialog?.setContentView(R.layout.dialog_project_information)
@@ -496,12 +496,22 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         setInfoDialog()
         setInfoTags()
     }
-
+    private fun editName(){
+        val input = EditText(requireContext())
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.edit_name))
+                .setView(input)
+                .setPositiveButton(android.R.string.yes) { _, _: Int ->
+                    val nameText = input.text.toString().trim()
+                    detailViewModel.updateProjectName(mExternalFilesDir!!, nameText, mCurrentProject!!)
+                }
+                .setNegativeButton(android.R.string.no, null).show()
+    }
     private fun initializeTagDialog(){
         mTagDialog = Dialog(requireContext())
         mTagDialog?.setContentView(R.layout.dialog_project_tag)
         mTagDialog?.setOnCancelListener { detailViewModel.tagDialogShowing = false }
-
         // set add tag fab
         val editText = mTagDialog?.findViewById<EditText>(R.id.add_tag_dialog_edit_text)
         val addTagFab = mTagDialog?.findViewById<FloatingActionButton>(R.id.add_tag_fab)
@@ -517,7 +527,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 }
             }
         }
-
         val okTextView = mTagDialog?.findViewById<TextView>(R.id.dialog_project_tag_dismiss)
         okTextView?.setOnClickListener {
             mTagDialog?.dismiss()
@@ -525,7 +534,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         setTagDialog()
     }
-
     private fun showTagValidationAlertDialog(message: String) {
         AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.invalid_tag))
@@ -534,7 +542,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setPositiveButton(android.R.string.ok) { _, _: Int ->
                 }.show()
     }
-
     private fun initializeScheduleDialog(){
         mScheduleDialog = Dialog(requireContext())
         mScheduleDialog?.setContentView(R.layout.dialog_schedule)
@@ -574,19 +581,13 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         setScheduleInformation()
     }
-
     private fun initializeFullscreenImageDialog() {
         // Create the dialog
         mFullscreenImageDialog = Dialog(requireContext(), R.style.Theme_AppCompat_Light_NoActionBar_FullScreen)
         mFullscreenImageDialog?.setCancelable(false)
-        mFullscreenImageDialog?.setContentView(R.layout.fullscreen_image)
-
-        mFullscreenImage = mFullscreenImageDialog?.findViewById(R.id.fullscreen_image)
-
-        // Get the fabs
+        mFullscreenImageDialog?.setContentView(R.layout.dialog_fullscreen_image)
         val mFullscreenExitFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_exit_fab)
         val mFullscreenBackFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_back_fab)
-
         // Display the dialog on clicking the image
         mFullscreenBackFab?.setOnClickListener {
             mFullscreenImageDialog?.dismiss()
@@ -596,7 +597,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mFullscreenImageDialog?.dismiss()
             detailViewModel.fullscreenDialogShowing = false
         }
-
         mFullscreenImageDialog?.setOnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 mFullscreenImageDialog?.dismiss()
@@ -604,18 +604,17 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             }
             true
         }
-
         // Set a listener to change the current photo on swipe
-        // Note: this may be preferable as a viewpager instead
+        val fullscreenImage = mFullscreenImageDialog?.findViewById<ImageView>(R.id.fullscreen_image_bottom)
         @Suppress("ClickableViewAccessibility")
-        mFullscreenImage?.setOnTouchListener(mOnSwipeTouchListener)
-
+        fullscreenImage?.setOnTouchListener(mOnSwipeTouchListener)
         setFullscreenImage()
     }
 
-    //Shared elements method
-    // UI methods
-    // TODO (update) implement dual loading solution for smooth transition between fullscreen images
+    /**
+    * UI methods
+    */
+
     // Pre loads the selected image into the hidden dialogue so that display appears immediate
     private fun setFullscreenImage() {
         if (mFullscreenImageDialog == null) return
@@ -625,9 +624,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 getEntryFromProject(mCurrentProject!!),
                 mCurrentPhoto!!.timestamp)
         val current = File(path)
-        Glide.with(this)
-                .load(current)
-                .into(mFullscreenImage!!)
+        val bottomImage = mFullscreenImageDialog?.findViewById<ImageView>(R.id.fullscreen_image_bottom)
+        val topImage = mFullscreenImageDialog?.findViewById<ImageView>(R.id.fullscreen_image_top)
+        if (bottomImage != null && topImage != null)
+            loadImagePair(current, bottomImage, topImage)
     }
 
     // Binds project and photos to database
@@ -635,10 +635,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Observe the current selected project
         detailViewModel.currentProject.observe(viewLifecycleOwner, Observer { currentProject: Project ->
             mCurrentProject = currentProject
-
             // Set id
             binding?.projectInformationLayout?.detailsProjectId?.text = mCurrentProject?.project_id.toString()
-
             // Set name for both the dialog and the project info card view
             val name = mCurrentProject?.project_name
             if (name == null || name.isEmpty()) {
@@ -665,7 +663,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         ?.detailsProjectNameTextView
                         ?.setTypeface(binding!!.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.BOLD)
             }
-
             // Begin set schedule information
             if (currentProject.interval_days == 0) {
                 binding?.projectScheduleFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
@@ -677,16 +674,13 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 binding?.scheduleIntervalTv?.text = currentProject.interval_days.toString()
                 binding?.scheduleIntervalTv?.visibility = VISIBLE
             }
-
             setInfoDialog()
             setScheduleInformation()
         })
-
         // Observe the list of photos
         detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
             // Save the list of photos
             mPhotos = photoEntries
-
             // Set the last photo whenever the list of photos changes
             if (mPhotos != null && mPhotos?.size != 0){
                 val lastPhotoEntry: PhotoEntry = mPhotos?.get(mPhotos!!.size-1)!!
@@ -695,20 +689,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 if (lastPhotoEntry.id != detailViewModel.lastPhoto?.photo_id) {
                     detailViewModel.currentPhoto.value = lastPhotoEntry
                 }
-
                 // Set the cover photo to the last in the set
                 detailViewModel.setCoverPhoto(lastPhotoEntry)
-
                 // Set the last photo
                 detailViewModel.setLastPhotoByEntry(mExternalFilesDir!!, mCurrentProject!!, lastPhotoEntry)
             }
-
             // Send the photos to the adapter
             mDetailAdapter?.setPhotoData(mPhotos, mCurrentProject)
-
             // Restore the play position
             mCurrentPlayPosition = mPhotos?.indexOf(mCurrentPhoto)
-
             // Set the date of the project based on the first photo entry
             val firstTimestamp = mPhotos?.get(0)?.timestamp
             val firstProjectDateString = TimeUtils.getShortDateFromTimestamp(firstTimestamp!!)
@@ -716,17 +705,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             val lastProjectDateString = TimeUtils.getShortDateFromTimestamp(lastTimestamp!!)
             binding?.projectInformationLayout
                     ?.detailsProjectTimespanTextview?.text = getString(R.string.timespan, firstProjectDateString, lastProjectDateString)
-
             // Set max for progress bar
             binding?.imageLoadingProgress?.max = mPhotos!!.size - 1
-
             // If current photo isn't set, set it to the last photo
             if (detailViewModel.currentPhoto.value == null) {
                 mCurrentPhoto = mPhotos!![mPhotos!!.size-1]
                 detailViewModel.currentPhoto.value = mCurrentPhoto
             }
         })
-
         // Load the ui based on the current photo
         detailViewModel.currentPhoto.observe(viewLifecycleOwner, Observer { currentPhoto: PhotoEntry? ->
             mCurrentPhoto = currentPhoto
@@ -734,17 +720,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 loadUi(currentPhoto)
             }
         })
-
         // Observe the tags
         detailViewModel.projectTags.observe(viewLifecycleOwner, Observer { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 // Update project information dialog
                 mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.text.toLowerCase(Locale.getDefault()) }
-
                 // Set the tags for the project tag dialog
                 setTagDialog()
                 val tagsText = setInfoTags()
-
                 // Update the tags in the project info card
                 if (mProjectTags!!.isEmpty()) {
                     binding?.projectInformationLayout?.detailsProjectTagsTextview?.visibility = GONE
@@ -753,18 +736,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     binding?.projectInformationLayout?.detailsProjectTagsTextview?.text = tagsText
                     binding?.projectInformationLayout?.detailsProjectTagsTextview?.visibility = VISIBLE
                 }
-
                 FileUtils.addTagToProject(mExternalFilesDir!!, mCurrentProject!!.project_id, mProjectTags!!)
             }
         })
-
-
         detailViewModel.tags.observe(viewLifecycleOwner, Observer {tagEntries: List<TagEntry> ->
             mAllTags = tagEntries.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
             setTagDialog()
         })
     }
-
     private fun setInfoTags(): String {
         // Update the tags in the project information dialog
         var tagsText = ""
@@ -777,10 +756,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         else tagsTextView?.text = tagsText
         return tagsText
     }
-
     private fun setInfoDialog() {
         if (mInfoDialog == null) return
-
         // Set info dialog fields
         val projectInfoDialogId = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_field)
         projectInfoDialogId?.text = mCurrentProject!!.project_id.toString()
@@ -788,7 +765,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         if (mCurrentProject?.project_name == null || mCurrentProject?.project_name!!.isEmpty()) {
             projectInfoNameTv?.text = getString(R.string.unnamed)
         } else projectInfoNameTv?.text = mCurrentProject!!.project_name
-
         if (mCurrentProject!!.interval_days == 0) {
             mInfoDialog?.findViewById<TextView>(R.id.info_dialog_schedule_description)?.text = getString(R.string.none)
         } else {
@@ -799,7 +775,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private fun setTagDialog() {
         if (mTagDialog == null) return
-
         val availableTagsLayout = mTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_available_tags_layout)
         availableTagsLayout?.removeAllViews()
         // Set up the available tags in the project information dialog
@@ -811,34 +786,28 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         tagInProject = true
                     }
                 }
-
                 val textView: TextView = layoutInflater.inflate(R.layout.tag_text_view, availableTagsLayout, false) as TextView
-
                 textView.text = getString(R.string.hashtag, tagEntry.text)
                 if (tagInProject) textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
                 else textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-
-                // Set the textview to remove or add the tag depending on whether the tag is in the project
+                // Set the text view to remove or add the tag depending on whether the tag is in the project
                 if (tagInProject) textView.setOnClickListener { detailViewModel.deleteTagFromProject(tagEntry, mCurrentProject!!) }
                 else textView.setOnClickListener { detailViewModel.addTag(tagEntry.text, mCurrentProject!!) }
-
-
-                // Set the textview to delete tag on long click
+                // TODO find way to let the user now about deletion on long click
+                // Set the text view to delete tag on long click
                 textView.setOnLongClickListener{
                     verifyTagDeletion(tagEntry)
                     true
                 }
-
                 // Finally add the view
                 availableTagsLayout?.addView(textView)
             }
         }
     }
 
-    // TODO find a way to get rid of all this terrible boiler plate
+    // TODO streamline the schedule dialog
+    // TODO update time interval display
     private fun setScheduleInformation(){
-        // TODO update time interval display
-        // TODO update dialog
         if (mScheduleDialog == null) return
         mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_none)?.setBackgroundResource(R.color.colorAccent)
         mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_one)?.setBackgroundResource(R.color.colorAccent)
@@ -870,54 +839,35 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         override fun onTouch(v: View, event: MotionEvent): Boolean {
             return gestureDetector.onTouchEvent(event)
         }
-
         private inner class GestureListener : SimpleOnGestureListener() {
-
             private val swipeThreshold = 100
             private val swipeVelocityThreshold = 100
-
             override fun onDown(e: MotionEvent): Boolean {
                 return true
             }
-
             override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
                 var result = false
                 val diffY = e2.y - e1.y
                 val diffX = e2.x - e1.x
-                if (diffX.absoluteValue > diffY.absoluteValue) {
+                if (diffX.absoluteValue > diffY.absoluteValue)
                     if (diffX.absoluteValue > swipeThreshold && velocityX.absoluteValue > swipeVelocityThreshold) {
-                        if (diffX > 0) {
-                            onSwipeRight()
-                        } else {
-                            onSwipeLeft()
-                        }
+                        if (diffX > 0) { onSwipeRight() }
+                        else { onSwipeLeft() }
                         result = true
                     }
-                }
                 return result
             }
         }
         fun onSwipeRight() = detailViewModel.previousPhoto()
         fun onSwipeLeft() = detailViewModel.nextPhoto()
-
         init {
             gestureDetector = GestureDetector(ctx, GestureListener())
         }
     }
 
-    private fun editName(){
-        val input = EditText(requireContext())
-        input.inputType = InputType.TYPE_CLASS_TEXT
-        AlertDialog.Builder(requireContext())
-                .setTitle(getString(R.string.edit_name))
-                .setView(input)
-                .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    val nameText = input.text.toString().trim()
-                    detailViewModel.updateProjectName(mExternalFilesDir!!, nameText, mCurrentProject!!)
-                }
-                .setNegativeButton(android.R.string.no, null).show()
-    }
-
+    /**
+     * Verification dialogs
+     */
     private fun verifyPhotoDeletion() {
         AlertDialog.Builder(requireContext())
                 .setTitle(R.string.delete_photo)
@@ -929,7 +879,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
-
     private fun verifyTagDeletion(tagEntry: TagEntry){
         AlertDialog.Builder(requireContext())
                 .setTitle(R.string.delete_tag)
@@ -941,7 +890,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
-
     private fun verifyLastPhotoDeletion() {
         AlertDialog.Builder(requireContext())
                 .setTitle(R.string.delete_photo)
@@ -951,7 +899,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     verifyProjectDeletion() }
                 .setNegativeButton(android.R.string.no, null).show()
     }
-
     // Deletes the current project after user verification
     private fun verifyProjectDeletion() {
         AlertDialog.Builder(requireContext())
@@ -962,7 +909,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     doubleVerifyProjectDeletion() }
                 .setNegativeButton(android.R.string.no, null).show()
     }
-
     // Double verifies project deletion
     private fun doubleVerifyProjectDeletion() {
         AlertDialog.Builder(requireContext())

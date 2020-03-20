@@ -6,7 +6,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
-        android:id="@+id/fullscreen_image"
+        android:id="@+id/fullscreen_image_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/fullscreen_image_content_description"/>
+
+    <ImageView
+        android:id="@+id/fullscreen_image_top"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitCenter"
