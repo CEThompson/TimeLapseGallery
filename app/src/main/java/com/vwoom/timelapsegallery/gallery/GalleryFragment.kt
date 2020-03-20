@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.gallery
 
 import android.app.Dialog
 import android.content.res.Configuration
+import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
@@ -13,6 +14,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -318,6 +320,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         for (tag in tags) {
             val tagCheckBox = CheckBox(requireContext())
             tagCheckBox.text = getString(R.string.hashtag, tag.text)
+            tagCheckBox.setTypeface(null, Typeface.ITALIC)
+            tagCheckBox.alpha = .8f
+            tagCheckBox.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
             tagCheckBox.isChecked = mGalleryViewModel.tagSelected(tag)
             tagCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) mGalleryViewModel.searchTags.add(tag)
