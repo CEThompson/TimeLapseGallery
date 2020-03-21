@@ -7,9 +7,20 @@
     android:orientation="vertical"
     android:padding="@dimen/medium">
 
+    <TextView
+        android:id="@+id/tag_deletion_instructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_margin="@dimen/medium"
+        android:alpha=".9"
+        android:text="@string/tag_deletion_instruction"
+        android:textColor="@color/colorSubtleRedAccent"/>
+
     <!-- Layout for available project tags -->
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/project_tag_dialog_available_tags_layout"
+        android:layout_margin="@dimen/large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:alignContent="stretch"
@@ -38,7 +49,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="@dimen/medium">
+        android:layout_margin="@dimen/medium">
 
         <EditText
             android:id="@+id/add_tag_dialog_edit_text"
@@ -48,7 +59,7 @@
             android:autofillHints="@string/new_tag_text"
             android:hint="@string/new_tag_text"
             android:inputType="text"
-            android:minWidth="150dp"
+            android:minWidth="200dp"
             android:singleLine="true"
             tools:text="#newtag" />
 
