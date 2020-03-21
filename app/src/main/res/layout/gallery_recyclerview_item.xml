@@ -39,15 +39,29 @@
                 app:layout_constraintBottom_toBottomOf="@id/project_image"
                 layout="@layout/schedule_layout" />
 
-            <!-- check mark to indicate if photo has been taken today -->
-            <ImageView
-                android:id="@+id/schedule_indicator_check"
-                android:layout_width="wrap_content"
+            <!-- Bottom gradient -->
+            <FrameLayout
+                android:id="@+id/gallery_item_check_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/schedule_indicator_check_content_description"
-                android:src="@drawable/ic_check_schedule_green_40dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintBottom_toBottomOf="parent">
+                <ImageView
+                    android:id="@+id/gallery_bottom_gradient"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:src="@drawable/gradient_overlay_bottom_up"
+                    />
+
+                <!-- check mark to indicate if photo has been taken today -->
+                <ImageView
+                    android:id="@+id/schedule_indicator_check"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|start"
+                    android:contentDescription="@string/schedule_indicator_check_content_description"
+                    android:src="@drawable/ic_check_schedule_green_40dp"
+                    />
+            </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </layout>

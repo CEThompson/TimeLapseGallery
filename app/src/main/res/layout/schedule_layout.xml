@@ -6,7 +6,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/schedule_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:minHeight="60dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/schedule_indicator_content_description"
                     android:src="@drawable/ic_schedule_indicator_pending_24dp"
-                    android:visibility="invisible" />
+                    android:visibility="visible" />
             </FrameLayout>
             <TextView
                 android:id="@+id/gallery_item_schedule_indicator_days"
@@ -59,17 +59,6 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white" />
         </LinearLayout>
-
-        <!-- Bottom gradient -->
-        <ImageView
-            android:id="@+id/gallery_bottom_gradient"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:src="@drawable/gradient_overlay_bottom_up"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            />
 
         <!-- days until due with a sun indicator -->
         <TextView

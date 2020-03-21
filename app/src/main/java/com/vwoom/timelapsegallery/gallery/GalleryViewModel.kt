@@ -9,6 +9,7 @@ import com.vwoom.timelapsegallery.data.repository.ProjectTagRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.TimeUtils
+import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 
 const val SEARCH_TYPE_NONE = "none"
 const val SEARCH_TYPE_DUE_TODAY = "due_today"
@@ -93,12 +94,6 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
             }
         }
         return resultProjects
-    }
-
-    private fun daysUntilDue(project: Project): Long {
-        val daysSinceLastPhotoTaken = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
-        val interval: Int = project.interval_days
-        return interval - daysSinceLastPhotoTaken
     }
 
     companion object {

@@ -49,6 +49,7 @@ import com.vwoom.timelapsegallery.databinding.FragmentDetailBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
+import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -666,13 +667,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             // Begin set schedule information
             if (currentProject.interval_days == 0) {
                 binding?.projectScheduleFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-                binding?.detailScheduleIndicator?.visibility = INVISIBLE
-                binding?.scheduleIntervalTv?.visibility = INVISIBLE
+                binding?.detailScheduleLayout?.scheduleLayout?.visibility = INVISIBLE
             } else {
                 binding?.projectScheduleFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
-                binding?.detailScheduleIndicator?.visibility = VISIBLE
-                binding?.scheduleIntervalTv?.text = currentProject.interval_days.toString()
-                binding?.scheduleIntervalTv?.visibility = VISIBLE
+                binding?.detailScheduleLayout?.scheduleLayout?.visibility = VISIBLE
+                binding?.detailScheduleLayout?.galleryItemScheduleIndicatorDays?.text = currentProject.interval_days.toString()
+                binding?.detailScheduleLayout?.daysUntilDueTextView?.text = daysUntilDue(mCurrentProject!!).toString()
             }
             setInfoDialog()
             setScheduleInformation()
