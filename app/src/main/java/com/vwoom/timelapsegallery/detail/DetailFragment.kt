@@ -302,6 +302,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val timestamp = photoEntry.timestamp
         val photoNumber = mPhotos!!.indexOf(photoEntry) + 1
         val photosInProject: Int = mPhotos!!.size
+        Log.d(TAG, "photoNumber is $photoNumber")
+        Log.d(TAG, "photosInProject is $photosInProject")
         // Get formatted strings
         val photoNumberString = getString(R.string.details_photo_number_out_of, photoNumber, photosInProject)
         val date = TimeUtils.getDateFromTimestamp(timestamp)
@@ -641,7 +643,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             loadImagePair(current, bottomImage, topImage)
     }
 
-    // TODO clarify observable logic, right now selected photo does not persist on configuration change
+    // TODO clarify observable logic, selected photo now persists on config change but this whole class needs organization
     // Binds project and photos to database
     private fun setupViewModel() {
         // Observe the current selected project
@@ -690,20 +692,28 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         })
         // Observe the list of photos
         detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
-            // Save the list of photos
-            mPhotos = photoEntries
-            // Set the last photo whenever the list of photos changes
-            if (mPhotos != null && mPhotos?.size != 0){
-                val lastPhotoEntry: PhotoEntry = mPhotos?.get(mPhotos!!.size-1)!!
+            val lastPhotoEntry = photoEntries.last()
+            // Set the last photo to pass to the camera fragment.
+            // Note: this is because photo passes the last photo url along with it as a parcelable
+            detailViewModel.setLastPhotoByEntry(mExternalFilesDir!!, mCurrentProject!!, lastPhotoEntry)
 
-                // If the last photo in the set changes update to the current photo
-                if (lastPhotoEntry.id != detailViewModel.lastPhoto?.photo_id) {
-                    detailViewModel.currentPhoto.value = lastPhotoEntry
-                }
+            // Before we set member variables determine if last photo changed
+            val lastPhotoChanged = (mPhotos!=null && lastPhotoEntry != mPhotos!!.last())
+
+            // NOTE: setting mPhotos here because of a timing issue,
+            // otherwise the current photo listener fires triggering a method which uses mPhotos incorrect value
+            // causing the photo number to read wrong on return to fragment from the camera
+            mPhotos = photoEntries
+
+            // If the last photo changed we want to update it as the current photo
+            // and make sure to set it as the cover photo
+            if (lastPhotoChanged) {
+                // Set the current photo to the last
+                mCurrentPhoto = lastPhotoEntry
+                detailViewModel.currentPhoto.value = lastPhotoEntry
                 // Set the cover photo to the last in the set
+                // TODO consider handling this in the view model
                 detailViewModel.setCoverPhoto(lastPhotoEntry)
-                // Set the last photo
-                detailViewModel.setLastPhotoByEntry(mExternalFilesDir!!, mCurrentProject!!, lastPhotoEntry)
             }
             // Send the photos to the adapter
             mDetailAdapter?.setPhotoData(mPhotos, mCurrentProject)
