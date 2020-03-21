@@ -82,6 +82,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mTagDialog: Dialog? = null
     private var mInfoDialog: Dialog? = null
     private var mScheduleDialog: Dialog? = null
+    private val mDaySelectionViews: ArrayList<TextView> = arrayListOf()
+    private val mWeekSelectionViews: ArrayList<TextView> = arrayListOf()
 
     private var toolbar: Toolbar? = null
 
@@ -551,34 +553,42 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 }.show()
     }
     private fun initializeScheduleDialog(){
+        if (mScheduleDialog != null) return
+
         mScheduleDialog = Dialog(requireContext())
         mScheduleDialog?.setContentView(R.layout.dialog_schedule)
         mScheduleDialog?.setOnCancelListener { detailViewModel.scheduleDialogShowing = false }
 
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_none)?.setOnClickListener {
-            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 0)
+        // TODO style selection views
+        // Set up days selection
+        val daysLayout = mScheduleDialog?.findViewById<FlexboxLayout>(R.id.dialog_schedule_days_selection_layout)
+        daysLayout?.removeAllViews()
+        for (dayInterval in 0..6){
+            // a selection layout for each interval
+            //val textView = TextView(requireContext())
+            val textView: TextView = layoutInflater.inflate(R.layout.dialog_schedule_selector, daysLayout,false) as TextView
+            textView.text = dayInterval.toString()
+            textView.setOnClickListener {
+                detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, dayInterval)
+            }
+            daysLayout?.addView(textView)
+            mDaySelectionViews.add(textView)
         }
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_one)?.setOnClickListener {
-            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 1)
+
+        // Set up weeks selection
+        val weeksLayout = mScheduleDialog?.findViewById<FlexboxLayout>(R.id.dialog_schedule_weeks_selection_layout)
+        weeksLayout?.removeAllViews()
+        for (weekInterval in 0..4){
+            val textView: TextView = layoutInflater.inflate(R.layout.dialog_schedule_selector, daysLayout,false) as TextView
+            textView.text = weekInterval.toString()
+            textView.setOnClickListener {
+                detailViewModel.setSchedule(mExternalFilesDir!!,mCurrentProject!!, weekInterval*7)
+            }
+            weeksLayout?.addView(textView)
+            mWeekSelectionViews.add(textView)
         }
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_two)?.setOnClickListener {
-            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 2)
-        }
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_three)?.setOnClickListener {
-            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 3)
-        }
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_four)?.setOnClickListener {
-            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 4)
-        }
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_five)?.setOnClickListener {
-            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 5)
-        }
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_six)?.setOnClickListener {
-            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 6)
-        }
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_seven)?.setOnClickListener {
-            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 7)
-        }
+
+        // Set up custom input
         mScheduleDialog?.findViewById<EditText>(R.id.custom_schedule_input)?.addTextChangedListener {
             val interval = it.toString()
             if (interval.isNotEmpty()){
@@ -587,6 +597,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 0)
             }
         }
+
         val okTextView = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_dismiss)
         okTextView?.setOnClickListener {
             mScheduleDialog?.dismiss()
@@ -830,26 +841,18 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // TODO update time interval display
     private fun setScheduleInformation(){
         if (mScheduleDialog == null) return
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_none)?.setBackgroundResource(R.color.colorAccent)
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_one)?.setBackgroundResource(R.color.colorAccent)
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_two)?.setBackgroundResource(R.color.colorAccent)
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_three)?.setBackgroundResource(R.color.colorAccent)
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_four)?.setBackgroundResource(R.color.colorAccent)
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_five)?.setBackgroundResource(R.color.colorAccent)
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_six)?.setBackgroundResource(R.color.colorAccent)
-        mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_seven)?.setBackgroundResource(R.color.colorAccent)
-
         val color = R.color.colorPrimary
-        when(mCurrentProject?.interval_days){
-            null -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_none)?.setBackgroundResource(color)}
-            0 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_none)?.setBackgroundResource(color)}
-            1 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_one)?.setBackgroundResource(color)}
-            2 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_two)?.setBackgroundResource(color)}
-            3 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_three)?.setBackgroundResource(color)}
-            4 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_four)?.setBackgroundResource(color)}
-            5 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_five)?.setBackgroundResource(color)}
-            6 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_six)?.setBackgroundResource(color)}
-            7 -> {mScheduleDialog?.findViewById<TextView>(R.id.schedule_selector_seven)?.setBackgroundResource(color)}
+        val currentInterval = mCurrentProject!!.interval_days
+        for (textView in mDaySelectionViews){
+            textView.setBackgroundResource(R.color.colorAccent)
+            if (textView.text == currentInterval.toString())
+                textView.setBackgroundResource(color)
+        }
+        for (textView in mWeekSelectionViews){
+            textView.setBackgroundResource(R.color.colorAccent)
+            val currentWeekIntervalToDays = textView.text.toString().toInt() * 7
+            if (currentWeekIntervalToDays == currentInterval)
+                textView.setBackgroundResource(color)
         }
     }
 
