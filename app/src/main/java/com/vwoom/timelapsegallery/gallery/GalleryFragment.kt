@@ -350,7 +350,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onClick(clickedProject: Project, projectImageView: ImageView, projectCardView: CardView, position: Int) {
         // Prevents multiple clicks which cause a crash
-        if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 500) return
+        if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 400) return
         mLastClickTime = SystemClock.elapsedRealtime()
 
         // Navigate to the detail fragment

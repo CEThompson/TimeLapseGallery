@@ -8,10 +8,7 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.HandlerThread
+import android.os.*
 import android.util.Log
 import android.util.Size
 import android.view.*
@@ -69,6 +66,9 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private var captureRequestBuilder: CaptureRequest.Builder? = null
 
     private var previewSize: Size? = null
+
+    // prevent double clicking
+    private var mLastClickTime: Long = System.currentTimeMillis() // initialize last click time
 
     private val surfaceTextureListener = object : TextureView.SurfaceTextureListener {
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
@@ -210,6 +210,10 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private fun setTakePictureFab() {
         mTakePictureFab?.setOnClickListener {
+            // Prevents multiple clicks which cause a crash
+            if (System.currentTimeMillis() - mLastClickTime < 2000) return@setOnClickListener
+            mLastClickTime = System.currentTimeMillis()
+
             var outputPhoto: FileOutputStream? = null
             try {
                 val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
@@ -221,7 +225,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     camera2ViewModel.handleFile(file, externalFilesDir)
                     findNavController().popBackStack()
                 }
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 camera2Preview.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
                 Log.d(TAG, "Take picture exception: ${e.message}")
             } finally {
@@ -231,6 +235,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     Log.d(TAG, "Take picture exception in finally block, exception closing photo: ${e.message}")
                 }
             }
+
         }
     }
 
