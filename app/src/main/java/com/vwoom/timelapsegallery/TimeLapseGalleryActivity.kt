@@ -17,7 +17,7 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_time_lapse_gallery)
 
         // Initialize mobile ads
-        MobileAds.initialize(this, OnInitializationCompleteListener { initializationStatus: InitializationStatus? -> })
+        MobileAds.initialize(this) { }
     }
 
     /* Ensure deletion of temporary photo files */
