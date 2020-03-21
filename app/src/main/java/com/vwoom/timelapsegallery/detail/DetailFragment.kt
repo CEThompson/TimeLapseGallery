@@ -494,6 +494,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Set fab colors
         editNameButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
         editNameButton?.setOnClickListener { editName() }
+        val infoOkTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_info_dismiss)
+        infoOkTextView?.setOnClickListener {
+            mInfoDialog?.dismiss()
+            detailViewModel.infoDialogShowing = false
+        }
         setInfoDialog()
         setInfoTags()
     }
@@ -579,6 +584,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             } else {
                 detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 0)
             }
+        }
+        val okTextView = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_dismiss)
+        okTextView?.setOnClickListener {
+            mScheduleDialog?.dismiss()
+            detailViewModel.scheduleDialogShowing = false
         }
         setScheduleInformation()
     }
