@@ -641,6 +641,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             loadImagePair(current, bottomImage, topImage)
     }
 
+    // TODO clarify observable logic, right now selected photo does not persist on configuration change
     // Binds project and photos to database
     private fun setupViewModel() {
         // Observe the current selected project
