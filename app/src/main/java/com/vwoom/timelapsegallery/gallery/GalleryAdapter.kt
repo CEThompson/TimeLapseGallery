@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.text.format.DateUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.*
@@ -21,6 +22,8 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 import java.util.*
+import kotlin.math.log
+import kotlin.math.log10
 
 class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, val externalFilesDir: File) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
     private var mProjectData: List<Project>? = null
@@ -129,9 +132,11 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         when {
             photoTakenToday -> holder.binding.galleryScheduleLayout.daysUntilDueTextView.alpha = 0.3f
             daysUntilDue <= 0 -> holder.binding.galleryScheduleLayout.daysUntilDueTextView.alpha = 1f
+            daysUntilDue == 1.toLong() ->  holder.binding.galleryScheduleLayout.daysUntilDueTextView.alpha = .9f
             else -> {
                 val minOpacity = .5f
-                val opacityAdjust = .4f * (1/daysUntilDue).toFloat()
+                val dimFactor = (1f/log(daysUntilDue.toFloat(),2f))
+                val opacityAdjust = .4f * dimFactor
                 val opacity = minOpacity + opacityAdjust
                 holder.binding.galleryScheduleLayout.daysUntilDueTextView.alpha = opacity
             }
