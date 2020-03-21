@@ -250,12 +250,20 @@
     <!-- Shared preference -->
     <string name="key_add_transition" translatable="false">add</string>
 
+    <!-- shared preference defaults -->
     <string name="playback_interval_default" translatable="false">50</string>
     <string name="notification_time_default" translatable="false">7</string>
 
+    <!-- launch key -->
     <string name="search_launch_due" translatable="false">search_launch_due</string>
 
+    <!-- project tag dialog -->
     <string name="tag_deletion_instruction">Note: Tap and hold to remove a tag.</string>
 
+    <!-- schedule dialog -->
     <string name="custom_interval_in_days_hint">custom interval (in days)</string>
+    <string name="every">every</string>
+    <string name="custom_interval_label">custom interval:</string>
+    <string name="days_label">days:</string>
+    <string name="weeks_label">weeks:</string>
 </resources>
