@@ -535,8 +535,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 }
             }
         }
-        val okTextView = mTagDialog?.findViewById<TextView>(R.id.dialog_project_tag_dismiss)
-        okTextView?.setOnClickListener {
+        val dismissView = mTagDialog?.findViewById<TextView>(R.id.dialog_project_tag_dismiss)
+        dismissView?.setOnClickListener {
             mTagDialog?.dismiss()
             detailViewModel.tagDialogShowing = false
         }
@@ -903,7 +903,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private fun verifyTagDeletion(tagEntry: TagEntry){
         AlertDialog.Builder(requireContext())
                 .setTitle(R.string.delete_tag)
-                .setMessage(R.string.verify_delete_tag)
+                .setMessage(getString(R.string.verify_delete_tag, tagEntry.text))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     // If this photo is the last photo then set the new thumbnail to its previous

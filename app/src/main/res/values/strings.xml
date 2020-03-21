@@ -71,7 +71,7 @@
     <!-- Verification strings -->
     <string name="verify_delete_project">Are you sure you wish to delete the project?</string>
     <string name="verify_delete_photo">Are you sure you wish to delete this photo?</string>
-    <string name="verify_delete_tag">This will delete the tag and remove it from all associated projects.\n\n
+    <string name="verify_delete_tag">This will delete the tag #%1$s and remove it from all associated projects.\n\n
         Do you wish to continue? </string>
     <string name="verify_delete_last_photo">This is the last photo in the project. Would you like to delete the project instead?</string>
     <string name="double_verify_project_deletion">Please verify to confirm.</string>
@@ -255,5 +255,7 @@
 
     <string name="search_launch_due" translatable="false">search_launch_due</string>
 
-    <string name="tag_deletion_instruction">Tap and hold a tag to remove.</string>
+    <string name="tag_deletion_instruction">Note: Tap and hold to remove a tag.</string>
+
+    <string name="custom_interval_in_days_hint">custom interval (in days)</string>
 </resources>
