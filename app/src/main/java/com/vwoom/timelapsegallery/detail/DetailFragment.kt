@@ -854,6 +854,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             if (currentWeekIntervalToDays == currentInterval)
                 textView.setBackgroundResource(color)
         }
+        val scheduleOutput = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_result)
+        if (mCurrentProject!!.interval_days==0) scheduleOutput?.text = getString(R.string.none)
+        else scheduleOutput?.text = getString(R.string.every_x_days, mCurrentProject!!.interval_days.toString())
     }
 
     // Changes photo on swipe
