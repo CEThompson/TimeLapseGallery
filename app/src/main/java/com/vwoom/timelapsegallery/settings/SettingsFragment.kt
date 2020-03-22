@@ -5,13 +5,16 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -19,7 +22,8 @@ import androidx.preference.PreferenceManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.notification.NotificationUtils
-import com.vwoom.timelapsegallery.utils.*
+import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.utils.RESERVED_CHARACTERS
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 
@@ -73,6 +77,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        setupViewModel()
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context)
@@ -96,14 +105,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-        val syncPref: Preference? =  findPreference(getString(R.string.key_sync))
+        val syncPref: Preference? = findPreference(getString(R.string.key_sync))
 
         // Listen for changes to shared preferences and update notification worker on change
         prefs = PreferenceManager.getDefaultSharedPreferences(activity)
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
             Log.d("settings activity", "Notification listener activitating for key = $key")
 
-            if (key == this.getString(R.string.key_ads_disabled)){
+            if (key == this.getString(R.string.key_ads_disabled)) {
                 val adsDisabled = prefs.getBoolean(context?.getString(R.string.key_ads_disabled), false)
                 if (adsDisabled)
                     mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_ads_disabled)!!, null)
@@ -131,7 +140,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
 
             // Track playback interval selection
-            if (key == getString(R.string.key_playback_interval)){
+            if (key == getString(R.string.key_playback_interval)) {
                 val interval = prefs.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
                 val params = Bundle()
                 params.putString(context?.getString(R.string.analytics_playback_interval)!!, interval)
@@ -139,7 +148,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
 
             // If the user enables manual file mSyncing give some info
-            if (key == getString(R.string.key_sync_allowed)){
+            if (key == getString(R.string.key_sync_allowed)) {
                 val isSyncAllowed = prefs.getBoolean(key, false)
                 if (isSyncAllowed) {
                     showFileModificationDialog()
@@ -150,7 +159,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         // Verify the user wants to sync files to the database
-        syncPref?.setOnPreferenceClickListener{
+        syncPref?.setOnPreferenceClickListener {
             showVerifyProjectImportDialog()
             true
         }
@@ -159,7 +168,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     //
     // Start Dialog Functions
     //
-    private fun createVerifyProjectImportDialog(){
+    private fun createVerifyProjectImportDialog() {
         val builder = AlertDialog.Builder(requireContext())
                 .setTitle(R.string.warning)
                 .setMessage(R.string.database_sync_warning)
@@ -168,19 +177,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     settingsViewModel.showingVerifySyncDialog = false
                     executeSync()
                 }
-                .setNegativeButton(R.string.cancel){_,_ -> settingsViewModel.showingVerifySyncDialog = false}
+                .setNegativeButton(R.string.cancel) { _, _ -> settingsViewModel.showingVerifySyncDialog = false }
                 .setIcon(R.drawable.ic_warning_black_24dp)
         mVerifySyncDialog = builder.create()
     }
+
     private fun createManualFileModificationDialog() {
         val builder = AlertDialog.Builder(requireContext())
                 .setTitle(R.string.warning)
                 .setMessage(R.string.file_modification_information)
-                .setPositiveButton(R.string.ok) { _, _ -> settingsViewModel.showingFileModDialog = false}
+                .setPositiveButton(R.string.ok) { _, _ -> settingsViewModel.showingFileModDialog = false }
                 .setIcon(R.drawable.ic_warning_black_24dp)
         mFileModDialog = builder.create()
     }
-    private fun createSyncDialog(){
+
+    private fun createSyncDialog() {
         Log.d(TAG, "creating sync dialog")
         mSyncDialog = Dialog(requireContext())
         mSyncDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -195,8 +206,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
             settingsViewModel.showingSyncDialog = false
         }
     }
+
     // Shows a dialog to give progress feedback on synchronization
-    private fun showSyncDialog(){
+    private fun showSyncDialog() {
         Log.d(TAG, "showing sync dialog")
         // Set the response
         val responseView = mSyncDialog?.findViewById(R.id.sync_response) as TextView
@@ -213,8 +225,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // Show the dialog
         mSyncDialog?.show()
     }
+
     // Updates the dialog showing progress on synchronization
-    private fun updateSyncDialog(result: ValidationResult<Nothing>){
+    private fun updateSyncDialog(result: ValidationResult<Nothing>) {
         Log.d(TAG, "updating sync dialog")
         // Set the response
         val responseView = mSyncDialog?.findViewById(R.id.sync_response) as TextView
@@ -223,7 +236,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val button = mSyncDialog?.findViewById(R.id.sync_verification_button) as androidx.appcompat.widget.AppCompatButton
 
         imageFeedback.setImageResource(R.drawable.ic_error_red_40dp)
-        when(result){
+        when (result) {
             is ValidationResult.Error.NoFilesError -> {
                 responseView.text = requireContext()
                         .getString(R.string.no_files_in_directory_error,
@@ -232,8 +245,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
             is ValidationResult.Error.InvalidCharacterError -> {
                 responseView.text = requireContext()
                         .getString(R.string.invalid_character_error,
-                        result.projectName,
-                        RESERVED_CHARACTERS)
+                                result.projectName,
+                                RESERVED_CHARACTERS)
             }
             is ValidationResult.Error.DuplicateIdError -> {
                 responseView.text = requireContext().getString(R.string.duplicate_id_error, result.projectName)
@@ -259,10 +272,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         imageFeedback.visibility = View.VISIBLE
         button.visibility = View.VISIBLE
     }
+
     private fun showVerifyProjectImportDialog() {
         settingsViewModel.showingVerifySyncDialog = true
         mVerifySyncDialog?.show()
     }
+
     private fun showFileModificationDialog() {
         settingsViewModel.showingFileModDialog = true
         mFileModDialog?.show()
@@ -272,12 +287,25 @@ class SettingsFragment : PreferenceFragmentCompat() {
     //
 
     // TODO: find way to update status of importing projects
-    private fun executeSync(){
+    private fun executeSync() {
         showSyncDialog()
         databaseSyncJob = settingsViewModel.viewModelScope.async {
             settingsViewModel.executeSync(requireContext())
             updateSyncDialog(settingsViewModel.response)
         }
+    }
+
+    private fun setupViewModel() {
+        settingsViewModel.progress.observe(viewLifecycleOwner, Observer {
+            val progress = mSyncDialog?.findViewById(R.id.sync_progress) as ProgressBar
+            progress.progress = it
+            Log.d("ProgressCheck", "progress bar progress observable firing")
+        })
+        settingsViewModel.max.observe(viewLifecycleOwner, Observer {
+            val progress = mSyncDialog?.findViewById(R.id.sync_progress) as ProgressBar
+            progress.max = it
+            Log.d("ProgressCheck", "progress bar max observable firing")
+        })
     }
 
     companion object {

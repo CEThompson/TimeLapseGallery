@@ -4,6 +4,7 @@ import android.util.Log
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.settings.SyncProgressCounter
 import com.vwoom.timelapsegallery.settings.ValidationResult
 import java.io.File
 import java.io.FileInputStream
@@ -86,7 +87,12 @@ object ProjectUtils {
 
         // Add all project references from the file structure
         val files = externalFilesDir.listFiles()
-        for (child in files!!) {
+
+        SyncProgressCounter.setMax(files!!.size)
+        Log.d("ProgressCheck", "setting max ${SyncProgressCounter.max}")
+        for (child in files) {
+            SyncProgressCounter.increment()
+            Log.d("ProgressCheck", "incrementing progress ${SyncProgressCounter.progress}")
             // Get the filename of the project
             val url = child.absolutePath
             val filename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
