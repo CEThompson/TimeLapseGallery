@@ -5,6 +5,8 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#E58D1C</color>
 
+    <color name="colorSubtleAccent">#E4B671</color>
+
     <color name="colorTag">#03A9F4</color>
 
     <color name="colorYellow">#FFC107</color>

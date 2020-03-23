@@ -18,6 +18,7 @@ import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.*
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -51,6 +52,7 @@ import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
+import kotlinx.android.synthetic.main.dialog_schedule_selector.view.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -82,8 +84,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mTagDialog: Dialog? = null
     private var mInfoDialog: Dialog? = null
     private var mScheduleDialog: Dialog? = null
-    private val mDaySelectionViews: ArrayList<TextView> = arrayListOf()
-    private val mWeekSelectionViews: ArrayList<TextView> = arrayListOf()
+    private val mDaySelectionViews: ArrayList<CardView> = arrayListOf()
+    private val mWeekSelectionViews: ArrayList<CardView> = arrayListOf()
 
     private var toolbar: Toolbar? = null
 
@@ -566,26 +568,28 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         for (dayInterval in 0..6){
             // a selection layout for each interval
             //val textView = TextView(requireContext())
-            val textView: TextView = layoutInflater.inflate(R.layout.dialog_schedule_selector, daysLayout,false) as TextView
+            val selectionLayout: CardView = layoutInflater.inflate(R.layout.dialog_schedule_selector, daysLayout,false) as CardView
+            val textView = selectionLayout.findViewById<TextView>(R.id.selector_child_tv)
             textView.text = dayInterval.toString()
-            textView.setOnClickListener {
+            selectionLayout.setOnClickListener {
                 detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, dayInterval)
             }
-            daysLayout?.addView(textView)
-            mDaySelectionViews.add(textView)
+            daysLayout?.addView(selectionLayout)
+            mDaySelectionViews.add(selectionLayout)
         }
 
         // Set up weeks selection
         val weeksLayout = mScheduleDialog?.findViewById<FlexboxLayout>(R.id.dialog_schedule_weeks_selection_layout)
         weeksLayout?.removeAllViews()
         for (weekInterval in 0..4){
-            val textView: TextView = layoutInflater.inflate(R.layout.dialog_schedule_selector, daysLayout,false) as TextView
+            val selectionLayout: CardView = layoutInflater.inflate(R.layout.dialog_schedule_selector, daysLayout,false) as CardView
+            val textView = selectionLayout.findViewById<TextView>(R.id.selector_child_tv)
             textView.text = weekInterval.toString()
-            textView.setOnClickListener {
+            selectionLayout.setOnClickListener {
                 detailViewModel.setSchedule(mExternalFilesDir!!,mCurrentProject!!, weekInterval*7)
             }
-            weeksLayout?.addView(textView)
-            mWeekSelectionViews.add(textView)
+            weeksLayout?.addView(selectionLayout)
+            mWeekSelectionViews.add(selectionLayout)
         }
 
         // Set up custom input
@@ -841,18 +845,18 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // TODO update time interval display
     private fun setScheduleInformation(){
         if (mScheduleDialog == null) return
-        val color = R.color.colorPrimary
+        val color = R.color.colorAccent
         val currentInterval = mCurrentProject!!.interval_days
-        for (textView in mDaySelectionViews){
-            textView.setBackgroundResource(R.color.colorAccent)
-            if (textView.text == currentInterval.toString())
-                textView.setBackgroundResource(color)
+        for (selector in mDaySelectionViews){
+            selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorSubtleAccent))
+            if (selector.selector_child_tv.text == currentInterval.toString())
+                selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), color))
         }
-        for (textView in mWeekSelectionViews){
-            textView.setBackgroundResource(R.color.colorAccent)
-            val currentWeekIntervalToDays = textView.text.toString().toInt() * 7
+        for (selector in mWeekSelectionViews){
+            selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorSubtleAccent))
+            val currentWeekIntervalToDays = selector.selector_child_tv.text.toString().toInt() * 7
             if (currentWeekIntervalToDays == currentInterval)
-                textView.setBackgroundResource(color)
+                selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), color))
         }
         val scheduleOutput = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_result)
         if (mCurrentProject!!.interval_days==0) scheduleOutput?.text = getString(R.string.none)
