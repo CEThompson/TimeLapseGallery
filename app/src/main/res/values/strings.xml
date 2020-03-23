@@ -179,15 +179,16 @@
     <!-- Database sync warning information -->
     <string name="warning">Warning!</string>
     <string name="file_modification_information">
-        Manually modifying your files will cause errors in the gallery prior to synchronization. Please backup your data!
+        Manually modifying your files may cause errors in the gallery. Please backup your data!
         \n\nFiles are located on your device at: Android/data/com.vwoom.timelapsegallery/files/pictures/
-        \n\nProject folders are organized by ID
-        \n\nProjects with a name are in the following format: {ID}_{Name}.
-        \n\nPlease use unique IDs and alpha numeric characters or spaces for names.
+        \n\nProject folders are organized by ID and name if specified. Example: "1" or "1_My Project".
+        \n\nUse unique IDs and alpha numeric characters or spaces for names.
         \n\nPhotos are arranged by unix timestamp.
+        \n\nTags and Schedules for projects are located at pictures/Meta/{Project ID}.
     </string>
     <string name="database_sync_warning">Synchronization may take some time and must complete to be successful.
-    \n\n Do you still wish to proceed?</string>
+        \n\nPlease do not exit the application.
+        \n\n Do you still wish to proceed?</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -205,7 +206,7 @@
         \n Exception message: %2$s</string>
 
     <string name="valid_file_structure" translatable="false">valid_file_structure</string>
-    <string name="executing_sync_notification">Executing synchronization</string>
+    <string name="executing_sync_notification">Executing synchronization...</string>
     <string name="executing_sync_complete">Synchronization completed</string>
 
     <!-- Settings -->

@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.settings
 import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -53,6 +54,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onDestroy() {
         super.onDestroy()
         databaseSyncJob?.cancel()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -215,6 +217,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // Set the response
         val responseView = mSyncDialog?.findViewById(R.id.sync_response) as TextView
         responseView.text = this.getString(R.string.executing_sync_notification)
+        val overallProgress = mSyncDialog?.findViewById(R.id.overall_sync_progress) as ProgressBar
         val projectProgress = mSyncDialog?.findViewById(R.id.project_sync_progress) as ProgressBar
         val photoProgress = mSyncDialog?.findViewById(R.id.photo_sync_progress) as ProgressBar
         val projectProgressTv = mSyncDialog?.findViewById(R.id.project_sync_tv) as TextView
@@ -224,6 +227,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val okButton = mSyncDialog?.findViewById(R.id.sync_verification_button) as androidx.appcompat.widget.AppCompatButton
 
         // Show the updated views
+        overallProgress.visibility = VISIBLE
         projectProgress.visibility = VISIBLE
         projectProgressTv.visibility = VISIBLE
         photoProgress.visibility = VISIBLE
@@ -239,6 +243,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         Log.d(TAG, "updating sync dialog")
         // Set the response
         val responseView = mSyncDialog?.findViewById(R.id.sync_response) as TextView
+        val overallProgress = mSyncDialog?.findViewById(R.id.overall_sync_progress) as ProgressBar
         val projectProgress = mSyncDialog?.findViewById(R.id.project_sync_progress) as ProgressBar
         val projectProgressTv = mSyncDialog?.findViewById(R.id.project_sync_tv) as TextView
         val photoProgress = mSyncDialog?.findViewById(R.id.photo_sync_progress) as ProgressBar
@@ -279,6 +284,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
         // Show the updated views
+        overallProgress.visibility = GONE
         projectProgress.visibility = GONE
         projectProgressTv.visibility = GONE
         photoProgress.visibility = GONE
@@ -304,8 +310,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun executeSync() {
         showSyncDialog()
         databaseSyncJob = settingsViewModel.viewModelScope.async {
+            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
             settingsViewModel.executeSync(requireContext())
             updateSyncDialog(settingsViewModel.response)
+            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }
     }
 
