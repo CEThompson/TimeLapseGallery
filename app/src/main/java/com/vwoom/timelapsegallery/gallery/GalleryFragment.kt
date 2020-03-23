@@ -12,6 +12,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -84,6 +85,18 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         toolbar = null
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val callback: OnBackPressedCallback = object: OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (userIsNotSearching())
+                    requireActivity().finish()
+                else clearSearch()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val binding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
@@ -136,14 +149,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         mSearchActiveFAB = binding.searchActiveIndicator
-        mSearchActiveFAB?.setOnClickListener {
-            // Clear search
-            mGalleryViewModel.searchName = ""
-            mGalleryViewModel.searchTags.clear()
-            mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-            updateSearchFilter()
-            updateSearchDialog()
-        }
+        mSearchActiveFAB?.setOnClickListener { clearSearch() }
 
         setupViewModel()
 
@@ -157,6 +163,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         else mSearchActiveFAB?.hide()
 
         return binding.root
+    }
+
+    private fun clearSearch() {
+        // Clear search
+        mGalleryViewModel.searchName = ""
+        mGalleryViewModel.searchTags.clear()
+        mGalleryViewModel.searchType = SEARCH_TYPE_NONE
+        updateSearchFilter()
+        updateSearchDialog()
     }
 
     override fun onResume() {
