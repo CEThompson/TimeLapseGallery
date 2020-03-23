@@ -1,49 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/selector_margin"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <ProgressBar
-        android:id="@+id/sync_progress"
+        android:id="@+id/project_sync_progress"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="100dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/project_sync_tv"
+        android:layout_marginTop="@dimen/medium"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/sync_response"
-        app:layout_constraintVertical_bias="0.5"
-        app:layout_constraintHorizontal_bias="0.5"/>
+        android:layout_gravity="center_horizontal"
+        tools:text="importing projects: 0 out of 100"/>
+
+    <ProgressBar
+        android:id="@+id/photo_sync_progress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="150dp"
+        android:layout_marginTop="@dimen/large"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/photo_sync_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/medium"
+        android:layout_gravity="center_horizontal"
+        tools:text="importing photos for project: 5 out of 67"/>
 
     <ImageView
         android:contentDescription="@string/sync_image_feedback_content_description"
-        android:visibility="invisible"
         android:id="@+id/sync_feedback_image"
         android:src="@drawable/ic_check_green_40dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/sync_response"
-        app:layout_constraintVertical_bias="0.5"
-        app:layout_constraintHorizontal_bias="0.5"/>
+        android:layout_gravity="center_horizontal"/>
 
     <TextView
         android:id="@+id/sync_response"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/textview_margin"
-        app:layout_constraintTop_toBottomOf="@id/sync_progress"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/sync_verification_button"
-        app:layout_constraintHorizontal_bias="0.5"
-        android:text="@string/executing_sync_notification"
-        tools:text="Executing synchronization"/>
+        android:textStyle="bold"
+        android:layout_margin="@dimen/textview_margin"
+        tools:text="Executing synchronization"
+        android:layout_gravity="center_horizontal"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/sync_verification_button"
@@ -53,6 +63,7 @@
         android:layout_height="wrap_content"
         android:text="@string/ok"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_gravity="end"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

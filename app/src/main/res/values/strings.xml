@@ -266,4 +266,8 @@
     <string name="custom_interval_label">custom interval:</string>
     <string name="days_label">days:</string>
     <string name="weeks_label">weeks:</string>
+
+    <!-- Project synchronization feedback -->
+    <string name="project_sync_text">Importing projects: %1$d/%2$d</string>
+    <string name="photo_sync_text">Importing photos for project %1$d: %2$d/%3$d</string>
 </resources>

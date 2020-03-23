@@ -15,7 +15,17 @@ object ProjectUtils {
 
     fun getEntryFromProject(project: Project): ProjectEntry = ProjectEntry(project.project_id, project.project_name)
 
-    fun validateFileStructure(externalFilesDir: File): ValidationResult<Nothing> {
+    // Used to bundle a project with the number of photos in it
+    // Passed to the project import utility
+    // List of projects and photo import used to provide user feedback on status of import
+    data class ProjectDataBundle(val projectEntry: ProjectEntry, val photoCount: Int)
+
+    // Ensures no errors in the file structure, returns a list of structurally sound projects with the numbers of photos
+    // for the project
+    fun validateFileStructure(externalFilesDir: File): ValidationResult<List<ProjectDataBundle>> {
+        // Final output list
+        val resultList = arrayListOf<ProjectDataBundle>()
+
         val files = externalFilesDir.listFiles()
         if (files == null || files.isEmpty())
             return ValidationResult.Error.NoFilesError(null, externalFilesDir.absolutePath)
@@ -62,6 +72,7 @@ object ProjectUtils {
             val projectFiles = child.listFiles()
 
             // Check for valid timestamps
+            var photoCounter = 0
             if (projectFiles != null) {
                 for (file in projectFiles) {
                     if (file.isDirectory) continue  // skips the meta subfolder
@@ -69,63 +80,47 @@ object ProjectUtils {
                     val photoFilename = photoUrl.substring(photoUrl.lastIndexOf(File.separatorChar) + 1)
                     try {
                         java.lang.Long.valueOf(photoFilename.replaceFirst("[.][^.]+$".toRegex(), ""))
+                        photoCounter++
                     } catch (e: Exception) {
                         return ValidationResult.Error.InvalidPhotoFileError(e, photoUrl, projectName)
                     }
                 }
             }
+            val currentProject = ProjectEntry(currentId, projectName)
+            val currentDataBundle = ProjectDataBundle(currentProject, photoCounter)
+            resultList.add(currentDataBundle)
         }
-        return ValidationResult.Success()
+        Log.d(TAG, "return validation result, list of size ${resultList.size}")
+        return ValidationResult.Success(resultList.toList())
     }
 
     /* Helper to scan through folders and import projects */
-    suspend fun importProjects(db: TimeLapseDatabase, externalFilesDir: File) {
+    suspend fun importProjects(db: TimeLapseDatabase, externalFilesDir: File, projectBundles: List<ProjectDataBundle>) {
 
         // Delete projects and tags in the database: should clear all tables by cascade
         db.projectDao().deleteAllProjects()
         db.tagDao().deleteAllTags()
 
-        // Add all project references from the file structure
-        val files = externalFilesDir.listFiles()
+        SyncProgressCounter.initProjectCount(projectBundles.size)
 
-        SyncProgressCounter.setMax(files!!.size)
-        Log.d("ProgressCheck", "setting max ${SyncProgressCounter.max}")
-        for (child in files) {
-            SyncProgressCounter.increment()
-            Log.d("ProgressCheck", "incrementing progress ${SyncProgressCounter.progress}")
-            // Get the filename of the project
-            val url = child.absolutePath
-            val filename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
-
-            // Skip Temporary Images
-            if (filename == FileUtils.TEMP_FILE_SUBDIRECTORY
-                    || filename == FileUtils.META_FILE_SUBDIRECTORY) continue
-
-            // Determine ID of project
-            val id = if (filename.lastIndexOf("_") == -1) filename
-            else filename.substring(0, filename.lastIndexOf("_"))
-            Log.d(TAG, "deriving project id = $id")
-
-            // Determine name of project
-            var projectName: String? = null
-            if (filename.lastIndexOf("_") >= 0)
-                projectName = filename.substring(filename.lastIndexOf("_") + 1)
-            Log.d(TAG, "deriving project name = $projectName")
+        Log.d("ProgressCheck", "setting max ${SyncProgressCounter.projectMax}")
+        for (projectBundle in projectBundles) {
+            SyncProgressCounter.incrementProject()
+            Log.d("ProgressCheck", "incrementing progress ${SyncProgressCounter.projectProgress}")
 
             // Get the files within the directory
-            val projectDir = File(externalFilesDir, filename)
+            val projectDir = FileUtils.getProjectFolder(externalFilesDir, projectBundle.projectEntry)
             val projectFiles = projectDir.listFiles()
 
             if (projectFiles != null) {
                 // Create the project entry
-                val currentProject = ProjectEntry(
-                        java.lang.Long.valueOf(id),
-                        projectName)
+                val currentProject = projectBundle.projectEntry
                 Log.d(TAG, "inserting project = $currentProject")
                 // Insert the project - this updates on conflict
-                db.projectDao().insertProject(currentProject);
+                db.projectDao().insertProject(currentProject)
 
                 // Recover photos
+                SyncProgressCounter.initPhotoCount(projectBundle.photoCount)
                 importProjectPhotos(externalFilesDir, db, currentProject)
 
                 // Recover tags
@@ -143,12 +138,13 @@ object ProjectUtils {
         if (allPhotosInFolder != null) {
             // Insert the new entries
             for (photoEntry in allPhotosInFolder) {
-                val id = db.photoDao().insertPhoto(photoEntry)
-                Log.d(TAG, "inserting photo id $id $photoEntry")
+                db.photoDao().insertPhoto(photoEntry)
+                //Log.d(TAG, "inserting photo id $id $photoEntry")
+                SyncProgressCounter.incrementPhoto()
             }
             val lastPhoto = db.photoDao().getLastPhoto(currentProject.id)
             val coverPhoto = CoverPhotoEntry(lastPhoto.project_id, lastPhoto.id)
-            Log.d(TAG, "inserting coverphoto $coverPhoto")
+            //Log.d(TAG, "inserting cover photo $coverPhoto")
             db.coverPhotoDao().insertPhoto(coverPhoto)
         }
     }
@@ -160,12 +156,11 @@ object ProjectUtils {
 
         // Import tags
         if (tagsFile.exists()) {
-            Log.d(TAG, "importing project tags for $currentProject")
-
+            //Log.d(TAG, "importing project tags for $currentProject")
             val inputAsString = FileInputStream(tagsFile).bufferedReader().use { it.readText() }
             val tags: List<String> = inputAsString.split('\n')
 
-            Log.d(TAG, "handling $tags")
+            //Log.d(TAG, "handling $tags")
             // Convert text to tag entries and enter into database
             for (text in tags) {
                 if (text.isEmpty()) continue
@@ -212,6 +207,5 @@ object ProjectUtils {
         val daysUntilDue = project.interval_days - daysSinceLastPhoto
         return daysUntilDue == 1.toLong()
     }
-
 }
 

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.*
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.ImageView
@@ -23,6 +24,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.RESERVED_CHARACTERS
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -213,25 +215,34 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // Set the response
         val responseView = mSyncDialog?.findViewById(R.id.sync_response) as TextView
         responseView.text = this.getString(R.string.executing_sync_notification)
-        val progress = mSyncDialog?.findViewById(R.id.sync_progress) as ProgressBar
+        val projectProgress = mSyncDialog?.findViewById(R.id.project_sync_progress) as ProgressBar
+        val photoProgress = mSyncDialog?.findViewById(R.id.photo_sync_progress) as ProgressBar
+        val projectProgressTv = mSyncDialog?.findViewById(R.id.project_sync_tv) as TextView
+        val photoProgressTv = mSyncDialog?.findViewById(R.id.photo_sync_tv) as TextView
         /// Set the image feedback
         val imageFeedback = mSyncDialog?.findViewById(R.id.sync_feedback_image) as ImageView
-        val button = mSyncDialog?.findViewById(R.id.sync_verification_button) as androidx.appcompat.widget.AppCompatButton
+        val okButton = mSyncDialog?.findViewById(R.id.sync_verification_button) as androidx.appcompat.widget.AppCompatButton
 
         // Show the updated views
-        progress.visibility = View.VISIBLE
-        imageFeedback.visibility = View.INVISIBLE
-        button.visibility = View.GONE
+        projectProgress.visibility = VISIBLE
+        projectProgressTv.visibility = VISIBLE
+        photoProgress.visibility = VISIBLE
+        photoProgressTv.visibility = VISIBLE
+        imageFeedback.visibility = GONE
+        okButton.visibility = GONE
         // Show the dialog
         mSyncDialog?.show()
     }
 
     // Updates the dialog showing progress on synchronization
-    private fun updateSyncDialog(result: ValidationResult<Nothing>) {
+    private fun updateSyncDialog(result: ValidationResult<List<ProjectUtils.ProjectDataBundle>>) {
         Log.d(TAG, "updating sync dialog")
         // Set the response
         val responseView = mSyncDialog?.findViewById(R.id.sync_response) as TextView
-        val progress = mSyncDialog?.findViewById(R.id.sync_progress) as ProgressBar
+        val projectProgress = mSyncDialog?.findViewById(R.id.project_sync_progress) as ProgressBar
+        val projectProgressTv = mSyncDialog?.findViewById(R.id.project_sync_tv) as TextView
+        val photoProgress = mSyncDialog?.findViewById(R.id.photo_sync_progress) as ProgressBar
+        val photoProgressTv = mSyncDialog?.findViewById(R.id.photo_sync_tv) as TextView
         val imageFeedback = mSyncDialog?.findViewById(R.id.sync_feedback_image) as ImageView
         val button = mSyncDialog?.findViewById(R.id.sync_verification_button) as androidx.appcompat.widget.AppCompatButton
 
@@ -268,9 +279,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
         // Show the updated views
-        progress.visibility = View.INVISIBLE
-        imageFeedback.visibility = View.VISIBLE
-        button.visibility = View.VISIBLE
+        projectProgress.visibility = GONE
+        projectProgressTv.visibility = GONE
+        photoProgress.visibility = GONE
+        photoProgressTv.visibility = GONE
+        imageFeedback.visibility = VISIBLE
+        button.visibility = VISIBLE
     }
 
     private fun showVerifyProjectImportDialog() {
@@ -296,16 +310,36 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun setupViewModel() {
-        settingsViewModel.progress.observe(viewLifecycleOwner, Observer {
-            val progress = mSyncDialog?.findViewById(R.id.sync_progress) as ProgressBar
-            progress.progress = it
-            Log.d("ProgressCheck", "progress bar progress observable firing")
+        // Updates the progress of importing projects
+        settingsViewModel.projectProgress.observe(viewLifecycleOwner, Observer {
+            val progress = mSyncDialog?.findViewById<ProgressBar>(R.id.project_sync_progress)
+            progress?.progress = it+1
+            val tv = mSyncDialog?.findViewById<TextView>(R.id.project_sync_tv)
+            tv?.text = getString(R.string.project_sync_text,
+                    it+1,
+                    SyncProgressCounter.projectMax.value!!+1)
         })
-        settingsViewModel.max.observe(viewLifecycleOwner, Observer {
-            val progress = mSyncDialog?.findViewById(R.id.sync_progress) as ProgressBar
-            progress.max = it
-            Log.d("ProgressCheck", "progress bar max observable firing")
+        // Updates the max number of projects to import
+        settingsViewModel.projectMax.observe(viewLifecycleOwner, Observer {
+            val progress = mSyncDialog?.findViewById<ProgressBar>(R.id.project_sync_progress)
+            progress?.max = it+1
         })
+        // Updates the progress of photos imported for a project
+        settingsViewModel.photoProgress.observe(viewLifecycleOwner, Observer {
+            val progress = mSyncDialog?.findViewById<ProgressBar>(R.id.photo_sync_progress)
+            progress?.progress = it+1
+            val tv = mSyncDialog?.findViewById<TextView>(R.id.photo_sync_tv)
+            tv?.text = getString(R.string.photo_sync_text,
+                    SyncProgressCounter.projectProgress.value!!+1,
+                    it+1,
+                    SyncProgressCounter.projectMax.value!!+1)
+        })
+        // Updates the photo maximum import for a project
+        settingsViewModel.photoMax.observe(viewLifecycleOwner, Observer {
+            val progress = mSyncDialog?.findViewById<ProgressBar>(R.id.photo_sync_progress)
+            progress?.max = it+1
+        })
+
     }
 
     companion object {

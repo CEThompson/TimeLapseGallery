@@ -13,9 +13,11 @@ class SettingsViewModel : ViewModel() {
     var showingSyncDialog: Boolean = false
     var showingFileModDialog: Boolean = false
     var showingVerifySyncDialog: Boolean = false
-    var response: ValidationResult<Nothing> = ValidationResult.InProgress
-    var max: MutableLiveData<Int> = SyncProgressCounter.max
-    var progress: MutableLiveData<Int> = SyncProgressCounter.progress
+    var response: ValidationResult<List<ProjectUtils.ProjectDataBundle>> = ValidationResult.InProgress
+    var projectMax: MutableLiveData<Int> = SyncProgressCounter.projectMax
+    var projectProgress: MutableLiveData<Int> = SyncProgressCounter.projectProgress
+    var photoMax: MutableLiveData<Int> = SyncProgressCounter.photoMax
+    var photoProgress: MutableLiveData<Int> = SyncProgressCounter.photoProgress
 
     suspend fun executeSync(context: Context) {
         response = ValidationResult.InProgress
@@ -26,9 +28,10 @@ class SettingsViewModel : ViewModel() {
             response = ProjectUtils.validateFileStructure(externalFilesDir)
 
         // If the directory is valid import projects
-        if (response is ValidationResult.Success<Nothing>) {
+        if (response is ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>) {
             syncing = true
-            ProjectUtils.importProjects(TimeLapseDatabase.getInstance(context), externalFilesDir!!)
+            val validatedList = (response as ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>).data
+            ProjectUtils.importProjects(TimeLapseDatabase.getInstance(context), externalFilesDir!!, validatedList)
             syncing = false
         }
     }

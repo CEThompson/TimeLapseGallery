@@ -27,7 +27,7 @@ object FileUtils {
         return File(projectDir, imageFileName)
     }
 
-    private fun getProjectFolder(externalFilesDir: File, projectEntry: ProjectEntry): File {
+    fun getProjectFolder(externalFilesDir: File, projectEntry: ProjectEntry): File {
         val projectPath = getProjectDirectoryPath(projectEntry)
         return File(externalFilesDir, projectPath)
     }
