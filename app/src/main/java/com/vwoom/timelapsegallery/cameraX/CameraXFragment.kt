@@ -36,6 +36,8 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
+
+// TODO: hunt down memory leak in fragment
 class CameraXFragment : Fragment(), LifecycleOwner {
 
     private var mTakePictureFab: FloatingActionButton? = null
