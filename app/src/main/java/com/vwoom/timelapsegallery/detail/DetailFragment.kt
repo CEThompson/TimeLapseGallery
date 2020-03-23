@@ -860,32 +860,34 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Updates UI of schedule dialog to current schedule
     private fun setScheduleInformation(){
         if (mScheduleDialog == null) return
-        val colorSelected = R.color.colorAccent
+        val colorSelected = R.color.colorPrimary
         val colorDefault = R.color.colorSubtleAccent
+        val defaultElevation = 2f
+        val selectedElevation = 6f
 
         val currentInterval = mCurrentProject!!.interval_days
         if (currentInterval == 0){
             mNoneSelector?.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
-            mNoneSelector?.elevation = 8f
+            mNoneSelector?.elevation = selectedElevation
         } else {
             mNoneSelector?.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorDefault))
-            mNoneSelector?.elevation = 4f
+            mNoneSelector?.elevation = defaultElevation
         }
         for (selector in mDaySelectionViews){
             selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorDefault))
-            selector.elevation = 4f
+            selector.elevation = defaultElevation
             if (selector.selector_child_tv.text == currentInterval.toString()) {
                 selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
-                selector.elevation = 8f
+                selector.elevation = selectedElevation
             }
         }
         for (selector in mWeekSelectionViews){
             selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorDefault))
-            selector.elevation = 4f
+            selector.elevation = defaultElevation
             val currentWeekIntervalToDays = selector.selector_child_tv.text.toString().toInt() * 7
             if (currentWeekIntervalToDays == currentInterval) {
                 selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
-                selector.elevation = 8f
+                selector.elevation = selectedElevation
             }
         }
         val scheduleOutput = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_result)
