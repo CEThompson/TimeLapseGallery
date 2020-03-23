@@ -84,6 +84,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mTagDialog: Dialog? = null
     private var mInfoDialog: Dialog? = null
     private var mScheduleDialog: Dialog? = null
+
+    // For schedule selection
+    private var mNoneSelector: CardView? = null
     private val mDaySelectionViews: ArrayList<CardView> = arrayListOf()
     private val mWeekSelectionViews: ArrayList<CardView> = arrayListOf()
 
@@ -561,11 +564,21 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mScheduleDialog?.setContentView(R.layout.dialog_schedule)
         mScheduleDialog?.setOnCancelListener { detailViewModel.scheduleDialogShowing = false }
 
-        // TODO style selection views
+        // Set up selector for no schedule
+        val noneLayout = mScheduleDialog?.findViewById<FrameLayout>(R.id.dialog_schedule_none_layout)
+        noneLayout?.removeAllViews()
+        mNoneSelector = layoutInflater.inflate(R.layout.dialog_schedule_selector, noneLayout, false) as CardView
+        val noneTv = mNoneSelector?.findViewById<TextView>(R.id.selector_child_tv)
+        noneTv?.text = getString(R.string.unscheduled)
+        noneLayout?.addView(mNoneSelector)
+        mNoneSelector?.setOnClickListener {
+            detailViewModel.setSchedule(mExternalFilesDir!!, mCurrentProject!!, 0)
+        }
+
         // Set up days selection
         val daysLayout = mScheduleDialog?.findViewById<FlexboxLayout>(R.id.dialog_schedule_days_selection_layout)
         daysLayout?.removeAllViews()
-        for (dayInterval in 0..6){
+        for (dayInterval in 1..6){
             // a selection layout for each interval
             //val textView = TextView(requireContext())
             val selectionLayout: CardView = layoutInflater.inflate(R.layout.dialog_schedule_selector, daysLayout,false) as CardView
@@ -581,7 +594,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Set up weeks selection
         val weeksLayout = mScheduleDialog?.findViewById<FlexboxLayout>(R.id.dialog_schedule_weeks_selection_layout)
         weeksLayout?.removeAllViews()
-        for (weekInterval in 0..4){
+        for (weekInterval in 1..4){
             val selectionLayout: CardView = layoutInflater.inflate(R.layout.dialog_schedule_selector, daysLayout,false) as CardView
             val textView = selectionLayout.findViewById<TextView>(R.id.selector_child_tv)
             textView.text = weekInterval.toString()
@@ -602,11 +615,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             }
         }
 
+        // Dismiss
         val okTextView = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_dismiss)
         okTextView?.setOnClickListener {
             mScheduleDialog?.dismiss()
             detailViewModel.scheduleDialogShowing = false
         }
+
+        // Update UI to current schedule
         setScheduleInformation()
     }
     private fun initializeFullscreenImageDialog() {
@@ -829,7 +845,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 // Set the text view to remove or add the tag depending on whether the tag is in the project
                 if (tagInProject) textView.setOnClickListener { detailViewModel.deleteTagFromProject(tagEntry, mCurrentProject!!) }
                 else textView.setOnClickListener { detailViewModel.addTag(tagEntry.text, mCurrentProject!!) }
-                // TODO find way to let the user now about deletion on long click
+
                 // Set the text view to delete tag on long click
                 textView.setOnLongClickListener{
                     verifyTagDeletion(tagEntry)
@@ -841,22 +857,36 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-    // TODO streamline the schedule dialog
-    // TODO update time interval display
+    // Updates UI of schedule dialog to current schedule
     private fun setScheduleInformation(){
         if (mScheduleDialog == null) return
-        val color = R.color.colorAccent
+        val colorSelected = R.color.colorAccent
+        val colorDefault = R.color.colorSubtleAccent
+
         val currentInterval = mCurrentProject!!.interval_days
+        if (currentInterval == 0){
+            mNoneSelector?.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
+            mNoneSelector?.elevation = 8f
+        } else {
+            mNoneSelector?.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorDefault))
+            mNoneSelector?.elevation = 4f
+        }
         for (selector in mDaySelectionViews){
-            selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorSubtleAccent))
-            if (selector.selector_child_tv.text == currentInterval.toString())
-                selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), color))
+            selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorDefault))
+            selector.elevation = 4f
+            if (selector.selector_child_tv.text == currentInterval.toString()) {
+                selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
+                selector.elevation = 8f
+            }
         }
         for (selector in mWeekSelectionViews){
-            selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorSubtleAccent))
+            selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorDefault))
+            selector.elevation = 4f
             val currentWeekIntervalToDays = selector.selector_child_tv.text.toString().toInt() * 7
-            if (currentWeekIntervalToDays == currentInterval)
-                selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), color))
+            if (currentWeekIntervalToDays == currentInterval) {
+                selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
+                selector.elevation = 8f
+            }
         }
         val scheduleOutput = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_result)
         if (mCurrentProject!!.interval_days==0) scheduleOutput?.text = getString(R.string.none)

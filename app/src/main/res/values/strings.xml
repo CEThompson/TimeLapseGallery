@@ -89,6 +89,7 @@
 
     <string name="unnamed">unnamed</string>
     <string name="none">none</string>
+    <string name="no_schedule">no schedule</string>
     <string name="daily">daily</string>
     <string name="weekly">weekly</string>
 

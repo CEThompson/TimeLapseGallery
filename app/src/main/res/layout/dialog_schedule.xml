@@ -1,180 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="@dimen/medium">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- days label and selection -->
-    <TextView
-        android:id="@+id/dialog_schedule_days_label"
-        android:layout_width="wrap_content"
-        android:textStyle="bold"
-        android:layout_height="wrap_content"
-        android:text="@string/days_label" />
-    <com.google.android.flexbox.FlexboxLayout
-        android:id="@+id/dialog_schedule_days_selection_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
-        android:orientation="horizontal"
-        app:alignContent="stretch"
-        app:alignItems="stretch"
-        app:flexWrap="wrap">
-        <!-- example children only -->
-        <TextView
-            android:id="@+id/schedule_selector_none"
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0" />
-
-        <TextView
-            android:id="@+id/schedule_selector_one"
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1" />
-
-        <TextView
-            android:id="@+id/schedule_selector_two"
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="2" />
-
-        <TextView
-            android:id="@+id/schedule_selector_three"
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3" />
-
-        <TextView
-            android:id="@+id/schedule_selector_four"
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="4" />
-
-        <TextView
-            android:id="@+id/schedule_selector_five"
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="5" />
-
-        <TextView
-            android:id="@+id/schedule_selector_six"
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="6" />
-
-        <TextView
-            android:id="@+id/schedule_selector_seven"
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="7" />
-    </com.google.android.flexbox.FlexboxLayout>
-
-    <!-- weeks label and selection -->
-    <TextView
-        android:id="@+id/dialog_schedule_weeks_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:text="@string/weeks_label" />
-
-    <com.google.android.flexbox.FlexboxLayout
-        android:id="@+id/dialog_schedule_weeks_selection_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
-        android:orientation="horizontal"
-        app:alignContent="stretch"
-        app:alignItems="stretch"
-        app:flexWrap="wrap">
-        <!-- example children -->
-        <TextView
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0" />
-
-        <TextView
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1" />
-
-        <TextView
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="2" />
-
-        <TextView
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3" />
-
-        <TextView
-            style="@style/ScheduleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="4" />
-    </com.google.android.flexbox.FlexboxLayout>
-
-    <!-- custom label and input -->
-    <TextView
-        android:id="@+id/dialog_schedule_custom_label"
-        android:layout_width="wrap_content"
-        android:textStyle="bold"
-        android:layout_height="wrap_content"
-        android:text="@string/custom_interval_label" />
-    <EditText
-        android:id="@+id/custom_schedule_input"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
-        android:hint="@string/custom_interval_in_days_hint"
-        android:inputType="number" />
-
-    <!-- output of resulting schedule -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_margin="@dimen/large"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:padding="@dimen/medium">
+
+        <FrameLayout
+            android:id="@+id/dialog_schedule_none_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/medium">
+            <!-- example only, replaced in dialog initialization -->
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="none"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </FrameLayout>
+        <!-- days label and selection -->
         <TextView
+            android:id="@+id/dialog_schedule_days_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/schedule_label"/>
-        <TextView
-            android:id="@+id/dialog_schedule_result"
-            android:textStyle="bold|italic"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:layout_marginStart="@dimen/medium"
+            android:text="@string/days_label"
+            android:textStyle="bold" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/dialog_schedule_days_selection_layout"
+            app:alignContent="stretch"
+            app:alignItems="stretch"
+            app:flexWrap="wrap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/none" />
+            android:layout_margin="@dimen/medium"
+            android:orientation="horizontal">
+            <!-- example children only -->
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <!-- weeks label and selection -->
+        <TextView
+            android:id="@+id/dialog_schedule_weeks_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/weeks_label"
+            android:textStyle="bold" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/dialog_schedule_weeks_selection_layout"
+            app:alignContent="stretch"
+            app:alignItems="stretch"
+            app:flexWrap="wrap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/medium"
+            android:orientation="horizontal">
+            <!-- example children -->
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/ScheduleStyle"
+                tools:text="4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <!-- custom label and input -->
+        <TextView
+            android:id="@+id/dialog_schedule_custom_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/custom_interval_label"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/custom_schedule_input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/medium"
+            android:hint="@string/custom_interval_in_days_hint"
+            android:inputType="number" />
+
+        <!-- output of resulting schedule -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/large"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/schedule_label" />
+
+            <TextView
+                android:id="@+id/dialog_schedule_result"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/medium"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold|italic" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dialog_schedule_dismiss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:gravity="center"
+            android:minWidth="@dimen/touch_target_min"
+            android:minHeight="@dimen/touch_target_min"
+            android:text="@string/ok"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold" />
     </LinearLayout>
-    <TextView
-        android:id="@+id/dialog_schedule_dismiss"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:gravity="center"
-        android:minWidth="@dimen/touch_target_min"
-        android:minHeight="@dimen/touch_target_min"
-        android:text="@string/ok"
-        android:textColor="@color/colorAccent"
-        android:textStyle="bold" />
-</LinearLayout>
+</ScrollView>
