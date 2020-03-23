@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.view.size
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -57,6 +58,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private val mGalleryViewModel: GalleryViewModel by viewModels {
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
     }
+
+    private var mPrevProjectsSize: Int? = null
 
     // prevent double clicking
     private var mLastClickTime: Long? = null
@@ -274,6 +277,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private fun setupViewModel() {
         // Observe projects
         mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer {
+            // When the size of the list of projects increases assume we have added a project
+            if (mPrevProjectsSize != null && mPrevProjectsSize!! < it.size) {
+                // Then scroll to the end
+                mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.displayedProjects.size)
+            }
+            mPrevProjectsSize = it.size
             mGalleryViewModel.viewModelScope.launch {
                 mGalleryViewModel.displayedProjects = mGalleryViewModel.filterProjects()
                 mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
