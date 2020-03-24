@@ -60,8 +60,8 @@ import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
 
-// TODO use NDK to implement converting photo sets to .gif and .mp4/.mov etc
-// TODO implement pinch zoom on fullscreen image
+// TODO: (update 1.2) use NDK to implement converting photo sets to .gif and .mp4/.mov etc
+// TODO: (update 1.2) implement pinch zoom on fullscreen image
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private var binding: FragmentDetailBinding? = null
@@ -547,7 +547,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mTagDialog?.dismiss()
             detailViewModel.tagDialogShowing = false
         }
-        setTagDialog()
+        setProjectTagDialog()
     }
     private fun showTagValidationAlertDialog(message: String) {
         AlertDialog.Builder(requireContext())
@@ -673,19 +673,21 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         if (bottomImage != null && topImage != null)
             loadImagePair(current, bottomImage, topImage)
     }
-
-    // TODO clarify observable logic, selected photo now persists on config change but this whole class needs organization
-    // Binds project and photos to database
+    
     private fun setupViewModel() {
         // Observe the current selected project
+        // This updates the project information card, project info dialog,
+        // schedule layout over the image and the schedule dialog
         detailViewModel.currentProject.observe(viewLifecycleOwner, Observer { currentProject: Project ->
             mCurrentProject = currentProject
-            // Set id
+
+            // Set the ui for the project information layout cardview
+            // 1. Set the ID
             binding?.projectInformationLayout?.detailsProjectId?.text = mCurrentProject?.project_id.toString()
-            // Set name for both the dialog and the project info card view
+            // 2. Set the name, handle appropriately if no name specified
             val name = mCurrentProject?.project_name
+            // Style for no name
             if (name == null || name.isEmpty()) {
-                // Set the layout card view
                 binding?.projectInformationLayout
                         ?.detailsProjectNameTextView
                         ?.text = getString(R.string.unnamed)
@@ -696,8 +698,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         ?.detailsProjectNameTextView
                         ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
             }
+            // Otherwise style for a set name
             else {
-                // Set the card view
                 binding?.projectInformationLayout
                         ?.detailsProjectNameTextView
                         ?.text = name
@@ -708,27 +710,43 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         ?.detailsProjectNameTextView
                         ?.setTypeface(binding!!.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.BOLD)
             }
-            // Begin set schedule information
+
+            // 3. Set the schedule information
+            // If there isn't a schedule set the color of the fab to white and hide the layout
             if (currentProject.interval_days == 0) {
-                binding?.projectScheduleFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+                binding?.projectScheduleFab?.backgroundTintList =
+                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
                 binding?.detailScheduleLayout?.scheduleLayout?.visibility = INVISIBLE
-            } else {
-                binding?.projectScheduleFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
-                binding?.detailScheduleLayout?.scheduleLayout?.visibility = VISIBLE
-                binding?.detailScheduleLayout?.galleryItemScheduleIndicatorDays?.text = currentProject.interval_days.toString()
-                binding?.detailScheduleLayout?.daysUntilDueTextView?.text = daysUntilDue(mCurrentProject!!).toString()
             }
+            // Otherwise set the color of the schedule fab to an accent and show the schedule layout
+            else {
+                binding?.projectScheduleFab?.backgroundTintList =
+                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
+                binding?.detailScheduleLayout?.scheduleLayout?.visibility = VISIBLE
+                // Show the interval of teh schedule
+                binding?.detailScheduleLayout?.galleryItemScheduleIndicatorDays?.text =
+                        currentProject.interval_days.toString()
+                // Show how many days until project is due
+                binding?.detailScheduleLayout?.daysUntilDueTextView?.text =
+                        daysUntilDue(mCurrentProject!!).toString()
+            }
+            // Also update the fields in the info dialog
             setInfoDialog()
+            // And update the fields in the schedule dialog
             setScheduleInformation()
         })
+
         // Observe the list of photos
+        // This keeps track of the last photo in the set and ensures that photo is the cover photo
+        // This also keeps track of the list of photos to pass to the details recycler view
+        // Lastly this updates UI showing the date range for photos and the progress bar max
         detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
-            val lastPhotoEntry = photoEntries.last()
-            // Set the last photo to pass to the camera fragment.
+            // 1. Set the last photo to pass to the camera fragment.
             // Note: this is because photo passes the last photo url along with it as a parcelable
+            val lastPhotoEntry = photoEntries.last()
             detailViewModel.setLastPhotoByEntry(mExternalFilesDir!!, mCurrentProject!!, lastPhotoEntry)
 
-            // Before we set member variables determine if last photo changed
+            // Detect if the last photo changed from previous assignment
             val lastPhotoChanged = (mPhotos!=null && lastPhotoEntry != mPhotos!!.last())
 
             // NOTE: setting mPhotos here because of a timing issue,
@@ -742,46 +760,59 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 // Set the current photo to the last
                 mCurrentPhoto = lastPhotoEntry
                 detailViewModel.currentPhoto.value = lastPhotoEntry
-                
+
                 // Set the cover photo to the last in the set
                 // This handles changing cover photo on deletion and addition
                 detailViewModel.setCoverPhoto(lastPhotoEntry)
             }
-            // Send the photos to the adapter
+
+            // 2. Send the list of photos to the adapter
             mDetailAdapter?.setPhotoData(mPhotos, mCurrentProject)
             // Restore the play position
             mCurrentPlayPosition = mPhotos?.indexOf(mCurrentPhoto)
-            // Set the date of the project based on the first photo entry
+
+            // 3. Update the project info card view to show the range of dates the photos represent
             val firstTimestamp = mPhotos?.get(0)?.timestamp
             val firstProjectDateString = TimeUtils.getShortDateFromTimestamp(firstTimestamp!!)
             val lastTimestamp = mPhotos?.get(mPhotos!!.size - 1)?.timestamp
             val lastProjectDateString = TimeUtils.getShortDateFromTimestamp(lastTimestamp!!)
             binding?.projectInformationLayout
                     ?.detailsProjectTimespanTextview?.text = getString(R.string.timespan, firstProjectDateString, lastProjectDateString)
-            // Set max for progress bar
+
+            // 4. Update the progress bar
             binding?.imageLoadingProgress?.max = mPhotos!!.size - 1
-            // If current photo isn't set, set it to the last photo
+
+            // 5. Lastly if current photo isn't set for some reason, set it to the last photo
             if (detailViewModel.currentPhoto.value == null) {
                 mCurrentPhoto = mPhotos!![mPhotos!!.size-1]
                 detailViewModel.currentPhoto.value = mCurrentPhoto
             }
         })
-        // Load the ui based on the current photo
+
+        // Observes the currently selected photo
+        // This loads the image and timestamp information based on the current photo
         detailViewModel.currentPhoto.observe(viewLifecycleOwner, Observer { currentPhoto: PhotoEntry? ->
             mCurrentPhoto = currentPhoto
             if (currentPhoto != null) {
                 loadUi(currentPhoto)
             }
         })
-        // Observe the tags
+
+        // Observe the tags for the project
+        // This updates the tags in the dialog, sets the tags in the project info card layout,
+        // Lastly this writes the sorted tags to the tags text file in the meta directory
         detailViewModel.projectTags.observe(viewLifecycleOwner, Observer { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
-                // Update project information dialog
-                mProjectTags = detailViewModel.getTags(projectTagEntries).sortedBy { it.text.toLowerCase(Locale.getDefault()) }
-                // Set the tags for the project tag dialog
-                setTagDialog()
+                // 1. Get the Tag Entries from the Project Tag Entries sorted
+                mProjectTags = detailViewModel.getTags(projectTagEntries)
+                        .sortedBy { it.text.toLowerCase(Locale.getDefault()) }
+
+                // 2. Set the tags for the project tag dialog
+                setProjectTagDialog()
+
+                // 3. Set the tags in the info dialog and get the string representing the tags
                 val tagsText = setInfoTags()
-                // Update the tags in the project info card
+                // 4. Use the string to set the tags in the project info card view unless there are none
                 if (mProjectTags!!.isEmpty()) {
                     binding?.projectInformationLayout?.detailsProjectTagsTextview?.visibility = GONE
                 }
@@ -789,16 +820,23 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     binding?.projectInformationLayout?.detailsProjectTagsTextview?.text = tagsText
                     binding?.projectInformationLayout?.detailsProjectTagsTextview?.visibility = VISIBLE
                 }
+
+                // 5. Lastly write the list of tags to the text file (overwriting any previously)
                 FileUtils.addTagToProject(mExternalFilesDir!!, mCurrentProject!!.project_id, mProjectTags!!)
             }
         })
+
+        // Observe all the tags in the database
+        // This is used to set up the list of all the tags in the project tag dialog
+        // So that the user may simply click on a tag to add them to a project
         detailViewModel.tags.observe(viewLifecycleOwner, Observer {tagEntries: List<TagEntry> ->
             mAllTags = tagEntries.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
-            setTagDialog()
+            setProjectTagDialog()
         })
     }
+    // This updates the tags in the project info dialog
+    // This is distinct from set info dialog so that tags may be updated separately
     private fun setInfoTags(): String {
-        // Update the tags in the project information dialog
         var tagsText = ""
         for (tag in mProjectTags!!) {
             // Concatenate a string for non-interactive output
@@ -809,6 +847,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         else tagsTextView?.text = tagsText
         return tagsText
     }
+    // This updates the rest of the info in the project info dialog
+    // Name, id, schedule, etc.
     private fun setInfoDialog() {
         if (mInfoDialog == null) return
         // Set info dialog fields
@@ -825,8 +865,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     getString(R.string.every_x_days, mCurrentProject!!.interval_days.toString())
         }
     }
-
-    private fun setTagDialog() {
+    // This sets the tags in the project info dialog
+    // This creates text views for all tags in the database, but if the tags
+    // belong to the project then they are styled appropriately for user feedback
+    private fun setProjectTagDialog() {
         if (mTagDialog == null) return
         val availableTagsLayout = mTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_available_tags_layout)
         availableTagsLayout?.removeAllViews()
@@ -857,7 +899,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             }
         }
     }
-
     // Updates UI of schedule dialog to current schedule
     private fun setScheduleInformation(){
         if (mScheduleDialog == null) return
@@ -930,7 +971,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     /**
-     * Verification dialogs
+     * Dialog verifications
      */
     private fun verifyPhotoDeletion() {
         AlertDialog.Builder(requireContext())
