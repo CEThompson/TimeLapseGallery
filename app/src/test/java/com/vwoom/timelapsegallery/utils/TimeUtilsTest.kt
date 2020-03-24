@@ -3,7 +3,7 @@ package com.vwoom.timelapsegallery.utils
 import org.junit.Test
 import java.util.*
 
-// TODO assess locales for time
+// TODO: (update 1.2) assess locales for time
 // NOTE: Timestamps are in milliseconds
 class TimeUtilsTest {
 
@@ -124,7 +124,6 @@ class TimeUtilsTest {
         assert(daysSinceTimestamp != 4.toLong())
     }
 
-    // TODO create a test case for a many year interval testing leap year
     @Test
     fun getDaysSinceTimestamp_currentTimeBeforeTimestamp() {
         // Given two timestamps, the current is before the photo

@@ -202,7 +202,7 @@ object FileUtils {
         val tagsFile = File(metaDir, TAGS_DEFINITION_TEXT_FILE)
 
         // Write the tags to a text file
-        // TODO: determine how to handle output stream writer exceptions
+        // TODO: (update 1.2) determine how to handle output stream writer exceptions
         try {
             val output = FileOutputStream(tagsFile)
             val outputStreamWriter = OutputStreamWriter(output)
@@ -222,7 +222,7 @@ object FileUtils {
         val scheduleFile = File(metaDir, SCHEDULE_TEXT_FILE)
 
         Log.d(TAG, "writing schedule file")
-        // TODO: determine how to handle output stream writer exceptions
+        // TODO: (update 1.2) determine how to handle output stream writer exceptions
         try {
             val output = FileOutputStream(scheduleFile)
             val outputStreamWriter = OutputStreamWriter(output)

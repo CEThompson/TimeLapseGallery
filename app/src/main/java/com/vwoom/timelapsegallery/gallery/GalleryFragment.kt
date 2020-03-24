@@ -117,7 +117,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             postponeEnterTransition()
         }
 
-        // TODO better handle transitioning during search filtration, this solution seems hacky
+        // TODO: (update 1.2) re-evaluate transition after taking pictures of a project, filtered projects do not update immediately
         if (mGalleryViewModel.displayedProjects.isNotEmpty())
             mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
 

@@ -11,6 +11,7 @@ import android.view.View
 import android.view.View.OnTouchListener
 import kotlin.math.max
 
+// TODO: re-evaluate use of on touch handler, comb through this and make the logic my own
 class CameraFocusOnTouchHandler(
         private val mCameraCharacteristics: CameraCharacteristics,
         private val mPreviewRequestBuilder: CaptureRequest.Builder,

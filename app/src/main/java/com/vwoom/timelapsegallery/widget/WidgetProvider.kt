@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.widget
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
@@ -13,6 +12,8 @@ import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 
+// TODO: restructure widget to implement branding,
+// TODO: showcase a random project per day and provide a quick link to projects due today
 class WidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         UpdateWidgetService.startActionUpdateWidgets(context)
@@ -51,8 +52,6 @@ class WidgetProvider : AppWidgetProvider() {
             val adapterIntent = Intent(context, WidgetGridRemoteViewsService::class.java)
             views.setRemoteAdapter(R.id.widget_grid_view, adapterIntent)
 
-
-            // TODO: Lock down widget!
             //val appIntent = Intent(context, TimeLapseGalleryActivity::class.java)
 
             // Create the nav pending intent

@@ -59,7 +59,7 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, cont
                 currentPhoto!!.timestamp)
         val f = File(photoPath)
 
-        // TODO (update) dynamically resize detail view
+        // TODO (update 1.2) dynamically resize detail view
         Glide.with(context)
                 .load(f)
                 .centerCrop()

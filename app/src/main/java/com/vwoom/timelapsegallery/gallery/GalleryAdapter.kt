@@ -103,9 +103,9 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         return if (mProjectData == null) 0 else mProjectData!!.size
     }
 
+    // TODO: (update 1.2) consider calculating this information somewhere else to speed up the gallery (perhaps a diff util?)
     fun setProjectData(projectData: List<Project>) {
         mProjectData = projectData
-        // TODO convert this to a diff util?
         mProjectsToCoverPhotos.clear()
         for (project in projectData) {
             val photoUrl = FileUtils.getPhotoUrl(

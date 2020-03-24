@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-// TODO test widget
 class UpdateWidgetService
     : IntentService("UpdateWidgetService"), CoroutineScope {
 

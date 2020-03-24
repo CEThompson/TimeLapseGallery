@@ -4,7 +4,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
-// TODO convert to instrumented test?
+// TODO: (update 1.2) re-evaluate implementing tests for photo utils after adjusting widget
 class PhotoUtilsTest {
 
     @Rule
@@ -13,32 +13,26 @@ class PhotoUtilsTest {
 
     @Test
     fun getAspectRatioFromImagePath() {
-        // TODO implement me!
     }
 
     @Test
     fun getOrientationFromImagePath() {
-        // TODO implement me!
     }
 
     @Test
     fun rotateBitmap() {
-        // TODO implement me!
     }
 
     @Test
     fun isLandscape() {
-        // TODO implement me!
     }
 
     @Test
     fun decodeSampledBitmapFromPath() {
-        // TODO implement me!
     }
 
     @Test
     fun calculateInSampleSize() {
-        // TODO implement me!
     }
 
 }
