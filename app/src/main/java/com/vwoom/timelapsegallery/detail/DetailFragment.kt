@@ -113,6 +113,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Analytics
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
+    // TODO: (update 1.2) improve shared element transitions
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mCurrentProject = args.clickedProject
