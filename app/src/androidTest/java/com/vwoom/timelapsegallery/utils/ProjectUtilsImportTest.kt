@@ -2,11 +2,13 @@ package com.vwoom.timelapsegallery.utils
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomOpenHelper
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.settings.ValidationResult
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -95,7 +97,10 @@ class ProjectUtilsImportTest {
                 ProjectScheduleEntry(3,3))
 
         // When: Projects are imported
-        runBlocking {ProjectUtils.importProjects(db, externalFilesTestDir)}
+        val result = ProjectUtils.validateFileStructure(externalFilesTestDir)
+        assert(result is ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>)
+        val projectBundles = (result as ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>).data
+        runBlocking {ProjectUtils.importProjects(db, externalFilesTestDir, projectBundles)}
 
         // Then: Database should match file structure
         runBlocking {
