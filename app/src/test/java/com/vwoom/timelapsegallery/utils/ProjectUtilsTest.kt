@@ -137,7 +137,7 @@ class ProjectUtilsTest {
         val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
 
         // Then
-        assert(response is ValidationResult.Success<Nothing>)
+        assert(response is ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>)
     }
 
     @Test
