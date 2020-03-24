@@ -5,9 +5,6 @@
         android:slideEdge="right">
         <targets>
             <target android:targetId="@id/play_as_video_fab"/>
-            <target android:targetId="@id/project_schedule_fab"/>
-            <target android:targetId="@id/project_tag_fab"/>
-            <target android:targetId="@id/project_information_fab"/>
         </targets>
     </slide>
 
@@ -19,11 +16,14 @@
         </targets>
     </slide>
 
-    <slide
-        android:slideEdge="left">
+    <fade
+        android:duration="150">
         <targets>
             <target android:targetId="@id/project_information_layout"/>
+            <target android:targetId="@id/project_schedule_fab"/>
+            <target android:targetId="@id/project_tag_fab"/>
+            <target android:targetId="@id/project_information_fab"/>
         </targets>
-    </slide>
+    </fade>
 
 </transitionSet>

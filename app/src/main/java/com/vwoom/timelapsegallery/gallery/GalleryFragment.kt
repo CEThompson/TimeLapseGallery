@@ -7,17 +7,15 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
 import android.os.SystemClock
+import android.transition.Transition
 import android.transition.TransitionInflater
 import android.view.*
+import android.view.animation.AlphaAnimation
 import android.widget.CheckBox
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.Toolbar
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
-import androidx.core.view.size
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -59,6 +57,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mSearchActiveFAB: FloatingActionButton? = null
     private var toolbar: Toolbar? = null
 
+    private var binding: FragmentGalleryBinding? = null
+
     private val mGalleryViewModel: GalleryViewModel by viewModels {
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
     }
@@ -86,23 +86,40 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mGridLayoutManager = null
         mGalleryAdapter = null
         toolbar = null
+        binding = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val transition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
-        exitTransition = transition
+        val reenter = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
+        reenter.addListener(object: Transition.TransitionListener{
+            override fun onTransitionEnd(transition: Transition?) {
+            }
+            override fun onTransitionCancel(transition: Transition?) {
+            }
+            override fun onTransitionStart(transition: Transition?) {
+                val fadeInAnimation = AlphaAnimation(0f, 1f)
+                fadeInAnimation.duration = 150
+                binding?.galleryRecyclerView?.startAnimation(fadeInAnimation)
+            }
+            override fun onTransitionPause(transition: Transition?) {
+            }
+            override fun onTransitionResume(transition: Transition?) {
+            }
+        })
+        exitTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
+        reenterTransition = reenter
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val binding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
+        binding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
 
         // Set up options menu
         setHasOptionsMenu(true)
-        toolbar = binding.galleryFragmentToolbar
+        toolbar = binding?.galleryFragmentToolbar
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar?.title = getString(R.string.app_name)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
@@ -119,7 +136,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Set up the recycler view
         mGridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
-        mGalleryRecyclerView = binding.galleryRecyclerView
+        mGalleryRecyclerView = binding?.galleryRecyclerView
         mGalleryRecyclerView?.apply {
             layoutManager = mGridLayoutManager
             setHasFixedSize(false)
@@ -139,13 +156,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         })
 
         // Set up navigation to add new projects
-        mAddProjectFAB = binding.addProjectFAB
+        mAddProjectFAB = binding?.addProjectFAB
         mAddProjectFAB?.setOnClickListener {
             val action = GalleryFragmentDirections.actionGalleryFragmentToCamera2Fragment(null, null)
             findNavController().navigate(action)
         }
 
-        mSearchActiveFAB = binding.searchActiveIndicator
+        mSearchActiveFAB = binding?.searchActiveIndicator
         mSearchActiveFAB?.setOnClickListener { clearSearch() }
 
         setupViewModel()
@@ -159,7 +176,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         if (!userIsNotSearching()) mSearchActiveFAB?.show()
         else mSearchActiveFAB?.hide()
 
-        return binding.root
+        return binding?.root
     }
 
     private fun clearSearch() {
@@ -371,7 +388,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onClick(clickedProject: Project, binding:GalleryRecyclerviewItemBinding, position: Int) {
         // Prevents multiple clicks which cause a crash
-        if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 400) return
+        if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 250) return
         mLastClickTime = SystemClock.elapsedRealtime()
 
         // Navigate to the detail fragment
