@@ -36,64 +36,92 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                     .build()
         }
 
-        // TODO lock down migration
-        val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+        // TODO test migration
+        private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // Create new tables
+                // TODO Create new tables
                 // (1) Cover Photo
                 // columns: project_id, photo_id
-                // Create the table
                 database.execSQL("CREATE TABLE IF NOT EXISTS cover_photo " +
                         "(project_id INTEGER PRIMARY KEY NOT NULL, photo_id INTEGER NOT NULL," +
                         "CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE," +
                         "CONSTRAINT fk_photo FOREIGN KEY (photo_id) REFERENCES photo (id) ON DELETE CASCADE)")
+
                 // (2) Project Schedule
-                // columns: project_id, schedule_time, interval_days
+                // columns: project_id, interval_days
                 database.execSQL("CREATE TABLE IF NOT EXISTS project_schedule " +
-                        "(project_id INTEGER PRIMARY KEY NOT NULL, schedule_time INTEGER, interval_days INTEGER," +
+                        "(project_id INTEGER PRIMARY KEY NOT NULL, " +
+                        "interval_days INTEGER," +
                         "CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE)")
+
                 // Copy data into new tables
-                // (1) Project
+                // (3) Project
                 // initial columns: id, name, thumbnail_url, schedule, schedule_next_submission, timestamp
-                // altered columns: id, project_name, cover_set_by_user
+                // altered columns: id, project_name
+
                 // This WOULD be the pattern!
                 // Create new table
-                //database.execSQL("CREATE TABLE project_new (id LONG, project_name TEXT, cover_set_by_user INT, PRIMARY KEY(id))");
+                database.execSQL("CREATE TABLE project_new " +
+                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "project_name TEXT)")
                 // Copy the data
-                //database.execSQL("INSERT INTO project_new (id, project_name) SELECT id, name FROM project");
+                database.execSQL("INSERT INTO project_new " +
+                        "(id, project_name) SELECT id, name FROM project")
                 // Remove old table
-                //database.execSQL("DROP TABLE project");
+                database.execSQL("DROP TABLE project");
                 // Change table name to old one
-                //database.execSQL("ALTER TABLE project_new RENAME TO project");
+                database.execSQL("ALTER TABLE project_new RENAME TO project")
+
+                /* This block could be used to drop the old data without migrating
                 database.execSQL("DROP TABLE project")
                 database.execSQL("CREATE TABLE IF NOT EXISTS project " +
-                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, project_name TEXT, cover_set_by_user INTEGER NOT NULL)")
-                // (2) Photo
+                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "project_name TEXT)")
+                */
+
+                // (4) Photo
                 // init: id, project_id, url, timestamp
                 // altered: id, project_id, timestamp
-                // Create the new
-                //database.execSQL("CREATE TABLE photo_new (id LONG, project_id LONG, timestamp LONG, PRIMARY KEY(id))");
-                // Add the old
-                //database.execSQL("DROP TABLE photo");
+                // Create the new photo table
+                database.execSQL("CREATE TABLE photo_new " +
+                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NO NULL, " +
+                        "project_id INTEGER NOT NULL, " +
+                        "timestamp INTEGER NOT NULL)");
+                // Copy the data
+                database.execSQL("INSERT INTO photo_new " +
+                        "(id, project_id, timestamp) SELECT id, project_id, timestamp FROM photo")
+                // Delete the old table
+                database.execSQL("DROP TABLE photo");
                 // Rename the new
-                //database.execSQL("ALTER TABLE photo_new RENAME TO photo");
+                database.execSQL("ALTER TABLE photo_new RENAME TO photo");
+
+                /* This block could be used to simply drop the old table and create the new without migrating data
                 database.execSQL("DROP TABLE photo")
                 database.execSQL("CREATE TABLE IF NOT EXISTS photo " +
-                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, project_id INTEGER NOT NULL, timestamp INTEGER NOT NULL)")
-                // (3) Project Tag
+                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "project_id INTEGER NOT NULL, " +
+                        "timestamp INTEGER NOT NULL)")
+                */
+
+                /*
+                * Note these two tables do not need data migration
+                 */
+                // (5) Project Tag
                 // init: id, tag_id, project_id
                 // altered: project_id, tag_id
                 database.execSQL("DROP TABLE project_tag")
                 database.execSQL("CREATE TABLE IF NOT EXISTS project_tag " +
-                        "(project_id INTEGER PRIMARY KEY NOT NULL, tag_id INTEGER NOT NULL, " +
+                        "(project_id INTEGER PRIMARY KEY NOT NULL, " +
+                        "tag_id INTEGER NOT NULL, " +
                         "CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE," +
                         "CONSTRAINT fk_tag FOREIGN KEY (tag_id) REFERENCES tag (id) ON DELETE CASCADE)")
-                // (4) Tag
+
+                // (6) Tag
                 // init: id, title
                 // altered: project_id, tag
                 database.execSQL("DROP TABLE tag")
                 database.execSQL("CREATE TABLE IF NOT EXISTS tag " +
-                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, tag TEXT)")
+                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, tag TEXT NOT NULL)")
             }
         }
     }
