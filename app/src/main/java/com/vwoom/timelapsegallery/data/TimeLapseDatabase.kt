@@ -39,54 +39,50 @@ abstract class TimeLapseDatabase : RoomDatabase() {
         // TODO test migration
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                // TODO Create new tables
-                // (1) Cover Photo
+                // Step (1) Create new tables
+                // Table 1: Cover Photo
                 // columns: project_id, photo_id
                 database.execSQL("CREATE TABLE IF NOT EXISTS cover_photo " +
-                        "(project_id INTEGER PRIMARY KEY NOT NULL, photo_id INTEGER NOT NULL," +
-                        "CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE," +
-                        "CONSTRAINT fk_photo FOREIGN KEY (photo_id) REFERENCES photo (id) ON DELETE CASCADE)")
-
-                // (2) Project Schedule
+                        "(project_id INTEGER NOT NULL, " +
+                        "photo_id INTEGER NOT NULL, " +
+                        "PRIMARY KEY(project_id), " +
+                        "FOREIGN KEY(project_id) REFERENCES project(id) ON UPDATE NO ACTION ON DELETE CASCADE, " +
+                        "FOREIGN KEY(photo_id) REFERENCES photo(id) ON UPDATE NO ACTION ON DELETE CASCADE)")
+                // Table 2: Project Schedule
                 // columns: project_id, interval_days
                 database.execSQL("CREATE TABLE IF NOT EXISTS project_schedule " +
-                        "(project_id INTEGER PRIMARY KEY NOT NULL, " +
-                        "interval_days INTEGER," +
-                        "CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE)")
+                        "(project_id INTEGER NOT NULL, " +
+                        "interval_days INTEGER NOT NULL, " +
+                        "PRIMARY KEY(project_id), " +
+                        "FOREIGN KEY(project_id) REFERENCES project(id) ON UPDATE NO ACTION ON DELETE CASCADE)")
 
-                // Copy data into new tables
-                // (3) Project
+                // Step (2) Copy data from old tables into new tables
+                // Table 3: Project
                 // initial columns: id, name, thumbnail_url, schedule, schedule_next_submission, timestamp
                 // altered columns: id, project_name
 
-                // This WOULD be the pattern!
-                // Create new table
+                // Create the new table
                 database.execSQL("CREATE TABLE project_new " +
                         "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                         "project_name TEXT)")
-                // Copy the data
+                // Copy the data into the new table from the old table
                 database.execSQL("INSERT INTO project_new " +
                         "(id, project_name) SELECT id, name FROM project")
                 // Remove old table
                 database.execSQL("DROP TABLE project");
-                // Change table name to old one
+                // Change new table name to old table name
                 database.execSQL("ALTER TABLE project_new RENAME TO project")
 
-                /* This block could be used to drop the old data without migrating
-                database.execSQL("DROP TABLE project")
-                database.execSQL("CREATE TABLE IF NOT EXISTS project " +
-                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                        "project_name TEXT)")
-                */
+                // Table 4: Photo
+                // initial columns: id, project_id, url, timestamp
+                // altered columns: id, project_id, timestamp
 
-                // (4) Photo
-                // init: id, project_id, url, timestamp
-                // altered: id, project_id, timestamp
                 // Create the new photo table
                 database.execSQL("CREATE TABLE photo_new " +
                         "(id INTEGER PRIMARY KEY AUTOINCREMENT NO NULL, " +
                         "project_id INTEGER NOT NULL, " +
-                        "timestamp INTEGER NOT NULL)");
+                        "timestamp INTEGER NOT NULL, " +
+                        "FOREIGN KEY(project_id) REFERENCES project(id) ON UPDATE NO ACTION ON DELETE CASCADE");
                 // Copy the data
                 database.execSQL("INSERT INTO photo_new " +
                         "(id, project_id, timestamp) SELECT id, project_id, timestamp FROM photo")
@@ -95,33 +91,28 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                 // Rename the new
                 database.execSQL("ALTER TABLE photo_new RENAME TO photo");
 
-                /* This block could be used to simply drop the old table and create the new without migrating data
-                database.execSQL("DROP TABLE photo")
-                database.execSQL("CREATE TABLE IF NOT EXISTS photo " +
-                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                        "project_id INTEGER NOT NULL, " +
-                        "timestamp INTEGER NOT NULL)")
-                */
-
                 /*
                 * Note these two tables do not need data migration
                  */
-                // (5) Project Tag
+                // Step (3) recreate tag tables, were not used in TLG 1.0 therefore should contain no data
+                // Table 5: Project Tag
                 // init: id, tag_id, project_id
-                // altered: project_id, tag_id
-                database.execSQL("DROP TABLE project_tag")
+                // altered: id, project_id, tag_id
+                database.execSQL("DROP TABLE IF EXISTS project_tag")
                 database.execSQL("CREATE TABLE IF NOT EXISTS project_tag " +
-                        "(project_id INTEGER PRIMARY KEY NOT NULL, " +
+                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "project_id INTEGER NOT NULL, " +
                         "tag_id INTEGER NOT NULL, " +
-                        "CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE," +
-                        "CONSTRAINT fk_tag FOREIGN KEY (tag_id) REFERENCES tag (id) ON DELETE CASCADE)")
+                        "FOREIGN KEY(project_id) REFERENCES project(id) ON UPDATE NO ACTION ON DELETE CASCADE, " +
+                        "FOREIGN KEY(tag_id) REFERENCES tag(id) ON UPDATE NO ACTION ON DELETE CASCADE)")
 
-                // (6) Tag
+                // Table(6): Tag
                 // init: id, title
-                // altered: project_id, tag
-                database.execSQL("DROP TABLE tag")
+                // altered: project_id, text
+                database.execSQL("DROP TABLE IF EXISTS tag")
                 database.execSQL("CREATE TABLE IF NOT EXISTS tag " +
-                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, tag TEXT NOT NULL)")
+                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "text TEXT NOT NULL)")
             }
         }
     }
