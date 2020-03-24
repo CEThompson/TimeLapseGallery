@@ -13,8 +13,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/project_recyclerview_constraint_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorLightPrimary">
+            android:layout_height="wrap_content">
 
             <!-- Image for project -->
             <ImageView
