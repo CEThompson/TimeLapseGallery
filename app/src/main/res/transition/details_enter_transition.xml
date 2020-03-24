@@ -5,6 +5,9 @@
         android:slideEdge="right">
         <targets>
             <target android:targetId="@id/play_as_video_fab"/>
+            <target android:targetId="@id/project_schedule_fab"/>
+            <target android:targetId="@id/project_tag_fab"/>
+            <target android:targetId="@id/project_information_fab"/>
         </targets>
     </slide>
 

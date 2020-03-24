@@ -30,18 +30,17 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
     private val constraintSet: ConstraintSet = ConstraintSet()
 
     interface GalleryAdapterOnClickHandler {
-        fun onClick(clickedProject: Project, projectImageView: ImageView, projectCardView: CardView, position: Int)
+        fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int)
     }
 
-    inner class GalleryAdapterViewHolder(var binding: GalleryRecyclerviewItemBinding)
-        : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+    inner class GalleryAdapterViewHolder(val binding: GalleryRecyclerviewItemBinding)
+        : RecyclerView.ViewHolder(binding.root), OnClickListener {
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
             val clickedProject = mProjectData!![adapterPosition]
             mClickHandler.onClick(
                     clickedProject,
-                    binding.projectImage,
-                    binding.projectCardView,
+                    binding,
                     adapterPosition)
         }
         init {
@@ -72,9 +71,9 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         // Handle Check Display
         val photoTakenToday = DateUtils.isToday(project.cover_photo_timestamp)
         if (photoTakenToday) {
-            holder.binding.galleryItemCheckLayout.visibility = VISIBLE
+            holder.binding.scheduleIndicatorCheck.visibility = VISIBLE
         } else {
-            holder.binding.galleryItemCheckLayout.visibility = INVISIBLE
+            holder.binding.scheduleIndicatorCheck.visibility = INVISIBLE
         }
 
         val projectIsScheduled = (project.interval_days != 0)
@@ -88,8 +87,17 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         // Set transition targets
         val imageTransitionName = project.project_id.toString()
         val cardTransitionName = "${imageTransitionName}card"
+        val bottomGradientTransitionName = "${imageTransitionName}bottomGradient"
+        val topGradientTransitionName = "${imageTransitionName}topGradient"
+        val dueTransitionName = "${imageTransitionName}due"
+        val intervalTransitionName = "${imageTransitionName}interval"
         holder.binding.projectImage.transitionName = imageTransitionName
         holder.binding.projectCardView.transitionName = cardTransitionName
+        holder.binding.galleryBottomGradient.transitionName = bottomGradientTransitionName
+        holder.binding.galleryScheduleLayout.galleryGradientTopDown.transitionName = topGradientTransitionName
+        holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.transitionName = dueTransitionName
+        holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.transitionName = intervalTransitionName
+
 
         // Load the image
         Glide.with(holder.itemView.context)
@@ -145,12 +153,12 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
             holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv
                     .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.colorSubtleRedAccent))
             holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv
-                    .setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_schedule_indicator_due_24dp, 0)
+                    .setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_schedule_indicator_due_24dp, 0, 0, 0)
         } else {
             holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv
                     .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.white))
             holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv
-                    .setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_schedule_indicator_pending_24dp, 0)
+                    .setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_schedule_indicator_pending_24dp, 0, 0, 0)
         }
     }
 

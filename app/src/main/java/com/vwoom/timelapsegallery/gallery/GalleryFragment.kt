@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
 import android.os.SystemClock
+import android.transition.TransitionInflater
 import android.view.*
 import android.widget.CheckBox
 import android.widget.EditText
@@ -34,11 +35,14 @@ import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
+import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
+
+// TODO set exit transition / enter transition for gallery to fade in / out
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private var mSearchDialog: Dialog? = null
@@ -82,6 +86,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mGridLayoutManager = null
         mGalleryAdapter = null
         toolbar = null
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val transition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
+        exitTransition = transition
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -359,7 +369,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         unscheduledCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_UNSCHEDULED
     }
 
-    override fun onClick(clickedProject: Project, projectImageView: ImageView, projectCardView: CardView, position: Int) {
+    override fun onClick(clickedProject: Project, binding:GalleryRecyclerviewItemBinding, position: Int) {
         // Prevents multiple clicks which cause a crash
         if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 400) return
         mLastClickTime = SystemClock.elapsedRealtime()
@@ -368,8 +378,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProject, position)
         val extras = FragmentNavigatorExtras(
                 mAddProjectFAB as View to getString(R.string.key_add_transition),
-                projectImageView to projectImageView.transitionName,
-                projectCardView to projectCardView.transitionName
+                binding.projectImage to binding.projectImage.transitionName,
+                binding.projectCardView to binding.projectCardView.transitionName,
+                binding.galleryBottomGradient to binding.galleryBottomGradient.transitionName,
+                binding.galleryScheduleLayout.galleryGradientTopDown to binding.galleryScheduleLayout.galleryGradientTopDown.transitionName,
+                binding.galleryScheduleLayout.scheduleDaysUntilDueTv to binding.galleryScheduleLayout.scheduleDaysUntilDueTv.transitionName,
+                binding.galleryScheduleLayout.scheduleIndicatorIntervalTv to binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.transitionName
         )
         findNavController().navigate(action, extras)
     }

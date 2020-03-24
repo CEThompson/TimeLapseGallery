@@ -11,11 +11,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
+import android.transition.Transition
 import android.transition.TransitionInflater
 import android.util.Log
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.*
+import android.view.animation.AlphaAnimation
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
@@ -111,15 +113,32 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     // Analytics
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
-
-    // TODO: (update 1.2) improve shared element transitions
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mCurrentProject = args.clickedProject
         mExternalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
-        sharedElementEnterTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
-        sharedElementReturnTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
+        val sharedElemTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
+        sharedElemTransition.addListener(object: Transition.TransitionListener{
+            override fun onTransitionEnd(transition: Transition?) {
+                binding?.fullscreenFab?.show()
+                val fadeInAnimation = AlphaAnimation(0f, 1f)
+                fadeInAnimation.duration = 300
+                binding?.photoInformationLayout?.startAnimation(fadeInAnimation)
+            }
+            override fun onTransitionCancel(transition: Transition?) {
+            }
+            override fun onTransitionStart(transition: Transition?) {
+                binding?.fullscreenFab?.hide()
+            }
+            override fun onTransitionPause(transition: Transition?) {
+            }
+            override fun onTransitionResume(transition: Transition?) {
+            }
+        })
+        sharedElementEnterTransition = sharedElemTransition
+        sharedElementReturnTransition = sharedElemTransition
         enterTransition = TransitionInflater.from(context).inflateTransition(R.transition.details_enter_transition)
         postponeEnterTransition()
     }
@@ -245,11 +264,18 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.detailCurrentImage?.setOnTouchListener(mOnSwipeTouchListener)
 
         // Set the transition name for the image
-        val imageTransitionName= "${mCurrentProject?.project_id}"
-        val cardTransitionName = imageTransitionName + "card"
-        binding?.detailCurrentImage?.transitionName = imageTransitionName
+        val transitionName= "${mCurrentProject!!.project_id}"
+        val cardTransitionName = "${transitionName}card"
+        val bottomTransitionName = "${transitionName}bottomGradient"
+        val topTransitionName = "${transitionName}topGradient"
+        val dueTransitionName = "${transitionName}due"
+        val intervalTransitionName = "${transitionName}interval"
+        binding?.detailCurrentImage?.transitionName = transitionName
         binding?.detailsCardContainer?.transitionName = cardTransitionName
-        Log.d(TAG, "tracking transition: detail fragment $imageTransitionName & $cardTransitionName")
+        binding?.detailsGradientOverlay?.transitionName = bottomTransitionName
+        binding?.detailScheduleLayout?.galleryGradientTopDown?.transitionName = topTransitionName
+        binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.transitionName = dueTransitionName
+        binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.transitionName = intervalTransitionName
 
         setupViewModel()
 
@@ -722,13 +748,30 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             else {
                 binding?.projectScheduleFab?.backgroundTintList =
                         ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
-                binding?.detailScheduleLayout?.scheduleLayout?.visibility = VISIBLE
-                // Show the interval of teh schedule
+                // Show the interval of the schedule
                 binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.text =
                         currentProject.interval_days.toString()
+
+                val daysUntilDue = daysUntilDue(mCurrentProject!!)
                 // Show how many days until project is due
                 binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.text =
-                        daysUntilDue(mCurrentProject!!).toString()
+                        daysUntilDue.toString()
+
+                // Style schedule layout depending upon whether or not the project is due
+                if (daysUntilDue <= 0) {
+                    binding?.detailScheduleLayout?.scheduleDaysUntilDueTv
+                            ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorSubtleRedAccent))
+                    binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv
+                            ?.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_schedule_indicator_due_24dp, 0, 0, 0)
+                } else {
+                    binding?.detailScheduleLayout?.scheduleDaysUntilDueTv
+                            ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv
+                            ?.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_schedule_indicator_pending_24dp, 0, 0, 0)
+                }
+
+                // Show the layout
+                binding?.detailScheduleLayout?.scheduleLayout?.visibility = VISIBLE
             }
             // Also update the fields in the info dialog
             setInfoDialog()
