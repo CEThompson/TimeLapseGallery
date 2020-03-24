@@ -4,13 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.vwoom.timelapsegallery.data.dao.*
 import com.vwoom.timelapsegallery.data.entry.*
 
-@Database(entities = [ProjectEntry::class, PhotoEntry::class, TagEntry::class, ProjectTagEntry::class, ProjectScheduleEntry::class, CoverPhotoEntry::class], version = 2, exportSchema = true)
+@Database(entities = [ProjectEntry::class, PhotoEntry::class, TagEntry::class, ProjectTagEntry::class, ProjectScheduleEntry::class, CoverPhotoEntry::class],
+        version = 2,
+        exportSchema = true)
 abstract class TimeLapseDatabase : RoomDatabase() {
     abstract fun projectDao(): ProjectDao
     abstract fun photoDao(): PhotoDao
@@ -69,7 +70,7 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                 database.execSQL("INSERT INTO project_new " +
                         "(id, project_name) SELECT id, name FROM project")
                 // Remove old table
-                database.execSQL("DROP TABLE project");
+                database.execSQL("DROP TABLE project")
                 // Change new table name to old table name
                 database.execSQL("ALTER TABLE project_new RENAME TO project")
 
@@ -82,14 +83,14 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                         "(id INTEGER PRIMARY KEY AUTOINCREMENT NO NULL, " +
                         "project_id INTEGER NOT NULL, " +
                         "timestamp INTEGER NOT NULL, " +
-                        "FOREIGN KEY(project_id) REFERENCES project(id) ON UPDATE NO ACTION ON DELETE CASCADE");
+                        "FOREIGN KEY(project_id) REFERENCES project(id) ON UPDATE NO ACTION ON DELETE CASCADE")
                 // Copy the data
                 database.execSQL("INSERT INTO photo_new " +
                         "(id, project_id, timestamp) SELECT id, project_id, timestamp FROM photo")
                 // Delete the old table
-                database.execSQL("DROP TABLE photo");
+                database.execSQL("DROP TABLE photo")
                 // Rename the new
-                database.execSQL("ALTER TABLE photo_new RENAME TO photo");
+                database.execSQL("ALTER TABLE photo_new RENAME TO photo")
 
                 /*
                 * Note these two tables do not need data migration
