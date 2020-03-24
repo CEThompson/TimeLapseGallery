@@ -742,8 +742,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 // Set the current photo to the last
                 mCurrentPhoto = lastPhotoEntry
                 detailViewModel.currentPhoto.value = lastPhotoEntry
+                
                 // Set the cover photo to the last in the set
-                // TODO consider handling this in the view model
+                // This handles changing cover photo on deletion and addition
                 detailViewModel.setCoverPhoto(lastPhotoEntry)
             }
             // Send the photos to the adapter
