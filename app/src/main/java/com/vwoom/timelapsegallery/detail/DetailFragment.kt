@@ -52,7 +52,6 @@ import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
-import kotlinx.android.synthetic.main.dialog_schedule_selector.view.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -725,10 +724,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
                 binding?.detailScheduleLayout?.scheduleLayout?.visibility = VISIBLE
                 // Show the interval of teh schedule
-                binding?.detailScheduleLayout?.galleryItemScheduleIndicatorDays?.text =
+                binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.text =
                         currentProject.interval_days.toString()
                 // Show how many days until project is due
-                binding?.detailScheduleLayout?.daysUntilDueTextView?.text =
+                binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.text =
                         daysUntilDue(mCurrentProject!!).toString()
             }
             // Also update the fields in the info dialog
@@ -919,7 +918,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         for (selector in mDaySelectionViews){
             selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorDefault))
             selector.elevation = defaultElevation
-            if (selector.selector_child_tv.text == currentInterval.toString()) {
+            val selectorTv = selector.findViewById<TextView>(R.id.selector_child_tv)
+            if (selectorTv.text == currentInterval.toString()) {
                 selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
                 selector.elevation = selectedElevation
             }
@@ -927,7 +927,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         for (selector in mWeekSelectionViews){
             selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorDefault))
             selector.elevation = defaultElevation
-            val currentWeekIntervalToDays = selector.selector_child_tv.text.toString().toInt() * 7
+            val selectorTv = selector.findViewById<TextView>(R.id.selector_child_tv)
+            val currentWeekIntervalToDays = selectorTv.text.toString().toInt() * 7
             if (currentWeekIntervalToDays == currentInterval) {
                 selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
                 selector.elevation = selectedElevation

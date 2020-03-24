@@ -1,7 +1,6 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.text.format.DateUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.*
@@ -23,7 +22,6 @@ import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 import java.util.*
 import kotlin.math.log
-import kotlin.math.log10
 
 class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, val externalFilesDir: File) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
     private var mProjectData: List<Project>? = null
@@ -125,34 +123,34 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         // Calc the days until project is due
         val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
         val daysUntilDue = project.interval_days - daysSinceLastPhoto
-        holder.binding.galleryScheduleLayout.daysUntilDueTextView.text = daysUntilDue.toString() // set days until due text
-        holder.binding.galleryScheduleLayout.galleryItemScheduleIndicatorDays.text = interval_days.toString() // set schedule interval
+        holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.text = daysUntilDue.toString() // set days until due text
+        holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.text = interval_days.toString() // set schedule interval
 
         // Calc opacity for due date
         when {
-            photoTakenToday -> holder.binding.galleryScheduleLayout.daysUntilDueTextView.alpha = 0.3f
-            daysUntilDue <= 0 -> holder.binding.galleryScheduleLayout.daysUntilDueTextView.alpha = 1f
-            daysUntilDue == 1.toLong() ->  holder.binding.galleryScheduleLayout.daysUntilDueTextView.alpha = .9f
+            photoTakenToday -> holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = 0.3f
+            daysUntilDue <= 0 -> holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = 1f
+            daysUntilDue == 1.toLong() ->  holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = .9f
             else -> {
                 val minOpacity = .5f
                 val dimFactor = (1f/log(daysUntilDue.toFloat(),2f))
                 val opacityAdjust = .4f * dimFactor
                 val opacity = minOpacity + opacityAdjust
-                holder.binding.galleryScheduleLayout.daysUntilDueTextView.alpha = opacity
+                holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = opacity
             }
         }
 
         // Style depending upon due state
         if (daysUntilDue <= 0) {
-            holder.binding.galleryScheduleLayout.daysUntilDueTextView
+            holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv
                     .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.colorSubtleRedAccent))
-            holder.binding.galleryScheduleLayout.scheduleIconDue.visibility = VISIBLE
-            holder.binding.galleryScheduleLayout.scheduleIconPending.visibility = INVISIBLE
+            holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv
+                    .setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_schedule_indicator_due_24dp, 0)
         } else {
-            holder.binding.galleryScheduleLayout.daysUntilDueTextView
+            holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv
                     .setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.white))
-            holder.binding.galleryScheduleLayout.scheduleIconDue.visibility = INVISIBLE
-            holder.binding.galleryScheduleLayout.scheduleIconPending.visibility = VISIBLE
+            holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv
+                    .setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_schedule_indicator_pending_24dp, 0)
         }
     }
 

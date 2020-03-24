@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/ScheduleStyle"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:minHeight="35dp"
-    android:minWidth="@dimen/touch_target_min"
-    app:cardCornerRadius="10dp"
     android:elevation="4dp"
-    style="@style/ScheduleStyle">
+    android:minWidth="@dimen/touch_target_min"
+    android:minHeight="35dp"
+    app:cardCornerRadius="10dp">
 
     <TextView
         android:id="@+id/selector_child_tv"
@@ -17,9 +18,8 @@
         android:layout_gravity="center"
         android:layout_margin="@dimen/medium"
         android:gravity="center"
-        android:textStyle="bold"
         android:textColor="@color/white"
         android:textSize="20sp"
-        tools:text="1"
-        />
+        android:textStyle="bold"
+        tools:text="1" />
 </androidx.cardview.widget.CardView>
