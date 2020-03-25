@@ -160,6 +160,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Set up navigation to add new projects
         mAddProjectFAB = binding?.addProjectFAB
         mAddProjectFAB?.setOnClickListener {
+            exitTransition = null // When navigating to the camera skip the fade out animation
+            reenterTransition = null // also skip fade in on return
             val action = GalleryFragmentDirections.actionGalleryFragmentToCamera2Fragment(null, null)
             findNavController().navigate(action)
         }
