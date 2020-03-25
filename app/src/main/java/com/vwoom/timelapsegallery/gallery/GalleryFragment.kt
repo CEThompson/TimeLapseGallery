@@ -99,7 +99,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
             override fun onTransitionStart(transition: Transition?) {
                 val fadeInAnimation = AlphaAnimation(0f, 1f)
-                fadeInAnimation.duration = 150
+                fadeInAnimation.duration = 375
                 binding?.galleryRecyclerView?.startAnimation(fadeInAnimation)
             }
 
