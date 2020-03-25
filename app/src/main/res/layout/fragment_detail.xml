@@ -76,13 +76,16 @@
                 android:id="@+id/details_card_container"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="@dimen/detail_margin"
+                android:layout_marginTop="@dimen/medium"
+                android:layout_marginBottom="@dimen/medium"
+                android:layout_marginEnd="@dimen/fab_size_plus_padding"
+                android:layout_marginStart="@dimen/fab_size"
+                app:layout_constraintTop_toBottomOf="@+id/project_information_layout"
                 app:layout_constraintBottom_toTopOf="@+id/image_loading_progress"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/project_information_layout"
-                app:layout_constraintVertical_bias="0.5">
+
+                >
 
                 <!-- Constraint layout used to dynamically resize the photo -->
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -97,7 +100,7 @@
                         android:background="@color/darkImagePlaceHolder"
                         android:contentDescription="@string/detail_current_image_content_description"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintDimensionRatio="3:4"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -109,7 +112,7 @@
                         android:contentDescription="@string/detail_current_image_content_description"
                         android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintDimensionRatio="3:4"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />

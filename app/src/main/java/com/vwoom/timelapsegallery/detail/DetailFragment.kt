@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -329,7 +330,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 mExternalFilesDir!!,
                 getEntryFromProject(mCurrentProject!!),
                 photoEntry.timestamp)
-        loadImage(imagePath)
+        resizeAndLoadImage(imagePath)
 
         // Get info for the current photo
         val timestamp = photoEntry.timestamp
@@ -351,24 +352,49 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     // Loads an image into the main photo view
-    private fun loadImage(imagePath: String) {
+    private fun resizeAndLoadImage(imagePath: String) {
         mImageIsLoaded = false
-        // Get photo info
+        // Get photo ratio, and photo /device orientation
         val ratio = PhotoUtils.getAspectRatioFromImagePath(imagePath)
-        val isImageLandscape = PhotoUtils.isLandscape(imagePath)
+        val imageIsLandscape = PhotoUtils.isLandscape(imagePath)
+        val imageIsPortrait = !imageIsLandscape
+        val deviceIsLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val deviceIsPortrait = !deviceIsLandscape
 
         // Set card view constraints depending upon if photo is landscape or portrait
         val layoutParams = binding?.detailsCardContainer?.layoutParams
 
         // If landscape set height to wrap content
         // Set width to be measured
-        if (isImageLandscape) {
+        when {
+            deviceIsLandscape && imageIsLandscape -> {
+                layoutParams?.height = 0
+                layoutParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
+            }
+            deviceIsLandscape && imageIsPortrait -> {
+                layoutParams?.height = 0
+                layoutParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
+            }
+            deviceIsPortrait && imageIsLandscape -> {
+                layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                layoutParams?.width = 0
+            }
+            deviceIsPortrait && imageIsPortrait -> {
+                layoutParams?.height = 0
+                layoutParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
+            }
+        }
+
+        /*
+        if (imageIsLandscape) {
             layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
             layoutParams?.width = 0
         } else {
             layoutParams?.height = 0
             layoutParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
         }
+         */
+
         // Resize the constraint layout
         val constraintSet = ConstraintSet()
         val constraintLayout: ConstraintLayout = binding!!.detailsCurrentImageConstraintLayout
