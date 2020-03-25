@@ -2,14 +2,12 @@ package com.vwoom.timelapsegallery.utils
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.util.FileUtil
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.data.view.Project
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -61,7 +59,7 @@ class FilesUtilsDbTest {
         val tags = listOf(TagEntry(1, "test one"), TagEntry(2, "test two"))
 
         // when we use the utility
-        FileUtils.addTagToProject(externalFilesTestDir, projectEntry.id, tags)
+        FileUtils.writeProjectTagsFile(externalFilesTestDir, projectEntry.id, tags)
 
         // then
         // each tag retrieved from the database should be in the list passed to the utility
@@ -102,7 +100,7 @@ class FilesUtilsDbTest {
         val tags = emptyList<TagEntry>()
 
         // when we use the utility
-        FileUtils.addTagToProject(externalFilesTestDir, projectEntry.id, tags)
+        FileUtils.writeProjectTagsFile(externalFilesTestDir, projectEntry.id, tags)
 
         // then
         // tags retrieved should be an empty list
@@ -134,7 +132,7 @@ class FilesUtilsDbTest {
         val schedule = ProjectScheduleEntry(projectEntry.id, 7)
 
         // when we use the utility
-        FileUtils.scheduleProject(externalFilesTestDir, projectEntry.id, schedule)
+        FileUtils.writeProjectScheduleFile(externalFilesTestDir, projectEntry.id, schedule)
 
         // then
         // the retrieved schedule from the db exists and represents the interval

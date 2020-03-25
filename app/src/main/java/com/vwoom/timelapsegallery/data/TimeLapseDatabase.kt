@@ -95,7 +95,6 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                 database.execSQL("DROP TABLE photo")
                 // Rename the new
                 database.execSQL("ALTER TABLE photo_new RENAME TO photo")
-                // TODO handle indexing
                 // Create the indexing for the photo table
                 database.execSQL("CREATE INDEX IF NOT EXISTS index_photo_project_id ON photo(project_id)")
 

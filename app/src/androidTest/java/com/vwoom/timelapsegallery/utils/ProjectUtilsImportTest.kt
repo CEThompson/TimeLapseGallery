@@ -2,7 +2,6 @@ package com.vwoom.timelapsegallery.utils
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomOpenHelper
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
@@ -72,11 +71,11 @@ class ProjectUtilsImportTest {
         val projectOneMetaDir = File(projectOneDir, FileUtils.META_FILE_SUBDIRECTORY)
         projectOneMetaDir.mkdirs()
         val projectOneDefinition = Project(1,"test",0,1,300)
-        FileUtils.addTagToProject(
+        FileUtils.writeProjectTagsFile(
                 externalFilesTestDir,
                 projectOneDefinition.project_id,
                 listOf(TagEntry(1, "c")))
-        FileUtils.scheduleProject(externalFilesTestDir,
+        FileUtils.writeProjectScheduleFile(externalFilesTestDir,
                 projectOneDefinition.project_id,
                 ProjectScheduleEntry(1,1))
 
@@ -88,11 +87,11 @@ class ProjectUtilsImportTest {
         val projectTwoMetaDir = File(projectTwoDir, FileUtils.META_FILE_SUBDIRECTORY)
         projectTwoMetaDir.mkdirs()
         val projectTwoDefinition = Project(3,"test two",0,2,400)
-        FileUtils.addTagToProject(
+        FileUtils.writeProjectTagsFile(
                 externalFilesTestDir,
                 projectTwoDefinition.project_id,
                 listOf(TagEntry(2, "d")))
-        FileUtils.scheduleProject(externalFilesTestDir,
+        FileUtils.writeProjectScheduleFile(externalFilesTestDir,
                 projectTwoDefinition.project_id,
                 ProjectScheduleEntry(3,3))
 

@@ -865,7 +865,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 }
 
                 // 5. Lastly write the list of tags to the text file (overwriting any previously)
-                FileUtils.addTagToProject(mExternalFilesDir!!, mCurrentProject!!.project_id, mProjectTags!!)
+                FileUtils.writeProjectTagsFile(mExternalFilesDir!!, mCurrentProject!!.project_id, mProjectTags!!)
             }
         })
 

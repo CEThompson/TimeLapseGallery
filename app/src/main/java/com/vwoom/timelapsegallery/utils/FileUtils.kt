@@ -197,12 +197,12 @@ object FileUtils {
         return arrayOf("$timestamp.jpg","$timestamp.png","$timestamp.jpeg")
     }
 
-    fun addTagToProject(externalFilesDir: File, projectId: Long, tags: List<TagEntry>){
+    // TODO: (update 1.2) determine how to handle output stream writer exceptions for writing project tags and project schedule
+    fun writeProjectTagsFile(externalFilesDir: File, projectId: Long, tags: List<TagEntry>){
         val metaDir = getMetaDirectoryForProject(externalFilesDir, projectId)
         val tagsFile = File(metaDir, TAGS_DEFINITION_TEXT_FILE)
 
         // Write the tags to a text file
-        // TODO: (update 1.2) determine how to handle output stream writer exceptions
         try {
             val output = FileOutputStream(tagsFile)
             val outputStreamWriter = OutputStreamWriter(output)
@@ -217,12 +217,11 @@ object FileUtils {
         }
     }
 
-    fun scheduleProject(externalFilesDir: File, projectId: Long, projectScheduleEntry: ProjectScheduleEntry){
+    fun writeProjectScheduleFile(externalFilesDir: File, projectId: Long, projectScheduleEntry: ProjectScheduleEntry){
         val metaDir = getMetaDirectoryForProject(externalFilesDir, projectId)
         val scheduleFile = File(metaDir, SCHEDULE_TEXT_FILE)
 
         Log.d(TAG, "writing schedule file")
-        // TODO: (update 1.2) determine how to handle output stream writer exceptions
         try {
             val output = FileOutputStream(scheduleFile)
             val outputStreamWriter = OutputStreamWriter(output)

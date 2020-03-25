@@ -39,8 +39,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
-
-// TODO set exit transition / enter transition for gallery to fade in / out
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private var mSearchDialog: Dialog? = null
@@ -92,18 +90,22 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val reenter = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
-        reenter.addListener(object: Transition.TransitionListener{
+        reenter.addListener(object : Transition.TransitionListener {
             override fun onTransitionEnd(transition: Transition?) {
             }
+
             override fun onTransitionCancel(transition: Transition?) {
             }
+
             override fun onTransitionStart(transition: Transition?) {
                 val fadeInAnimation = AlphaAnimation(0f, 1f)
                 fadeInAnimation.duration = 150
                 binding?.galleryRecyclerView?.startAnimation(fadeInAnimation)
             }
+
             override fun onTransitionPause(transition: Transition?) {
             }
+
             override fun onTransitionResume(transition: Transition?) {
             }
         })
@@ -386,7 +388,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         unscheduledCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_UNSCHEDULED
     }
 
-    override fun onClick(clickedProject: Project, binding:GalleryRecyclerviewItemBinding, position: Int) {
+    override fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int) {
         // Prevents multiple clicks which cause a crash
         if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 250) return
         mLastClickTime = SystemClock.elapsedRealtime()
