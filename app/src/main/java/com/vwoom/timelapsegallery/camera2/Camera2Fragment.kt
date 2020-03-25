@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.ImageFormat
 import android.hardware.camera2.*
-import android.media.ExifInterface
 import android.media.Image
 import android.media.ImageReader
 import android.os.*
@@ -14,6 +13,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
@@ -50,9 +50,7 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
-// TODO image capture is rotated, handle rotation case
-// TODO handle permissions in a permission fragment?
-// TODO: (update 1.2) figure out why camera 2 photos are interpreted differently when made into a video by ffmpeg
+// TODO: Clean up code, look into image quality difference between this and previous implementation
 class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val args: Camera2FragmentArgs by navArgs()
@@ -131,7 +129,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
         mTakePictureFab?.setOnClickListener {
             it.isEnabled = false
-            // TODO consider using viewmodel scope rather than lifecycle scope
+            // TODO consider using view model scope rather than lifecycle scope
             takePictureJob = lifecycleScope.launchIdling {
                 takePhoto().use { result ->
                     Log.d(TAG, "resulting take photo")
@@ -206,7 +204,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
             addTarget(viewFinder.holder.surface)
         }
 
-        // TODO set up tap to focus here
+        // TODO set up tap to focus
         //setTapToFocus()
 
         session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
@@ -325,7 +323,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 val bytes = ByteArray(buffer.remaining()).apply { buffer.get(this) }
                 try {
                     val output = FileUtils.createTemporaryImageFile(externalFilesDir)
-                    // TODO create utility to create file directly?
                     FileOutputStream(output).use { it.write(bytes) }
                     cont.resume(output)
                 } catch (exc: IOException) {
@@ -337,7 +334,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 val dngCreator = DngCreator(characteristics, result.metadata)
                 try {
                     val output = FileUtils.createTemporaryImageFile(externalFilesDir)
-                    // TODO create utility to create file directly?
                     FileOutputStream(output).use { dngCreator.writeImage(it, result.image) }
                     cont.resume(output)
                 } catch (exc: IOException) {
@@ -383,20 +379,15 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     }
 
-    /* begin old code */
-    // TODO figure out how to handle tap to focus
-    /*
-    fun setTapToFocus(){
+    fun setTapToFocus(captureRequestBuilder: CaptureRequest.Builder){
         @Suppress("ClickableViewAccessibility")
-            Log.d(TAG, "setting up tap to focus")
-            viewFinder.setOnTouchListener(
-                    CameraFocusOnTouchHandler(
-                    characteristics,
-                    captureRequestBuilder!!,
-                    session,
-                    cameraHandler))
-    }*/
-
+        viewFinder.setOnTouchListener(
+                CameraFocusOnTouchHandler(
+                characteristics,
+                captureRequestBuilder,
+                session,
+                cameraHandler))
+    }
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
