@@ -39,7 +39,7 @@ private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
 
 // TODO image capture is rotated, handle rotation case
-// TODO figure out why camera 2 photos are interpreted differently when made into a video by ffmpeg
+// TODO: (update 1.2) figure out why camera 2 photos are interpreted differently when made into a video by ffmpeg
 class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val cameraManager: CameraManager by lazy {
