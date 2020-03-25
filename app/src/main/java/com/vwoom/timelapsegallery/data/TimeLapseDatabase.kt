@@ -21,13 +21,13 @@ abstract class TimeLapseDatabase : RoomDatabase() {
     abstract fun projectScheduleDao(): ProjectScheduleDao
 
     companion object {
-
-        @Volatile private var instance: TimeLapseDatabase? = null
+        @Volatile
+        private var instance: TimeLapseDatabase? = null
         private const val DATABASE_NAME = "time_lapse_db"
 
         fun getInstance(context: Context): TimeLapseDatabase {
             return instance ?: synchronized(this) {
-                instance ?: buildDatabase(context).also {instance = it}
+                instance ?: buildDatabase(context).also { instance = it }
             }
         }
 
@@ -37,8 +37,7 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                     .build()
         }
 
-        // TODO test migration
-        private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+        val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // Step (1) Create new tables
                 // Table 1: Cover Photo
@@ -49,6 +48,11 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                         "PRIMARY KEY(project_id), " +
                         "FOREIGN KEY(project_id) REFERENCES project(id) ON UPDATE NO ACTION ON DELETE CASCADE, " +
                         "FOREIGN KEY(photo_id) REFERENCES photo(id) ON UPDATE NO ACTION ON DELETE CASCADE)")
+                // Create the indexing for the photo table
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_cover_photo_project_id ON cover_photo(project_id)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_cover_photo_photo_id ON cover_photo(photo_id)")
+
+
                 // Table 2: Project Schedule
                 // columns: project_id, interval_days
                 database.execSQL("CREATE TABLE IF NOT EXISTS project_schedule " +
@@ -80,10 +84,10 @@ abstract class TimeLapseDatabase : RoomDatabase() {
 
                 // Create the new photo table
                 database.execSQL("CREATE TABLE photo_new " +
-                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NO NULL, " +
+                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                         "project_id INTEGER NOT NULL, " +
                         "timestamp INTEGER NOT NULL, " +
-                        "FOREIGN KEY(project_id) REFERENCES project(id) ON UPDATE NO ACTION ON DELETE CASCADE")
+                        "FOREIGN KEY(project_id) REFERENCES project(id) ON UPDATE NO ACTION ON DELETE CASCADE)")
                 // Copy the data
                 database.execSQL("INSERT INTO photo_new " +
                         "(id, project_id, timestamp) SELECT id, project_id, timestamp FROM photo")
@@ -91,6 +95,9 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                 database.execSQL("DROP TABLE photo")
                 // Rename the new
                 database.execSQL("ALTER TABLE photo_new RENAME TO photo")
+                // TODO handle indexing
+                // Create the indexing for the photo table
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_photo_project_id ON photo(project_id)")
 
                 /*
                 * Note these two tables do not need data migration
@@ -106,6 +113,9 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                         "tag_id INTEGER NOT NULL, " +
                         "FOREIGN KEY(project_id) REFERENCES project(id) ON UPDATE NO ACTION ON DELETE CASCADE, " +
                         "FOREIGN KEY(tag_id) REFERENCES tag(id) ON UPDATE NO ACTION ON DELETE CASCADE)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_project_tag_project_id ON project_tag(project_id)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_project_tag_tag_id ON project_tag(tag_id)")
+
 
                 // Table(6): Tag
                 // init: id, title
