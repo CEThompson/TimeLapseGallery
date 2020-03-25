@@ -4,14 +4,13 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.*
+import android.graphics.ImageFormat
 import android.hardware.camera2.*
 import android.media.ExifInterface
 import android.media.Image
 import android.media.ImageReader
 import android.os.*
 import android.util.Log
-import android.util.Size
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -20,7 +19,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -40,7 +38,6 @@ import java.io.Closeable
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.RuntimeException
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.TimeoutException
 import kotlin.coroutines.resume
@@ -53,8 +50,8 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
-
 // TODO image capture is rotated, handle rotation case
+// TODO handle permissions in a permission fragment?
 // TODO: (update 1.2) figure out why camera 2 photos are interpreted differently when made into a video by ffmpeg
 class Camera2Fragment : Fragment(), LifecycleOwner {
 
@@ -65,7 +62,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         val context = requireContext().applicationContext
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     }
-    // TODO figure out how to get the camera ID
+
+    // TODO figure out best way to get the camera ID
     private val cameraId by lazy {
         lateinit var id: String
         for (cameraId in cameraManager.cameraIdList) {
@@ -78,7 +76,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         }
         id
     }
-    private val pixelFormat = ImageFormat.JPEG
+    private val pixelFormat = ImageFormat.JPEG // TODO could later support ImageFormat.RAW_SENSOR or ImageFormat.DEPTH_JPEG
     private val characteristics: CameraCharacteristics by lazy {
         cameraManager.getCameraCharacteristics(cameraId)
     }
@@ -92,12 +90,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private lateinit var session: CameraCaptureSession
     private lateinit var relativeOrientation: OrientationLiveData
 
-    // these are not in camera 2 basic
-    // TODO figure out how to use this to set up tap to focus
-    private var captureRequestBuilder: CaptureRequest.Builder? = null
 
-
-    // TLG specific
     private var takePictureJob: Job? = null
     private val camera2ViewModel: Camera2ViewModel by viewModels {
         InjectorUtils.provideCamera2ViewModelFactory(requireActivity(), args.photo, args.project)
@@ -136,8 +129,9 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         // If no project photo was passed hide the quick compare
         if (args.photo == null) binding.quickCompareFab.hide()
 
-        mTakePictureFab?.setOnClickListener{
+        mTakePictureFab?.setOnClickListener {
             it.isEnabled = false
+            // TODO consider using viewmodel scope rather than lifecycle scope
             takePictureJob = lifecycleScope.launchIdling {
                 takePhoto().use { result ->
                     Log.d(TAG, "resulting take photo")
@@ -157,23 +151,21 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     findNavController().popBackStack()
                 }
             }
-            it.post {it.isEnabled = true}
+            it.post { it.isEnabled = true }
         }
-
-        // TODO determine if this is the right location to set up focus
-        //setTapToFocus()
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewFinder.holder.addCallback(object: SurfaceHolder.Callback {
+        viewFinder.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceDestroyed(holder: SurfaceHolder?) = Unit
             override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) = Unit
             override fun surfaceCreated(holder: SurfaceHolder?) {
                 val previewSize = getPreviewOutputSize(
-                        viewFinder.display, characteristics, SurfaceHolder::class.java)
+                        viewFinder.display,
+                        characteristics,
+                        SurfaceHolder::class.java)
                 viewFinder.holder.setFixedSize(previewSize.width, previewSize.height)
                 viewFinder.setAspectRatio(previewSize.width, previewSize.height)
 
@@ -186,8 +178,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         })
 
         relativeOrientation = OrientationLiveData(requireContext(), characteristics).apply {
-            observe(viewLifecycleOwner, Observer {
-                orientation -> Log.d(TAG, "Orientation changed to $orientation")
+            observe(viewLifecycleOwner, Observer { orientation ->
+                Log.d(TAG, "Orientation changed to $orientation")
             })
         }
     }
@@ -196,17 +188,26 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         camera = openCamera(cameraManager, cameraId, cameraHandler)
 
         // TODO setting pixel format to ImageFormat.JPEG for now, could also be ImageFormat.RAW_SENSOR && ImageFormat.DEPTH_JPEG
-        val size = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
-                .getOutputSizes(pixelFormat).maxBy {it.height * it.width}!!
+        // This block gets true camera output size
+        //val size = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
+        //        .getOutputSizes(pixelFormat).maxBy {it.height * it.width}!!
 
-        imageReader = ImageReader.newInstance(size.width, size.height, pixelFormat, IMAGE_BUFFER_SIZE)
+        // Match size of image output to preview size
+        val previewSize = getPreviewOutputSize(
+                viewFinder.display,
+                characteristics,
+                SurfaceHolder::class.java)
+        imageReader = ImageReader.newInstance(previewSize.width, previewSize.height, pixelFormat, IMAGE_BUFFER_SIZE)
 
         val targets = listOf(viewFinder.holder.surface, imageReader.surface) // where the camera will output frames
         session = createCaptureSession(camera, targets, cameraHandler)
 
-        val captureRequest = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply{
+        val captureRequest = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
             addTarget(viewFinder.holder.surface)
         }
+
+        // TODO set up tap to focus here
+        //setTapToFocus()
 
         session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
@@ -217,8 +218,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
             manager: CameraManager,
             cameraId: String,
             handler: Handler? = null
-    ) : CameraDevice = suspendCancellableCoroutine { cont ->
-        manager.openCamera(cameraId, object : CameraDevice.StateCallback(){
+    ): CameraDevice = suspendCancellableCoroutine { cont ->
+        manager.openCamera(cameraId, object : CameraDevice.StateCallback() {
             override fun onOpened(camera: CameraDevice) = cont.resume(camera)
             override fun onDisconnected(camera: CameraDevice) {
                 // TODO handle disconnected camera
@@ -226,7 +227,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
             }
 
             override fun onError(camera: CameraDevice, error: Int) {
-                val msg = when(error){
+                val msg = when (error) {
                     ERROR_CAMERA_DEVICE -> "Fatal (device"
                     ERROR_CAMERA_DISABLED -> "Device policy"
                     ERROR_CAMERA_IN_USE -> "Camera in use"
@@ -242,7 +243,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private suspend fun createCaptureSession(device: CameraDevice, targets: List<Surface>, handler: Handler? = null
     ): CameraCaptureSession = suspendCoroutine { cont ->
-        device.createCaptureSession(targets, object: CameraCaptureSession.StateCallback() {
+        device.createCaptureSession(targets, object : CameraCaptureSession.StateCallback() {
             override fun onConfigured(session: CameraCaptureSession) = cont.resume(session)
             override fun onConfigureFailed(session: CameraCaptureSession) {
                 val exc = RuntimeException("Camera ${device.id} session config failed")
@@ -254,7 +255,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private suspend fun takePhoto(): CombinedCaptureResult = suspendCoroutine {
         @Suppress("ControlFlowWithEmptyBody")
-        while (imageReader.acquireNextImage() != null){}
+        while (imageReader.acquireNextImage() != null) {
+        }
 
         val imageQueue = ArrayBlockingQueue<Image>(IMAGE_BUFFER_SIZE)
         imageReader.setOnImageAvailableListener({ reader ->
@@ -266,7 +268,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
             addTarget(imageReader.surface)
         }
 
-        session.capture(captureRequest.build(), object : CameraCaptureSession.CaptureCallback(){
+        session.capture(captureRequest.build(), object : CameraCaptureSession.CaptureCallback() {
             override fun onCaptureCompleted(
                     session: CameraCaptureSession,
                     request: CaptureRequest,
@@ -282,7 +284,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
                 // TODO changed cont to it here, figure out what this means
                 @Suppress("BlockingMethodInNonBlockingContext")
-                lifecycleScope.launch(it.context){
+                lifecycleScope.launch(it.context) {
                     while (true) {
                         val image = imageQueue.take()
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
@@ -320,11 +322,11 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         when (result.format) {
             ImageFormat.JPEG, ImageFormat.DEPTH_JPEG -> {
                 val buffer = result.image.planes[0].buffer
-                val bytes = ByteArray(buffer.remaining()).apply{buffer.get(this)}
+                val bytes = ByteArray(buffer.remaining()).apply { buffer.get(this) }
                 try {
                     val output = FileUtils.createTemporaryImageFile(externalFilesDir)
                     // TODO create utility to create file directly?
-                    FileOutputStream(output).use {it.write(bytes)}
+                    FileOutputStream(output).use { it.write(bytes) }
                     cont.resume(output)
                 } catch (exc: IOException) {
                     Log.e(TAG, "Unable to write JPEG image to file", exc)
@@ -336,7 +338,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 try {
                     val output = FileUtils.createTemporaryImageFile(externalFilesDir)
                     // TODO create utility to create file directly?
-                    FileOutputStream(output).use {dngCreator.writeImage(it, result.image)}
+                    FileOutputStream(output).use { dngCreator.writeImage(it, result.image) }
                     cont.resume(output)
                 } catch (exc: IOException) {
                     Log.e(TAG, "Unable to write DNG image to file", exc)
@@ -382,147 +384,18 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     }
 
     /* begin old code */
-/*
-    private val surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-        override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
-            setupCamera(width, height)
-        }
-        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
-        }
-        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
-            return false
-        }
-        override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
-        }
-    }
-*/
+    // TODO figure out how to handle tap to focus
     /*
-    private val stateCallback = object : CameraDevice.StateCallback() {
-        override fun onOpened(camera: CameraDevice) {
-            this@Camera2Fragment.camera = camera
-            createPreviewSession()
-        }
-        override fun onDisconnected(camera: CameraDevice) {
-            camera.close()
-            this@Camera2Fragment.camera = null
-        }
-        override fun onError(camera: CameraDevice, error: Int) {
-            camera.close()
-            this@Camera2Fragment.camera = null
-        }
-    }
-
-*/
-
-    // TODO: determine how to handle permissions
-    /*
-    override fun onResume() {
-        super.onResume()
-        if (allPermissionsGranted()) {
-            if (viewFinder.isAvailable) {
-                setupCamera(viewFinder.width, viewFinder.height)
-            } else {
-                viewFinder.surfaceTextureListener = surfaceTextureListener
-            }
-        } else {
-            requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-        }
-    }
-*/
-    //override fun onStop() {
-    //    super.onStop()
-    //    takePictureJob?.cancel()
-    //    closeCamera()
-    //}
-
-    //override fun onDestroy() {
-    //    super.onDestroy()
-    //    cameraThread.quitSafely()
-    //}
-
-    //private fun closeCamera() {
-    //    session?.close()
-    //    session = null
-    //    camera?.close()
-    //    camera = null
-    //}
-
-    /*
-    private fun setupCamera(width: Int, height: Int) = lifecycleScope.launchIdling {
-        lateinit var cameraIdToSet: String
-        try {
-            for (cameraId in cameraManager.cameraIdList) {
-                val currentCameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId)
-
-                if (currentCameraCharacteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) {
-                    val streamConfigurationMap = currentCameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-                    previewSize = streamConfigurationMap?.getOutputSizes(SurfaceTexture::class.java)!![0]
-                    cameraIdToSet = cameraId
-                    characteristics = currentCameraCharacteristics
-                    break
-                }
-            }
-            Log.d(TAG, "opening camera")
-            Log.d(TAG, "camera id $cameraIdToSet")
-            transformImage(width, height)
-            cameraManager.openCamera(cameraIdToSet, stateCallback, cameraHandler)
-        } catch (e: CameraAccessException) {
-            Log.d(TAG, "Camera access exception ${e.message}")
-        } catch (s: SecurityException) {
-            Log.d(TAG, "Camera security exception ${s.message}")
-        }
-    }
-*/
-
-    // TODO determine where to set tap to focus
     fun setTapToFocus(){
         @Suppress("ClickableViewAccessibility")
-        if (characteristics != null
-            && captureRequestBuilder != null
-            && session != null)
-        {
             Log.d(TAG, "setting up tap to focus")
-            viewFinder.setOnTouchListener(CameraFocusOnTouchHandler(
-                    characteristics!!,
+            viewFinder.setOnTouchListener(
+                    CameraFocusOnTouchHandler(
+                    characteristics,
                     captureRequestBuilder!!,
-                    session!!,
+                    session,
                     cameraHandler))
-        }
-    }
-
-    /*
-    private fun setTakePictureFab() {
-        mTakePictureFab?.setOnClickListener {
-
-            var outputPhoto: FileOutputStream? = null
-            try {
-                val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-                val file = FileUtils.createTemporaryImageFile(externalFilesDir)
-                outputPhoto = FileOutputStream(file)
-                viewFinder.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
-
-                takePictureJob = camera2ViewModel.viewModelScope.launchIdling {
-                    camera2ViewModel.handleFile(file, externalFilesDir)
-                    findNavController().popBackStack()
-                }
-            } catch (e: Exception) {
-                viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
-                Log.d(TAG, "Take picture exception: ${e.message}")
-            } finally {
-                try {
-                    outputPhoto?.close()
-                } catch (e: Exception) {
-                    Log.d(TAG, "Take picture exception in finally block, exception closing photo: ${e.message}")
-                }
-            }
-
-        }
-    }
-
-
-*/
-    // TODO handle permissions in a permission fragment?
-
+    }*/
 
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

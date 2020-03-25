@@ -20,7 +20,8 @@ class CameraFocusOnTouchHandler(
 ) : OnTouchListener {
     private var mManualFocusEngaged = false
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouch(view: View, motionEvent: MotionEvent): Boolean { //Override in your touch-enabled view (this can be different than the view you use for displaying the cam preview)
+    override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
+        //Override in your touch-enabled view (this can be different than the view you use for displaying the cam preview)
         val actionMasked = motionEvent.actionMasked
         if (actionMasked != MotionEvent.ACTION_DOWN) {
             return false
