@@ -10,7 +10,7 @@
         android:orientation="vertical"
         tools:context="com.vwoom.timelapsegallery.camera2.Camera2Fragment">
 
-        <TextureView
+        <com.vwoom.timelapsegallery.camera2.common.AutoFitSurfaceView
             android:id="@+id/camera_preview"
             android:layout_width="0dp"
             android:layout_height="0dp"
