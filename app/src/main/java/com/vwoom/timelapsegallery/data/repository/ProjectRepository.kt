@@ -37,7 +37,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
         }
     }
 
-    suspend fun newProject(file: File, externalFilesDir: File, scheduleInterval: Int = 0){
+    suspend fun newProject(file: File, externalFilesDir: File, scheduleInterval: Int = 0, exifOrientation: Int?){
         // Create database entries
         val timestamp = System.currentTimeMillis()
 
@@ -58,7 +58,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
         projectScheduleDao.insertProjectSchedule(projectScheduleEntry)
 
         withContext(Dispatchers.IO) {
-            FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
+            FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp, exifOrientation)
         }
     }
 

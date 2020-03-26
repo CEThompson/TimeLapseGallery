@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.utils
 
 import android.util.Log
+import androidx.exifinterface.media.ExifInterface
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
@@ -86,7 +87,7 @@ object FileUtils {
             externalFilesDir: File,
             tempPath: String,
             projectEntry: ProjectEntry,
-            timestamp: Long): File {
+            timestamp: Long, exifOrientation: Int?): File {
         // Create the permanent file for the photo
         val finalFile = createImageFileForProject(externalFilesDir, projectEntry, timestamp)
         // Create temporary file from previous path
@@ -95,6 +96,14 @@ object FileUtils {
         copy(tempFile, finalFile)
         // Remove temporary file
         tempFile.delete()
+
+        if (exifOrientation!=null) {
+            val exif = ExifInterface(finalFile.absolutePath)
+            exif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation.toString())
+            Log.d(TAG, "writing exif orientation $exifOrientation")
+            exif.saveAttributes()
+        }
+
         return finalFile
     }
 

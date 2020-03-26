@@ -4,12 +4,13 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.ImageFormat
+import android.graphics.*
 import android.hardware.camera2.*
 import android.media.Image
 import android.media.ImageReader
 import android.os.*
 import android.util.Log
+import android.util.Size
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -23,14 +24,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.vwoom.timelapsegallery.camera2.common.AutoFitSurfaceView
-import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
-import com.vwoom.timelapsegallery.camera2.common.computeExifOrientation
-import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
+import com.vwoom.timelapsegallery.camera2.common.*
 import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.utils.PhotoUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -84,11 +83,15 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private val cameraHandler: Handler = Handler(cameraThread.looper)
     private val imageReaderThread = HandlerThread("imageReaderThread").apply { start() }
     private val imageReaderHandler = Handler(imageReaderThread.looper)
-    private lateinit var viewFinder: AutoFitSurfaceView
+    private lateinit var viewFinder: AutoFitTextureView
     private lateinit var camera: CameraDevice
     private lateinit var session: CameraCaptureSession
     private lateinit var relativeOrientation: OrientationLiveData
     private lateinit var captureRequestBuilder: CaptureRequest.Builder
+    private var previewSize: Size? = null
+
+    private var baseWidth: Int = 0
+    private var baseHeight: Int = 0
 
     private var takePictureJob: Job? = null
     private val camera2ViewModel: Camera2ViewModel by viewModels {
@@ -130,7 +133,39 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
         mTakePictureFab?.setOnClickListener {
             it.isEnabled = false
-            // TODO consider using view model scope rather than lifecycle scope
+            // takePhoto for metadata but copy bitmap straight from texture view
+            //val result = runBlocking { takePhoto() }
+
+            var outputPhoto: FileOutputStream? = null
+            try {
+                val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
+                val file = FileUtils.createTemporaryImageFile(externalFilesDir)
+                outputPhoto = FileOutputStream(file)
+
+                val matrix = getTransformMatrix(baseWidth, baseHeight)
+                //if (rotation != 0) {
+                //matrix.preRotate(rotationDegrees.toFloat())
+                //matrix.preScale()
+                //}
+
+                val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap, 0, 0, viewFinder.bitmap.width, viewFinder.bitmap.height, matrix, true)
+                adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
+
+                takePictureJob = lifecycleScope.launchIdling {
+                    camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir, ExifInterface.ORIENTATION_NORMAL)
+                    findNavController().popBackStack()
+                }
+            } catch (e: Exception) {
+                viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
+                Log.d(TAG, "Take picture exception: ${e.message}")
+            } finally {
+                try {
+                    outputPhoto?.close()
+                } catch (e: Exception) {
+                    Log.d(TAG, "Take picture exception in finally block, exception closing photo: ${e.message}")
+                }
+            }
+            /*
             takePictureJob = lifecycleScope.launchIdling {
                 takePhoto().use { result ->
                     Log.d(TAG, "resulting take photo")
@@ -150,6 +185,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     findNavController().popBackStack()
                 }
             }
+             */
             it.post { it.isEnabled = true }
         }
         return binding.root
@@ -157,24 +193,37 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewFinder.holder.addCallback(object : SurfaceHolder.Callback {
-            override fun surfaceDestroyed(holder: SurfaceHolder?) = Unit
-            override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) = Unit
-            override fun surfaceCreated(holder: SurfaceHolder?) {
-                val previewSize = getPreviewOutputSize(
+        viewFinder.surfaceTextureListener = object: TextureView.SurfaceTextureListener{
+            override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
+                Log.d(TAG, "onSurfaceTextureAvailable called with to width $width and height $height")
+                previewSize = getPreviewOutputSize(
                         viewFinder.display,
                         characteristics,
                         SurfaceHolder::class.java)
-                viewFinder.holder.setFixedSize(previewSize.width, previewSize.height)
-                viewFinder.setAspectRatio(previewSize.width, previewSize.height)
+                //viewFinder.holder.setFixedSize(previewSize.width, previewSize.height)
+                Log.d(TAG, "previewSize is width ${previewSize!!.width} and height ${previewSize!!.height}")
+                viewFinder.setAspectRatio(previewSize!!.width, previewSize!!.height)
+
+                transformImage(width, height)
 
                 // Initialize camera in the viewfinders thread so that size is set
                 viewFinder.post {
                     // but first request the permissions, if permissions cleared or granted then camera is initialized
                     requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
                 }
+                baseHeight = height
+                baseWidth = width
             }
-        })
+            override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+                return false
+            }
+            override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
+                baseHeight = height
+                baseWidth = width
+            }
+            override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
+            }
+        }
 
         relativeOrientation = OrientationLiveData(requireContext(), characteristics).apply {
             observe(viewLifecycleOwner, Observer { orientation ->
@@ -194,13 +243,19 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 viewFinder.display,
                 characteristics,
                 SurfaceHolder::class.java)
-        imageReader = ImageReader.newInstance(previewSize.width, previewSize.height, pixelFormat, IMAGE_BUFFER_SIZE)
+        //imageReader = ImageReader.newInstance(previewSize.width, previewSize.height, pixelFormat, IMAGE_BUFFER_SIZE)
 
-        val targets = listOf(viewFinder.holder.surface, imageReader.surface) // where the camera will output frames
+        // TODO remove image reader?
+        val surfaceTexture = viewFinder.surfaceTexture
+        surfaceTexture.setDefaultBufferSize(previewSize.width, previewSize.height)
+        val previewSurface = Surface(surfaceTexture)
+        val targets = listOf(previewSurface)
+        //val targets = listOf(viewFinder.holder.surface, imageReader.surface) // where the camera will output frames
         session = createCaptureSession(camera, targets, cameraHandler)
 
         captureRequestBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
-            addTarget(viewFinder.holder.surface)
+            //addTarget(viewFinder.holder.surface)
+            addTarget(previewSurface)
         }
 
         // Set the touch focus listener on the viewfinder
@@ -256,6 +311,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         }, handler)
     }
 
+    /*
     private suspend fun takePhoto(): CombinedCaptureResult = suspendCoroutine {
         @Suppress("ControlFlowWithEmptyBody")
         while (imageReader.acquireNextImage() != null) {
@@ -352,6 +408,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
             }
         }
     }
+     */
 
     override fun onStop() {
         super.onStop()
@@ -367,6 +424,53 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         cameraThread.quitSafely()
         imageReaderThread.quitSafely()
     }
+
+
+    private fun transformImage(viewWidth: Int, viewHeight: Int){
+        if (previewSize == null || !::viewFinder.isInitialized) return
+        val matrix = Matrix()
+        val rotation = requireActivity().windowManager.defaultDisplay.rotation
+        val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
+        val bufferRect = RectF(0f, 0f, previewSize!!.height.toFloat(), previewSize!!.width.toFloat())
+        val centerX = viewRect.centerX()
+        val centerY = viewRect.centerY()
+        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY())
+            val scale : Float = (viewHeight.toFloat() / previewSize!!.height)
+                    .coerceAtLeast(viewWidth.toFloat() / previewSize!!.width)
+            with(matrix) {
+                setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
+                postScale(scale, scale, centerX, centerY)
+                postRotate((90 * (rotation - 2)).toFloat(), centerX, centerY)
+            }
+        } else if (Surface.ROTATION_180 == rotation) {
+            matrix.postRotate(180f, centerX, centerY)
+        }
+        viewFinder.setTransform(matrix)
+    }
+
+    private fun getTransformMatrix(viewWidth: Int, viewHeight: Int): Matrix{
+        val matrix = Matrix()
+        val rotation = requireActivity().windowManager.defaultDisplay.rotation
+        val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
+        val bufferRect = RectF(0f, 0f, previewSize!!.height.toFloat(), previewSize!!.width.toFloat())
+        val centerX = viewRect.centerX()
+        val centerY = viewRect.centerY()
+        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY())
+            val scale : Float = (viewHeight.toFloat() / previewSize!!.height)
+                    .coerceAtLeast(viewWidth.toFloat() / previewSize!!.width)
+            with(matrix) {
+                setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
+                postScale(scale, scale, centerX, centerY)
+                postRotate((90 * (rotation - 2)).toFloat(), centerX, centerY)
+            }
+        } else if (Surface.ROTATION_180 == rotation) {
+            matrix.postRotate(180f, centerX, centerY)
+        }
+        return matrix
+    }
+
 
     companion object {
         val TAG = Camera2Fragment::class.java.simpleName
