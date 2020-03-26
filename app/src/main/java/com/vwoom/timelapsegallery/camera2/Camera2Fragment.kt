@@ -50,7 +50,8 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
-// TODO: Clean up code, look into image quality difference between this and previous implementation
+// TODO: Clean up code
+// TODO: look into controlling image quality
 class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val args: Camera2FragmentArgs by navArgs()
