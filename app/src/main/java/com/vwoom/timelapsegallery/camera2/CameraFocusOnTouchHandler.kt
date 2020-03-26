@@ -14,7 +14,7 @@ import kotlin.math.max
 // TODO: re-evaluate use of on touch handler, comb through this and make the logic my own
 class CameraFocusOnTouchHandler(
         private val mCameraCharacteristics: CameraCharacteristics,
-        private val mPreviewRequestBuilder: CaptureRequest.Builder,
+        private val mCaptureRequestBuilder: CaptureRequest.Builder,
         private val mCaptureSession: CameraCaptureSession,
         private val mBackgroundHandler: Handler
 ) : OnTouchListener {
@@ -46,9 +46,9 @@ class CameraFocusOnTouchHandler(
                 super.onCaptureCompleted(session, request, result)
                 mManualFocusEngaged = false
                 if (request.tag === "FOCUS_TAG") { //the focus trigger is complete - resume repeating (preview surface will get frames), clear AF trigger
-                    mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, null)
+                    mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, null)
                     try {
-                        mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null, null)
+                        mCaptureSession.setRepeatingRequest(mCaptureRequestBuilder.build(), null, null)
                     } catch (e: CameraAccessException) {
                         e.printStackTrace()
                     }
@@ -68,24 +68,24 @@ class CameraFocusOnTouchHandler(
             e.printStackTrace()
         }
         //cancel any existing AF trigger (repeated touches, etc.)
-        mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_CANCEL)
-        mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF)
+        mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_CANCEL)
+        mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF)
         try {
-            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureCallbackHandler, mBackgroundHandler)
+            mCaptureSession.capture(mCaptureRequestBuilder.build(), captureCallbackHandler, mBackgroundHandler)
         } catch (e: CameraAccessException) {
             e.printStackTrace()
         }
         //Now add a new AF trigger with focus region
         if (isMeteringAreaAFSupported) {
-            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_REGIONS, arrayOf(focusAreaTouch))
+            mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_REGIONS, arrayOf(focusAreaTouch))
         }
-        mPreviewRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
-        mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO)
-        mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_START)
-        mPreviewRequestBuilder.setTag("FOCUS_TAG") //we'll capture this later for resuming the preview
+        mCaptureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
+        mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO)
+        mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_START)
+        mCaptureRequestBuilder.setTag("FOCUS_TAG") //we'll capture this later for resuming the preview
         //then we ask for a single request (not repeating!)
         try {
-            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureCallbackHandler, mBackgroundHandler)
+            mCaptureSession.capture(mCaptureRequestBuilder.build(), captureCallbackHandler, mBackgroundHandler)
         } catch (e: CameraAccessException) {
             e.printStackTrace()
         }

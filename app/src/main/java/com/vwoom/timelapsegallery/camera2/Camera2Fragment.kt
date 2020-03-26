@@ -87,7 +87,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private lateinit var camera: CameraDevice
     private lateinit var session: CameraCaptureSession
     private lateinit var relativeOrientation: OrientationLiveData
-
+    private lateinit var captureRequestBuilder: CaptureRequest.Builder
 
     private var takePictureJob: Job? = null
     private val camera2ViewModel: Camera2ViewModel by viewModels {
@@ -185,10 +185,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private fun initializeCamera() = lifecycleScope.launchIdling {
         camera = openCamera(cameraManager, cameraId, cameraHandler)
 
-        // TODO setting pixel format to ImageFormat.JPEG for now, could also be ImageFormat.RAW_SENSOR && ImageFormat.DEPTH_JPEG
-        // This block gets true camera output size
-        //val size = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
-        //        .getOutputSizes(pixelFormat).maxBy {it.height * it.width}!!
+        // This line would get the true sensor size but for now match the size of the preview view
+        // val size = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!.getOutputSizes(pixelFormat).maxBy {it.height * it.width}!!
 
         // Match size of image output to preview size
         val previewSize = getPreviewOutputSize(
@@ -200,15 +198,21 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         val targets = listOf(viewFinder.holder.surface, imageReader.surface) // where the camera will output frames
         session = createCaptureSession(camera, targets, cameraHandler)
 
-        val captureRequest = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
+        captureRequestBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
             addTarget(viewFinder.holder.surface)
         }
 
-        // TODO set up tap to focus
-        //setTapToFocus()
+        // Set the touch focus listener on the viewfinder
+        @Suppress("ClickableViewAccessibility")
+        viewFinder.setOnTouchListener(
+                CameraFocusOnTouchHandler(
+                        characteristics,
+                        captureRequestBuilder,
+                        session,
+                        cameraHandler))
 
-        session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
-
+        // Set the initial request: Note the touch handler sets a repeated request as well likely overriding this
+        session.setRepeatingRequest(captureRequestBuilder.build(), null, cameraHandler)
     }
 
     @SuppressLint("MissingPermission")
@@ -379,15 +383,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     }
 
-    fun setTapToFocus(captureRequestBuilder: CaptureRequest.Builder){
-        @Suppress("ClickableViewAccessibility")
-        viewFinder.setOnTouchListener(
-                CameraFocusOnTouchHandler(
-                characteristics,
-                captureRequestBuilder,
-                session,
-                cameraHandler))
-    }
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
