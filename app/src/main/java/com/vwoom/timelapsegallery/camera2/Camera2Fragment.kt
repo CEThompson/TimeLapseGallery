@@ -32,6 +32,7 @@ import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.Closeable
 import java.io.File
@@ -133,8 +134,12 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
         mTakePictureFab?.setOnClickListener {
             it.isEnabled = false
-            // takePhoto for metadata but copy bitmap straight from texture view
-            //val result = runBlocking { takePhoto() }
+
+            // TODO consider using result to copy exif data OR label exif data manually
+            //val result = runBlocking {
+            //    takePhoto()
+            //}
+            //saveResult(result)
 
             var outputPhoto: FileOutputStream? = null
             try {
@@ -143,10 +148,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 outputPhoto = FileOutputStream(file)
 
                 val matrix = getTransformMatrix(baseWidth, baseHeight)
-                //if (rotation != 0) {
-                //matrix.preRotate(rotationDegrees.toFloat())
-                //matrix.preScale()
-                //}
 
                 val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap, 0, 0, viewFinder.bitmap.width, viewFinder.bitmap.height, matrix, true)
                 adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
@@ -165,27 +166,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     Log.d(TAG, "Take picture exception in finally block, exception closing photo: ${e.message}")
                 }
             }
-            /*
-            takePictureJob = lifecycleScope.launchIdling {
-                takePhoto().use { result ->
-                    Log.d(TAG, "resulting take photo")
-                    // Output into temp file
-                    val output = saveResult(result)
-
-                    if (output.extension == "jpg") {
-                        val exif = ExifInterface(output.absolutePath)
-                        exif.setAttribute(ExifInterface.TAG_ORIENTATION, result.orientation.toString())
-                        exif.saveAttributes()
-                    }
-                    Log.d(TAG, "checking for output: ${output.absolutePath}")
-
-                    // Send to view model to handle final file and return to gallery
-                    val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                    camera2ViewModel.handleFile(output, externalFilesDir!!)
-                    findNavController().popBackStack()
-                }
-            }
-             */
             it.post { it.isEnabled = true }
         }
         return binding.root
@@ -239,15 +219,15 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         // val size = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!.getOutputSizes(pixelFormat).maxBy {it.height * it.width}!!
 
         // Match size of image output to preview size
-        val previewSize = getPreviewOutputSize(
+        previewSize = getPreviewOutputSize(
                 viewFinder.display,
                 characteristics,
                 SurfaceHolder::class.java)
+        // TODO re-implement this image reader to use it to take a lower quality picture or take its exif data
         //imageReader = ImageReader.newInstance(previewSize.width, previewSize.height, pixelFormat, IMAGE_BUFFER_SIZE)
 
-        // TODO remove image reader?
         val surfaceTexture = viewFinder.surfaceTexture
-        surfaceTexture.setDefaultBufferSize(previewSize.width, previewSize.height)
+        surfaceTexture.setDefaultBufferSize(previewSize!!.width, previewSize!!.height)
         val previewSurface = Surface(surfaceTexture)
         val targets = listOf(previewSurface)
         //val targets = listOf(viewFinder.holder.surface, imageReader.surface) // where the camera will output frames
@@ -453,13 +433,13 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         val matrix = Matrix()
         val rotation = requireActivity().windowManager.defaultDisplay.rotation
         val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
-        val bufferRect = RectF(0f, 0f, previewSize!!.height.toFloat(), previewSize!!.width.toFloat())
+        val bufferRect = RectF(0f, 0f, viewFinder.height.toFloat(), viewFinder.width.toFloat())
         val centerX = viewRect.centerX()
         val centerY = viewRect.centerY()
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY())
-            val scale : Float = (viewHeight.toFloat() / previewSize!!.height)
-                    .coerceAtLeast(viewWidth.toFloat() / previewSize!!.width)
+            val scale : Float = (viewHeight.toFloat() / viewFinder.height)
+                    .coerceAtLeast(viewWidth.toFloat() / viewFinder.width)
             with(matrix) {
                 setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
                 postScale(scale, scale, centerX, centerY)
