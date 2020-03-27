@@ -14,16 +14,6 @@ interface ProjectDao {
     @Query("SELECT * FROM project ORDER BY id")
     fun getProjectsLiveData(): LiveData<List<ProjectEntry>>
 
-    @Query("SELECT * FROM project " +
-            "INNER JOIN project_schedule " +
-            "ON project.id = project_schedule.project_id " +
-            "WHERE project_schedule.interval_days != 0")
-    suspend fun getScheduledProjects(): List<ProjectEntry>
-
-    @Query("SELECT * FROM project " +
-            "WHERE project_name LIKE '%' || :search || '%'")
-    suspend fun getProjectsByName(search: String): List<ProjectEntry>
-
     @Query("SELECT * FROM project WHERE id = :id")
     suspend fun getProjectById(id: Long): ProjectEntry
 

@@ -25,8 +25,6 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
 
     fun getProjectView(projectId: Long) = projectDao.getProjectViewLiveData(projectId)
 
-    suspend fun getScheduledProjects(): List<ProjectEntry> { return projectDao.getScheduledProjects() }
-
     suspend fun updateProjectName(externalFilesDir: File, sourceProject: Project, name: String){
         val source = projectDao.getProjectById(sourceProject.project_id)
         val destination = ProjectEntry(source.id, name)
