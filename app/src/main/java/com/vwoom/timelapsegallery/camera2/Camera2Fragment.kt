@@ -140,10 +140,13 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
 
                 // TODO write exif data for saved image
-
                 takePictureJob = lifecycleScope.launchIdling {
                     camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir, ExifInterface.ORIENTATION_NORMAL)
-                    findNavController().popBackStack()
+                    if (args.project!=null){
+                        // TODO show interstitial ad, perhaps once per day after adding photo to a project only
+                    } else {
+                        findNavController().popBackStack()
+                    }
                 }
             } catch (e: Exception) {
                 viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
