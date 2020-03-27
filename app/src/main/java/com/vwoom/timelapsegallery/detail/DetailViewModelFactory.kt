@@ -12,6 +12,7 @@ class DetailViewModelFactory(private val photoRepository: PhotoRepository,
                              private val projectScheduleRepository: ProjectScheduleRepository,
                              private val mProjectId: Long) : NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
         return DetailViewModel(photoRepository,
                 projectRepository,
                 projectTagRepository,

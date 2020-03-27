@@ -11,6 +11,7 @@ class GalleryViewModelFactory(private val projectRepository: ProjectRepository,
                               private val tagRepository: TagRepository,
                               private val projectTagRepository: ProjectTagRepository) : NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
         return GalleryViewModel(
                 projectRepository,
                 tagRepository,

@@ -12,6 +12,7 @@ class Camera2ViewModelFactory(private val projectRepository: ProjectRepository,
                               private val photo: Photo?,
                               private val project: Project?) : NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
         return Camera2ViewModel(
                 projectRepository,
                 photoRepository,
