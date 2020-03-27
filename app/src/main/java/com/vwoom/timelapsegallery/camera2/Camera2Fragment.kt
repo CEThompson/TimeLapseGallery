@@ -4,11 +4,15 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Matrix
+import android.graphics.RectF
+import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
-import android.media.Image
-import android.media.ImageReader
-import android.os.*
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.HandlerThread
 import android.util.Log
 import android.util.Size
 import android.view.*
@@ -24,22 +28,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.vwoom.timelapsegallery.camera2.common.*
+import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
+import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
+import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
 import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
-import com.vwoom.timelapsegallery.utils.PhotoUtils
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.io.Closeable
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.TimeoutException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -50,19 +49,17 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
-// TODO: Clean up code
-// TODO: look into controlling image quality
 class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val args: Camera2FragmentArgs by navArgs()
 
-    // Variables from camera 2 basic
+    // Camera variables
     private val cameraManager: CameraManager by lazy {
         val context = requireContext().applicationContext
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     }
 
-    // TODO figure out best way to get the camera ID
+    // TODO figure out if there is a better way to get the back facing camera ID
     private val cameraId by lazy {
         lateinit var id: String
         for (cameraId in cameraManager.cameraIdList) {
@@ -71,19 +68,15 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                             .get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) {
                 id = cameraId
                 break
-            }
+        }
         }
         id
     }
-    private val pixelFormat = ImageFormat.JPEG // TODO could later support ImageFormat.RAW_SENSOR or ImageFormat.DEPTH_JPEG
     private val characteristics: CameraCharacteristics by lazy {
         cameraManager.getCameraCharacteristics(cameraId)
     }
-    private lateinit var imageReader: ImageReader // Used as buffer for camera still shot
     private val cameraThread = HandlerThread("CameraThread").apply { start() }
     private val cameraHandler: Handler = Handler(cameraThread.looper)
-    private val imageReaderThread = HandlerThread("imageReaderThread").apply { start() }
-    private val imageReaderHandler = Handler(imageReaderThread.looper)
     private lateinit var viewFinder: AutoFitTextureView
     private lateinit var camera: CameraDevice
     private lateinit var session: CameraCaptureSession
@@ -135,22 +128,18 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         mTakePictureFab?.setOnClickListener {
             it.isEnabled = false
 
-            // TODO consider using result to copy exif data OR label exif data manually
-            //val result = runBlocking {
-            //    takePhoto()
-            //}
-            //saveResult(result)
-
             var outputPhoto: FileOutputStream? = null
             try {
                 val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
                 val file = FileUtils.createTemporaryImageFile(externalFilesDir)
                 outputPhoto = FileOutputStream(file)
 
+                // Rotates and scales the bitmap based on the device rotation
                 val matrix = getTransformMatrix(baseWidth, baseHeight)
-
                 val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap, 0, 0, viewFinder.bitmap.width, viewFinder.bitmap.height, matrix, true)
                 adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
+
+                // TODO write exif data for saved image
 
                 takePictureJob = lifecycleScope.launchIdling {
                     camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir, ExifInterface.ORIENTATION_NORMAL)
@@ -173,7 +162,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewFinder.surfaceTextureListener = object: TextureView.SurfaceTextureListener{
+        viewFinder.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
             override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
                 Log.d(TAG, "onSurfaceTextureAvailable called with to width $width and height $height")
                 previewSize = getPreviewOutputSize(
@@ -184,6 +173,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 Log.d(TAG, "previewSize is width ${previewSize!!.width} and height ${previewSize!!.height}")
                 viewFinder.setAspectRatio(previewSize!!.width, previewSize!!.height)
 
+                // Transforms the viewfinder if device is rotated
                 transformImage(width, height)
 
                 // Initialize camera in the viewfinders thread so that size is set
@@ -194,13 +184,16 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 baseHeight = height
                 baseWidth = width
             }
+
             override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
                 return false
             }
+
             override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
                 baseHeight = height
                 baseWidth = width
             }
+
             override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
             }
         }
@@ -223,18 +216,14 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 viewFinder.display,
                 characteristics,
                 SurfaceHolder::class.java)
-        // TODO re-implement this image reader to use it to take a lower quality picture or take its exif data
-        //imageReader = ImageReader.newInstance(previewSize.width, previewSize.height, pixelFormat, IMAGE_BUFFER_SIZE)
 
         val surfaceTexture = viewFinder.surfaceTexture
         surfaceTexture.setDefaultBufferSize(previewSize!!.width, previewSize!!.height)
         val previewSurface = Surface(surfaceTexture)
         val targets = listOf(previewSurface)
-        //val targets = listOf(viewFinder.holder.surface, imageReader.surface) // where the camera will output frames
         session = createCaptureSession(camera, targets, cameraHandler)
 
         captureRequestBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
-            //addTarget(viewFinder.holder.surface)
             addTarget(previewSurface)
         }
 
@@ -260,7 +249,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         manager.openCamera(cameraId, object : CameraDevice.StateCallback() {
             override fun onOpened(camera: CameraDevice) = cont.resume(camera)
             override fun onDisconnected(camera: CameraDevice) {
-                // TODO handle disconnected camera
+                Toast.makeText(requireContext(), "Error: Camera disconnected.", Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
                 Log.d(TAG, "Camera disconnected")
             }
 
@@ -291,105 +281,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         }, handler)
     }
 
-    /*
-    private suspend fun takePhoto(): CombinedCaptureResult = suspendCoroutine {
-        @Suppress("ControlFlowWithEmptyBody")
-        while (imageReader.acquireNextImage() != null) {
-        }
-
-        val imageQueue = ArrayBlockingQueue<Image>(IMAGE_BUFFER_SIZE)
-        imageReader.setOnImageAvailableListener({ reader ->
-            val image = reader.acquireNextImage()
-            imageQueue.add(image)
-        }, imageReaderHandler)
-
-        val captureRequest = session.device.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE).apply {
-            addTarget(imageReader.surface)
-        }
-
-        session.capture(captureRequest.build(), object : CameraCaptureSession.CaptureCallback() {
-            override fun onCaptureCompleted(
-                    session: CameraCaptureSession,
-                    request: CaptureRequest,
-                    result: TotalCaptureResult) {
-                super.onCaptureCompleted(session, request, result)
-                val resultTimestamp = result.get(CaptureResult.SENSOR_TIMESTAMP)
-                Log.d(TAG, "Capture result received: $resultTimestamp")
-
-                val exc = TimeoutException("Image dequeuing took too long")
-                // TODO changed cont to it here, figure out what this means
-                val timeoutRunnable = Runnable { it.resumeWithException(exc) }
-                imageReaderHandler.postDelayed(timeoutRunnable, IMAGE_CAPTURE_TIMEOUT_MILLIS)
-
-                // TODO changed cont to it here, figure out what this means
-                @Suppress("BlockingMethodInNonBlockingContext")
-                lifecycleScope.launch(it.context) {
-                    while (true) {
-                        val image = imageQueue.take()
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-                                image.format != ImageFormat.DEPTH_JPEG &&
-                                image.timestamp != resultTimestamp) continue
-                        Log.d(TAG, "Matching image dequeued: ${image.timestamp}")
-
-                        imageReaderHandler.removeCallbacks(timeoutRunnable)
-                        imageReader.setOnImageAvailableListener(null, null)
-
-                        Log.d(TAG, "imageQueue $imageQueue")
-                        while (imageQueue.size > 0) {
-                            imageQueue.take().close()
-                        }
-
-                        val rotation = relativeOrientation.value ?: 0
-                        val mirrored = characteristics.get(CameraCharacteristics.LENS_FACING) ==
-                                CameraCharacteristics.LENS_FACING_FRONT
-                        val exifOrientation = computeExifOrientation(rotation, mirrored)
-
-                        Log.d(TAG, "about to it resume")
-                        // TODO changed cont to it here, figure out what this means
-                        it.resume(CombinedCaptureResult(
-                                image, result, exifOrientation, imageReader.imageFormat))
-                        Log.d(TAG, "done with it resume")
-                        break
-                    }
-                }
-            }
-        }, cameraHandler)
-    }
-
-    private suspend fun saveResult(result: CombinedCaptureResult): File = suspendCoroutine { cont ->
-        val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-        when (result.format) {
-            ImageFormat.JPEG, ImageFormat.DEPTH_JPEG -> {
-                val buffer = result.image.planes[0].buffer
-                val bytes = ByteArray(buffer.remaining()).apply { buffer.get(this) }
-                try {
-                    val output = FileUtils.createTemporaryImageFile(externalFilesDir)
-                    FileOutputStream(output).use { it.write(bytes) }
-                    cont.resume(output)
-                } catch (exc: IOException) {
-                    Log.e(TAG, "Unable to write JPEG image to file", exc)
-                    cont.resumeWithException(exc)
-                }
-            }
-            ImageFormat.RAW_SENSOR -> {
-                val dngCreator = DngCreator(characteristics, result.metadata)
-                try {
-                    val output = FileUtils.createTemporaryImageFile(externalFilesDir)
-                    FileOutputStream(output).use { dngCreator.writeImage(it, result.image) }
-                    cont.resume(output)
-                } catch (exc: IOException) {
-                    Log.e(TAG, "Unable to write DNG image to file", exc)
-                    cont.resumeWithException(exc)
-                }
-            }
-            else -> {
-                val exc = RuntimeException("Unknown image format: ${result.image.format}")
-                cont.resumeWithException(exc)
-            }
-        }
-    }
-     */
-
     override fun onStop() {
         super.onStop()
         try {
@@ -402,11 +293,10 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     override fun onDestroy() {
         super.onDestroy()
         cameraThread.quitSafely()
-        imageReaderThread.quitSafely()
     }
 
 
-    private fun transformImage(viewWidth: Int, viewHeight: Int){
+    private fun transformImage(viewWidth: Int, viewHeight: Int) {
         if (previewSize == null || !::viewFinder.isInitialized) return
         val matrix = Matrix()
         val rotation = requireActivity().windowManager.defaultDisplay.rotation
@@ -416,7 +306,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         val centerY = viewRect.centerY()
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY())
-            val scale : Float = (viewHeight.toFloat() / previewSize!!.height)
+            val scale: Float = (viewHeight.toFloat() / previewSize!!.height)
                     .coerceAtLeast(viewWidth.toFloat() / previewSize!!.width)
             with(matrix) {
                 setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
@@ -429,7 +319,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         viewFinder.setTransform(matrix)
     }
 
-    private fun getTransformMatrix(viewWidth: Int, viewHeight: Int): Matrix{
+    private fun getTransformMatrix(viewWidth: Int, viewHeight: Int): Matrix {
         val matrix = Matrix()
         val rotation = requireActivity().windowManager.defaultDisplay.rotation
         val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
@@ -438,7 +328,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         val centerY = viewRect.centerY()
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY())
-            val scale : Float = (viewHeight.toFloat() / viewFinder.height)
+            val scale: Float = (viewHeight.toFloat() / viewFinder.height)
                     .coerceAtLeast(viewWidth.toFloat() / viewFinder.width)
             with(matrix) {
                 setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
@@ -451,33 +341,19 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         return matrix
     }
 
-
     companion object {
         val TAG = Camera2Fragment::class.java.simpleName
-        private const val IMAGE_BUFFER_SIZE: Int = 3
-        private const val IMAGE_CAPTURE_TIMEOUT_MILLIS: Long = 5000
-
-        data class CombinedCaptureResult(
-                val image: Image,
-                val metadata: CaptureResult,
-                val orientation: Int,
-                val format: Int
-        ) : Closeable {
-            override fun close() = image.close()
         }
-
-    }
 
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 viewFinder.post {
-                    //Toast.makeText(this.requireContext(), "Permissions granted, firing up the camera.", Toast.LENGTH_SHORT).show()
                     initializeCamera()
                 }
             } else {
-                Toast.makeText(this.requireContext(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this.requireContext(), "Permissions not granted.", Toast.LENGTH_SHORT).show()
             }
         }
     }
