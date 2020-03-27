@@ -11,7 +11,6 @@ import android.view.View
 import android.view.View.OnTouchListener
 import kotlin.math.max
 
-// TODO: re-evaluate use of on touch handler, comb through this and make the logic my own
 class CameraFocusOnTouchHandler(
         private val mCameraCharacteristics: CameraCharacteristics,
         private val mCaptureRequestBuilder: CaptureRequest.Builder,
@@ -21,7 +20,7 @@ class CameraFocusOnTouchHandler(
     private var mManualFocusEngaged = false
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
-        //Override in your touch-enabled view (this can be different than the view you use for displaying the cam preview)
+        // Override in your touch-enabled view (this can be different than the view you use for displaying the cam preview)
         val actionMasked = motionEvent.actionMasked
         if (actionMasked != MotionEvent.ACTION_DOWN) {
             return false
@@ -31,11 +30,12 @@ class CameraFocusOnTouchHandler(
             return true
         }
         val sensorArraySize = mCameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE)
-        //TODO: here I just flip x,y, but this needs to correspond with the sensor orientation (via SENSOR_ORIENTATION)
+        //TODO (update 1.2): correspond flipped x / y to actual sensor orientation
         val y = (motionEvent.x / view.width.toFloat() * sensorArraySize!!.height().toFloat()).toInt()
         val x = (motionEvent.y / view.height.toFloat() * sensorArraySize.width().toFloat()).toInt()
-        val halfTouchWidth = 50 //(int)motionEvent.getTouchMajor(); //TODO: this doesn't represent actual touch size in pixel. Values range in [3, 10]...
-        val halfTouchHeight = 50 //(int)motionEvent.getTouchMinor();
+        // TODO (update 1.2): represent actual touch size in pixels
+        val halfTouchWidth = 50
+        val halfTouchHeight = 50
         val focusAreaTouch = MeteringRectangle(max(x - halfTouchWidth, 0),
                 max(y - halfTouchHeight, 0),
                 halfTouchWidth * 2,
@@ -61,13 +61,13 @@ class CameraFocusOnTouchHandler(
                 mManualFocusEngaged = false
             }
         }
-        //first stop the existing repeating request
+        // First stop the existing repeating request
         try {
             mCaptureSession.stopRepeating()
         } catch (e: CameraAccessException) {
             e.printStackTrace()
         }
-        //cancel any existing AF trigger (repeated touches, etc.)
+        // Cancel any existing AF trigger (repeated touches, etc.)
         mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_CANCEL)
         mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF)
         try {
@@ -75,15 +75,16 @@ class CameraFocusOnTouchHandler(
         } catch (e: CameraAccessException) {
             e.printStackTrace()
         }
-        //Now add a new AF trigger with focus region
+        // Add a new AF trigger with focus region
         if (isMeteringAreaAFSupported) {
             mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_REGIONS, arrayOf(focusAreaTouch))
         }
         mCaptureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
         mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO)
         mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_START)
-        mCaptureRequestBuilder.setTag("FOCUS_TAG") //we'll capture this later for resuming the preview
-        //then we ask for a single request (not repeating!)
+        mCaptureRequestBuilder.setTag("FOCUS_TAG") // Capture this later for resuming the preview
+
+        // Then ask for a single request
         try {
             mCaptureSession.capture(mCaptureRequestBuilder.build(), captureCallbackHandler, mBackgroundHandler)
         } catch (e: CameraAccessException) {
