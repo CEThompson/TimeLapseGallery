@@ -95,18 +95,25 @@ object ProjectUtils {
     }
 
     /* Helper to scan through folders and import projects */
-    suspend fun importProjects(db: TimeLapseDatabase, externalFilesDir: File, projectBundles: List<ProjectDataBundle>) {
+    suspend fun importProjects(db: TimeLapseDatabase,
+                               externalFilesDir: File,
+                               projectBundles: List<ProjectDataBundle>,
+                               testing: Boolean = false) {
 
         // Delete projects and tags in the database: should clear all tables by cascade
         db.projectDao().deleteAllProjects()
         db.tagDao().deleteAllTags()
 
-        SyncProgressCounter.initProjectCount(projectBundles.size)
+        if (!testing) {
+            SyncProgressCounter.initProjectCount(projectBundles.size)
+            Log.d("ProgressCheck", "setting max ${SyncProgressCounter.projectMax}")
+        }
 
-        Log.d("ProgressCheck", "setting max ${SyncProgressCounter.projectMax}")
         for (projectBundle in projectBundles) {
-            SyncProgressCounter.incrementProject()
-            Log.d("ProgressCheck", "incrementing progress ${SyncProgressCounter.projectProgress}")
+            if (!testing) {
+                SyncProgressCounter.incrementProject()
+                Log.d("ProgressCheck", "incrementing progress ${SyncProgressCounter.projectProgress}")
+            }
 
             // Get the files within the directory
             val projectDir = FileUtils.getProjectFolder(externalFilesDir, projectBundle.projectEntry)
@@ -120,8 +127,8 @@ object ProjectUtils {
                 db.projectDao().insertProject(currentProject)
 
                 // Recover photos
-                SyncProgressCounter.initPhotoCount(projectBundle.photoCount)
-                importProjectPhotos(externalFilesDir, db, currentProject)
+                if (!testing) {SyncProgressCounter.initPhotoCount(projectBundle.photoCount)}
+                importProjectPhotos(externalFilesDir, db, currentProject, testing)
 
                 // Recover tags
                 importProjectMetaData(externalFilesDir, db, currentProject)
@@ -130,7 +137,10 @@ object ProjectUtils {
     }
 
     /* Finds all photos in the project directory and adds any missing photos to the database */
-    private suspend fun importProjectPhotos(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry) {
+    private suspend fun importProjectPhotos(externalFilesDir: File,
+                                            db: TimeLapseDatabase,
+                                            currentProject: ProjectEntry,
+                                            testing: Boolean = false) {
         //Log.d(TAG, "Importing photos for project")
         // Create a list of all photos in the project directory
         val allPhotosInFolder = FileUtils.getPhotoEntriesInProjectDirectory(externalFilesDir, currentProject)
@@ -140,7 +150,7 @@ object ProjectUtils {
             for (photoEntry in allPhotosInFolder) {
                 db.photoDao().insertPhoto(photoEntry)
                 //Log.d(TAG, "inserting photo id $id $photoEntry")
-                SyncProgressCounter.incrementPhoto()
+                if (!testing) {SyncProgressCounter.incrementPhoto()}
             }
             val lastPhoto = db.photoDao().getLastPhoto(currentProject.id)
             val coverPhoto = CoverPhotoEntry(lastPhoto.project_id, lastPhoto.id)

@@ -99,7 +99,7 @@ class ProjectUtilsImportTest {
         val result = ProjectUtils.validateFileStructure(externalFilesTestDir)
         assert(result is ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>)
         val projectBundles = (result as ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>).data
-        runBlocking {ProjectUtils.importProjects(db, externalFilesTestDir, projectBundles)}
+        runBlocking {ProjectUtils.importProjects(db, externalFilesTestDir, projectBundles, testing = true)}
 
         // Then: Database should match file structure
         runBlocking {
