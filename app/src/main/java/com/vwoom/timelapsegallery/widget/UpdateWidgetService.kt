@@ -34,7 +34,7 @@ class UpdateWidgetService
             // Retrieve the database
             val projectRepository = InjectorUtils.getProjectRepository(context)
             // Get the list of all scheduled projects from the database
-            val allScheduledProjects = projectRepository.getScheduledProjects()
+            val allScheduledProjects = projectRepository.getScheduledProjectViews()
 
             // Update the widgets
             val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -43,8 +43,7 @@ class UpdateWidgetService
                     context,
                     appWidgetManager,
                     appWidgetIds,
-                    allScheduledProjects) // Send the list of projects scheduled for today
-
+                    allScheduledProjects) // Send the list of all scheduled projects
         }
     }
 

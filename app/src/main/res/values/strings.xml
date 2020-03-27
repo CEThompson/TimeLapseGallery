@@ -111,7 +111,7 @@
 
     <string name="hashtag">#%1$s</string>
 
-    <string name="no_projects_for_today">No projects due today.</string>
+    <string name="x_projects_due_today">%1$d projects due today</string>
 
     <!-- Notifications -->
     <string name="projects_due_today">You have projects due today.</string>
