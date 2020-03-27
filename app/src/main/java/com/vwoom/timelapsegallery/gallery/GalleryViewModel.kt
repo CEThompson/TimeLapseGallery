@@ -28,10 +28,11 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
     var searchTags: ArrayList<TagEntry> = arrayListOf()
     var searchName: String = ""
     var searchType: String = SEARCH_TYPE_NONE
-
     var displayedProjects: List<Project> = listOf()
 
     var searchDialogShowing = false
+
+    var userClickedToStopSearch = false
 
     fun tagSelected(tag: TagEntry): Boolean {
         return searchTags.contains(tag)

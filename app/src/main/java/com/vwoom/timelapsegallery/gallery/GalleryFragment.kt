@@ -167,12 +167,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         mSearchActiveFAB = binding?.searchActiveIndicator
-        mSearchActiveFAB?.setOnClickListener { clearSearch() }
+        mSearchActiveFAB?.setOnClickListener {
+            mGalleryViewModel.userClickedToStopSearch = true
+            clearSearch()
+        }
 
         setupViewModel()
 
         // Launch with search filter if set from the notification
-        if (args.searchLaunchDue) {
+        if (args.searchLaunchDue && !mGalleryViewModel.userClickedToStopSearch) {
             mGalleryViewModel.searchType = SEARCH_TYPE_DUE_TODAY
         }
 
