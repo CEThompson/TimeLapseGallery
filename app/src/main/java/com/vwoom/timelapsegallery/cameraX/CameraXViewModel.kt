@@ -13,7 +13,7 @@ class CameraXViewModel(
         val photo: Photo?,
         val project: Project?
 ) : ViewModel() {
-    suspend fun handleFile(file: File, externalFilesDir: File, exifOrientation: Int?){
+    suspend fun handleFile(file: File, externalFilesDir: File){
         // If no photo when constructed then we have a new project
         if (photo == null) projectRepository.newProject(file, externalFilesDir, 0,null)
         // Otherwise add photo to project

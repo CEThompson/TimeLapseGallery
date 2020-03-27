@@ -155,7 +155,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
 
                         override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                             takePictureJob = cameraViewModel.viewModelScope.launch {
-                                cameraViewModel.handleFile(photoFile, externalFilesDir, null)
+                                cameraViewModel.handleFile(photoFile, externalFilesDir)
                                 findNavController().popBackStack()
                             }
                         }
