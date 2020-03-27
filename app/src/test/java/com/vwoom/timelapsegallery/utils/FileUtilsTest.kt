@@ -79,7 +79,12 @@ class FileUtilsTest {
         val projectEntry = ProjectEntry("test project")
 
         // When we create the folder for the project
-        val finalFile = FileUtils.createFinalFileFromTemp(externalFilesTestDir, tempFile.absolutePath, projectEntry, timestamp)
+        val finalFile = FileUtils.createFinalFileFromTemp(
+                externalFilesTestDir,
+                tempFile.absolutePath,
+                projectEntry,
+                timestamp,
+                null)
 
         // Then the temp file should have been deleted
         assert(!tempFile.exists())
