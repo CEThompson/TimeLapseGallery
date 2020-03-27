@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- TODO: setup full content backup -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -74,10 +75,6 @@
         <!-- This service updates the widgets -->
         <service android:name=".widget.UpdateWidgetService" />
 
-        <!-- This service provides the views for the widgets -->
-        <service
-            android:name=".widget.WidgetGridRemoteViewsService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

@@ -26,8 +26,14 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
 import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
@@ -68,7 +74,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                             .get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) {
                 id = cameraId
                 break
-        }
+            }
         }
         id
     }
@@ -92,6 +98,13 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         InjectorUtils.provideCamera2ViewModelFactory(requireActivity(), args.photo, args.project)
     }
     private var mTakePictureFab: FloatingActionButton? = null
+
+    private lateinit var interstitialAd: InterstitialAd
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        interstitialAd = (requireActivity() as TimeLapseGalleryActivity).interstitialAd
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Set up bindings
@@ -143,7 +156,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 takePictureJob = lifecycleScope.launchIdling {
                     camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir, ExifInterface.ORIENTATION_NORMAL)
                     if (args.project!=null){
-                        // TODO show interstitial ad, perhaps once per day after adding photo to a project only
+                        handleInterstitialAd()
                     } else {
                         findNavController().popBackStack()
                     }
@@ -206,6 +219,11 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 Log.d(TAG, "Orientation changed to $orientation")
             })
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!interstitialAd.isLoaded) interstitialAd.loadAd(AdRequest.Builder().build())
     }
 
     private fun initializeCamera() = lifecycleScope.launchIdling {
@@ -364,5 +382,14 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
                 requireContext(), it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun handleInterstitialAd(){
+        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val adsDisabled = preferences.getBoolean(getString(R.string.key_ads_disabled), false
+        )
+        // TODO handle logic to only show the ad per some number of photos
+        if (!adsDisabled && interstitialAd.isLoaded) interstitialAd.show()
+        findNavController().popBackStack()
     }
 }

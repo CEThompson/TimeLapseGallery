@@ -6,5 +6,5 @@
     <string name="admob_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
 
     <!-- Test interstitial id -->
-    <string name="add_photo_activity_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="interstitial_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/1033173712</string>
 </resources>
