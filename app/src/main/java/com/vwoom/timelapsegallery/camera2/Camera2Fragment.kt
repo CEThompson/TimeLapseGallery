@@ -26,14 +26,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.InterstitialAd
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
 import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
@@ -99,13 +93,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     }
     private var mTakePictureFab: FloatingActionButton? = null
 
-    private lateinit var interstitialAd: InterstitialAd
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        interstitialAd = (requireActivity() as TimeLapseGalleryActivity).interstitialAd
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Set up bindings
         val binding = FragmentCamera2Binding.inflate(inflater, container, false).apply {
@@ -155,11 +142,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 // TODO write exif data for saved image
                 takePictureJob = lifecycleScope.launchIdling {
                     camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir, ExifInterface.ORIENTATION_NORMAL)
-                    if (args.project!=null){
-                        handleInterstitialAd()
-                    } else {
-                        findNavController().popBackStack()
-                    }
+                    findNavController().popBackStack()
                 }
             } catch (e: Exception) {
                 viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
@@ -219,11 +202,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 Log.d(TAG, "Orientation changed to $orientation")
             })
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (!interstitialAd.isLoaded) interstitialAd.loadAd(AdRequest.Builder().build())
     }
 
     private fun initializeCamera() = lifecycleScope.launchIdling {
@@ -316,7 +294,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         cameraThread.quitSafely()
     }
 
-
     private fun transformImage(viewWidth: Int, viewHeight: Int) {
         if (previewSize == null || !::viewFinder.isInitialized) return
         val matrix = Matrix()
@@ -364,7 +341,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     companion object {
         val TAG = Camera2Fragment::class.java.simpleName
-        }
+    }
 
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -382,14 +359,5 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
                 requireContext(), it) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun handleInterstitialAd(){
-        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val adsDisabled = preferences.getBoolean(getString(R.string.key_ads_disabled), false
-        )
-        // TODO handle logic to only show the ad per some number of photos
-        if (!adsDisabled && interstitialAd.isLoaded) interstitialAd.show()
-        findNavController().popBackStack()
     }
 }

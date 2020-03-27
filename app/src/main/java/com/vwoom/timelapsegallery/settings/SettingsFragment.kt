@@ -8,7 +8,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.*
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.ImageView
@@ -114,13 +115,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // Listen for changes to shared preferences and update notification worker on change
         prefs = PreferenceManager.getDefaultSharedPreferences(activity)
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
-            Log.d("settings activity", "Notification listener activitating for key = $key")
-
-            if (key == this.getString(R.string.key_ads_disabled)) {
-                val adsDisabled = prefs.getBoolean(context?.getString(R.string.key_ads_disabled), false)
-                if (adsDisabled)
-                    mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_ads_disabled)!!, null)
-            }
+            Log.d("settings activity", "Notification listener activating for key = $key")
 
             // If the user changes the notifications enabled preference trigger the notification worker to update any alarms
             if (key == this.getString(R.string.key_notifications_enabled)) {
@@ -320,31 +315,31 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // Updates the progress of importing projects
         settingsViewModel.projectProgress.observe(viewLifecycleOwner, Observer {
             val progress = mSyncDialog?.findViewById<ProgressBar>(R.id.project_sync_progress)
-            progress?.progress = it+1
+            progress?.progress = it + 1
             val tv = mSyncDialog?.findViewById<TextView>(R.id.project_sync_tv)
             tv?.text = getString(R.string.project_sync_text,
-                    it+1,
-                    SyncProgressCounter.projectMax.value!!+1)
+                    it + 1,
+                    SyncProgressCounter.projectMax.value!! + 1)
         })
         // Updates the max number of projects to import
         settingsViewModel.projectMax.observe(viewLifecycleOwner, Observer {
             val progress = mSyncDialog?.findViewById<ProgressBar>(R.id.project_sync_progress)
-            progress?.max = it+1
+            progress?.max = it + 1
         })
         // Updates the progress of photos imported for a project
         settingsViewModel.photoProgress.observe(viewLifecycleOwner, Observer {
             val progress = mSyncDialog?.findViewById<ProgressBar>(R.id.photo_sync_progress)
-            progress?.progress = it+1
+            progress?.progress = it + 1
             val tv = mSyncDialog?.findViewById<TextView>(R.id.photo_sync_tv)
             tv?.text = getString(R.string.photo_sync_text,
-                    SyncProgressCounter.projectProgress.value!!+1,
-                    it+1,
-                    SyncProgressCounter.projectMax.value!!+1)
+                    SyncProgressCounter.projectProgress.value!! + 1,
+                    it + 1,
+                    SyncProgressCounter.projectMax.value!! + 1)
         })
         // Updates the photo maximum import for a project
         settingsViewModel.photoMax.observe(viewLifecycleOwner, Observer {
             val progress = mSyncDialog?.findViewById<ProgressBar>(R.id.photo_sync_progress)
-            progress?.max = it+1
+            progress?.max = it + 1
         })
 
     }
