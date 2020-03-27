@@ -10,6 +10,8 @@ import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
+import java.util.*
+import kotlin.collections.ArrayList
 
 const val SEARCH_TYPE_NONE = "none"
 const val SEARCH_TYPE_DUE_TODAY = "due_today"
@@ -58,7 +60,7 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
         if (searchName.isNotEmpty()) {
             resultProjects = resultProjects.filter {
                 if (it.project_name == null) return@filter false
-                if (it.project_name.contains(searchName)) return@filter true
+                if (it.project_name.toLowerCase(Locale.getDefault()).contains(searchName.toLowerCase(Locale.getDefault()))) return@filter true
                 return@filter false
             }
         }
