@@ -59,7 +59,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     }
 
-    // TODO figure out if there is a better way to get the back facing camera ID
     private val cameraId by lazy {
         lateinit var id: String
         for (cameraId in cameraManager.cameraIdList) {
