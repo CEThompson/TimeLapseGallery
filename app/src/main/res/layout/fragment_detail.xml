@@ -150,6 +150,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             tools:text="photo time" />
+                        <!-- Displays the day the photo was taken -->
+                        <TextView
+                            android:id="@+id/details_photo_day_tv"
+                            style="@style/WhiteText"
+                            android:textStyle="italic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="Tuesday" />
                         <!-- Displays the date the photo was taken -->
                         <TextView
                             android:id="@+id/details_photo_date_tv"

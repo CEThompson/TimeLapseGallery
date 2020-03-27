@@ -14,6 +14,10 @@ object TimeUtils {
         return SimpleDateFormat("M/d/y", Locale.getDefault()).format(Date(timestamp))
     }
 
+    fun getDayFromTimestamp(timestamp: Long): String {
+        return SimpleDateFormat("EEEE", Locale.getDefault()).format(Date(timestamp))
+    }
+
     fun getDateFromTimestamp(timestamp: Long): String {
         return SimpleDateFormat("MMMM d, yyyy", Locale.getDefault()).format(Date(timestamp))
     }

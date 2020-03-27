@@ -144,6 +144,24 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         postponeEnterTransition()
     }
 
+    private fun fadeInPhotoInformation() {
+        if (binding == null) return
+        binding!!.detailScheduleLayout.galleryGradientTopDown.animate().alpha(1f)
+        binding!!.detailScheduleLayout.scheduleIndicatorIntervalTv.animate().alpha(1f)
+        binding!!.detailScheduleLayout.scheduleDaysUntilDueTv.animate().alpha(1f)
+        binding!!.photoInformationLayout.animate().alpha(1f)
+        binding!!.fullscreenFab.show()
+    }
+
+    private fun fadeOutPhotoInformation() {
+        if (binding == null) return
+        binding!!.detailScheduleLayout.galleryGradientTopDown.animate().alpha(0f)
+        binding!!.detailScheduleLayout.scheduleIndicatorIntervalTv.animate().alpha(0f)
+        binding!!.detailScheduleLayout.scheduleDaysUntilDueTv.animate().alpha(0f)
+        binding!!.photoInformationLayout.animate().alpha(0f)
+        binding!!.fullscreenFab.hide()
+    }
+
     override fun onStart() {
         super.onStart()
         binding?.detailsFragmentToolbar?.setNavigationOnClickListener {
@@ -332,23 +350,30 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 photoEntry.timestamp)
         resizeAndLoadImage(imagePath)
 
+        // Update position of progress view and thumbnail
+        val position = mPhotos!!.indexOf(photoEntry)
+        val photoNumber = position + 1
+        binding?.detailsRecyclerview?.scrollToPosition(position)
+        binding?.imageLoadingProgress?.progress = position
+
+        // If playing do not update the individual photo info
+        if (mPlaying) return
+
         // Get info for the current photo
         val timestamp = photoEntry.timestamp
-        val photoNumber = mPhotos!!.indexOf(photoEntry) + 1
         val photosInProject: Int = mPhotos!!.size
         Log.d(TAG, "photoNumber is $photoNumber")
         Log.d(TAG, "photosInProject is $photosInProject")
         // Get formatted strings
         val photoNumberString = getString(R.string.details_photo_number_out_of, photoNumber, photosInProject)
         val date = TimeUtils.getDateFromTimestamp(timestamp)
+        val day = TimeUtils.getDayFromTimestamp(timestamp)
         val time = TimeUtils.getTimeFromTimestamp(timestamp)
         // Set the info
         binding?.detailsPhotoNumberTv?.text = photoNumberString
         binding?.detailsPhotoDateTv?.text = date
+        binding?.detailsPhotoDayTv?.text = day
         binding?.detailsPhotoTimeTv?.text = time
-        val position = mPhotos!!.indexOf(photoEntry)
-        binding?.detailsRecyclerview?.scrollToPosition(position)
-        binding?.imageLoadingProgress?.progress = photoNumber - 1
     }
 
     // Loads an image into the main photo view
@@ -472,15 +497,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             return
         }
 
-        // Handle UI
-        binding?.fullscreenFab?.hide()
-        binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
-        binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
-        binding?.playAsVideoFab?.setImageResource(R.drawable.ic_stop_white_24dp)
-
         // Handle play state
         mPlaying = true
         mCurrentPlayPosition = mPhotos!!.indexOf(mCurrentPhoto)
+
+        // Handle UI
+        fadeOutPhotoInformation()
+        binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
+        binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
+        binding?.playAsVideoFab?.setImageResource(R.drawable.ic_stop_white_24dp)
 
         // Get the playback interval from the shared preferences
         val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -505,22 +530,18 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private fun stopPlaying() { // Set color of play fab
         playJob?.cancel()
         mPlaying = false
-
+        binding?.imageLoadingProgress?.progress = mCurrentPlayPosition ?: 0
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
         binding?.playAsVideoFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
-        binding?.fullscreenFab?.show()
+
+        fadeInPhotoInformation()
     }
 
     private fun scheduleLoadPhoto(position: Int, interval: Long) {
         Log.d("DetailsFragment", "schedule loading position $position")
         if (position < 0 || position >= mPhotos!!.size) {
-            mPlaying = false
-            binding?.playAsVideoFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
-            binding?.imageLoadingProgress?.progress = position
-            binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-            binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
-            binding?.fullscreenFab?.show()
+            stopPlaying()
             return
         }
 
