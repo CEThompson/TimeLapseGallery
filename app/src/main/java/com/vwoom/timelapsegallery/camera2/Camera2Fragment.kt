@@ -59,7 +59,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     }
 
-    private val cameraId = args.cameraId
+    private lateinit var cameraId: String
 
     private val characteristics: CameraCharacteristics by lazy {
         cameraManager.getCameraCharacteristics(cameraId)
@@ -87,6 +87,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         val binding = FragmentCamera2Binding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
+        cameraId = args.cameraId
         viewFinder = binding.cameraPreview
         mTakePictureFab = binding.takePictureFab
 

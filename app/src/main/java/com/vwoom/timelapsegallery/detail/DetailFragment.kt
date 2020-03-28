@@ -112,10 +112,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         InjectorUtils.provideDetailsViewModelFactory(requireActivity(), args.clickedProject)
     }
 
-    private val cameraId: String? by lazy {
-        PhotoUtils.findCamera(requireContext())
-    }
-
     // Analytics
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
     
@@ -251,6 +247,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // 2. Set the click listeners
         binding?.addPhotoFab?.setOnClickListener {
+            val cameraId = PhotoUtils.findCamera(requireContext())
             if (cameraId == null){
                 Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
             } else {

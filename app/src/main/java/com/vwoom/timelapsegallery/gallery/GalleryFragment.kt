@@ -43,10 +43,6 @@ import java.util.*
 
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
-    private val cameraId: String? by lazy {
-        PhotoUtils.findCamera(requireContext())
-    }
-
     private var mSearchDialog: Dialog? = null
 
     private var mGalleryAdapter: GalleryAdapter? = null
@@ -168,10 +164,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mAddProjectFAB?.setOnClickListener {
             exitTransition = null // When navigating to the camera skip the fade out animation
             reenterTransition = null // also skip fade in on return
+            val cameraId = PhotoUtils.findCamera(requireContext())
             if (cameraId == null){
                 Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
             } else {
-                val action = GalleryFragmentDirections.actionGalleryFragmentToCamera2Fragment(cameraId!!, null, null)
+                val action = GalleryFragmentDirections.actionGalleryFragmentToCamera2Fragment(cameraId, null, null)
                 findNavController().navigate(action)
             }
         }
