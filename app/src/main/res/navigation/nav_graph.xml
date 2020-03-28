@@ -58,6 +58,9 @@
         android:name="com.vwoom.timelapsegallery.camera2.Camera2Fragment"
         android:label="fragment_camera_2">
         <argument
+            android:name="cameraId"
+            app:argType="string"/>
+        <argument
             android:name="photo"
             app:argType="com.vwoom.timelapsegallery.data.view.Photo"
             app:nullable="true" />

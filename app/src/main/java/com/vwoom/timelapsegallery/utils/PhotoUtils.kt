@@ -1,14 +1,29 @@
 package com.vwoom.timelapsegallery.utils
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import java.io.IOException
 
 object PhotoUtils {
     private val TAG = PhotoUtils::class.java.simpleName
+
+    fun findCamera(context: Context): String? {
+        val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        for (id in cameraManager.cameraIdList) {
+            val currentCameraCharacteristics = cameraManager.getCameraCharacteristics(id)
+            if (currentCameraCharacteristics
+                            .get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) {
+                return id
+            }
+        }
+        return null
+    }
 
     /* Returns the aspect ratio from the photo path */
     fun getAspectRatioFromImagePath(path: String?): String {

@@ -59,18 +59,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     }
 
-    private val cameraId by lazy {
-        lateinit var id: String
-        for (cameraId in cameraManager.cameraIdList) {
-            val currentCameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId)
-            if (currentCameraCharacteristics
-                            .get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK) {
-                id = cameraId
-                break
-            }
-        }
-        id
-    }
+    private val cameraId = args.cameraId
+
     private val characteristics: CameraCharacteristics by lazy {
         cameraManager.getCameraCharacteristics(cameraId)
     }

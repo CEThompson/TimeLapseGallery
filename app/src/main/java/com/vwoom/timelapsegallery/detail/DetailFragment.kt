@@ -112,6 +112,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         InjectorUtils.provideDetailsViewModelFactory(requireActivity(), args.clickedProject)
     }
 
+    private val cameraId: String? by lazy {
+        PhotoUtils.findCamera(requireContext())
+    }
+
     // Analytics
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
     
@@ -245,12 +249,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
 
-
         // 2. Set the click listeners
         binding?.addPhotoFab?.setOnClickListener {
-            val action = DetailFragmentDirections
-                    .actionDetailsFragmentToCamera2Fragment(detailViewModel.lastPhoto, mCurrentProject)
-            findNavController().navigate(action)
+            if (cameraId == null){
+                Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
+            } else {
+                val action = DetailFragmentDirections
+                        .actionDetailsFragmentToCamera2Fragment(cameraId!!, detailViewModel.lastPhoto, mCurrentProject)
+                findNavController().navigate(action)
+            }
         }
         binding?.playAsVideoFab?.setOnClickListener { playSetOfImages() }
         binding?.projectScheduleFab?.setOnClickListener {

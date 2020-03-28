@@ -14,6 +14,7 @@ import android.view.animation.AlphaAnimation
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -35,11 +36,16 @@ import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.utils.PhotoUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
+
+    private val cameraId: String? by lazy {
+        PhotoUtils.findCamera(requireContext())
+    }
 
     private var mSearchDialog: Dialog? = null
 
@@ -162,8 +168,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mAddProjectFAB?.setOnClickListener {
             exitTransition = null // When navigating to the camera skip the fade out animation
             reenterTransition = null // also skip fade in on return
-            val action = GalleryFragmentDirections.actionGalleryFragmentToCamera2Fragment(null, null)
-            findNavController().navigate(action)
+            if (cameraId == null){
+                Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
+            } else {
+                val action = GalleryFragmentDirections.actionGalleryFragmentToCamera2Fragment(cameraId!!, null, null)
+                findNavController().navigate(action)
+            }
         }
 
         mSearchActiveFAB = binding?.searchActiveIndicator
