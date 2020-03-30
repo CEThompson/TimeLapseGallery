@@ -656,7 +656,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         addTagFab?.setOnClickListener {
             val tagText = editText?.text.toString().trim()
             when {
-                tagText.isEmpty() -> showTagValidationAlertDialog(getString(R.string.invalid_tag_empty))
+                tagText.isEmpty() -> {return@setOnClickListener}
                 tagText.contains(' ') -> showTagValidationAlertDialog(getString(R.string.invalid_tag_one_word))
                 tagText.length > 14 -> showTagValidationAlertDialog(getString(R.string.invalid_tag_length))
                 else -> {
@@ -1148,7 +1148,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
     private fun verifyTagDeletion(tagEntry: TagEntry){
         AlertDialog.Builder(requireContext())
-                .setTitle(R.string.delete_tag)
+                .setTitle(getString(R.string.delete_tag, tagEntry.text))
                 .setMessage(getString(R.string.verify_delete_tag, tagEntry.text))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
