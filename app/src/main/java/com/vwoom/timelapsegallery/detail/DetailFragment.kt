@@ -20,7 +20,6 @@ import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.*
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.view.animation.LinearInterpolator
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
@@ -348,14 +347,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private fun loadUi(photoEntry: PhotoEntry) { // Set the fullscreen image dialogue to the current photo
         if (!mPlaying) setFullscreenImage()
-        // Notify the adapter
+        // Notify the adapter: this updates the detail recycler view red highlight indicator
         mDetailAdapter?.setCurrentPhoto(photoEntry)
-        // Load the current image
+
+        // Get the image path, handle orientation indicator and load the image
         val imagePath = FileUtils.getPhotoUrl(
                 mExternalFilesDir!!,
                 getEntryFromProject(mCurrentProject!!),
                 photoEntry.timestamp)
-        resizeAndLoadImage(imagePath)
+        if (!mPlaying) handleOrientationIndicator(imagePath)
+        loadImage(imagePath)
 
         // Update position of progress view and thumbnail
         val position = mPhotos!!.indexOf(photoEntry)
@@ -363,7 +364,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.detailsRecyclerview?.scrollToPosition(position)
         binding?.imageLoadingProgress?.progress = position
 
-        // If playing do not update the individual photo info
+        // If playing do not update the individual photo info (skip the rest)
         if (mPlaying) return
 
         // Get info for the current photo
@@ -385,9 +386,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private fun showBlinkingRotate(){
         val animation: Animation = AlphaAnimation(1f, 0f) //to change visibility from visible to invisible
-        animation.duration = 400 //1 second duration for each animation cycle
+        animation.duration = 400 //.4 second duration for each animation cycle
         //animation.interpolator = LinearInterpolator()
-
         animation.repeatCount = Animation.INFINITE //repeating indefinitely
         animation.repeatMode = Animation.REVERSE //animation will start from end point once ended.
         binding?.rotationIndicator?.startAnimation(animation)
@@ -395,77 +395,26 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     private fun stopBlinkingRotate(){
-        //val frameAnimation: AnimationDrawable = binding?.rotationIndicator?.drawable as AnimationDrawable
-        //frameAnimation.stop()
-        //binding?.rotationIndicator?.setImageResource(R.drawable.ic_repeat_white_24dp)
         binding?.rotationIndicator?.visibility = INVISIBLE
     }
 
-    // Loads an image into the main photo view
-    private fun resizeAndLoadImage(imagePath: String) {
-        mImageIsLoaded = false
-
-        if (!mPlaying) {
-            val imageIsLandscape = PhotoUtils.isLandscape(imagePath)
-            val deviceIsPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-            val deviceIsLandscape = !deviceIsPortrait
-            val imageIsPortrait = !imageIsLandscape
-            if (deviceIsPortrait && imageIsLandscape) {
-                showBlinkingRotate()
-            } else stopBlinkingRotate()
-            if (deviceIsLandscape && imageIsPortrait) showBlinkingRotate()
-            else stopBlinkingRotate()
-        }
-        /*
-        // Get photo ratio, and photo /device orientation
-        val ratio = PhotoUtils.getAspectRatioFromImagePath(imagePath)
+    private fun handleOrientationIndicator(imagePath: String) {
+        // Detect configuration
         val imageIsLandscape = PhotoUtils.isLandscape(imagePath)
+        val deviceIsPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        val deviceIsLandscape = !deviceIsPortrait
         val imageIsPortrait = !imageIsLandscape
-        val deviceIsLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        val deviceIsPortrait = !deviceIsLandscape
+        // If device is portrait and image is landscape show the indicator
+        if (deviceIsPortrait && imageIsLandscape)  showBlinkingRotate()
+        else stopBlinkingRotate()
+        // If the device is landscape and the image is portrait show the indactor
+        if (deviceIsLandscape && imageIsPortrait) showBlinkingRotate()
+        else stopBlinkingRotate()
+    }
 
-        // Set card view constraints depending upon if photo is landscape or portrait
-        val layoutParams = binding?.detailsCardContainer?.layoutParams
-
-        // If landscape set height to wrap content
-        // Set width to be measured
-        when {
-            deviceIsLandscape && imageIsLandscape -> {
-                layoutParams?.height = 0
-                layoutParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
-            }
-            deviceIsLandscape && imageIsPortrait -> {
-                layoutParams?.height = 0
-                layoutParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
-            }
-            deviceIsPortrait && imageIsLandscape -> {
-                layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                layoutParams?.width = 0
-            }
-            deviceIsPortrait && imageIsPortrait -> {
-                layoutParams?.height = 0
-                layoutParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
-            }
-        }
-
-        /*
-        if (imageIsLandscape) {
-            layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            layoutParams?.width = 0
-        } else {
-            layoutParams?.height = 0
-            layoutParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
-        }
-         */
-
-        // Resize the constraint layout
-        val constraintSet = ConstraintSet()
-        val constraintLayout: ConstraintLayout = binding!!.detailsCurrentImageConstraintLayout
-        constraintSet.clone(constraintLayout)
-        constraintSet.setDimensionRatio(R.id.detail_current_image, ratio)
-        constraintSet.setDimensionRatio(R.id.detail_next_image, ratio)
-        constraintSet.applyTo(constraintLayout)
-         */
+    // Loads an image into the main photo view
+    private fun loadImage(imagePath: String) {
+        mImageIsLoaded = false // this set to true after load image pair completes
         // Load the image
         val f = File(imagePath)
         loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
