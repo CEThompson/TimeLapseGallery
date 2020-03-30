@@ -18,11 +18,10 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
 import java.io.File
 
-class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, context: Context) : RecyclerView.Adapter<DetailAdapterViewHolder>() {
+class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val externalFilesDir: File) : RecyclerView.Adapter<DetailAdapterViewHolder>() {
     private var mPhotos: List<PhotoEntry>? = null
     private var mProject: Project? = null
     private var mCurrentPhoto: PhotoEntry? = null
-    private val mExternalFilesDir: File?
 
     interface DetailAdapterOnClickHandler {
         fun onClick(clickedPhoto: PhotoEntry)
@@ -54,7 +53,7 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, cont
         val context = holder.itemView.context
         val currentPhoto = mPhotos?.get(position)
         val photoPath = FileUtils.getPhotoUrl(
-                mExternalFilesDir!!,
+                externalFilesDir,
                 getEntryFromProject(mProject!!),
                 currentPhoto!!.timestamp)
         val f = File(photoPath)
@@ -88,9 +87,5 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, cont
 
     companion object {
         private val TAG = DetailAdapter::class.java.simpleName
-    }
-
-    init {
-        mExternalFilesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
     }
 }

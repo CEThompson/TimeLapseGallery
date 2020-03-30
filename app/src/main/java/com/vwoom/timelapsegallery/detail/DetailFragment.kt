@@ -236,7 +236,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Set up adapter and recycler view
-        mDetailAdapter = DetailAdapter(this, requireContext())
+        mDetailAdapter = DetailAdapter(this, mExternalFilesDir!!)
         val linearLayoutManager
                 = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
@@ -255,7 +255,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
             } else {
                 val action = DetailFragmentDirections
-                        .actionDetailsFragmentToCamera2Fragment(cameraId!!, detailViewModel.lastPhoto, mCurrentProject)
+                        .actionDetailsFragmentToCamera2Fragment(cameraId, detailViewModel.lastPhoto, mCurrentProject)
                 findNavController().navigate(action)
             }
         }
