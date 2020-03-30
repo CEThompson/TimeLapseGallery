@@ -607,6 +607,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
      */
     private fun initializeInfoDialog(){
         mInfoDialog = Dialog(requireContext())
+        mInfoDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         mInfoDialog?.setContentView(R.layout.dialog_project_information)
         mInfoDialog?.setOnCancelListener { detailViewModel.infoDialogShowing = false }
         // Get Views
@@ -641,6 +642,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
     private fun initializeTagDialog(){
         mTagDialog = Dialog(requireContext())
+        mTagDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         mTagDialog?.setContentView(R.layout.dialog_project_tag)
         mTagDialog?.setOnCancelListener { detailViewModel.tagDialogShowing = false }
         // set add tag fab
@@ -682,6 +684,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         if (mScheduleDialog != null) return
 
         mScheduleDialog = Dialog(requireContext())
+        mScheduleDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         mScheduleDialog?.setContentView(R.layout.dialog_schedule)
         mScheduleDialog?.setOnCancelListener { detailViewModel.scheduleDialogShowing = false }
 

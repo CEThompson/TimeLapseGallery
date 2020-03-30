@@ -234,6 +234,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     private fun initializeSearchDialog() {
         mSearchDialog = Dialog(requireContext())
+        mSearchDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         mSearchDialog?.setContentView(R.layout.dialog_search)
         mSearchDialog?.setOnCancelListener { mGalleryViewModel.searchDialogShowing = false }
 
