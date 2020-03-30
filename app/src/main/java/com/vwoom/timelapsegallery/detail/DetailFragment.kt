@@ -610,12 +610,17 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mInfoDialog?.setContentView(R.layout.dialog_project_information)
         mInfoDialog?.setOnCancelListener { detailViewModel.infoDialogShowing = false }
         // Get Views
-        val editNameButton = mInfoDialog?.findViewById<ImageButton>(R.id.edit_project_name_button)
+        val editNameButton = mInfoDialog?.findViewById<FloatingActionButton>(R.id.edit_project_name_button)
         // Set fab colors
         editNameButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
         editNameButton?.setOnClickListener { editName() }
         val infoOkTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_info_dismiss)
         infoOkTextView?.setOnClickListener {
+            mInfoDialog?.dismiss()
+            detailViewModel.infoDialogShowing = false
+        }
+        val exitFab = mInfoDialog?.findViewById<FloatingActionButton>(R.id.project_info_exit_fab)
+        exitFab?.setOnClickListener {
             mInfoDialog?.dismiss()
             detailViewModel.infoDialogShowing = false
         }
@@ -655,6 +660,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         val dismissView = mTagDialog?.findViewById<TextView>(R.id.dialog_project_tag_dismiss)
         dismissView?.setOnClickListener {
+            mTagDialog?.dismiss()
+            detailViewModel.tagDialogShowing = false
+        }
+        val exitFab = mTagDialog?.findViewById<FloatingActionButton>(R.id.project_tag_exit_fab)
+        exitFab?.setOnClickListener {
             mTagDialog?.dismiss()
             detailViewModel.tagDialogShowing = false
         }
@@ -729,6 +739,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Dismiss
         val okTextView = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_dismiss)
         okTextView?.setOnClickListener {
+            mScheduleDialog?.dismiss()
+            detailViewModel.scheduleDialogShowing = false
+        }
+        val exitFab = mScheduleDialog?.findViewById<FloatingActionButton>(R.id.schedule_dialog_exit_fab)
+        exitFab?.setOnClickListener {
             mScheduleDialog?.dismiss()
             detailViewModel.scheduleDialogShowing = false
         }

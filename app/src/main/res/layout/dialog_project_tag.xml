@@ -1,95 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="@dimen/medium">
+    android:layout_height="wrap_content">
 
-    <!-- Layout for available project tags -->
-    <com.google.android.flexbox.FlexboxLayout
-        android:id="@+id/project_tag_dialog_available_tags_layout"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
-        android:orientation="horizontal"
-        app:alignContent="stretch"
-        app:alignItems="stretch"
-        app:flexWrap="wrap"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_margin="@dimen/medium">
 
-        <TextView
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/project_tag_exit_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/small"
-            android:minWidth="@dimen/touch_target_min"
-            android:minHeight="@dimen/touch_target_min"
-            tools:text="#tag three" />
+            android:layout_margin="@dimen/medium"
+            android:src="@drawable/ic_clear_white_24dp"
+            app:backgroundTint="@color/colorSubtleRedAccent"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/tag_deletion_instructions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/small"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/medium"
+            android:alpha=".9"
+            android:gravity="end"
+            android:text="@string/tag_deletion_instruction"
+            android:textColor="@color/colorSubtleRedAccent"
+            app:layout_constraintVertical_bias=".5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintTop_toTopOf="@id/project_tag_exit_fab"
+            app:layout_constraintEnd_toStartOf="@id/project_tag_exit_fab"
+            app:layout_constraintTop_toBottomOf="@id/project_tag_exit_fab" />
+
+
+        <!-- Layout for available project tags -->
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/project_tag_dialog_available_tags_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/medium"
+            android:orientation="horizontal"
+            app:alignContent="stretch"
+            app:alignItems="stretch"
+            app:flexWrap="wrap"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/project_tag_exit_fab">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small"
+                android:minWidth="@dimen/touch_target_min"
+                android:minHeight="@dimen/touch_target_min"
+                tools:text="#tag three" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small"
+                android:minWidth="@dimen/touch_target_min"
+                android:minHeight="@dimen/touch_target_min"
+                tools:text="#tag four" />
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <EditText
+            android:id="@+id/add_tag_dialog_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:autofillHints="@string/new_tag_text"
+            android:hint="@string/new_tag_text"
+            android:inputType="text"
+            android:minWidth="180dp"
+            android:singleLine="true"
+            app:layout_constraintBottom_toBottomOf="@id/add_tag_fab"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/add_tag_fab"
+            app:layout_constraintVertical_bias="0.5"
+            tools:text="#newtag" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_tag_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/medium"
+            android:src="@drawable/ic_add_white_24dp"
+            app:fabSize="mini"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/add_tag_dialog_edit_text"
+            app:layout_constraintTop_toBottomOf="@id/project_tag_dialog_available_tags_layout"
+            app:layout_constraintEnd_toStartOf="@id/dialog_project_tag_dismiss"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/dialog_project_tag_dismiss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
             android:minWidth="@dimen/touch_target_min"
             android:minHeight="@dimen/touch_target_min"
-            tools:text="#tag four" />
-    </com.google.android.flexbox.FlexboxLayout>
+            android:text="@string/ok"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <EditText
-        android:id="@+id/add_tag_dialog_edit_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:autofillHints="@string/new_tag_text"
-        android:hint="@string/new_tag_text"
-        android:inputType="text"
-        android:minWidth="200dp"
-        android:singleLine="true"
-        tools:text="#newtag"
-        app:layout_constraintTop_toTopOf="@id/add_tag_fab"
-        app:layout_constraintBottom_toBottomOf="@id/add_tag_fab"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="0.5"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_tag_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/large"
-        android:src="@drawable/ic_add_white_24dp"
-        app:fabSize="mini"
-        app:layout_constraintStart_toEndOf="@id/add_tag_dialog_edit_text"
-        app:layout_constraintTop_toBottomOf="@id/project_tag_dialog_available_tags_layout" />
-
-    <TextView
-        android:id="@+id/tag_deletion_instructions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_margin="@dimen/medium"
-        android:alpha=".9"
-        android:text="@string/tag_deletion_instruction"
-        android:textColor="@color/colorSubtleRedAccent"
-        android:gravity="end"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/add_tag_fab"
-        app:layout_constraintBottom_toTopOf="@id/dialog_project_tag_dismiss"/>
-
-    <TextView
-        android:id="@+id/dialog_project_tag_dismiss"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_gravity="end"
-        android:minWidth="@dimen/touch_target_min"
-        android:minHeight="@dimen/touch_target_min"
-        android:text="@string/ok"
-        android:textColor="@color/colorAccent"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

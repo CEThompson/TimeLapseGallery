@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -16,12 +16,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|top"
-            android:layout_margin="@dimen/small"
             android:src="@drawable/ic_clear_white_24dp"
             app:backgroundTint="@color/colorSubtleRedAccent"
             app:fabSize="mini"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- search by due state label -->
         <TextView
@@ -53,12 +52,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/large"
-            android:text="@string/due_tomorrow"
-            android:textStyle="italic"
             android:alpha="0.6"
+            android:text="@string/due_tomorrow"
             android:textSize="16sp"
-            app:layout_constraintHorizontal_bias="0"
+            android:textStyle="italic"
             app:layout_constraintEnd_toStartOf="@id/search_dialog_exit_fab"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@id/search_due_today_checkbox"
             app:layout_constraintTop_toBottomOf="@id/search_due_today_checkbox" />
 
@@ -101,22 +100,21 @@
                 android:id="@+id/dialog_search_tags_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/medium"
                 android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/medium"
                 app:alignContent="stretch"
                 app:alignItems="stretch"
                 app:flexWrap="wrap">
                 <!-- Example checkbox for layout -->
                 <CheckBox
-                    tools:text="example checkbox"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    tools:text="example checkbox" />
             </com.google.android.flexbox.FlexboxLayout>
         </FrameLayout>
 
         <TextView
             android:id="@+id/search_by_schedule_label"
-            tools:text="search by schedule"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -126,7 +124,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dialog_search_tags_layout_container" />
+            app:layout_constraintTop_toBottomOf="@id/dialog_search_tags_layout_container"
+            tools:text="search by schedule" />
 
         <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/filter_by_schedule_layout"
@@ -143,10 +142,10 @@
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/search_pending_checkbox"
-                android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/pending" />
+                android:text="@string/pending"
+                android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/search_scheduled_checkbox"
@@ -159,9 +158,9 @@
                 android:id="@+id/search_unscheduled_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textStyle="italic"
                 android:alpha="0.5"
-                android:text="@string/unscheduled" />
+                android:text="@string/unscheduled"
+                android:textStyle="italic" />
 
         </com.google.android.flexbox.FlexboxLayout>
 
@@ -181,16 +180,32 @@
         <EditText
             android:id="@+id/search_edit_text"
             android:layout_width="wrap_content"
-            android:minWidth="200dp"
             android:layout_height="wrap_content"
-            android:gravity="start"
             android:layout_margin="@dimen/medium"
+            android:gravity="start"
             android:hint="@string/project_name"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:minWidth="200dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_by_name_label" />
+
+        <TextView
+            android:id="@+id/search_dialog_dismiss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:minWidth="@dimen/touch_target_min"
+            android:minHeight="@dimen/touch_target_min"
+            android:gravity="center|bottom"
+            android:text="@string/ok"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/search_edit_text"
+            app:layout_constraintStart_toEndOf="@id/search_edit_text"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

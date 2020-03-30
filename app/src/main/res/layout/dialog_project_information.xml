@@ -8,13 +8,38 @@
     android:padding="@dimen/medium"
     android:orientation="vertical">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/project_info_exit_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/medium"
+        android:src="@drawable/ic_clear_white_24dp"
+        app:backgroundTint="@color/colorSubtleRedAccent"
+        app:fabSize="mini"
+        app:layout_constraintStart_toEndOf="@id/project_info_dialog_label"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/project_info_dialog_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:text="@string/project_information"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/project_info_exit_fab"/>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/info_dialog_name_id_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/medium"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/project_info_dialog_label">
+
         <!-- Id Label -->
         <TextView
             android:id="@+id/dialog_project_info_id_label"
@@ -68,10 +93,13 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!-- Edit name image -->
-    <ImageButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/edit_project_name_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:fabSize="mini"
+        app:backgroundTint="@color/white"
+        android:layout_marginStart="@dimen/medium"
         android:src="@drawable/ic_edit_black_24dp"
         app:layout_constraintStart_toEndOf="@id/info_dialog_name_id_layout"
         app:layout_constraintBottom_toBottomOf="@id/info_dialog_name_id_layout"/>

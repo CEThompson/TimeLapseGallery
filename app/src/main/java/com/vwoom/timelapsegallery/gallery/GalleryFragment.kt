@@ -239,8 +239,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         val searchEditText = mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)
 
-        val dismissFab = mSearchDialog?.findViewById<FloatingActionButton>(R.id.search_dialog_exit_fab)
-        dismissFab?.setOnClickListener {
+        val exitFab = mSearchDialog?.findViewById<FloatingActionButton>(R.id.search_dialog_exit_fab)
+        exitFab?.setOnClickListener {
+            mGalleryViewModel.searchDialogShowing = false
+            mSearchDialog?.dismiss()
+        }
+        val okDismiss = mSearchDialog?.findViewById<TextView>(R.id.search_dialog_dismiss)
+        okDismiss?.setOnClickListener {
             mGalleryViewModel.searchDialogShowing = false
             mSearchDialog?.dismiss()
         }

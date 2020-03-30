@@ -101,7 +101,7 @@
     <string name="manage_tags">Manage tags</string>
     <string name="add_tag">Add Tag</string>
     <string name="delete">delete</string>
-    <string name="project_id_label">Project ID:</string>
+    <string name="project_id_label">Id:</string>
     <string name="new_tag_text">#newtag</string>
     <string name="invalid_tag">Invalid Tag</string>
     <string name="invalid_tag_empty">Tags must not be empty.</string>
@@ -252,16 +252,15 @@
     <string name="search_launch_due" translatable="false">search_launch_due</string>
 
     <!-- project tag dialog -->
-    <string name="tag_deletion_instruction">Note: Tap to toggle a tag. \n
-        Tap and hold to delete.</string>
+    <string name="tag_deletion_instruction">Tap to toggle. Tap and hold to delete.</string>
     <string name="tag_start_instruction">Add a tag to get started.</string>
 
     <!-- schedule dialog -->
     <string name="custom_interval_in_days_hint">custom interval (in days)</string>
     <string name="every">every</string>
-    <string name="custom_interval_label">custom interval:</string>
-    <string name="days_label">days:</string>
-    <string name="weeks_label">weeks:</string>
+    <string name="custom_interval_label">Custom interval:</string>
+    <string name="days_label">Days:</string>
+    <string name="weeks_label">Weeks:</string>
 
     <!-- Project synchronization feedback -->
     <string name="project_sync_text">Importing projects: %1$d/%2$d</string>
@@ -269,5 +268,7 @@
 
     <!-- Error if there are no cameras before launching camera fragment -->
     <string name="no_camera_found">No camera found.</string>
+
+    <string name="project_information">Project Information</string>
 
 </resources>
