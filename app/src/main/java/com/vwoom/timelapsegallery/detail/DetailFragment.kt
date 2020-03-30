@@ -968,28 +968,37 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         availableTagsLayout?.removeAllViews()
         // Set up the available tags in the project information dialog
         if (mAllTags != null) {
-            for (tagEntry in mAllTags!!) {
-                var tagInProject = false
-                if (mProjectTags != null) {
-                    if (mProjectTags!!.contains(tagEntry)) {
-                        tagInProject = true
-                    }
-                }
-                val textView: TextView = layoutInflater.inflate(R.layout.tag_text_view, availableTagsLayout, false) as TextView
-                textView.text = getString(R.string.hashtag, tagEntry.text)
-                if (tagInProject) textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
-                else textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-                // Set the text view to remove or add the tag depending on whether the tag is in the project
-                if (tagInProject) textView.setOnClickListener { detailViewModel.deleteTagFromProject(tagEntry, mCurrentProject!!) }
-                else textView.setOnClickListener { detailViewModel.addTag(tagEntry.text, mCurrentProject!!) }
+            val instructionTv = mTagDialog?.findViewById<TextView>(R.id.tag_deletion_instructions)
+            if (mAllTags!!.isEmpty()){
+                instructionTv?.text = getString(R.string.tag_start_instruction)
+            } else {
+                instructionTv?.text = getString(R.string.tag_deletion_instruction)
+                // Add the tags to the layout
+                for (tagEntry in mAllTags!!) {
+                    // Inflate the tag and set its text
+                    val textView: TextView = layoutInflater.inflate(R.layout.tag_text_view, availableTagsLayout, false) as TextView
+                    textView.text = getString(R.string.hashtag, tagEntry.text)
 
-                // Set the text view to delete tag on long click
-                textView.setOnLongClickListener{
-                    verifyTagDeletion(tagEntry)
-                    true
+                    // Style depending upon whether or not this particular project is tagged
+                    val tagInProject: Boolean = mProjectTags?.contains(tagEntry) ?: false
+                    if (tagInProject) {
+                        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
+                        textView.setOnClickListener { detailViewModel.deleteTagFromProject(tagEntry, mCurrentProject!!) }
+                    }
+                    else {
+                        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                        textView.setOnClickListener { detailViewModel.addTag(tagEntry.text, mCurrentProject!!) }
+                    }
+
+                    // Set tag deletion
+                    textView.setOnLongClickListener {
+                        verifyTagDeletion(tagEntry)
+                        true
+                    }
+
+                    // Add the view to the flexbox layout
+                    availableTagsLayout?.addView(textView)
                 }
-                // Finally add the view
-                availableTagsLayout?.addView(textView)
             }
         }
     }

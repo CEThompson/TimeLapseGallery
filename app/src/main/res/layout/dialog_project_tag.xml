@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:padding="@dimen/medium">
 
     <!-- Layout for available project tags -->
@@ -13,9 +12,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/medium"
+        android:orientation="horizontal"
         app:alignContent="stretch"
         app:alignItems="stretch"
-        app:flexWrap="wrap">
+        app:flexWrap="wrap"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
@@ -34,33 +38,31 @@
             tools:text="#tag four" />
     </com.google.android.flexbox.FlexboxLayout>
 
-    <!-- Layout for adding new tag -->
-    <LinearLayout
+    <EditText
+        android:id="@+id/add_tag_dialog_edit_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
-        android:orientation="horizontal">
+        android:layout_gravity="center_vertical"
+        android:autofillHints="@string/new_tag_text"
+        android:hint="@string/new_tag_text"
+        android:inputType="text"
+        android:minWidth="200dp"
+        android:singleLine="true"
+        tools:text="#newtag"
+        app:layout_constraintTop_toTopOf="@id/add_tag_fab"
+        app:layout_constraintBottom_toBottomOf="@id/add_tag_fab"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0.5"/>
 
-        <EditText
-            android:id="@+id/add_tag_dialog_edit_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:autofillHints="@string/new_tag_text"
-            android:hint="@string/new_tag_text"
-            android:inputType="text"
-            android:minWidth="200dp"
-            android:singleLine="true"
-            tools:text="#newtag" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/add_tag_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/large"
-            android:src="@drawable/ic_add_white_24dp"
-            app:fabSize="mini" />
-    </LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_tag_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/large"
+        android:src="@drawable/ic_add_white_24dp"
+        app:fabSize="mini"
+        app:layout_constraintStart_toEndOf="@id/add_tag_dialog_edit_text"
+        app:layout_constraintTop_toBottomOf="@id/project_tag_dialog_available_tags_layout" />
 
     <TextView
         android:id="@+id/tag_deletion_instructions"
@@ -70,7 +72,11 @@
         android:layout_margin="@dimen/medium"
         android:alpha=".9"
         android:text="@string/tag_deletion_instruction"
-        android:textColor="@color/colorSubtleRedAccent" />
+        android:textColor="@color/colorSubtleRedAccent"
+        android:gravity="end"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/add_tag_fab"
+        app:layout_constraintBottom_toTopOf="@id/dialog_project_tag_dismiss"/>
 
     <TextView
         android:id="@+id/dialog_project_tag_dismiss"
@@ -82,6 +88,8 @@
         android:minHeight="@dimen/touch_target_min"
         android:text="@string/ok"
         android:textColor="@color/colorAccent"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
