@@ -92,10 +92,10 @@
                     <!-- Dual image views for smooth loading -->
                     <ImageView
                         android:id="@+id/detail_current_image"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:background="@color/darkImagePlaceHolder"
-                        app:layout_constraintDimensionRatio="3:4"
+                        android:scaleType="centerCrop"
                         android:contentDescription="@string/detail_current_image_content_description"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -103,11 +103,11 @@
                         app:layout_constraintBottom_toBottomOf="parent"/>
                     <ImageView
                         android:id="@+id/detail_next_image"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:visibility="invisible"
                         android:background="@color/darkImagePlaceHolder"
-                        app:layout_constraintDimensionRatio="3:4"
+                        android:scaleType="centerCrop"
                         android:contentDescription="@string/detail_current_image_content_description"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -165,6 +165,17 @@
                             tools:text="photo date"
                             style="@style/WhiteText"/>
                     </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/rotation_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_repeat_white_24dp"
+                        android:layout_margin="@dimen/detail_small_margin"
+                        android:visibility="invisible"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/fullscreen_fab"/>
+
 
                     <!-- Fullscreen fab -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton

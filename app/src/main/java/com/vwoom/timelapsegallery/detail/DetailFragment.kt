@@ -19,11 +19,11 @@ import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.*
 import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -51,8 +51,11 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentDetailBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
-import com.vwoom.timelapsegallery.utils.*
+import com.vwoom.timelapsegallery.utils.FileUtils
+import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
+import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import kotlinx.coroutines.Job
@@ -380,9 +383,39 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.detailsPhotoTimeTv?.text = time
     }
 
+    private fun showBlinkingRotate(){
+        val animation: Animation = AlphaAnimation(1f, 0f) //to change visibility from visible to invisible
+        animation.duration = 500 //1 second duration for each animation cycle
+        animation.interpolator = LinearInterpolator()
+        animation.repeatCount = Animation.INFINITE //repeating indefinitely
+        animation.repeatMode = Animation.REVERSE //animation will start from end point once ended.
+        binding?.rotationIndicator?.startAnimation(animation)
+        binding?.rotationIndicator?.visibility = VISIBLE
+    }
+
+    private fun stopBlinkingRotate(){
+        //val frameAnimation: AnimationDrawable = binding?.rotationIndicator?.drawable as AnimationDrawable
+        //frameAnimation.stop()
+        //binding?.rotationIndicator?.setImageResource(R.drawable.ic_repeat_white_24dp)
+        binding?.rotationIndicator?.visibility = INVISIBLE
+    }
+
     // Loads an image into the main photo view
     private fun resizeAndLoadImage(imagePath: String) {
         mImageIsLoaded = false
+
+        if (!mPlaying) {
+            val imageIsLandscape = PhotoUtils.isLandscape(imagePath)
+            val deviceIsPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+            val deviceIsLandscape = !deviceIsPortrait
+            val imageIsPortrait = !imageIsLandscape
+            if (deviceIsPortrait && imageIsLandscape) {
+                showBlinkingRotate()
+            } else stopBlinkingRotate()
+            if (deviceIsLandscape && imageIsPortrait) showBlinkingRotate()
+            else stopBlinkingRotate()
+        }
+        /*
         // Get photo ratio, and photo /device orientation
         val ratio = PhotoUtils.getAspectRatioFromImagePath(imagePath)
         val imageIsLandscape = PhotoUtils.isLandscape(imagePath)
@@ -431,7 +464,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         constraintSet.setDimensionRatio(R.id.detail_current_image, ratio)
         constraintSet.setDimensionRatio(R.id.detail_next_image, ratio)
         constraintSet.applyTo(constraintLayout)
-
+         */
         // Load the image
         val f = File(imagePath)
         loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
