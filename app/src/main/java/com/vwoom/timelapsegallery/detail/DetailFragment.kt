@@ -615,6 +615,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Set fab colors
         editNameButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
         editNameButton?.setOnClickListener { editName() }
+        val tagsTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
+        tagsTextView?.setOnClickListener {
+            mTagDialog?.show()
+            detailViewModel.tagDialogShowing = true
+        }
         val infoOkTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_info_dismiss)
         infoOkTextView?.setOnClickListener {
             mInfoDialog?.dismiss()

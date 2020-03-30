@@ -8,36 +8,38 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minHeight="150dp"
         android:layout_margin="@dimen/medium">
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/project_tag_exit_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/medium"
-            android:src="@drawable/ic_clear_white_24dp"
-            app:backgroundTint="@color/colorSubtleRedAccent"
-            app:fabSize="mini"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tag_deletion_instructions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_margin="@dimen/medium"
             android:alpha=".9"
-            android:gravity="end"
+            android:gravity="start"
             android:text="@string/tag_deletion_instruction"
+            tools:text="Add a tag to get started."
             android:textColor="@color/colorSubtleRedAccent"
-            app:layout_constraintVertical_bias=".5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintTop_toTopOf="@id/project_tag_exit_fab"
-            app:layout_constraintEnd_toStartOf="@id/project_tag_exit_fab"
-            app:layout_constraintTop_toBottomOf="@id/project_tag_exit_fab" />
 
+            app:layout_constraintEnd_toStartOf="@id/project_tag_exit_fab"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/project_tag_exit_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/medium"
+            android:src="@drawable/ic_clear_white_24dp"
+            app:backgroundTint="@color/colorSubtleRedAccent"
+            app:fabSize="mini"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintEnd_toEndOf="@id/dialog_project_tag_dismiss"
+            app:layout_constraintStart_toStartOf="@id/dialog_project_tag_dismiss"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Layout for available project tags -->
         <com.google.android.flexbox.FlexboxLayout
@@ -51,7 +53,9 @@
             app:flexWrap="wrap"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintVertical_bias="0"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/dialog_project_tag_dismiss"
             app:layout_constraintTop_toBottomOf="@id/project_tag_exit_fab">
 
             <TextView
@@ -81,9 +85,11 @@
             android:inputType="text"
             android:minWidth="180dp"
             android:singleLine="true"
+            app:layout_constraintEnd_toStartOf="@id/add_tag_fab"
             app:layout_constraintBottom_toBottomOf="@id/add_tag_fab"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/add_tag_fab"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintVertical_bias="0.5"
             tools:text="#newtag" />
 
@@ -91,14 +97,16 @@
             android:id="@+id/add_tag_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/medium"
+            android:layout_marginEnd="@dimen/large"
             android:src="@drawable/ic_add_white_24dp"
             app:fabSize="mini"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toEndOf="@id/add_tag_dialog_edit_text"
-            app:layout_constraintTop_toBottomOf="@id/project_tag_dialog_available_tags_layout"
+            android:layout_marginStart="@dimen/medium"
+            app:layout_constraintTop_toTopOf="@id/dialog_project_tag_dismiss"
+            app:layout_constraintBottom_toBottomOf="@id/dialog_project_tag_dismiss"
             app:layout_constraintEnd_toStartOf="@id/dialog_project_tag_dismiss"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintVertical_bias=".5"
+            app:layout_constraintStart_toEndOf="@id/add_tag_dialog_edit_text" />
 
         <TextView
             android:id="@+id/dialog_project_tag_dismiss"
@@ -110,6 +118,8 @@
             android:text="@string/ok"
             android:textColor="@color/colorAccent"
             android:textStyle="bold"
+            app:layout_constraintHorizontal_bias="1"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

@@ -1,69 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:minWidth="250dp"
-    android:padding="@dimen/medium"
-    android:orientation="vertical">
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/project_info_exit_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
-        android:src="@drawable/ic_clear_white_24dp"
-        app:backgroundTint="@color/colorSubtleRedAccent"
-        app:fabSize="mini"
-        app:layout_constraintStart_toEndOf="@id/project_info_dialog_label"
-        app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/project_info_dialog_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:text="@string/project_information"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/project_info_exit_fab"/>
+    android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/info_dialog_name_id_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/project_info_dialog_label">
+        android:minWidth="250dp"
+        android:orientation="vertical"
+        android:padding="@dimen/medium">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/project_info_exit_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/medium"
+            android:src="@drawable/ic_clear_white_24dp"
+            app:backgroundTint="@color/colorSubtleRedAccent"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toEndOf="@id/edit_project_name_button"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/project_info_dialog_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/project_information"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/project_info_exit_fab"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/project_info_exit_fab"
+            app:layout_constraintVertical_bias="0" />
 
         <!-- Id Label -->
         <TextView
             android:id="@+id/dialog_project_info_id_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:textColor="@color/black"
+            android:layout_marginTop="@dimen/large"
             android:text="@string/project_id_label"
-            tools:text="@string/project_id_label"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@id/project_info_dialog_label"
+            tools:text="@string/project_id_label" />
 
         <!-- Id Field -->
         <TextView
             android:id="@+id/dialog_project_info_id_field"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/medium"
             android:textSize="18sp"
             android:textStyle="italic"
-            android:layout_marginStart="@dimen/medium"
-            tools:text="3"
             app:layout_constraintStart_toEndOf="@id/dialog_project_info_id_label"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="@id/dialog_project_info_id_label"
+            tools:text="3" />
 
         <!-- Name Label -->
         <TextView
@@ -72,101 +71,110 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/large"
             android:gravity="center_vertical"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:textColor="@color/black"
             android:text="@string/project_name_label"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dialog_project_info_id_label"/>
+            app:layout_constraintTop_toBottomOf="@id/dialog_project_info_id_label" />
         <!-- Name Field -->
         <TextView
             android:id="@+id/dialog_project_info_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="italic"
-            android:textSize="18sp"
             android:layout_marginStart="@dimen/medium"
             android:gravity="center_vertical"
+            android:textSize="18sp"
+            android:textStyle="italic"
+            app:layout_constraintEnd_toStartOf="@id/edit_project_name_button"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/dialog_project_info_name_label"
             app:layout_constraintTop_toTopOf="@id/dialog_project_info_name_label"
             tools:text="project name" />
 
+        <!-- Edit name image -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/edit_project_name_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/large"
+            android:src="@drawable/ic_edit_black_24dp"
+            app:backgroundTint="@color/white"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toBottomOf="@id/dialog_project_info_name"
+            app:layout_constraintEnd_toStartOf="@id/project_info_exit_fab"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/dialog_project_info_name"
+            app:layout_constraintTop_toTopOf="@id/dialog_project_info_name"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <!-- Schedule Label -->
+        <TextView
+            android:id="@+id/info_dialog_schedule_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/large"
+            android:text="@string/schedule_label"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dialog_project_info_name_label" />
+        <!-- Schedule Field -->
+        <TextView
+            android:id="@+id/info_dialog_schedule_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/medium"
+            android:textStyle="italic"
+            app:layout_constraintStart_toEndOf="@id/info_dialog_schedule_label"
+            app:layout_constraintTop_toTopOf="@id/info_dialog_schedule_label"
+            tools:text="none" />
+
+        <!-- Tags Label -->
+        <TextView
+            android:id="@+id/dialog_tags_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/large"
+            android:text="@string/tags_label"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/info_dialog_schedule_label" />
+
+        <!-- Tags Field -->
+        <TextView
+            android:id="@+id/dialog_information_tags"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/medium"
+            android:layout_marginEnd="@dimen/medium"
+            android:layout_marginBottom="@dimen/medium"
+            android:alpha="0.5"
+            android:ellipsize="end"
+            android:maxLines="8"
+            android:scrollHorizontally="true"
+            android:textColor="@color/colorTag"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/dialog_info_dismiss"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/dialog_tags_label"
+            app:layout_constraintTop_toTopOf="@id/dialog_tags_label"
+            tools:text="#tag" />
+
+        <TextView
+            android:id="@+id/dialog_info_dismiss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:minWidth="@dimen/touch_target_min"
+            android:minHeight="@dimen/touch_target_min"
+            android:text="@string/ok"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- Edit name image -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/edit_project_name_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:fabSize="mini"
-        app:backgroundTint="@color/white"
-        android:layout_marginStart="@dimen/medium"
-        android:src="@drawable/ic_edit_black_24dp"
-        app:layout_constraintStart_toEndOf="@id/info_dialog_name_id_layout"
-        app:layout_constraintBottom_toBottomOf="@id/info_dialog_name_id_layout"/>
-
-    <!-- Schedule Label -->
-    <TextView
-        android:id="@+id/info_dialog_schedule_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/large"
-        android:layout_marginStart="@dimen/medium"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:text="@string/schedule_label"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/info_dialog_name_id_layout"/>
-    <!-- Schedule Field -->
-    <TextView
-        android:id="@+id/info_dialog_schedule_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/medium"
-        android:textStyle="italic"
-        app:layout_constraintStart_toEndOf="@id/info_dialog_schedule_label"
-        app:layout_constraintTop_toTopOf="@id/info_dialog_schedule_label"
-        tools:text="none" />
-
-    <!-- Tags Label -->
-    <TextView
-        android:id="@+id/dialog_tags_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/large"
-        android:layout_marginStart="@dimen/medium"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:text="@string/tags_label"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/info_dialog_schedule_label" />
-
-    <!-- Tags Field -->
-    <TextView
-        android:id="@+id/dialog_information_tags"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorTag"
-        android:layout_marginEnd="@dimen/medium"
-        android:layout_marginBottom="@dimen/medium"
-        android:layout_marginStart="@dimen/medium"
-        android:alpha="0.5"
-        app:layout_constraintStart_toEndOf="@id/dialog_tags_label"
-        app:layout_constraintTop_toTopOf="@id/dialog_tags_label"
-        app:layout_constraintBottom_toTopOf="@id/dialog_info_dismiss"
-        tools:text="#tag"
-        />
-
-    <TextView
-        android:id="@+id/dialog_info_dismiss"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:minWidth="@dimen/touch_target_min"
-        android:minHeight="@dimen/touch_target_min"
-        android:text="@string/ok"
-        android:textColor="@color/colorAccent"
-        android:textStyle="bold" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
