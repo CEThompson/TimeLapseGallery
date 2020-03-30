@@ -385,8 +385,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private fun showBlinkingRotate(){
         val animation: Animation = AlphaAnimation(1f, 0f) //to change visibility from visible to invisible
-        animation.duration = 500 //1 second duration for each animation cycle
-        animation.interpolator = LinearInterpolator()
+        animation.duration = 400 //1 second duration for each animation cycle
+        //animation.interpolator = LinearInterpolator()
+
         animation.repeatCount = Animation.INFINITE //repeating indefinitely
         animation.repeatMode = Animation.REVERSE //animation will start from end point once ended.
         binding?.rotationIndicator?.startAnimation(animation)

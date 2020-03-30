@@ -19,6 +19,7 @@
         android:scaleType="fitCenter"
         android:contentDescription="@string/fullscreen_image_content_description"/>
 
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fullscreen_back_fab"
         android:contentDescription="@string/fullscreen_back_fab_content_description"
@@ -37,7 +38,9 @@
         android:layout_height="wrap_content"
         app:fabSize="mini"
         android:layout_margin="@dimen/detail_small_margin"
-        app:backgroundTint="@color/darkImagePlaceHolder"
+        app:elevation="0dp"
+        app:pressedTranslationZ="0dp"
+        app:backgroundTint="@android:color/transparent"
         android:src="@drawable/ic_fullscreen_exit_white_24dp"
         android:layout_gravity="bottom|end"/>
 
