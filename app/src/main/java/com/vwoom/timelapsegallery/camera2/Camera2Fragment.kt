@@ -18,7 +18,6 @@ import android.util.Size
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
@@ -53,7 +52,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val args: Camera2FragmentArgs by navArgs()
 
-    private val cameraId: String by lazy {args.cameraId}
+    private val cameraId: String by lazy { args.cameraId }
 
     // Camera variables
     private val cameraManager: CameraManager by lazy {
