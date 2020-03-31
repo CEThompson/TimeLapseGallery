@@ -87,7 +87,7 @@ object FileUtils {
             externalFilesDir: File,
             tempPath: String,
             projectEntry: ProjectEntry,
-            timestamp: Long, exifOrientation: Int?): File {
+            timestamp: Long): File {
         // Create the permanent file for the photo
         val finalFile = createImageFileForProject(externalFilesDir, projectEntry, timestamp)
         // Create temporary file from previous path
@@ -96,13 +96,6 @@ object FileUtils {
         copy(tempFile, finalFile)
         // Remove temporary file
         tempFile.delete()
-
-        if (exifOrientation!=null) {
-            val exif = ExifInterface(finalFile.absolutePath)
-            exif.setAttribute(ExifInterface.TAG_ORIENTATION, exifOrientation.toString())
-            Log.d(TAG, "writing exif orientation $exifOrientation")
-            exif.saveAttributes()
-        }
 
         return finalFile
     }

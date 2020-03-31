@@ -21,8 +21,7 @@ class PhotoRepository private constructor(private val photoDao: PhotoDao,
 
     suspend fun addPhotoToProject(file: File,
                                   externalFilesDir: File,
-                                  project: Project,
-                                  exifOrientation: Int?){
+                                  project: Project){
         val timestamp = System.currentTimeMillis()
         val photoEntry = PhotoEntry(project.project_id, timestamp)
         val photoId = photoDao.insertPhoto(photoEntry)
@@ -33,7 +32,7 @@ class PhotoRepository private constructor(private val photoDao: PhotoDao,
         val projectEntry = projectDao.getProjectById(project.project_id)
 
         withContext(Dispatchers.IO) {
-            FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp, exifOrientation)
+            FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
         }
     }
 

@@ -131,7 +131,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
                 // TODO write exif data for saved image
                 takePictureJob = lifecycleScope.launchIdling {
-                    camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir, ExifInterface.ORIENTATION_NORMAL)
+                    camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir)
                     findNavController().popBackStack()
                 }
             } catch (e: Exception) {
