@@ -128,7 +128,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap, 0, 0, viewFinder.bitmap.width, viewFinder.bitmap.height, matrix, true)
                 adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
 
-                // TODO write exif data for saved image
+                // TODO: (update 1.2) consider writing exif data for saved image
                 takePictureJob = lifecycleScope.launchIdling {
                     camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir)
                     findNavController().popBackStack()
