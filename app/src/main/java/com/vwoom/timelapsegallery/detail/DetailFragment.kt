@@ -63,6 +63,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
+import kotlin.properties.Delegates
 
 // TODO: (update 1.2) use NDK to implement converting photo sets to .gif and .mp4/.mov etc
 // TODO: (update 1.2) implement pinch zoom on fullscreen image
@@ -74,6 +75,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     // Database
     private var mExternalFilesDir: File? = null
+
+    private var mPlaybackInterval by Delegates.notNull<Long>()
 
     // Photo and project Information
     private var mPhotos: List<PhotoEntry>? = null
@@ -120,6 +123,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mCurrentProject = args.clickedProject
+        mPlaybackInterval = getString(R.string.playback_interval_default).toLong()
         mExternalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
         val sharedElemTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
@@ -226,6 +230,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding = FragmentDetailBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
+
+        // Get the playback interval from the shared preferences
+        val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
+        mPlaybackInterval = playbackIntervalSharedPref!!.toLong()
 
         // Set up toolbar
         setHasOptionsMenu(true)
@@ -351,10 +360,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mDetailAdapter?.setCurrentPhoto(photoEntry)
 
         // Get the image path, handle orientation indicator and load the image
-        val imagePath = FileUtils.getPhotoUrl(
-                mExternalFilesDir!!,
-                getEntryFromProject(mCurrentProject!!),
-                photoEntry.timestamp)
+        val imagePath = FileUtils.getPhotoUrl(mExternalFilesDir!!, getEntryFromProject(mCurrentProject!!), photoEntry.timestamp)
         if (!mPlaying) handleOrientationIndicator(imagePath)
         loadImage(imagePath)
 
@@ -366,22 +372,24 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // If playing do not update the individual photo info (skip the rest)
         if (mPlaying) return
-
-        // Get info for the current photo
-        val timestamp = photoEntry.timestamp
-        val photosInProject: Int = mPhotos!!.size
-        Log.d(TAG, "photoNumber is $photoNumber")
-        Log.d(TAG, "photosInProject is $photosInProject")
-        // Get formatted strings
-        val photoNumberString = getString(R.string.details_photo_number_out_of, photoNumber, photosInProject)
-        val date = TimeUtils.getDateFromTimestamp(timestamp)
-        val day = TimeUtils.getDayFromTimestamp(timestamp)
-        val time = TimeUtils.getTimeFromTimestamp(timestamp)
-        // Set the info
-        binding?.detailsPhotoNumberTv?.text = photoNumberString
-        binding?.detailsPhotoDateTv?.text = date
-        binding?.detailsPhotoDayTv?.text = day
-        binding?.detailsPhotoTimeTv?.text = time
+        // Otherwise update photo information
+        else {
+            // Get info for the current photo
+            val timestamp = photoEntry.timestamp
+            val photosInProject: Int = mPhotos!!.size
+            Log.d(TAG, "photoNumber is $photoNumber")
+            Log.d(TAG, "photosInProject is $photosInProject")
+            // Get formatted strings
+            val photoNumberString = getString(R.string.details_photo_number_out_of, photoNumber, photosInProject)
+            val date = TimeUtils.getDateFromTimestamp(timestamp)
+            val day = TimeUtils.getDayFromTimestamp(timestamp)
+            val time = TimeUtils.getTimeFromTimestamp(timestamp)
+            // Set the info
+            binding?.detailsPhotoNumberTv?.text = photoNumberString
+            binding?.detailsPhotoDateTv?.text = date
+            binding?.detailsPhotoDayTv?.text = day
+            binding?.detailsPhotoTimeTv?.text = time
+        }
     }
 
     private fun showBlinkingRotate(){
@@ -494,10 +502,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
         binding?.playAsVideoFab?.setImageResource(R.drawable.ic_stop_white_24dp)
 
-        // Get the playback interval from the shared preferences
-        val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), "50")
-        val playbackInterval = playbackIntervalSharedPref!!.toLong()
 
         // Override the play position to beginning if currently already at the end
         if (mCurrentPlayPosition == mPhotos!!.size - 1) {
@@ -507,7 +511,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // Actually schedule the sequence via recursive function
         binding?.imageLoadingProgress?.progress = mCurrentPlayPosition!!
-        scheduleLoadPhoto(mCurrentPlayPosition!!, playbackInterval) // Recursively loads the rest of set from beginning
+        scheduleLoadPhoto(mCurrentPlayPosition!!) // Recursively loads the rest of set from beginning
 
         // Track play button interaction
         mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_play_time_lapse), null)
@@ -525,7 +529,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         fadeInPhotoInformation()
     }
 
-    private fun scheduleLoadPhoto(position: Int, interval: Long) {
+    private fun scheduleLoadPhoto(position: Int) {
         Log.d("DetailsFragment", "schedule loading position $position")
         if (position < 0 || position >= mPhotos!!.size) {
             stopPlaying()
@@ -535,14 +539,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mCurrentPlayPosition = position
 
         playJob = detailViewModel.viewModelScope.launch {
-            delay(interval)
+            delay(mPlaybackInterval)
             // If image is loaded load the next photo
             if (mImageIsLoaded) {
                 detailViewModel.nextPhoto()
                 binding?.imageLoadingProgress?.progress = position + 1
-                scheduleLoadPhoto(position + 1, interval)
+                scheduleLoadPhoto(position + 1)
             } else {
-                scheduleLoadPhoto(position, interval)
+                scheduleLoadPhoto(position)
             }
         }
     }
