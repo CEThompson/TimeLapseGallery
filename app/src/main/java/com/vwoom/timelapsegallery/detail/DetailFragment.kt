@@ -851,7 +851,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
             // Keep track of maximum index number
             detailViewModel.maxIndex = photoEntries.size - 1
-            // If the observable is firing because a photo was deleted, recover the current photo from the index
+            // If the observable is firing because a photo was deleted or initial start
+            // recover the current photo from the index or set it to last
+            if (mCurrentPhoto == null) detailViewModel.photoIndex = detailViewModel.maxIndex
             mCurrentPhoto = photoEntries[detailViewModel.photoIndex]
 
             // 1. Set the last photo to pass to the camera fragment.
