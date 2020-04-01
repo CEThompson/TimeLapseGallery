@@ -36,7 +36,7 @@
             app:layout_constraintBottom_toBottomOf="@id/project_info_exit_fab"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/project_info_exit_fab"
-            app:layout_constraintVertical_bias="0" />
+            app:layout_constraintVertical_bias="0.5" />
 
         <!-- Id Label -->
         <TextView
@@ -140,7 +140,8 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/info_dialog_schedule_label" />
+            app:layout_constraintTop_toBottomOf="@+id/info_dialog_schedule_label"
+            app:layout_constraintBottom_toTopOf="@id/dialog_info_dismiss"/>
 
         <!-- Tags Field -->
         <TextView
@@ -158,6 +159,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/dialog_info_dismiss"
             app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintVertical_bias="0"
             app:layout_constraintStart_toEndOf="@id/dialog_tags_label"
             app:layout_constraintTop_toTopOf="@id/dialog_tags_label"
             tools:text="#tag" />
