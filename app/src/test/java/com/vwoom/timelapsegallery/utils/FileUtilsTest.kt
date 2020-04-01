@@ -83,8 +83,7 @@ class FileUtilsTest {
                 externalFilesTestDir,
                 tempFile.absolutePath,
                 projectEntry,
-                timestamp,
-                null)
+                timestamp)
 
         // Then the temp file should have been deleted
         assert(!tempFile.exists())
