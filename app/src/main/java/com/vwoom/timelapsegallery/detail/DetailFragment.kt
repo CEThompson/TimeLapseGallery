@@ -849,6 +849,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // This also keeps track of the list of photos to pass to the details recycler view
         // Lastly this updates UI showing the date range for photos and the progress bar max
         detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
+            // Keep track of maximum index number
+            detailViewModel.maxIndex = photoEntries.size - 1
+
             // 1. Set the last photo to pass to the camera fragment.
             // Note: this is because photo passes the last photo url along with it as a parcelable
             val lastPhotoEntry = photoEntries.last()
@@ -868,6 +871,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 // Set the current photo to the last
                 mCurrentPhoto = lastPhotoEntry
                 detailViewModel.currentPhoto.value = lastPhotoEntry
+                detailViewModel.photoIndex = detailViewModel.maxIndex
 
                 // Set the cover photo to the last in the set
                 // This handles changing cover photo on deletion and addition
@@ -882,18 +886,19 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             // 3. Update the project info card view to show the range of dates the photos represent
             val firstTimestamp = mPhotos?.get(0)?.timestamp
             val firstProjectDateString = TimeUtils.getShortDateFromTimestamp(firstTimestamp!!)
-            val lastTimestamp = mPhotos?.get(mPhotos!!.size - 1)?.timestamp
+            val lastTimestamp = mPhotos?.get(detailViewModel.maxIndex)?.timestamp
             val lastProjectDateString = TimeUtils.getShortDateFromTimestamp(lastTimestamp!!)
             binding?.projectInformationLayout
                     ?.detailsProjectTimespanTextview?.text = getString(R.string.timespan, firstProjectDateString, lastProjectDateString)
 
             // 4. Update the progress bar
-            binding?.imageLoadingProgress?.max = mPhotos!!.size - 1
+            binding?.imageLoadingProgress?.max = detailViewModel.maxIndex
 
             // 5. Lastly if current photo isn't set for some reason, set it to the last photo
             if (detailViewModel.currentPhoto.value == null) {
-                mCurrentPhoto = mPhotos!![mPhotos!!.size-1]
+                mCurrentPhoto = mPhotos!!.last()
                 detailViewModel.currentPhoto.value = mCurrentPhoto
+                detailViewModel.photoIndex = detailViewModel.maxIndex
             }
         })
 
@@ -1098,7 +1103,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setMessage(R.string.verify_delete_photo)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    // If this photo is the last photo then set the new thumbnail to its previous
                     detailViewModel.deleteCurrentPhoto(mExternalFilesDir!!)
                 }
                 .setNegativeButton(android.R.string.no, null).show()

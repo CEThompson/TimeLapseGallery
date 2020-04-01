@@ -8,10 +8,8 @@ import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
-import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
-import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -39,6 +37,9 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
 
     // Play state
     private var isPlaying: Boolean = false
+
+    var photoIndex: Int = 0
+    var maxIndex: Int = 0
 
     fun setSchedule(externalFilesDir: File, project: Project, intervalInDays: Int){
         viewModelScope.launch {
@@ -76,24 +77,22 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
     fun nextPhoto(){
         if (isPlaying) return
         if (photos.value == null || photos.value!!.size <= 1) return
-        if (currentPhoto.value == null) return
-        val index: Int = photos.value!!.indexOf(currentPhoto.value!!)
-        if (index == photos.value!!.size - 1) return
-        currentPhoto.value = photos.value!!.get(index+1)
+        if (photoIndex == maxIndex) return
+        photoIndex += 1
+        currentPhoto.value = photos.value!![photoIndex]
     }
 
     fun previousPhoto(){
         if (isPlaying) return
-        if (photos.value == null || photos.value!!.size <= 0) return
-        if (currentPhoto.value == null) return
-        val index: Int = photos.value!!.indexOf(currentPhoto.value!!)
-        if (index == 0) return
-        currentPhoto.value = photos.value!!.get(index-1)
-
+        if (photos.value == null || photos.value!!.isEmpty()) return
+        if (photoIndex == 0) return
+        photoIndex -= 1
+        currentPhoto.value = photos.value!![photoIndex]
     }
 
     fun setPhoto(photoEntry: PhotoEntry) {
         currentPhoto.value = photoEntry
+        photoIndex = photos.value!!.indexOf(photoEntry)
     }
 
     fun setCoverPhoto(photoEntry: PhotoEntry) {
@@ -114,7 +113,14 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
 
     fun deleteCurrentPhoto(externalFilesDir: File){
         viewModelScope.launch {
-            photoRepository.deletePhoto(externalFilesDir, currentPhoto.value!!)
+            // First get the next photo entry to display
+            val currentPhotoEntry: PhotoEntry = currentPhoto.value ?: return@launch
+            val nextPhoto: PhotoEntry? = photos.value?.get(photoIndex + 1)
+
+            // Delete the current entry
+            photoRepository.deletePhoto(externalFilesDir, currentPhotoEntry)
+            // Set the current to the next so the observables fire
+            currentPhoto.value = nextPhoto
         }
     }
 
