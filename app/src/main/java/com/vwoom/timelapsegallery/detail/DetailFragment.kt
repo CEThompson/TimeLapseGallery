@@ -529,7 +529,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
         binding?.playAsVideoFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
-
+        loadUi(mCurrentPhoto!!)
         fadeInPhotoInformation()
     }
 
@@ -851,6 +851,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
             // Keep track of maximum index number
             detailViewModel.maxIndex = photoEntries.size - 1
+            // If the observable is firing because a photo was deleted, recover the current photo from the index
+            mCurrentPhoto = photoEntries[detailViewModel.photoIndex]
 
             // 1. Set the last photo to pass to the camera fragment.
             // Note: this is because photo passes the last photo url along with it as a parcelable
@@ -870,9 +872,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             if (lastPhotoChanged) {
                 // Set the current photo to the last
                 mCurrentPhoto = lastPhotoEntry
-                detailViewModel.currentPhoto.value = lastPhotoEntry
                 detailViewModel.photoIndex = detailViewModel.maxIndex
-
                 // Set the cover photo to the last in the set
                 // This handles changing cover photo on deletion and addition
                 detailViewModel.setCoverPhoto(lastPhotoEntry)
@@ -880,8 +880,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
             // 2. Send the list of photos to the adapter
             mDetailAdapter?.setPhotoData(mPhotos, mCurrentProject)
+
             // Restore the play position
-            mCurrentPlayPosition = mPhotos?.indexOf(mCurrentPhoto)
+            mCurrentPlayPosition = mPhotos?.indexOf(mCurrentPhoto!!)
 
             // 3. Update the project info card view to show the range of dates the photos represent
             val firstTimestamp = mPhotos?.get(0)?.timestamp
@@ -895,11 +896,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             binding?.imageLoadingProgress?.max = detailViewModel.maxIndex
 
             // 5. Lastly if current photo isn't set for some reason, set it to the last photo
-            if (detailViewModel.currentPhoto.value == null) {
+            if (mCurrentPhoto == null) {
                 mCurrentPhoto = mPhotos!!.last()
                 detailViewModel.currentPhoto.value = mCurrentPhoto
                 detailViewModel.photoIndex = detailViewModel.maxIndex
             }
+
+            // Override the current photo in the view model so that the observable fires and loads the UI
+            detailViewModel.currentPhoto.value = mCurrentPhoto
+            // Then update the adapter so the current photo is outlined in the frames recycler view
+            mDetailAdapter?.setCurrentPhoto(mCurrentPhoto)
         })
 
         // Observes the currently selected photo

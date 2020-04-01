@@ -115,12 +115,12 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
         viewModelScope.launch {
             // First get the next photo entry to display
             val currentPhotoEntry: PhotoEntry = currentPhoto.value ?: return@launch
-            val nextPhoto: PhotoEntry? = photos.value?.get(photoIndex + 1)
+
+            if (photoIndex == maxIndex) photoIndex--
 
             // Delete the current entry
             photoRepository.deletePhoto(externalFilesDir, currentPhotoEntry)
-            // Set the current to the next so the observables fire
-            currentPhoto.value = nextPhoto
+
         }
     }
 
