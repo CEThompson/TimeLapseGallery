@@ -279,7 +279,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mTagDialog?.show()
             detailViewModel.tagDialogShowing = true
         }
-        binding?.projectInformationFab?.setOnClickListener {
+        binding?.projectInformationLayout?.projectInformationCardview?.setOnClickListener {
             if (mInfoDialog == null) initializeInfoDialog()
             mInfoDialog?.show()
             detailViewModel.infoDialogShowing = true

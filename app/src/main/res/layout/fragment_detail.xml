@@ -42,21 +42,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 />
 
-            <!-- project management FAB -->
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/project_information_fab"
-                android:contentDescription="@string/project_information_fab_management_content_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:backgroundTint="@color/white"
-                android:src="@drawable/ic_info_outline_black_24dp"
-                app:borderWidth="0dp"
-                app:fabSize="mini"
-                app:layout_constraintTop_toBottomOf="@id/project_tag_fab"
-                app:layout_constraintEnd_toEndOf="parent"
-                />
-
             <!-- schedule management FAB -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/project_schedule_fab"
@@ -67,7 +52,7 @@
                 android:src="@drawable/ic_date_range_black_24dp"
                 app:borderWidth="0dp"
                 app:fabSize="mini"
-                app:layout_constraintTop_toBottomOf="@id/project_information_fab"
+                app:layout_constraintTop_toBottomOf="@id/project_tag_fab"
                 app:layout_constraintEnd_toEndOf="parent"
                 />
 
@@ -83,9 +68,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/project_information_layout"
                 app:layout_constraintBottom_toTopOf="@+id/image_loading_progress"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-
-                >
+                app:layout_constraintStart_toStartOf="parent">
 
                 <!-- Constraint layout used to dynamically resize the photo -->
                 <androidx.constraintlayout.widget.ConstraintLayout

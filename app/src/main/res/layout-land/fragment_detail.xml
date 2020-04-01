@@ -37,24 +37,10 @@
                 android:src="@drawable/ic_hashtag"
                 app:borderWidth="0dp"
                 app:fabSize="mini"
-                app:layout_constraintTop_toBottomOf="@id/project_information_layout"
-                app:layout_constraintEnd_toEndOf="@id/project_information_layout"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 />
 
-            <!-- project info FAB -->
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/project_information_fab"
-                android:contentDescription="@string/project_information_fab_management_content_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:backgroundTint="@color/white"
-                android:src="@drawable/ic_info_outline_black_24dp"
-                app:borderWidth="0dp"
-                app:fabSize="mini"
-                app:layout_constraintTop_toBottomOf="@id/project_information_layout"
-                app:layout_constraintEnd_toStartOf="@id/project_tag_fab"
-                />
 
             <!-- schedule management FAB -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -66,7 +52,7 @@
                 android:src="@drawable/ic_date_range_black_24dp"
                 app:borderWidth="0dp"
                 app:fabSize="mini"
-                app:layout_constraintTop_toTopOf="@id/details_card_container"
+                app:layout_constraintTop_toBottomOf="@id/project_tag_fab"
                 app:layout_constraintEnd_toEndOf="parent"
                 />
 

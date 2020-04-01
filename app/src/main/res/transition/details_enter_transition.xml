@@ -22,7 +22,6 @@
             <target android:targetId="@id/project_information_layout"/>
             <target android:targetId="@id/project_schedule_fab"/>
             <target android:targetId="@id/project_tag_fab"/>
-            <target android:targetId="@id/project_information_fab"/>
         </targets>
     </fade>
 
