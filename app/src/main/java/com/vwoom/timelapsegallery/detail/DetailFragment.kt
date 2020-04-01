@@ -574,6 +574,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         editNameButton?.setOnClickListener { editName() }
         val tagsTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
         tagsTextView?.setOnClickListener {
+            if (mTagDialog == null) initializeTagDialog()
             mTagDialog?.show()
             detailViewModel.tagDialogShowing = true
         }
