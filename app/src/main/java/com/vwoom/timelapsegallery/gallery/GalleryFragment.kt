@@ -68,6 +68,24 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     // prevent double clicking
     private var mLastClickTime: Long? = null
 
+    private lateinit var galleryExitTransition: Transition
+    private lateinit var galleryReenterTransition: Transition
+    private val reenterListener = object : Transition.TransitionListener {
+        override fun onTransitionEnd(transition: Transition?) {
+        }
+        override fun onTransitionCancel(transition: Transition?) {
+        }
+        override fun onTransitionStart(transition: Transition?) {
+            val fadeInAnimation = AlphaAnimation(0f, 1f)
+            fadeInAnimation.duration = 375
+            binding?.galleryRecyclerView?.startAnimation(fadeInAnimation)
+        }
+        override fun onTransitionPause(transition: Transition?) {
+        }
+        override fun onTransitionResume(transition: Transition?) {
+        }
+    }
+
     override fun onPause() {
         super.onPause()
         mSearchDialog?.dismiss()
@@ -89,31 +107,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         binding = null
     }
 
-    // TODO figure out why fading stops working after adding a project
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val reenter = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
-        reenter.addListener(object : Transition.TransitionListener {
-            override fun onTransitionEnd(transition: Transition?) {
-            }
-
-            override fun onTransitionCancel(transition: Transition?) {
-            }
-
-            override fun onTransitionStart(transition: Transition?) {
-                val fadeInAnimation = AlphaAnimation(0f, 1f)
-                fadeInAnimation.duration = 375
-                binding?.galleryRecyclerView?.startAnimation(fadeInAnimation)
-            }
-
-            override fun onTransitionPause(transition: Transition?) {
-            }
-
-            override fun onTransitionResume(transition: Transition?) {
-            }
-        })
-        exitTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
-        reenterTransition = reenter
+        galleryReenterTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
+        galleryReenterTransition.addListener(reenterListener)
+        galleryExitTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
+        exitTransition = galleryExitTransition
+        reenterTransition = galleryReenterTransition
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -163,8 +163,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Set up navigation to add new projects
         mAddProjectFAB = binding?.addProjectFAB
         mAddProjectFAB?.setOnClickListener {
-            exitTransition = null // When navigating to the camera skip the fade out animation
-            reenterTransition = null // also skip fade in on return
+            // Skip the gallery fade out transition When navigating to the camera
+            exitTransition = null
+            reenterTransition = null
+            // Send the camera ID to the camera fragment or notify the user if no camera available
             val cameraId = PhotoUtils.findCamera(requireContext())
             if (cameraId == null){
                 Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
@@ -327,19 +329,23 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private fun setupViewModel() {
         // Observe projects
         mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer {
-            // When the size of the list of projects increases assume we have added a project
-            if (mPrevProjectsSize != null && mPrevProjectsSize!! < it.size) {
-                // Then scroll to the end
+            // Detect if we have added a project and scroll to the end
+            // If the size of the current list is larger a project has been added
+            val projectHasBeenAdded = (mPrevProjectsSize!= null && mPrevProjectsSize!! < it.size)
+            if (projectHasBeenAdded) {
                 mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.displayedProjects.size)
             }
+            // Keep track of number of projects
             mPrevProjectsSize = it.size
+
+            // Update the displayed projects in the gallery
             mGalleryViewModel.viewModelScope.launch {
                 mGalleryViewModel.displayedProjects = mGalleryViewModel.filterProjects()
                 mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
             }
         })
 
-        // Observe tags
+        // Watch the tags to update the search dialog
         mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer {
             updateSearchDialog()
         })
@@ -408,9 +414,14 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     override fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int) {
-        // Prevents multiple clicks which cause a crash
+        // Prevents multiple clicks
         if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 250) return
         mLastClickTime = SystemClock.elapsedRealtime()
+
+        // Restore the exit transition if it has been nullified by navigating to the add project fab
+        if (exitTransition == null)
+            exitTransition = galleryExitTransition
+        if (reenterTransition == null) reenterTransition = galleryReenterTransition
 
         // Navigate to the detail fragment
         val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProject, position)
