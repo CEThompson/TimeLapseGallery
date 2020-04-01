@@ -89,6 +89,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         binding = null
     }
 
+    // TODO figure out why fading stops working after adding a project
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val reenter = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
