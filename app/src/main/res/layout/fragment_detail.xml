@@ -238,7 +238,7 @@
             android:contentDescription="@string/play_as_video_fab_content_description"
             android:src="@drawable/ic_play_arrow_white_24dp"
             app:borderWidth="0dp"
-            app:fabSize="normal"
+            app:fabCustomSize="50dp"
             />
 
         <!-- FAB to add a new photo -->
