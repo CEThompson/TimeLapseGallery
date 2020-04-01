@@ -1156,6 +1156,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         NotificationUtils.scheduleNotificationWorker(requireContext())
                         UpdateWidgetService.startActionUpdateWidgets(requireContext())
                     }
+                    sharedElementReturnTransition = null
                     findNavController().popBackStack()
                 }
                 .setNegativeButton(android.R.string.no, null).show()
