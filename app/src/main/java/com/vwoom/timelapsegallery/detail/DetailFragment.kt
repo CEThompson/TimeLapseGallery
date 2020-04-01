@@ -20,6 +20,7 @@ import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.*
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
@@ -392,32 +393,35 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-    private fun showBlinkingRotate(){
-        val animation: Animation = AlphaAnimation(1f, 0f) //to change visibility from visible to invisible
+
+    private val blinkAnimation: Animation by lazy {
+        val animation: Animation = AlphaAnimation(0f, 1f) //to change visibility from visible to invisible
         animation.duration = 400 //.4 second duration for each animation cycle
-        //animation.interpolator = LinearInterpolator()
         animation.repeatCount = Animation.INFINITE //repeating indefinitely
         animation.repeatMode = Animation.REVERSE //animation will start from end point once ended.
-        binding?.rotationIndicator?.startAnimation(animation)
-        binding?.rotationIndicator?.visibility = VISIBLE
+        animation
+    }
+    private val stopAnimation: Animation by lazy {
+        val animation: Animation = AlphaAnimation(1f, 0f)
+        animation.duration = 0
+        animation
     }
 
-    private fun stopBlinkingRotate(){
-        binding?.rotationIndicator?.visibility = INVISIBLE
-    }
 
     private fun handleOrientationIndicator(imagePath: String) {
         // Detect configuration
         val imageIsLandscape = PhotoUtils.isLandscape(imagePath)
-        val deviceIsPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        val deviceIsLandscape = !deviceIsPortrait
-        val imageIsPortrait = !imageIsLandscape
-        // If device is portrait and image is landscape show the indicator
-        if (deviceIsPortrait && imageIsLandscape)  showBlinkingRotate()
-        else stopBlinkingRotate()
-        // If the device is landscape and the image is portrait show the indactor
-        if (deviceIsLandscape && imageIsPortrait) showBlinkingRotate()
-        else stopBlinkingRotate()
+        val deviceIsLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+        // If landscape device and image (true == true) or portrait device and image (false == false)
+        // Do not display the indicator
+        if (imageIsLandscape == deviceIsLandscape)  {
+            binding?.rotationIndicator?.startAnimation(stopAnimation)
+        }
+        // Otherwise show the blinking indicator
+        else {
+            binding?.rotationIndicator?.startAnimation(blinkAnimation)
+        }
     }
 
     // Loads an image into the main photo view
