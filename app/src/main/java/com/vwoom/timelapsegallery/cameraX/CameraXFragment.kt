@@ -130,7 +130,8 @@ class CameraXFragment : Fragment(), LifecycleOwner {
                 .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                 .build()
 
-        preview?.setSurfaceProvider(previewView?.previewSurfaceProvider)
+        // TODO test out new camera set up
+        //preview?.setSurfaceProvider(previewView.previewSurfaceProvider)
 
         // Build the image capture use case and attach button click listener
         val imageCapture = ImageCapture.Builder()
@@ -166,6 +167,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         cameraProviderFuture.addListener(Runnable {
             val cameraProvider = cameraProviderFuture.get()
             val camera = cameraProvider.bindToLifecycle(this, cameraSelector, imageCapture, preview)
+            preview?.setSurfaceProvider(previewView?.createSurfaceProvider(camera.cameraInfo))
             setUpTapToFocus(display, cameraSelector, camera)
         }, ContextCompat.getMainExecutor(requireContext()))
     }
