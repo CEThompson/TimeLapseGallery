@@ -16,6 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
+            android:layout_margin="@dimen/medium"
             android:alpha=".9"
             android:gravity="start"
             android:text="@string/tag_deletion_instruction"
@@ -85,11 +86,9 @@
             android:inputType="text"
             android:minWidth="180dp"
             android:singleLine="true"
-            app:layout_constraintEnd_toStartOf="@id/add_tag_fab"
             app:layout_constraintBottom_toBottomOf="@id/add_tag_fab"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/add_tag_fab"
-            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintVertical_bias="0.5"
             tools:text="#newtag" />
 
@@ -98,6 +97,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/large"
+            android:layout_marginBottom="@dimen/medium"
             android:src="@drawable/ic_add_white_24dp"
             app:fabSize="mini"
             android:layout_marginStart="@dimen/medium"
