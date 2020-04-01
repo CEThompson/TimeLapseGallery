@@ -201,7 +201,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onPause() {
         super.onPause()
         // Cancel any jobs
-        playJob?.cancel()
+        if (mPlaying) stopPlaying()
         tagJob?.cancel()
 
         // Dismiss any dialogs
