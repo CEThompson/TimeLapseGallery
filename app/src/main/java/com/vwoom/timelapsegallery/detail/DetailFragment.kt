@@ -849,65 +849,47 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // This also keeps track of the list of photos to pass to the details recycler view
         // Lastly this updates UI showing the date range for photos and the progress bar max
         detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
-            // Keep track of maximum index number
-            detailViewModel.maxIndex = photoEntries.size - 1
-            // If the observable is firing because a photo was deleted or initial start
-            // recover the current photo from the index or set it to last
-            if (mCurrentPhoto == null) detailViewModel.photoIndex = detailViewModel.maxIndex
-            mCurrentPhoto = photoEntries[detailViewModel.photoIndex]
-
-            // 1. Set the last photo to pass to the camera fragment.
-            // Note: this is because photo passes the last photo url along with it as a parcelable
+            // Update the recycler view
+            mPhotos = photoEntries
+            mDetailAdapter?.setPhotoData(mPhotos, mCurrentProject)
+            // Bind cover photo to the end of the list always
             val lastPhotoEntry = photoEntries.last()
             detailViewModel.setLastPhotoByEntry(mExternalFilesDir!!, mCurrentProject!!, lastPhotoEntry)
-
-            // Detect if the last photo changed from previous assignment
-            val lastPhotoChanged = (mPhotos!=null && lastPhotoEntry != mPhotos!!.last())
-
-            // NOTE: setting mPhotos here because of a timing issue,
-            // otherwise the current photo listener fires triggering a method which uses mPhotos incorrect value
-            // causing the photo number to read wrong on return to fragment from the camera
-            mPhotos = photoEntries
-
-            // If the last photo changed we want to update it as the current photo
-            // and make sure to set it as the cover photo
-            if (lastPhotoChanged) {
-                // Set the current photo to the last
-                mCurrentPhoto = lastPhotoEntry
-                detailViewModel.photoIndex = detailViewModel.maxIndex
-                // Set the cover photo to the last in the set
-                // This handles changing cover photo on deletion and addition
-                detailViewModel.setCoverPhoto(lastPhotoEntry)
-            }
-
-            // 2. Send the list of photos to the adapter
-            mDetailAdapter?.setPhotoData(mPhotos, mCurrentProject)
-
-            // Restore the play position
-            mCurrentPlayPosition = mPhotos?.indexOf(mCurrentPhoto!!)
-
-            // 3. Update the project info card view to show the range of dates the photos represent
-            val firstTimestamp = mPhotos?.get(0)?.timestamp
-            val firstProjectDateString = TimeUtils.getShortDateFromTimestamp(firstTimestamp!!)
-            val lastTimestamp = mPhotos?.get(detailViewModel.maxIndex)?.timestamp
-            val lastProjectDateString = TimeUtils.getShortDateFromTimestamp(lastTimestamp!!)
+            detailViewModel.setCoverPhoto(lastPhotoEntry)
+            // Update the UI based upon the range of photo dates
+            val firstTimestamp = photoEntries[0].timestamp
+            val firstProjectDateString = TimeUtils.getShortDateFromTimestamp(firstTimestamp)
+            val lastTimestamp = photoEntries.last().timestamp
+            val lastProjectDateString = TimeUtils.getShortDateFromTimestamp(lastTimestamp)
             binding?.projectInformationLayout
                     ?.detailsProjectTimespanTextview?.text = getString(R.string.timespan, firstProjectDateString, lastProjectDateString)
+            binding?.imageLoadingProgress?.max = photoEntries.size-1
 
-            // 4. Update the progress bar
-            binding?.imageLoadingProgress?.max = detailViewModel.maxIndex
 
-            // 5. Lastly if current photo isn't set for some reason, set it to the last photo
-            if (mCurrentPhoto == null) {
-                mCurrentPhoto = mPhotos!!.last()
-                detailViewModel.currentPhoto.value = mCurrentPhoto
-                detailViewModel.photoIndex = detailViewModel.maxIndex
+            // Now figure out whether or not a photo was added or deleted to determine the new current photo
+            val newMaxIndex = photoEntries.size - 1
+            val oldMaxIndex = detailViewModel.maxIndex
+            val previousSize = oldMaxIndex + 1
+            val currentSize = photoEntries.size
+            val added: Boolean = (currentSize > previousSize)
+
+            lateinit var newCurrentPhoto: PhotoEntry
+            // If added set to the last photo
+            if (added){
+                newCurrentPhoto = lastPhotoEntry
+                detailViewModel.photoIndex = newMaxIndex
+            }
+            // If deleted, set current photo
+            else {
+                newCurrentPhoto = photoEntries[detailViewModel.photoIndex]
             }
 
-            // Override the current photo in the view model so that the observable fires and loads the UI
-            detailViewModel.currentPhoto.value = mCurrentPhoto
-            // Then update the adapter so the current photo is outlined in the frames recycler view
-            mDetailAdapter?.setCurrentPhoto(mCurrentPhoto)
+            // Restore the play position
+            mCurrentPlayPosition = mPhotos?.indexOf(newCurrentPhoto)
+            // Load the current photo
+            detailViewModel.currentPhoto.value = newCurrentPhoto
+            // Make sure to save the position of the max index in the view model
+            detailViewModel.maxIndex = newMaxIndex
         })
 
         // Observes the currently selected photo
