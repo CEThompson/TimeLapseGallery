@@ -9,7 +9,7 @@ import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
-import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
+import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -69,7 +69,7 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
     fun setLastPhotoByEntry(externalFilesDir: File, project: Project, entry: PhotoEntry){
         val url = FileUtils.getPhotoUrl(
                 externalFilesDir,
-                getEntryFromProject(project),
+                getProjectEntryFromProjectView(project),
                 entry.timestamp)
         lastPhoto = Photo(entry.project_id, entry.id, entry.timestamp, url)
     }

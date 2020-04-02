@@ -20,7 +20,6 @@ import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.*
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.view.animation.LinearInterpolator
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
@@ -54,7 +53,7 @@ import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
-import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
+import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
@@ -89,6 +88,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     // Dialogs
     private var mFullscreenImageDialog: Dialog? = null
+    private var fullscreenImageBottom: ImageView? = null
+    private var fullscreenImageTop: ImageView? = null
     private var mTagDialog: Dialog? = null
     private var mInfoDialog: Dialog? = null
     private var mScheduleDialog: Dialog? = null
@@ -331,7 +332,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     val photoFile = File(FileUtils
                             .getPhotoUrl(
                                     mExternalFilesDir!!,
-                                    getEntryFromProject(mCurrentProject!!),
+                                    getProjectEntryFromProjectView(mCurrentProject!!),
                                     mCurrentPhoto!!.timestamp))
                     Log.d(TAG, photoFile.absolutePath)
                     putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile))
@@ -356,12 +357,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     private fun loadUi(photoEntry: PhotoEntry) { // Set the fullscreen image dialogue to the current photo
-        if (!mPlaying) setFullscreenImage()
         // Notify the adapter: this updates the detail recycler view red highlight indicator
         mDetailAdapter?.setCurrentPhoto(photoEntry)
 
         // Get the image path, handle orientation indicator and load the image
-        val imagePath = FileUtils.getPhotoUrl(mExternalFilesDir!!, getEntryFromProject(mCurrentProject!!), photoEntry.timestamp)
+        val imagePath = FileUtils.getPhotoUrl(mExternalFilesDir!!, getProjectEntryFromProjectView(mCurrentProject!!), photoEntry.timestamp)
         if (!mPlaying) handleOrientationIndicator(imagePath)
         loadImage(imagePath)
 
@@ -427,9 +427,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Loads an image into the main photo view
     private fun loadImage(imagePath: String) {
         mImageIsLoaded = false // this set to true after load image pair completes
-        // Load the image
+        // Load the image to the fullscreen dialog if it is showing or to the detail cardview otherwise
         val f = File(imagePath)
-        loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
+        if (mFullscreenImageDialog?.isShowing == true) {
+            loadImagePair(f, fullscreenImageBottom!!, fullscreenImageTop!!)
+        } else {
+            loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
+            // if we are not playing preload the fullscreen image for the user
+            // so that they do not have to wait for image load
+            if (!mPlaying) setFullscreenImage()
+        }
     }
 
     // TODO: (update 1.2) re-evaluate and speed up image loading
@@ -502,10 +509,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // Handle UI
         fadeOutPhotoInformation()
-        binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
-        binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
-        binding?.playAsVideoFab?.setImageResource(R.drawable.ic_stop_white_24dp)
-
+        setFabStatePlaying()
 
         // Override the play position to beginning if currently already at the end
         if (mCurrentPlayPosition == mPhotos!!.size - 1) {
@@ -521,14 +525,31 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_play_time_lapse), null)
     }
 
+    private fun setFabStatePlaying() {
+        binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
+        binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
+        binding?.playAsVideoFab?.setImageResource(R.drawable.ic_stop_white_24dp)
+        val fullscreenPlayFab = mFullscreenImageDialog?.findViewById<FloatingActionButton>(R.id.fullscreen_play_fab)
+        fullscreenPlayFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
+        fullscreenPlayFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
+        fullscreenPlayFab?.setImageResource(R.drawable.ic_stop_white_24dp)
+    }
+    private fun setFabStateStopped() {
+        binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
+        binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
+        binding?.playAsVideoFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
+        val fullscreenPlayFab = mFullscreenImageDialog?.findViewById<FloatingActionButton>(R.id.fullscreen_play_fab)
+        fullscreenPlayFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
+        fullscreenPlayFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
+        fullscreenPlayFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
+    }
+
     // Resets the UI & handles state after playing
     private fun stopPlaying() { // Set color of play fab
         playJob?.cancel()
         mPlaying = false
         binding?.imageLoadingProgress?.progress = mCurrentPlayPosition ?: 0
-        binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-        binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
-        binding?.playAsVideoFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
+        setFabStateStopped()
         loadUi(mCurrentPhoto!!)
         fadeInPhotoInformation()
     }
@@ -722,28 +743,35 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mFullscreenImageDialog = Dialog(requireContext(), R.style.Theme_AppCompat_Light_NoActionBar_FullScreen)
         mFullscreenImageDialog?.setCancelable(false)
         mFullscreenImageDialog?.setContentView(R.layout.dialog_fullscreen_image)
-        val mFullscreenExitFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_exit_fab)
-        val mFullscreenBackFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_back_fab)
+        fullscreenImageBottom = mFullscreenImageDialog?.findViewById(R.id.fullscreen_image_bottom)
+        fullscreenImageTop = mFullscreenImageDialog?.findViewById(R.id.fullscreen_image_top)
+        val fullscreenExitFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_exit_fab)
+        val fullscreenBackFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_back_fab)
+        val fullscreenPlayFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_play_fab)
+        // Init color of play fab
+        fullscreenPlayFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
+        fullscreenPlayFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
         // Display the dialog on clicking the image
-        mFullscreenBackFab?.setOnClickListener {
+        fullscreenPlayFab?.setOnClickListener { playSetOfImages() }
+        fullscreenBackFab?.setOnClickListener {
+            stopPlaying()
             mFullscreenImageDialog?.dismiss()
-            detailViewModel.fullscreenDialogShowing = false
         }
-        mFullscreenExitFab?.setOnClickListener {
+        fullscreenExitFab?.setOnClickListener {
+            stopPlaying()
             mFullscreenImageDialog?.dismiss()
-            detailViewModel.fullscreenDialogShowing = false
         }
         mFullscreenImageDialog?.setOnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_BACK) {
+                stopPlaying()
                 mFullscreenImageDialog?.dismiss()
-                detailViewModel.fullscreenDialogShowing = false
             }
             true
         }
+        mFullscreenImageDialog?.setOnDismissListener { detailViewModel.fullscreenDialogShowing = false }
         // Set a listener to change the current photo on swipe
-        val fullscreenImage = mFullscreenImageDialog?.findViewById<ImageView>(R.id.fullscreen_image_bottom)
         @Suppress("ClickableViewAccessibility")
-        fullscreenImage?.setOnTouchListener(mOnSwipeTouchListener)
+        fullscreenImageBottom?.setOnTouchListener(mOnSwipeTouchListener)
         setFullscreenImage()
     }
 
@@ -757,13 +785,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         if (mCurrentPhoto == null) return
         val path = FileUtils.getPhotoUrl(
                 mExternalFilesDir!!,
-                getEntryFromProject(mCurrentProject!!),
+                getProjectEntryFromProjectView(mCurrentProject!!),
                 mCurrentPhoto!!.timestamp)
         val current = File(path)
-        val bottomImage = mFullscreenImageDialog?.findViewById<ImageView>(R.id.fullscreen_image_bottom)
-        val topImage = mFullscreenImageDialog?.findViewById<ImageView>(R.id.fullscreen_image_top)
-        if (bottomImage != null && topImage != null)
-            loadImagePair(current, bottomImage, topImage)
+        loadImagePair(current, fullscreenImageBottom!!, fullscreenImageTop!!)
     }
     
     private fun setupViewModel() {

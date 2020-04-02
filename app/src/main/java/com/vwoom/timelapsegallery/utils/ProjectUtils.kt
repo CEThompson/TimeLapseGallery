@@ -13,7 +13,7 @@ import java.util.*
 object ProjectUtils {
     private val TAG = ProjectUtils::class.java.simpleName
 
-    fun getEntryFromProject(project: Project): ProjectEntry = ProjectEntry(project.project_id, project.project_name)
+    fun getProjectEntryFromProjectView(project: Project): ProjectEntry = ProjectEntry(project.project_id, project.project_name)
 
     // Used to bundle a project with the number of photos in it
     // Passed to the project import utility

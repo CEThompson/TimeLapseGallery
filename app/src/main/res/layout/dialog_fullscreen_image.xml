@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
@@ -19,6 +19,16 @@
         android:scaleType="fitCenter"
         android:contentDescription="@string/fullscreen_image_content_description"/>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fullscreen_play_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabSize="mini"
+        android:layout_margin="@dimen/small"
+        android:src="@drawable/ic_play_arrow_white_24dp"
+        app:layout_constraintBottom_toTopOf="@id/fullscreen_exit_fab"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fullscreen_back_fab"
@@ -29,7 +39,8 @@
         android:layout_margin="@dimen/detail_small_margin"
         app:backgroundTint="@color/colorSubtleRedAccent"
         android:src="@drawable/ic_arrow_back_white_24dp"
-        android:layout_gravity="top|start"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fullscreen_exit_fab"
@@ -41,7 +52,8 @@
         app:elevation="0dp"
         app:pressedTranslationZ="0dp"
         app:backgroundTint="@android:color/transparent"
-        android:src="@drawable/ic_fullscreen_exit_white_24dp"
-        android:layout_gravity="bottom|end"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/ic_fullscreen_exit_white_24dp" />
 
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

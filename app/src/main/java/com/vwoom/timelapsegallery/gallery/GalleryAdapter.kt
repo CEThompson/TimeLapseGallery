@@ -5,8 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.*
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -17,7 +15,7 @@ import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.gallery.GalleryAdapter.GalleryAdapterViewHolder
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
-import com.vwoom.timelapsegallery.utils.ProjectUtils.getEntryFromProject
+import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 import java.util.*
@@ -116,7 +114,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         for (project in projectData) {
             val photoUrl = FileUtils.getPhotoUrl(
                     externalFilesDir,
-                    getEntryFromProject(project),
+                    getProjectEntryFromProjectView(project),
                     project.cover_photo_timestamp)
             val ratio = PhotoUtils.getAspectRatioFromImagePath(photoUrl)
             val file = File(photoUrl)
