@@ -1,7 +1,7 @@
 ﻿# Time Lapse Gallery 1.1
 
 ### Overview
-An open-source android application for managing a gallery of time-lapse photo projects.
+An open-source android application for creating a gallery of time-lapse photo projects.
 
 ### 1.1
 
