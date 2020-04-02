@@ -8,7 +8,6 @@ import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.ProjectTagRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Project
-import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import java.util.*
 import kotlin.collections.ArrayList
@@ -46,7 +45,7 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
 
         if (searchTags.isNotEmpty()) {
             resultProjects = resultProjects.filter {
-                val projectTags: List<ProjectTagEntry> = projectTagRepository.getProjectTags_nonLiveData(it.project_id)
+                val projectTags: List<ProjectTagEntry> = projectTagRepository.getProjectTags(it.project_id)
                 val tagEntriesForProject: List<TagEntry> = tagRepository.getTagsFromProjectTags(projectTags)
 
                 // Include projects with tags included in the search filter

@@ -1,12 +1,10 @@
 package com.vwoom.timelapsegallery.utils
 
 import android.util.Log
-import androidx.exifinterface.media.ExifInterface
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.data.view.Project
 import java.io.*
 import java.util.*
 
@@ -33,7 +31,7 @@ object FileUtils {
         return File(externalFilesDir, projectPath)
     }
 
-    fun getMetaDirectoryForProject(externalFilesDir: File, projectId: Long): File{
+    fun getMetaDirectoryForProject(externalFilesDir: File, projectId: Long): File {
         val metaDir = File(externalFilesDir, META_FILE_SUBDIRECTORY)
         val projectSubfolder = File(metaDir, projectId.toString())
         projectSubfolder.mkdirs()
@@ -139,7 +137,7 @@ object FileUtils {
     private fun deleteRecursive(fileOrFileDirectory: File) {
         if (fileOrFileDirectory.isDirectory) {
             val files = fileOrFileDirectory.listFiles()
-            if (files!=null)
+            if (files != null)
                 for (child in files) {
                     deleteRecursive(child)
                 }
@@ -168,7 +166,7 @@ object FileUtils {
 
     // Returns true if a path contain a reserved character
     fun pathContainsReservedCharacter(path: String): Boolean {
-        for (character in RESERVED_CHARACTERS){
+        for (character in RESERVED_CHARACTERS) {
             if (path.contains(character)) return true
         }
         return false
@@ -188,7 +186,7 @@ object FileUtils {
 
         lateinit var photoFile: File
         // Try the timestamp to various file formats, i.e. timestamp.jpeg, timestamp.png, timestamp.jpg
-        for (fileName in imageFileNames){
+        for (fileName in imageFileNames) {
             photoFile = File(projectDir, fileName)
             if (photoFile.exists()) return photoFile.absolutePath
         }
@@ -196,11 +194,14 @@ object FileUtils {
     }
 
     fun getPhotoFileNames(timestamp: Long): Array<String> {
-        return arrayOf("$timestamp.jpg","$timestamp.png","$timestamp.jpeg")
+        return arrayOf("$timestamp.jpg", "$timestamp.png", "$timestamp.jpeg")
     }
 
     // TODO: (update 1.2) determine how to handle output stream writer exceptions for writing project tags and project schedule
-    fun writeProjectTagsFile(externalFilesDir: File, projectId: Long, tags: List<TagEntry>){
+    fun writeProjectTagsFile(
+            externalFilesDir: File,
+            projectId: Long,
+            tags: List<TagEntry>) {
         val metaDir = getMetaDirectoryForProject(externalFilesDir, projectId)
         val tagsFile = File(metaDir, TAGS_DEFINITION_TEXT_FILE)
 
@@ -219,10 +220,12 @@ object FileUtils {
         }
     }
 
-    fun writeProjectScheduleFile(externalFilesDir: File, projectId: Long, projectScheduleEntry: ProjectScheduleEntry){
+    fun writeProjectScheduleFile(
+            externalFilesDir: File,
+            projectId: Long,
+            projectScheduleEntry: ProjectScheduleEntry) {
         val metaDir = getMetaDirectoryForProject(externalFilesDir, projectId)
         val scheduleFile = File(metaDir, SCHEDULE_TEXT_FILE)
-
         Log.d(TAG, "writing schedule file")
         try {
             val output = FileOutputStream(scheduleFile)

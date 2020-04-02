@@ -26,7 +26,7 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
     val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
     var lastPhoto: Photo? = null
     val photos: LiveData<List<PhotoEntry>> = photoRepository.getPhotos(projectId)
-    val projectTags: LiveData<List<ProjectTagEntry>> = projectTagRepository.getProjectTags(projectId)
+    val projectTags: LiveData<List<ProjectTagEntry>> = projectTagRepository.getProjectTagsLiveData(projectId)
     val tags: LiveData<List<TagEntry>> = tagRepository.getTags()
 
     // Dialog state
