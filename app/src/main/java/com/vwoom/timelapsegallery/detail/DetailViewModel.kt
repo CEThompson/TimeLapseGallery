@@ -27,7 +27,7 @@ class DetailViewModel(private val photoRepository: PhotoRepository,
     var lastPhoto: Photo? = null
     val photos: LiveData<List<PhotoEntry>> = photoRepository.getPhotos(projectId)
     val projectTags: LiveData<List<ProjectTagEntry>> = projectTagRepository.getProjectTagsLiveData(projectId)
-    val tags: LiveData<List<TagEntry>> = tagRepository.getTags()
+    val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
 
     // Dialog state
     var fullscreenDialogShowing: Boolean = false

@@ -23,7 +23,7 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
                                             private val tagRepository: TagRepository,
                                             private val projectTagRepository: ProjectTagRepository) : ViewModel() {
     val projects: LiveData<List<Project>> = projectRepository.getProjectViews()
-    val tags: LiveData<List<TagEntry>> = tagRepository.getTags()
+    val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
 
     // search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
