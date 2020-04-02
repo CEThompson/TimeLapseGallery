@@ -114,6 +114,20 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Analytics
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
+    // Animations for orientation indicator
+    private val blinkAnimation: Animation by lazy {
+        val animation: Animation = AlphaAnimation(0f, 1f) //to change visibility from visible to invisible
+        animation.duration = 400 //.4 second duration for each animation cycle
+        animation.repeatCount = Animation.INFINITE //repeating indefinitely
+        animation.repeatMode = Animation.REVERSE //animation will start from end point once ended.
+        animation
+    }
+    private val stopAnimation: Animation by lazy {
+        val animation: Animation = AlphaAnimation(1f, 0f)
+        animation.duration = 0
+        animation
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mCurrentProject = args.clickedProject
@@ -128,13 +142,17 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 fadeInAnimation.duration = 300
                 binding?.photoInformationLayout?.startAnimation(fadeInAnimation)
             }
+
             override fun onTransitionCancel(transition: Transition?) {
             }
+
             override fun onTransitionStart(transition: Transition?) {
                 binding?.fullscreenFab?.hide()
             }
+
             override fun onTransitionPause(transition: Transition?) {
             }
+
             override fun onTransitionResume(transition: Transition?) {
             }
         })
@@ -144,26 +162,134 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         postponeEnterTransition()
     }
 
-    // Animates the information for the current photo to fade in
-    private fun fadeInPhotoInformation() {
-        if (binding == null) return
-        binding!!.detailScheduleLayout.galleryGradientTopDown.animate().alpha(1f)
-        binding!!.detailScheduleLayout.scheduleIndicatorIntervalTv.animate().alpha(1f)
-        binding!!.detailScheduleLayout.scheduleDaysUntilDueTv.animate().alpha(1f)
-        binding!!.photoInformationLayout.animate().alpha(1f)
-        binding!!.fullscreenFab.show()
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentDetailBinding.inflate(inflater, container, false).apply {
+            lifecycleOwner = viewLifecycleOwner
+        }
+
+        // Initialize the playback interval from the shared preferences
+        val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
+        mPlaybackInterval = playbackIntervalSharedPref?.toLong() ?: 50
+
+        // Set up toolbar
+        setHasOptionsMenu(true)
+        toolbar = binding?.detailsFragmentToolbar
+        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
+        toolbar?.title = getString(R.string.project_details)
+        (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        // Set up adapter and recycler view
+        mDetailAdapter = DetailAdapter(this, mExternalFilesDir!!)
+        val linearLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding?.detailsRecyclerview?.layoutManager = linearLayoutManager
+        binding?.detailsRecyclerview?.adapter = mDetailAdapter
+
+        // 1. Initialize the color of the play as video fab
+        // NOTE: this is not set in XML because setting by xml seems to lock the value of the color
+        binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
+        binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
+
+        // 2. Set the click listeners
+        binding?.addPhotoFab?.setOnClickListener {
+            val cameraId = PhotoUtils.findCamera(requireContext())
+            if (cameraId == null) {
+                Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
+            } else {
+                val action = DetailFragmentDirections
+                        .actionDetailsFragmentToCamera2Fragment(cameraId, detailViewModel.lastPhoto, mCurrentProject)
+                findNavController().navigate(action)
+            }
+        }
+        binding?.playAsVideoFab?.setOnClickListener { playSetOfImages() }
+        binding?.projectScheduleFab?.setOnClickListener {
+            if (mScheduleDialog == null) initializeScheduleDialog()
+            mScheduleDialog?.show()
+            detailViewModel.scheduleDialogShowing = true
+        }
+        binding?.projectTagFab?.setOnClickListener {
+            if (mTagDialog == null) initializeTagDialog()
+            mTagDialog?.show()
+            detailViewModel.tagDialogShowing = true
+        }
+        binding?.projectInformationLayout?.projectInformationCardview?.setOnClickListener {
+            if (mInfoDialog == null) initializeInfoDialog()
+            mInfoDialog?.show()
+            detailViewModel.infoDialogShowing = true
+        }
+        binding?.fullscreenFab?.setOnClickListener {
+            if (mFullscreenImageDialog == null) initializeFullscreenImageDialog()
+            if (!mPlaying) {
+                mFullscreenImageDialog?.show()
+                detailViewModel.fullscreenDialogShowing = true
+            }
+        }
+        // Set a swipe listener for the image
+        mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
+        @Suppress("ClickableViewAccessibility")
+        binding?.detailCurrentImage?.setOnTouchListener(mOnSwipeTouchListener)
+
+        // Set the transition tags
+        val transitionName = "${mCurrentProject!!.project_id}"
+        val cardTransitionName = "${transitionName}card"
+        val bottomTransitionName = "${transitionName}bottomGradient"
+        val topTransitionName = "${transitionName}topGradient"
+        val dueTransitionName = "${transitionName}due"
+        val intervalTransitionName = "${transitionName}interval"
+        binding?.detailCurrentImage?.transitionName = transitionName
+        binding?.detailsCardContainer?.transitionName = cardTransitionName
+        binding?.detailsGradientOverlay?.transitionName = bottomTransitionName
+        binding?.detailScheduleLayout?.galleryGradientTopDown?.transitionName = topTransitionName
+        binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.transitionName = dueTransitionName
+        binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.transitionName = intervalTransitionName
+
+        // Finally set up the observables
+        setupViewModel()
+
+        return binding?.root
     }
 
-    // Animates the information for the current photo to fade out
-    private fun fadeOutPhotoInformation() {
-        if (binding == null) return
-        binding!!.detailScheduleLayout.galleryGradientTopDown.animate().alpha(0f)
-        binding!!.detailScheduleLayout.scheduleIndicatorIntervalTv.animate().alpha(0f)
-        binding!!.detailScheduleLayout.scheduleDaysUntilDueTv.animate().alpha(0f)
-        binding!!.photoInformationLayout.animate().alpha(0f)
-        binding!!.fullscreenFab.hide()
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.detail_fragment_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.share -> {
+                val shareIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    type = "image/jpeg"
+                    val photoFile = File(FileUtils
+                            .getPhotoUrl(
+                                    mExternalFilesDir!!,
+                                    getProjectEntryFromProjectView(mCurrentProject!!),
+                                    mCurrentPhoto!!.timestamp))
+                    Log.d(TAG, photoFile.absolutePath)
+                    putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile))
+                }
+                startActivity(Intent.createChooser(shareIntent, "Share Image"))
+                true
+            }
+            R.id.delete_photo -> {
+                if (mPhotos?.size == 1) {
+                    verifyLastPhotoDeletion()
+                } else {
+                    verifyPhotoDeletion()
+                }
+                true
+            }
+            R.id.delete_project -> {
+                verifyProjectDeletion()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    /**
+     * Lifecycle
+     */
     override fun onStart() {
         super.onStart()
         binding?.detailsFragmentToolbar?.setNavigationOnClickListener {
@@ -223,134 +349,32 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         toolbar = null
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentDetailBinding.inflate(inflater, container, false).apply {
-            lifecycleOwner = viewLifecycleOwner
-        }
+    /**
+     * Photo information and loading methods
+     */
 
-        // Initialize the playback interval from the shared preferences
-        val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
-        mPlaybackInterval = playbackIntervalSharedPref?.toLong() ?: 50
-
-        // Set up toolbar
-        setHasOptionsMenu(true)
-        toolbar = binding?.detailsFragmentToolbar
-        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
-        toolbar?.title = getString(R.string.project_details)
-        (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        // Set up adapter and recycler view
-        mDetailAdapter = DetailAdapter(this, mExternalFilesDir!!)
-        val linearLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-
-        binding?.detailsRecyclerview?.layoutManager = linearLayoutManager
-        binding?.detailsRecyclerview?.adapter = mDetailAdapter
-
-        // 1. Initialize the color of the play as video fab
-        // NOTE: this is not set in XML because setting by xml seems to lock the value of the color
-        binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-        binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
-
-        // 2. Set the click listeners
-        binding?.addPhotoFab?.setOnClickListener {
-            val cameraId = PhotoUtils.findCamera(requireContext())
-            if (cameraId == null) {
-                Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
-            } else {
-                val action = DetailFragmentDirections
-                        .actionDetailsFragmentToCamera2Fragment(cameraId, detailViewModel.lastPhoto, mCurrentProject)
-                findNavController().navigate(action)
-            }
-        }
-        binding?.playAsVideoFab?.setOnClickListener { playSetOfImages() }
-        binding?.projectScheduleFab?.setOnClickListener {
-            if (mScheduleDialog == null) initializeScheduleDialog()
-            mScheduleDialog?.show()
-            detailViewModel.scheduleDialogShowing = true
-        }
-        binding?.projectTagFab?.setOnClickListener {
-            if (mTagDialog == null) initializeTagDialog()
-            mTagDialog?.show()
-            detailViewModel.tagDialogShowing = true
-        }
-        binding?.projectInformationLayout?.projectInformationCardview?.setOnClickListener {
-            if (mInfoDialog == null) initializeInfoDialog()
-            mInfoDialog?.show()
-            detailViewModel.infoDialogShowing = true
-        }
-        binding?.fullscreenFab?.setOnClickListener {
-            if (mFullscreenImageDialog == null) initializeFullscreenImageDialog()
-
-            if (!mPlaying) {
-                mFullscreenImageDialog?.show()
-                detailViewModel.fullscreenDialogShowing = true
-            }
-        }
-
-        // Set a swipe listener for the image
-        mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
-        @Suppress("ClickableViewAccessibility")
-        binding?.detailCurrentImage?.setOnTouchListener(mOnSwipeTouchListener)
-
-        // Set the transition name for the image
-        val transitionName = "${mCurrentProject!!.project_id}"
-        val cardTransitionName = "${transitionName}card"
-        val bottomTransitionName = "${transitionName}bottomGradient"
-        val topTransitionName = "${transitionName}topGradient"
-        val dueTransitionName = "${transitionName}due"
-        val intervalTransitionName = "${transitionName}interval"
-        binding?.detailCurrentImage?.transitionName = transitionName
-        binding?.detailsCardContainer?.transitionName = cardTransitionName
-        binding?.detailsGradientOverlay?.transitionName = bottomTransitionName
-        binding?.detailScheduleLayout?.galleryGradientTopDown?.transitionName = topTransitionName
-        binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.transitionName = dueTransitionName
-        binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.transitionName = intervalTransitionName
-
-        setupViewModel()
-
-        return binding?.root
+    // Animates the information for the current photo to fade in
+    private fun fadeInPhotoInformation() {
+        if (binding == null) return
+        binding!!.detailScheduleLayout.galleryGradientTopDown.animate().alpha(1f)
+        binding!!.detailScheduleLayout.scheduleIndicatorIntervalTv.animate().alpha(1f)
+        binding!!.detailScheduleLayout.scheduleDaysUntilDueTv.animate().alpha(1f)
+        binding!!.photoInformationLayout.animate().alpha(1f)
+        binding!!.fullscreenFab.show()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.detail_fragment_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
+    // Animates the information for the current photo to fade out
+    private fun fadeOutPhotoInformation() {
+        if (binding == null) return
+        binding!!.detailScheduleLayout.galleryGradientTopDown.animate().alpha(0f)
+        binding!!.detailScheduleLayout.scheduleIndicatorIntervalTv.animate().alpha(0f)
+        binding!!.detailScheduleLayout.scheduleDaysUntilDueTv.animate().alpha(0f)
+        binding!!.photoInformationLayout.animate().alpha(0f)
+        binding!!.fullscreenFab.hide()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.share -> {
-                val shareIntent: Intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    type = "image/jpeg"
-                    val photoFile = File(FileUtils
-                            .getPhotoUrl(
-                                    mExternalFilesDir!!,
-                                    getProjectEntryFromProjectView(mCurrentProject!!),
-                                    mCurrentPhoto!!.timestamp))
-                    Log.d(TAG, photoFile.absolutePath)
-                    putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile))
-                }
-                startActivity(Intent.createChooser(shareIntent, "Share Image"))
-                true
-            }
-            R.id.delete_photo -> {
-                if (mPhotos?.size == 1) {
-                    verifyLastPhotoDeletion()
-                } else {
-                    verifyPhotoDeletion()
-                }
-                true
-            }
-            R.id.delete_project -> {
-                verifyProjectDeletion()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun loadUi(photoEntry: PhotoEntry) { // Set the fullscreen image dialogue to the current photo
+    // Updates the ui to a particular photo entry
+    private fun loadUi(photoEntry: PhotoEntry) {
         // Notify the adapter: this updates the detail recycler view red highlight indicator
         mDetailAdapter?.setCurrentPhoto(photoEntry)
 
@@ -387,21 +411,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-
-    private val blinkAnimation: Animation by lazy {
-        val animation: Animation = AlphaAnimation(0f, 1f) //to change visibility from visible to invisible
-        animation.duration = 400 //.4 second duration for each animation cycle
-        animation.repeatCount = Animation.INFINITE //repeating indefinitely
-        animation.repeatMode = Animation.REVERSE //animation will start from end point once ended.
-        animation
-    }
-    private val stopAnimation: Animation by lazy {
-        val animation: Animation = AlphaAnimation(1f, 0f)
-        animation.duration = 0
-        animation
-    }
-
-
+    // Handles whether or not to display an indicator showing that an image is in the wrong orientation
     private fun handleOrientationIndicator(imagePath: String) {
         // Detect configuration
         val imageIsLandscape = PhotoUtils.isLandscape(imagePath)
@@ -418,7 +428,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-    // Loads an image into the main photo view
+    // Loads an image into either the main photo view or the fullscreen dialog
     private fun loadImage(imagePath: String) {
         mImageIsLoaded = false // this set to true after load image pair completes
         // Load the image to the fullscreen dialog if it is showing or to the detail cardview otherwise
@@ -437,7 +447,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // This function loads an image into a top view, then loads an image into the bottom view and hides the top view
     // This makes 'playing' the images look seamless
     private fun loadImagePair(f: File, bottomImage: ImageView, topImage: ImageView) {
-        // 1. First load the image into the next image view on top of the current
+        // 1. The first glide call: First load the image into the next image view on top of the current
         Glide.with(this)
                 .load(f)
                 .listener(object : RequestListener<Drawable?> {
@@ -452,7 +462,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
                         // Show the just loaded image on the top
                         topImage.visibility = VISIBLE
-                        // 2. Then load the image into the current image on the bottom
+                        // 2. The second glide call: Then load the image into the current image on the bottom
                         Glide.with(requireContext())
                                 .load(f)
                                 .listener(object : RequestListener<Drawable?> {
@@ -480,7 +490,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .into(topImage)
     }
 
-
     // Loads the set of images in sequence
     private fun playSetOfImages() {
         // If already playing then stop
@@ -489,7 +498,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
             return
         }
-
         // If not enough photos give user feedback
         if (mPhotos!!.size <= 1) {
             Snackbar.make(binding!!.detailsCoordinatorLayout, R.string.add_more_photos,
@@ -501,18 +509,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Handle play state
         mPlaying = true
         mCurrentPlayPosition = mPhotos!!.indexOf(mCurrentPhoto)
-
         // Handle UI
         fadeOutPhotoInformation()
         setFabStatePlaying()
-
         // Override the play position to beginning if currently already at the end
         if (mCurrentPlayPosition == mPhotos!!.size - 1) {
             mCurrentPlayPosition = 0
             detailViewModel.setPhoto(mPhotos!![0])
         }
 
-        // Actually schedule the sequence via recursive function
+        // Schedule the recursive sequence
         binding?.imageLoadingProgress?.progress = mCurrentPlayPosition!!
         scheduleLoadPhoto(mCurrentPlayPosition!!) // Recursively loads the rest of set from beginning
 
@@ -520,6 +526,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_play_time_lapse), null)
     }
 
+    // Sets the two play buttons to red with a stop icon
     private fun setFabStatePlaying() {
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
@@ -530,6 +537,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         fullscreenPlayFab?.setImageResource(R.drawable.ic_stop_white_24dp)
     }
 
+    // Sets the two play buttons to green with a play icon
     private fun setFabStateStopped() {
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
@@ -550,15 +558,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         fadeInPhotoInformation()
     }
 
+    // Sets a coroutine to load the next photo every 50 ms, or whatever has been chosen from the shared preferences
     private fun scheduleLoadPhoto(position: Int) {
         Log.d("DetailsFragment", "schedule loading position $position")
         if (position < 0 || position >= mPhotos!!.size) {
             stopPlaying()
             return
         }
-
         mCurrentPlayPosition = position
-
         playJob = detailViewModel.viewModelScope.launch {
             delay(mPlaybackInterval)
             // If image is loaded load the next photo
@@ -566,18 +573,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 detailViewModel.nextPhoto()
                 binding?.imageLoadingProgress?.progress = position + 1
                 scheduleLoadPhoto(position + 1)
-            } else {
+            }
+            // Otherwise check again after the interval
+            else {
                 scheduleLoadPhoto(position)
             }
         }
     }
 
-    override fun onClick(clickedPhoto: PhotoEntry) {
-        detailViewModel.setPhoto(clickedPhoto)
-    }
-
     /**
-     * Dialog Methods
+     * Dialog Initialization Methods
      */
     private fun initializeInfoDialog() {
         mInfoDialog = Dialog(requireContext())
@@ -588,7 +593,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val editNameButton = mInfoDialog?.findViewById<FloatingActionButton>(R.id.edit_project_name_button)
         // Set fab colors
         editNameButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-        editNameButton?.setOnClickListener { editName() }
+        editNameButton?.setOnClickListener { verifyEditName() }
         val tagsTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
         tagsTextView?.setOnClickListener {
             if (mTagDialog == null) initializeTagDialog()
@@ -607,19 +612,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         setInfoDialog()
         setInfoTags()
-    }
-
-    private fun editName() {
-        val input = EditText(requireContext())
-        input.inputType = InputType.TYPE_CLASS_TEXT
-        AlertDialog.Builder(requireContext())
-                .setTitle(getString(R.string.edit_name))
-                .setView(input)
-                .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    val nameText = input.text.toString().trim()
-                    detailViewModel.updateProjectName(mExternalFilesDir!!, nameText, mCurrentProject!!)
-                }
-                .setNegativeButton(android.R.string.no, null).show()
     }
 
     private fun initializeTagDialog() {
@@ -655,15 +647,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             detailViewModel.tagDialogShowing = false
         }
         setProjectTagDialog()
-    }
-
-    private fun showTagValidationAlertDialog(message: String) {
-        AlertDialog.Builder(requireContext())
-                .setTitle(getString(R.string.invalid_tag))
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setMessage(message)
-                .setPositiveButton(android.R.string.ok) { _, _: Int ->
-                }.show()
     }
 
     private fun initializeScheduleDialog() {
@@ -725,7 +708,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             }
         }
 
-        // Dismiss
+        // Set up dismissing the dialog
         val okTextView = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_dismiss)
         okTextView?.setOnClickListener {
             mScheduleDialog?.dismiss()
@@ -779,21 +762,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     /**
-     * UI methods
+     * UI binding
      */
-
-    // Pre loads the selected image into the hidden dialogue so that display appears immediate
-    private fun setFullscreenImage() {
-        if (mFullscreenImageDialog == null) return
-        if (mCurrentPhoto == null) return
-        val path = FileUtils.getPhotoUrl(
-                mExternalFilesDir!!,
-                getProjectEntryFromProjectView(mCurrentProject!!),
-                mCurrentPhoto!!.timestamp)
-        val current = File(path)
-        loadImagePair(current, fullscreenImageBottom!!, fullscreenImageTop!!)
-    }
-
+    // Bind the ui to observables
     private fun setupViewModel() {
         // Observe the current selected project
         // This updates the project information card, project info dialog,
@@ -966,6 +937,19 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         })
     }
 
+    // Pre loads the selected image into the fullscreen dialogue
+    // This is so that the user can navigate to the fullscreen dialog without having to wait for image loading
+    private fun setFullscreenImage() {
+        if (mFullscreenImageDialog == null) return
+        if (mCurrentPhoto == null) return
+        val path = FileUtils.getPhotoUrl(
+                mExternalFilesDir!!,
+                getProjectEntryFromProjectView(mCurrentProject!!),
+                mCurrentPhoto!!.timestamp)
+        val current = File(path)
+        loadImagePair(current, fullscreenImageBottom!!, fullscreenImageTop!!)
+    }
+
     // This updates the tags in the project info dialog
     // This is distinct from set info dialog so that tags may be updated separately
     private fun setInfoTags(): String {
@@ -1082,6 +1066,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         else scheduleOutput?.text = getString(R.string.every_x_days, mCurrentProject!!.interval_days.toString())
     }
 
+    /**
+     * User input
+     */
     // Changes photo on swipe
     inner class OnSwipeTouchListener(ctx: Context?) : OnTouchListener {
         private val gestureDetector: GestureDetector
@@ -1123,9 +1110,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
+    // Sets the current photo from clicking on the bottom recycler view
+    override fun onClick(clickedPhoto: PhotoEntry) {
+        detailViewModel.setPhoto(clickedPhoto)
+    }
+
     /**
      * Dialog verifications
      */
+    // Ensures the user wishes to delete the current photo
     private fun verifyPhotoDeletion() {
         AlertDialog.Builder(requireContext())
                 .setTitle(R.string.delete_photo)
@@ -1137,6 +1130,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setNegativeButton(android.R.string.no, null).show()
     }
 
+    // Ensures the user wishes to delete the selected tag
     private fun verifyTagDeletion(tagEntry: TagEntry) {
         AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.delete_tag, tagEntry.text))
@@ -1149,6 +1143,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setNegativeButton(android.R.string.no, null).show()
     }
 
+    // If the photo is the last in the project, directs the user to deleting the project instead
     private fun verifyLastPhotoDeletion() {
         AlertDialog.Builder(requireContext())
                 .setTitle(R.string.delete_photo)
@@ -1172,7 +1167,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setNegativeButton(android.R.string.no, null).show()
     }
 
-    // Double verifies project deletion
+    // Provides an additional layer of verification for project deletion
     private fun doubleVerifyProjectDeletion() {
         AlertDialog.Builder(requireContext())
                 .setTitle(R.string.delete_project)
@@ -1189,6 +1184,31 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     findNavController().popBackStack()
                 }
                 .setNegativeButton(android.R.string.no, null).show()
+    }
+
+    // Verifies the user wishes to rename the project
+    // This will rename the folder the images are written to.
+    private fun verifyEditName() {
+        val input = EditText(requireContext())
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.edit_name))
+                .setView(input)
+                .setPositiveButton(android.R.string.yes) { _, _: Int ->
+                    val nameText = input.text.toString().trim()
+                    detailViewModel.updateProjectName(mExternalFilesDir!!, nameText, mCurrentProject!!)
+                }
+                .setNegativeButton(android.R.string.no, null).show()
+    }
+
+    // Gives user feedback on tags
+    private fun showTagValidationAlertDialog(message: String) {
+        AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.invalid_tag))
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok) { _, _: Int ->
+                }.show()
     }
 
     companion object {
