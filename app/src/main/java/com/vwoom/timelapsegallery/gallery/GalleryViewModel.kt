@@ -19,23 +19,28 @@ const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 
 class GalleryViewModel internal constructor(projectRepository: ProjectRepository,
                                             private val tagRepository: TagRepository) : ViewModel() {
+    // Tag Live Data
     val projects: LiveData<List<Project>> = projectRepository.getProjectViewsLiveData()
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
 
-    // search data
+    // Inputted search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
     var searchName: String = ""
     var searchType: String = SEARCH_TYPE_NONE
+
+    // The resulting projects
     var displayedProjects: List<Project> = listOf()
 
+    // State of user interaction
     var searchDialogShowing = false
-
     var userClickedToStopSearch = false
 
+    // Returns whether or not a tag was selected by the user
     fun tagSelected(tag: TagEntry): Boolean {
         return searchTags.contains(tag)
     }
 
+    // Filters the projects by the inputted search parameters
     suspend fun filterProjects(): List<Project> {
         if (projects.value == null) return listOf()
         var resultProjects = projects.value!!
@@ -48,7 +53,6 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
                 // Include projects with tags included in the search filter
                 for (tag in searchTags)
                     if (tagEntriesForProject.contains(tag)) return@filter true
-
                 return@filter false
             }
         }
