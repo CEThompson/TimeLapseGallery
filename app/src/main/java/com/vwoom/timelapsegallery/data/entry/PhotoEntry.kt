@@ -12,7 +12,7 @@ data class PhotoEntry(
         @ColumnInfo(index = true)
         var project_id: Long,
         var timestamp: Long) {
-    /* Getters *//* Setters */
+
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 
