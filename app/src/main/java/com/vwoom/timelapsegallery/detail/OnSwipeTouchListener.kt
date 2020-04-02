@@ -10,6 +10,11 @@ import kotlin.math.absoluteValue
 class OnSwipeTouchListener(ctx: Context?) : View.OnTouchListener {
     private val gestureDetector: GestureDetector
 
+    interface SwipeHandler {
+        fun onSwipeLeft()
+        fun onSwipeRight()
+    }
+
     @Suppress("ClickableViewAccessibility")
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         return gestureDetector.onTouchEvent(event)
@@ -29,9 +34,9 @@ class OnSwipeTouchListener(ctx: Context?) : View.OnTouchListener {
             if (diffX.absoluteValue > diffY.absoluteValue)
                 if (diffX.absoluteValue > swipeThreshold && velocityX.absoluteValue > swipeVelocityThreshold) {
                     if (diffX > 0) {
-                        //onSwipeRight()
+                        onSwipeRight()
                     } else {
-                        //onSwipeLeft()
+                        onSwipeLeft()
                     }
                     result = true
                 }
@@ -39,8 +44,8 @@ class OnSwipeTouchListener(ctx: Context?) : View.OnTouchListener {
         }
     }
 
-    //fun onSwipeRight() = detailViewModel.previousPhoto()
-    //fun onSwipeLeft() = detailViewModel.nextPhoto()
+    fun onSwipeRight() = detailViewModel.previousPhoto()
+    fun onSwipeLeft() = detailViewModel.nextPhoto()
 
     init {
         gestureDetector = GestureDetector(ctx, GestureListener())

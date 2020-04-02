@@ -227,14 +227,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     //binding!!.detailCurrentImage as View to "fullscreen_base_image",
                     binding!!.playAsVideoFab as View to "fs_play_fab")
             findNavController().navigate(action, extras)
-
-            /*
-            if (mFullscreenImageDialog == null) initializeFullscreenImageDialog()
-            if (!mPlaying) {
-                mFullscreenImageDialog?.show()
-                detailViewModel.fullscreenDialogShowing = true
-            }
-             */
         }
         // Set a swipe listener for the image
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())

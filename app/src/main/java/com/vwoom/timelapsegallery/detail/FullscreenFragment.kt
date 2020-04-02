@@ -48,11 +48,12 @@ class FullscreenFragment : Fragment() {
         position = args.position
         photos = args.photoUrls
 
-        val arraylist = arrayListOf<File>()
+        val arrayList = arrayListOf<File>()
         for (url in photos) {
-            arraylist.add(File(url))
+            arrayList.add(File(url))
         }
-        photoFiles = arraylist.toList()
+        photoFiles = arrayList.toList()
+
         val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
         playbackInterval = playbackIntervalSharedPref?.toLong() ?: 50
@@ -61,7 +62,6 @@ class FullscreenFragment : Fragment() {
         sharedElementEnterTransition = sharedElemTransition
         sharedElementReturnTransition = sharedElemTransition
         enterTransition = TransitionInflater.from(context).inflateTransition(R.transition.fullscreen_transition)
-        //exitTransition = TransitionInflater.from(context).inflateTransition(R.transition.fullscreen_transition)
         postponeEnterTransition()
     }
 
@@ -77,7 +77,6 @@ class FullscreenFragment : Fragment() {
         initializeFullscreenFragment()
     }
 
-    // TODO handle feedback when trying to play a set of 1 image within fullscreen dialog
     private fun initializeFullscreenFragment() {
         // Create the dialog
         // Init color of play fab
