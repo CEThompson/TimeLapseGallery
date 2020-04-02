@@ -24,7 +24,7 @@ object NotificationUtils {
     private const val CHANNEL_DESCRIPTION = "channel_description"
     private val TAG = NotificationUtils::class.java.simpleName
 
-    /* Creates a notification that launches the main activity and filters by todays scheduled projects */
+    /* Creates a notification that launches the main activity and filters by today's scheduled projects */
     @JvmStatic
     fun notifyUserOfScheduledProjects(context: Context, requestCode: Int) {
         Log.d(TAG, "Notification Tracker: Notifying user of scheduled projects for request code $requestCode")

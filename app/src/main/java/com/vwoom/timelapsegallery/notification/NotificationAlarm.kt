@@ -11,65 +11,84 @@ import com.vwoom.timelapsegallery.BuildConfig
 import com.vwoom.timelapsegallery.notification.NotificationUtils.clearPreviousNotifications
 import com.vwoom.timelapsegallery.notification.NotificationUtils.convertDayOfYearToNotificationTime
 import com.vwoom.timelapsegallery.notification.NotificationUtils.notifyUserOfScheduledProjects
+import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils
 import java.util.*
 
 class NotificationAlarm : BroadcastReceiver() {
-    /* This receives the pending intent broadcast and creates the notification */
+    // This receives the pending intent broadcast from the notification alarm and creates a notification
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(TAG, "Notification Tracker: Receiving intent to create notification")
+
         // Set up the wake lock
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val w1 = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG)
         val timeout: Long = 1000 // release wakelock after 1 second
         w1.acquire(timeout)
-        // Get the request code
+
+        // Get the request code which is the day of the year
         val requestCode = intent.getIntExtra(REQUEST_CODE, 0)
         Log.d(TAG, "Notification Tracker: Request code is $requestCode")
         Log.d(TAG, "Notification Tracker: Action type is " + intent.action)
         // Clear any previous notifications that are unused
         clearPreviousNotifications(context)
-        // Send the notification
-        notifyUserOfScheduledProjects(context, requestCode)
+
+        // Get the scheduled projects and figure out if any projects are due today
+        val projectRepo = InjectorUtils.getProjectRepository(context)
+        val scheduledProjects = projectRepo.getScheduledProjectViews()
+        val dueProjects = scheduledProjects.filter {
+            ProjectUtils.isProjectDueToday(it)
+        }
+
+        // TODO test and verify this
+        // If there are projects due today, send the notification
+        if (dueProjects.isNotEmpty()) notifyUserOfScheduledProjects(context, requestCode)
         // Release the wake lock
         w1.release()
     }
 
-    /* Set an alarm for tomorrow */
+    // Sets an alarm for tomorrow at the shared preference time
     fun setAlarmForTomorrow(context: Context) {
         Log.d(TAG, "Notification Tracker: Setting alarm for tomorrow")
+        // Get the day of the year and set it to the request code
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = System.currentTimeMillis()
         val today = calendar[Calendar.DAY_OF_YEAR]
         val requestCode = today + 1
+
+        // Create the pending intent to broadcast on that day
         Log.d(TAG, "Notification Tracker: Request code / day of year is $requestCode")
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        // Create the intent
         val intent = Intent(context, NotificationAlarm::class.java)
         intent.putExtra(REQUEST_CODE, requestCode)
         intent.action = CREATE_NOTIFICATION_AUTHORITY + requestCode
         val pendingIntent = PendingIntent
                 .getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        // Convert tomorrow into a timestamp at a set notification time
+
+        // Get the timestamp from the shared preference for the day at that notification time
         val timestampForTomorrow = convertDayOfYearToNotificationTime(requestCode, context)
+
+        // Set the alarm
         alarmManager[AlarmManager.RTC_WAKEUP, timestampForTomorrow] = pendingIntent
     }
 
-    /* Cancels an alarm by the day of year */
+    // Helper function that Cancels an alarm by the day of year
     private fun cancelAlarmByDay(context: Context, dayOfYear: Int) {
         Log.d(TAG, "Notification Tracker: Canceling alarm for day $dayOfYear")
-        // Set up the alarm manager
+
+        // Identify the alarm
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        // Create the intent
         val intent = Intent(context, NotificationAlarm::class.java)
-        // Note: intent action is modified by project id same as above
         intent.action = CREATE_NOTIFICATION_AUTHORITY + dayOfYear
-        // Create the pending intent identified by both request code and intent
+        // Create the pending intent to remove the alarm by day
         val sender = PendingIntent.getBroadcast(context, dayOfYear, intent, 0)
+
         // Now cancel the alarm
         alarmManager.cancel(sender)
     }
 
-    /* Cancels any alarms set for today or tomorrow */
+    // Cancels any alarms set for today or tomorrow
+    // This should be any alarms set
     fun cancelAlarms(context: Context) {
         Log.d(TAG, "Notification Tracker: Canceling alarms for today and tomorrow")
         val calendar = Calendar.getInstance()

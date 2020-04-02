@@ -34,6 +34,8 @@ class NotificationWorker(context: Context, params: WorkerParameters)
             return Result.success()
         }
 
+        // If there are projects due today or tomorrow schedule the alarm
+        // Note: when the alarm fires should check if projects have been taken care of before sending notification
         val dueProjects = scheduledProjects.filter {
             ProjectUtils.isProjectDueToday(it) || ProjectUtils.isProjectDueTomorrow(it)
         }
