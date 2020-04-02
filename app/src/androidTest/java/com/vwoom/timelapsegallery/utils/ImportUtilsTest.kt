@@ -8,6 +8,8 @@ import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.settings.ValidationResult
+import com.vwoom.timelapsegallery.utils.ImportUtils.validateFileStructure
+import com.vwoom.timelapsegallery.utils.ImportUtils.importProjects
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -19,7 +21,7 @@ import java.io.File
 import java.io.IOException
 
 @RunWith(AndroidJUnit4ClassRunner::class)
-class ProjectUtilsImportTest {
+class ImportUtilsTest {
 
     @Rule
     @JvmField
@@ -96,10 +98,10 @@ class ProjectUtilsImportTest {
                 ProjectScheduleEntry(3,3))
 
         // When: Projects are imported
-        val result = ProjectUtils.validateFileStructure(externalFilesTestDir)
-        assert(result is ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>)
-        val projectBundles = (result as ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>).data
-        runBlocking {ProjectUtils.importProjects(db, externalFilesTestDir, projectBundles, testing = true)}
+        val result = validateFileStructure(externalFilesTestDir)
+        assert(result is ValidationResult.Success<List<ImportUtils.ProjectDataBundle>>)
+        val projectBundles = (result as ValidationResult.Success<List<ImportUtils.ProjectDataBundle>>).data
+        runBlocking {importProjects(db, externalFilesTestDir, projectBundles, true)}
 
         // Then: Database should match file structure
         runBlocking {
@@ -156,7 +158,7 @@ class ProjectUtilsImportTest {
         externalFilesTestDir.deleteRecursively()
 
         // When
-        val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
+        val response = validateFileStructure(externalFilesTestDir)
 
         // Then
         assert(response is ValidationResult.Error.NoFilesError)
@@ -170,7 +172,7 @@ class ProjectUtilsImportTest {
         projectFile.mkdirs()
 
         // When
-        val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
+        val response = validateFileStructure(externalFilesTestDir)
 
         // Then
         assert(response is ValidationResult.Error.InvalidFolder)
@@ -187,7 +189,7 @@ class ProjectUtilsImportTest {
         photoFile.createNewFile()
 
         // When
-        val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
+        val response = validateFileStructure(externalFilesTestDir)
 
         // Then
         assert(response is ValidationResult.Error.InvalidPhotoFileError)
@@ -209,7 +211,7 @@ class ProjectUtilsImportTest {
         File(projectFileTwo, "123456789.jpeg").createNewFile()
 
         // When
-        val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
+        val response = validateFileStructure(externalFilesTestDir)
         println(response)
         // Then
         assert(response is ValidationResult.Error.DuplicateIdError)
@@ -239,7 +241,7 @@ class ProjectUtilsImportTest {
             File(projectFile, "123456789.jpeg").createNewFile()
 
             // When
-            val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
+            val response = validateFileStructure(externalFilesTestDir)
 
             // Then
             println(response)
@@ -261,10 +263,10 @@ class ProjectUtilsImportTest {
         File(projectFolderTwo, "2345671.jpeg").createNewFile()
 
         // When
-        val response = ProjectUtils.validateFileStructure(externalFilesTestDir)
+        val response = validateFileStructure(externalFilesTestDir)
 
         // Then
-        assert(response is ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>)
+        assert(response is ValidationResult.Success<List<ImportUtils.ProjectDataBundle>>)
     }
 
 }

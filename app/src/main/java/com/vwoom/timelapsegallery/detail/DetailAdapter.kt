@@ -9,7 +9,7 @@ import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.DetailRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.detail.DetailAdapter.DetailAdapterViewHolder
-import com.vwoom.timelapsegallery.utils.FileUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import java.io.File
 
@@ -29,6 +29,7 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
             mCurrentPhoto = clickedPhoto
             mClickHandler.onClick(clickedPhoto)
         }
+
         init {
             binding.root.setOnClickListener(this)
         }
@@ -46,7 +47,7 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
         val binding = holder.binding
         val context = holder.itemView.context
         val currentPhoto = mPhotos?.get(position)
-        val photoPath = FileUtils.getPhotoUrl(
+        val photoPath = ProjectUtils.getProjectPhotoUrl(
                 externalFilesDir!!,
                 getProjectEntryFromProjectView(mProject!!),
                 currentPhoto!!.timestamp)

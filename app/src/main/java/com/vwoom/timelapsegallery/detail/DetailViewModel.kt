@@ -12,7 +12,7 @@ import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.Project
-import com.vwoom.timelapsegallery.utils.FileUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -65,7 +65,7 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
 
     // For passing to the camera fragment
     fun setLastPhotoByEntry(externalFilesDir: File, project: Project, entry: PhotoEntry) {
-        val url = FileUtils.getPhotoUrl(
+        val url = ProjectUtils.getProjectPhotoUrl(
                 externalFilesDir,
                 getProjectEntryFromProjectView(project),
                 entry.timestamp)

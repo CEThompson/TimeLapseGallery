@@ -13,8 +13,8 @@ import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.gallery.GalleryAdapter.GalleryAdapterViewHolder
-import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
@@ -107,7 +107,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         mProjectData = projectData
         mProjectsToCoverPhotos.clear()
         for (project in projectData) {
-            val photoUrl = FileUtils.getPhotoUrl(
+            val photoUrl = ProjectUtils.getProjectPhotoUrl(
                     externalFilesDir,
                     getProjectEntryFromProjectView(project),
                     project.cover_photo_timestamp)

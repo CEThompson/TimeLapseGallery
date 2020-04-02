@@ -5,7 +5,7 @@ import android.os.Environment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
-import com.vwoom.timelapsegallery.utils.ProjectUtils
+import com.vwoom.timelapsegallery.utils.ImportUtils
 
 class SettingsViewModel : ViewModel() {
 
@@ -18,7 +18,7 @@ class SettingsViewModel : ViewModel() {
     var showingVerifySyncDialog: Boolean = false
 
     // Validation response for syncing
-    var response: ValidationResult<List<ProjectUtils.ProjectDataBundle>> = ValidationResult.InProgress
+    var response: ValidationResult<List<ImportUtils.ProjectDataBundle>> = ValidationResult.InProgress
 
     // For showing sync progress
     var projectMax: MutableLiveData<Int> = SyncProgressCounter.projectMax
@@ -33,13 +33,13 @@ class SettingsViewModel : ViewModel() {
 
         // Validate the directory if we have a directory
         if (externalFilesDir != null)
-            response = ProjectUtils.validateFileStructure(externalFilesDir)
+            response = ImportUtils.validateFileStructure(externalFilesDir)
 
         // If the directory is valid import projects
-        if (response is ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>) {
+        if (response is ValidationResult.Success<List<ImportUtils.ProjectDataBundle>>) {
             syncing = true
-            val validatedList = (response as ValidationResult.Success<List<ProjectUtils.ProjectDataBundle>>).data
-            ProjectUtils.importProjects(TimeLapseDatabase.getInstance(context), externalFilesDir!!, validatedList)
+            val validatedList = (response as ValidationResult.Success<List<ImportUtils.ProjectDataBundle>>).data
+            ImportUtils.importProjects(TimeLapseDatabase.getInstance(context), externalFilesDir!!, validatedList)
             syncing = false
         }
     }

@@ -1,22 +1,25 @@
 package com.vwoom.timelapsegallery.utils
 
 import android.util.Log
-import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
+import com.vwoom.timelapsegallery.utils.ProjectUtils.getMetaDirectoryForProject
+import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectFolder
 import java.io.*
-import java.util.*
 
 const val RESERVED_CHARACTERS = "|\\?*<\":>+[]/'"
 
 object FileUtils {
     private val TAG = FileUtils::class.java.simpleName
+
+    // Directory definitions
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
     const val META_FILE_SUBDIRECTORY = "Meta"
+
+    // Text files for metadata
     const val SCHEDULE_TEXT_FILE = "schedule.txt"
     const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
-    private const val ERROR_TIMESTAMP_TO_PHOTO = "error retrieving photo from timestamp"
 
     // Creates an image file for a project in the projects folder by project view
     private fun createImageFileForProject(storageDirectory: File, projectEntry: ProjectEntry, timestamp: Long): File {
@@ -24,45 +27,6 @@ object FileUtils {
         val projectDir = getProjectFolder(storageDirectory, projectEntry)
         if (!projectDir.exists()) projectDir.mkdirs()
         return File(projectDir, imageFileName)
-    }
-
-    fun getProjectFolder(externalFilesDir: File, projectEntry: ProjectEntry): File {
-        val projectPath = getProjectDirectoryPath(projectEntry)
-        return File(externalFilesDir, projectPath)
-    }
-
-    fun getMetaDirectoryForProject(externalFilesDir: File, projectId: Long): File {
-        val metaDir = File(externalFilesDir, META_FILE_SUBDIRECTORY)
-        val projectSubfolder = File(metaDir, projectId.toString())
-        projectSubfolder.mkdirs()
-        return projectSubfolder
-    }
-
-    // Creates a list of photo entries in a project folder sorted by timestamp
-    fun getPhotoEntriesInProjectDirectory(externalFilesDir: File,
-                                          projectEntry: ProjectEntry): List<PhotoEntry>? {
-        val photos: MutableList<PhotoEntry> = ArrayList()
-        val projectFolder = getProjectFolder(externalFilesDir, projectEntry)
-        val files = projectFolder.listFiles()
-        if (files != null) {
-            for (child in files) {
-                // Skip directories
-                if (!child.isFile) continue
-
-                // Get the timestamp from the url
-                val url = child.absolutePath
-                val filename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
-                val filenameParts = filename.split(".").toTypedArray()
-                val timestamp = filenameParts[0].toLong()
-
-                // Create a photo entry for the timestamp
-                val photoEntry = PhotoEntry(projectEntry.id, timestamp)
-                photos.add(photoEntry)
-            }
-        } else return null
-        // Sort the photo entries by timestamp
-        photos.sortBy { it.timestamp }
-        return photos
     }
 
     // Creates a file in the temporary directory
@@ -91,7 +55,7 @@ object FileUtils {
         // Create temporary file from previous path
         val tempFile = File(tempPath)
         // Copy file to new destination
-        copy(tempFile, finalFile)
+        copyFile(tempFile, finalFile)
         // Remove temporary file
         tempFile.delete()
 
@@ -100,7 +64,7 @@ object FileUtils {
 
     // Used to copy temp photo file to final photo file
     @Throws(IOException::class)
-    private fun copy(src: File, dst: File) {
+    private fun copyFile(src: File, dst: File) {
         val input: InputStream = FileInputStream(src)
         input.use {
             val out: OutputStream = FileOutputStream(dst)
@@ -114,18 +78,6 @@ object FileUtils {
         }
     }
 
-    // Copies a Project from one folder to another: For use in renaming a project
-    fun renameProject(externalFilesDir: File, sourceProjectEntry: ProjectEntry, destinationProjectEntry: ProjectEntry): Boolean { // Create a file for the source project
-        val sourceProjectPath = getProjectDirectoryPath(sourceProjectEntry)
-        val sourceProject = File(externalFilesDir, sourceProjectPath)
-        // Create a file for the destination project
-        val destinationProjectPath = getProjectDirectoryPath(destinationProjectEntry)
-        val destinationProject = File(externalFilesDir, destinationProjectPath)
-
-        // Rename the folder: returns true if successful and false if not
-        return sourceProject.renameTo(destinationProject)
-    }
-
     // Deletes the temporary directory and files within
     fun deleteTempFiles(externalFilesDir: File?) {
         if (externalFilesDir == null) return
@@ -134,7 +86,7 @@ object FileUtils {
     }
 
     // Recursive delete used by delete project, delete temp, or delete photo
-    private fun deleteRecursive(fileOrFileDirectory: File) {
+    fun deleteRecursive(fileOrFileDirectory: File) {
         if (fileOrFileDirectory.isDirectory) {
             val files = fileOrFileDirectory.listFiles()
             if (files != null)
@@ -145,25 +97,6 @@ object FileUtils {
         fileOrFileDirectory.delete()
     }
 
-    // Delete project directory and files within project directory
-    fun deleteProject(externalFilesDir: File, projectEntry: ProjectEntry) {
-        val projectDirectoryPath = getProjectDirectoryPath(projectEntry)
-        val projectDirectory = File(externalFilesDir, projectDirectoryPath)
-        val metaProjectDirectory = getMetaDirectoryForProject(externalFilesDir, projectEntry.id)
-        // Delete the project photo files
-        deleteRecursive(projectDirectory)
-        // Delete the metadata for the project
-        deleteRecursive(metaProjectDirectory)
-    }
-
-    // Deletes file referred to in photo entry by project view
-    fun deletePhoto(externalFilesDir: File, projectEntry: ProjectEntry, photoEntry: PhotoEntry) {
-        val photoUrl = getPhotoUrl(externalFilesDir, projectEntry, photoEntry.timestamp)
-        if (photoUrl == ERROR_TIMESTAMP_TO_PHOTO) return // photo file does not exist already
-        val photoFile = File(photoUrl)
-        deleteRecursive(photoFile)
-    }
-
     // Returns true if a path contain a reserved character
     fun pathContainsReservedCharacter(path: String): Boolean {
         for (character in RESERVED_CHARACTERS) {
@@ -172,28 +105,7 @@ object FileUtils {
         return false
     }
 
-    // Returns the pattern for a projects path : project path = {project_id}_{project_name}
-    // Examples: 1_My Project, 2_Cactus, 3_Flower, etc.
-    private fun getProjectDirectoryPath(projectEntry: ProjectEntry): String {
-        val name = projectEntry.project_name
-        return if (name == null) projectEntry.id.toString()
-        else projectEntry.id.toString() + "_" + projectEntry.project_name
-    }
-
-    fun getPhotoUrl(externalFilesDir: File, projectEntry: ProjectEntry, timestamp: Long): String {
-        val imageFileNames = getPhotoFileNames(timestamp)
-        val projectDir = getProjectFolder(externalFilesDir, projectEntry)
-
-        lateinit var photoFile: File
-        // Try the timestamp to various file formats, i.e. timestamp.jpeg, timestamp.png, timestamp.jpg
-        for (fileName in imageFileNames) {
-            photoFile = File(projectDir, fileName)
-            if (photoFile.exists()) return photoFile.absolutePath
-        }
-        return ERROR_TIMESTAMP_TO_PHOTO
-    }
-
-    fun getPhotoFileNames(timestamp: Long): Array<String> {
+    fun getPhotoFileExtensions(timestamp: Long): Array<String> {
         return arrayOf("$timestamp.jpg", "$timestamp.png", "$timestamp.jpeg")
     }
 

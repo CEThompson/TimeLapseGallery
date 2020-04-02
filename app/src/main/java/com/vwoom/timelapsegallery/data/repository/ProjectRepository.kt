@@ -10,6 +10,7 @@ import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.FileUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -57,7 +58,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
         val source = projectDao.getProjectById(sourceProject.project_id)
         val destination = ProjectEntry(source.id, name)
         withContext(Dispatchers.IO) {
-            val success = FileUtils.renameProject(externalFilesDir, source, destination)
+            val success = ProjectUtils.renameProject(externalFilesDir, source, destination)
             if (success) {
                 source.project_name = destination.project_name
                 projectDao.updateProject(source)
@@ -69,7 +70,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
         val projectEntry = projectDao.getProjectById(projectId)
         withContext(Dispatchers.IO) {
             // Delete files first since there is a listener on the project
-            FileUtils.deleteProject(externalFilesDir, projectEntry)
+            ProjectUtils.deleteProject(externalFilesDir, projectEntry)
             // Now remove reference from the database
             projectDao.deleteProjectByEntry(projectEntry)
         }
@@ -122,7 +123,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
     suspend fun deleteProjectPhoto(externalFilesDir: File, photoEntry: PhotoEntry) {
         val projectEntry = projectDao.getProjectById(photoEntry.project_id)
         withContext(Dispatchers.IO) {
-            FileUtils.deletePhoto(externalFilesDir, projectEntry, photoEntry)
+            ProjectUtils.deleteProjectPhoto(externalFilesDir, projectEntry, photoEntry)
         }
         photoDao.deletePhoto(photoEntry)
     }

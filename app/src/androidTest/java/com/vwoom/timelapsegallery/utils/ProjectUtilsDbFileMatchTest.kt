@@ -8,6 +8,7 @@ import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
+import com.vwoom.timelapsegallery.utils.ProjectUtils.getMetaDirectoryForProject
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -70,7 +71,7 @@ class FilesUtilsDbTest {
             assert(tags.contains(currentTag)) // make the assertions
         }
         // and a tag file should exist in the projects meta directory
-        val meta = FileUtils.getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
+        val meta = getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
         val tagsFile = File(meta, FileUtils.TAGS_DEFINITION_TEXT_FILE)
         assert(tagsFile.exists()) // make the assertion
         // and the text file should contain both of the tags
@@ -108,7 +109,7 @@ class FilesUtilsDbTest {
         assert(projectTagEntries.isEmpty())
 
         // and an empty tag file should exist in the projects meta directory
-        val meta = FileUtils.getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
+        val meta = getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
         val tagsFile = File(meta, FileUtils.TAGS_DEFINITION_TEXT_FILE)
         assert(tagsFile.exists()) // make the assertion
         val inputAsString = FileInputStream(tagsFile).bufferedReader().use { it.readText() }
@@ -141,7 +142,7 @@ class FilesUtilsDbTest {
         assert(retrievedSchedule?.interval_days == 7)
 
         // and the text file exists and represents the interval
-        val meta = FileUtils.getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
+        val meta = getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
         val scheduleFile = File(meta, FileUtils.SCHEDULE_TEXT_FILE)
         assert (scheduleFile.exists())
         val inputAsString = FileInputStream(scheduleFile).bufferedReader().use { it.readText() }

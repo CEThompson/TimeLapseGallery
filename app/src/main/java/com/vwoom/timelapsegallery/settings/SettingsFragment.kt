@@ -25,8 +25,8 @@ import androidx.preference.PreferenceManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.notification.NotificationUtils
+import com.vwoom.timelapsegallery.utils.ImportUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
-import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.RESERVED_CHARACTERS
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -226,7 +226,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     // Updates the dialog showing progress on synchronization
-    private fun updateSyncDialog(result: ValidationResult<List<ProjectUtils.ProjectDataBundle>>) {
+    private fun updateSyncDialog(result: ValidationResult<List<ImportUtils.ProjectDataBundle>>) {
         Log.d(TAG, "updating sync dialog")
         // Set the response
         val responseView = mSyncDialog?.findViewById(R.id.sync_response) as TextView

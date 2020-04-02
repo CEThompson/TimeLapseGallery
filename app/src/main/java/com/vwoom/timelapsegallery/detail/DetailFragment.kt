@@ -50,11 +50,8 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.databinding.FragmentDetailBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
-import com.vwoom.timelapsegallery.utils.FileUtils
-import com.vwoom.timelapsegallery.utils.InjectorUtils
-import com.vwoom.timelapsegallery.utils.PhotoUtils
+import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
-import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import kotlinx.coroutines.Job
@@ -235,7 +232,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val transitionName = "${mCurrentProject!!.project_id}"
         binding?.detailCurrentImage?.transitionName = transitionName
         binding?.detailsCardContainer?.transitionName = "${transitionName}card"
-        binding?.detailsGradientOverlay?.transitionName ="${transitionName}bottomGradient"
+        binding?.detailsGradientOverlay?.transitionName = "${transitionName}bottomGradient"
         binding?.detailScheduleLayout?.galleryGradientTopDown?.transitionName = "${transitionName}topGradient"
         binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.transitionName = "${transitionName}due"
         binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.transitionName = "${transitionName}interval"
@@ -257,8 +254,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 val shareIntent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
                     type = "image/jpeg"
-                    val photoFile = File(FileUtils
-                            .getPhotoUrl(
+                    val photoFile = File(ProjectUtils
+                            .getProjectPhotoUrl(
                                     mExternalFilesDir!!,
                                     getProjectEntryFromProjectView(mCurrentProject!!),
                                     mCurrentPhoto!!.timestamp))
@@ -368,7 +365,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mDetailAdapter?.setCurrentPhoto(photoEntry)
 
         // Get the image path, handle orientation indicator and load the image
-        val imagePath = FileUtils.getPhotoUrl(mExternalFilesDir!!, getProjectEntryFromProjectView(mCurrentProject!!), photoEntry.timestamp)
+        val imagePath = ProjectUtils.getProjectPhotoUrl(mExternalFilesDir!!, getProjectEntryFromProjectView(mCurrentProject!!), photoEntry.timestamp)
         if (!mPlaying) handleOrientationIndicator(imagePath)
         loadImage(imagePath)
 
@@ -832,10 +829,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             lifecycleScope.launch {
                 val list = arrayListOf<String>()
                 for (photo in photoEntries) {
-                    val photoUrl = FileUtils.getPhotoUrl(mExternalFilesDir!!, getProjectEntryFromProjectView(mCurrentProject!!), photo.timestamp)
+                    val photoUrl = ProjectUtils.getProjectPhotoUrl(mExternalFilesDir!!, getProjectEntryFromProjectView(mCurrentProject!!), photo.timestamp)
                     list.add(photoUrl)
                 }
-                photoUrls = list.map {it}.toTypedArray()
+                photoUrls = list.map { it }.toTypedArray()
             }
         })
 
