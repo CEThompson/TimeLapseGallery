@@ -35,21 +35,21 @@ import kotlinx.coroutines.async
 // TODO: (update 1.2) re-evaluate free and paid variants
 // TODO: (update 1.2) re-evaluate  analytics metrics
 class SettingsFragment : PreferenceFragmentCompat() {
+
     private var prefs: SharedPreferences? = null
     private var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
+    private val settingsViewModel: SettingsViewModel by viewModels {
+        InjectorUtils.provideSettingsViewModelFactory()
+    }
 
     // Dialogs
     private var mSyncDialog: Dialog? = null
     private var mFileModDialog: Dialog? = null
     private var mVerifySyncDialog: Dialog? = null
 
-    private val settingsViewModel: SettingsViewModel by viewModels {
-        InjectorUtils.provideSettingsViewModelFactory()
-    }
-
+    // For syncing database to files
     private var databaseSyncJob: Job? = null
 
-    /* Analytics */
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
     override fun onDestroy() {
@@ -60,7 +60,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         // Set up dialogs
         createSyncDialog()
         createVerifyProjectImportDialog()
@@ -68,17 +67,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         // Restore dialog state from view model
         if (settingsViewModel.syncing) {
-            executeSync()
+            executeSync()   // if syncing continue
         }
-
         if (settingsViewModel.showingSyncDialog) {
             updateSyncDialog(settingsViewModel.response)
             mSyncDialog?.show()
         }
-
         if (settingsViewModel.showingFileModDialog) showFileModificationDialog()
         if (settingsViewModel.showingVerifySyncDialog) showVerifyProjectImportDialog()
-
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
     }
 
@@ -127,7 +123,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_notifications_disabled)!!, null)
             }
 
-            // Same for notification time
             if (key == this.getString(R.string.key_notification_time)) {
                 NotificationUtils.scheduleNotificationWorker(requireContext())
 
@@ -164,9 +159,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    //
-    // Start Dialog Functions
-    //
     private fun createVerifyProjectImportDialog() {
         val builder = AlertDialog.Builder(requireContext())
                 .setTitle(R.string.warning)
@@ -297,16 +289,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
         settingsViewModel.showingFileModDialog = true
         mFileModDialog?.show()
     }
-    //
-    // End Dialog Functions
-    //
 
     private fun executeSync() {
         showSyncDialog()
         databaseSyncJob = settingsViewModel.viewModelScope.async {
+            // Lock screen orientation during sync
             requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
             settingsViewModel.executeSync(requireContext())
             updateSyncDialog(settingsViewModel.response)
+            // Restore screen orientation
             requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }
     }
