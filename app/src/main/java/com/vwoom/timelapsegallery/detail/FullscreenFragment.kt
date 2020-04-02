@@ -7,7 +7,6 @@ import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -92,18 +91,20 @@ class FullscreenFragment : Fragment() {
         }
 
         // Set a listener to change the current photo on swipe
-        val swipeListener = OnSwipeTouchListener(requireContext(), {previousPhoto()}, {nextPhoto()})
+        val swipeListener = OnSwipeTouchListener(requireContext(), { previousPhoto() }, { nextPhoto() })
         @Suppress("ClickableViewAccessibility")
         binding?.fullscreenImageBottom?.setOnTouchListener(swipeListener)
         Glide.with(this)
                 .load(photos[position])
-                .listener(object: RequestListener<Drawable?>{
+                .listener(object : RequestListener<Drawable?> {
                     override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
                         startPostponedEnterTransition()
                         return false
                     }
+
                     override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                         startPostponedEnterTransition()
+                        mImageIsLoaded = true
                         return false
                     }
                 })
@@ -189,7 +190,7 @@ class FullscreenFragment : Fragment() {
 
     private fun scheduleLoadPhoto() {
         if (position < 0 || position >= photos.size) {
-            position = photos.size-1
+            position = photos.size - 1
             stopPlaying()
             return
         }
@@ -232,13 +233,13 @@ class FullscreenFragment : Fragment() {
         fullscreenPlayFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
     }
 
-    private fun nextPhoto(){
-        if (position == photos.size-1) return
+    private fun nextPhoto() {
+        if (position == photos.size - 1) return
         position++
         loadImagePair()
     }
 
-    private fun previousPhoto(){
+    private fun previousPhoto() {
         if (position == 0) return
         position--
         loadImagePair()
