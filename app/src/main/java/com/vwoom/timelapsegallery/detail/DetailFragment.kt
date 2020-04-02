@@ -248,29 +248,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         return binding?.root
     }
 
-    // After creating the binding load the cover photo to start the postponed enter transition
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val timestamp = mCurrentProject!!.cover_photo_timestamp
-        val url = FileUtils.getPhotoUrl(mExternalFilesDir!!, getProjectEntryFromProjectView(mCurrentProject!!), timestamp)
-        val file = File(url)
-        Glide.with(this)
-                .load(file)
-                .listener(object : RequestListener<Drawable?> {
-                    override fun onLoadFailed(e: GlideException?,
-                                              model: Any,
-                                              target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
-                        startPostponedEnterTransition()
-                        return false
-                    }
-                    override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
-                        startPostponedEnterTransition()
-                        return false
-                    }
-                })
-                .into(binding!!.detailCurrentImage)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.detail_fragment_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -476,6 +453,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                                     override fun onLoadFailed(e: GlideException?, model: Any, target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
                                         val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
                                         toast.show()
+                                        startPostponedEnterTransition()
                                         return false
                                     }
 
@@ -485,6 +463,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                                         // Record state
                                         mImageIsLoaded = true
                                         // And begin the shared element transition if appropriate
+                                        startPostponedEnterTransition()
                                         return false
                                     }
                                 })
