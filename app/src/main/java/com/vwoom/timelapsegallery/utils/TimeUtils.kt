@@ -9,7 +9,6 @@ const val DAY_IN_MILLISECONDS: Long = (1000 * 60 * 60 * 24).toLong()
 
 object TimeUtils {
 
-
     fun getShortDateFromTimestamp(timestamp: Long): String {
         return SimpleDateFormat("M/d/y", Locale.getDefault()).format(Date(timestamp))
     }
