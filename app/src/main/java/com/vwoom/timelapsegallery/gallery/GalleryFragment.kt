@@ -43,70 +43,60 @@ import java.util.*
 
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
-    private var mSearchDialog: Dialog? = null
-
-    private var mGalleryAdapter: GalleryAdapter? = null
-    private var mGridLayoutManager: StaggeredGridLayoutManager? = null
-
-    private var searchJob: Job? = null
-
     private val args: GalleryFragmentArgs by navArgs()
-
-    private var mGalleryRecyclerView: RecyclerView? = null
-    private var mAddProjectFAB: FloatingActionButton? = null
-    private var mSearchActiveFAB: FloatingActionButton? = null
-    private var toolbar: Toolbar? = null
-
-    private var binding: FragmentGalleryBinding? = null
 
     private val mGalleryViewModel: GalleryViewModel by viewModels {
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
     }
 
+
+    // Recyclerview
+    private var mGalleryRecyclerView: RecyclerView? = null
+    private var mGalleryAdapter: GalleryAdapter? = null
+    private var mGridLayoutManager: StaggeredGridLayoutManager? = null
+
+    // UI
+    private var binding: FragmentGalleryBinding? = null
+    private var toolbar: Toolbar? = null
+    private var mAddProjectFAB: FloatingActionButton? = null
+    private var mSearchActiveFAB: FloatingActionButton? = null
+
+    // Searching
+    private var mSearchDialog: Dialog? = null
+    private var searchJob: Job? = null
+
+    // For scrolling to the end when adding a new project
     private var mPrevProjectsSize: Int? = null
 
-    // prevent double clicking
+    // For preventing double click crash
     private var mLastClickTime: Long? = null
 
+    // Transitions
     private lateinit var galleryExitTransition: Transition
     private lateinit var galleryReenterTransition: Transition
     private val reenterListener = object : Transition.TransitionListener {
         override fun onTransitionEnd(transition: Transition?) {
         }
+
         override fun onTransitionCancel(transition: Transition?) {
         }
+
         override fun onTransitionStart(transition: Transition?) {
             val fadeInAnimation = AlphaAnimation(0f, 1f)
             fadeInAnimation.duration = 375
             binding?.galleryRecyclerView?.startAnimation(fadeInAnimation)
         }
+
         override fun onTransitionPause(transition: Transition?) {
         }
+
         override fun onTransitionResume(transition: Transition?) {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        mSearchDialog?.dismiss()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        searchJob?.cancel()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mGalleryRecyclerView = null
-        mAddProjectFAB = null
-        mSearchActiveFAB = null
-        mGridLayoutManager = null
-        mGalleryAdapter = null
-        toolbar = null
-        binding = null
-    }
-
+    /**
+     * Lifecycle
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         galleryReenterTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
@@ -168,7 +158,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             reenterTransition = null
             // Send the camera ID to the camera fragment or notify the user if no camera available
             val cameraId = PhotoUtils.findCamera(requireContext())
-            if (cameraId == null){
+            if (cameraId == null) {
                 Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
             } else {
                 val action = GalleryFragmentDirections.actionGalleryFragmentToCamera2Fragment(cameraId, null, null)
@@ -196,23 +186,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         return binding?.root
     }
 
-    private fun clearSearch() {
-        // Clear search
-        mGalleryViewModel.searchName = ""
-        mGalleryViewModel.searchTags.clear()
-        mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-        updateSearchFilter()
-        updateSearchDialog()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (mGalleryViewModel.searchDialogShowing) {
-            initializeSearchDialog()
-            mSearchDialog?.show()
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.gallery_fragment_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -235,6 +208,66 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (mGalleryViewModel.searchDialogShowing) {
+            initializeSearchDialog()
+            mSearchDialog?.show()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mSearchDialog?.dismiss()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        searchJob?.cancel()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mGalleryRecyclerView = null
+        mAddProjectFAB = null
+        mSearchActiveFAB = null
+        mGridLayoutManager = null
+        mGalleryAdapter = null
+        toolbar = null
+        binding = null
+    }
+
+    /**
+     * UI binding
+     */
+    private fun setupViewModel() {
+        // Observe projects
+        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer {
+            // Detect if we have added a project and scroll to the end
+            // If the size of the current list is larger a project has been added
+            val projectHasBeenAdded = (mPrevProjectsSize != null && mPrevProjectsSize!! < it.size)
+            if (projectHasBeenAdded) {
+                mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.displayedProjects.size)
+            }
+            // Keep track of number of projects
+            mPrevProjectsSize = it.size
+
+            // Update the displayed projects in the gallery
+            mGalleryViewModel.viewModelScope.launch {
+                mGalleryViewModel.displayedProjects = mGalleryViewModel.filterProjects()
+                mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
+            }
+        })
+
+        // Watch the tags to update the search dialog
+        mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer {
+            updateSearchDialog()
+        })
+    }
+
+    /**
+     * Search Dialog methods
+     */
     private fun initializeSearchDialog() {
         mSearchDialog = Dialog(requireContext())
         mSearchDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -326,32 +359,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 && mGalleryViewModel.searchName.isBlank()
     }
 
-    private fun setupViewModel() {
-        // Observe projects
-        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer {
-            // Detect if we have added a project and scroll to the end
-            // If the size of the current list is larger a project has been added
-            val projectHasBeenAdded = (mPrevProjectsSize!= null && mPrevProjectsSize!! < it.size)
-            if (projectHasBeenAdded) {
-                mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.displayedProjects.size)
-            }
-            // Keep track of number of projects
-            mPrevProjectsSize = it.size
-
-            // Update the displayed projects in the gallery
-            mGalleryViewModel.viewModelScope.launch {
-                mGalleryViewModel.displayedProjects = mGalleryViewModel.filterProjects()
-                mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
-            }
-        })
-
-        // Watch the tags to update the search dialog
-        mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer {
-            updateSearchDialog()
-        })
-    }
-
     // Updates the dialog with all tags in the database for filtration
+    // And updates the state of the checkboxes in the dialog
     private fun updateSearchDialog() {
         if (mSearchDialog == null) return
 
@@ -365,6 +374,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         updateSearchDialogCheckboxes()
     }
 
+    // This sets the tags
     private fun updateSearchDialogTags() {
         var tags: List<TagEntry> = listOf()
         if (mGalleryViewModel.tags.value != null) {
@@ -399,6 +409,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
+    // This sets the checkboxes
     private fun updateSearchDialogCheckboxes() {
         // Update the state of search by schedule layout
         val dueTodayCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_today_checkbox)
@@ -412,6 +423,19 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         scheduledCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_SCHEDULED
         unscheduledCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_UNSCHEDULED
     }
+
+    // Resets the search parameters and updates the UI
+    private fun clearSearch() {
+        mGalleryViewModel.searchName = ""
+        mGalleryViewModel.searchTags.clear()
+        mGalleryViewModel.searchType = SEARCH_TYPE_NONE
+        updateSearchFilter()
+        updateSearchDialog()
+    }
+
+    /**
+     * User Input
+     */
 
     override fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int) {
         // Prevents multiple clicks
@@ -437,14 +461,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         findNavController().navigate(action, extras)
     }
 
-    // Restore recycler view state
+    /**
+     * Recycler View State
+     */
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
         val recyclerState: Parcelable? = savedInstanceState?.getParcelable(BUNDLE_RECYCLER_LAYOUT)
         mGalleryRecyclerView?.layoutManager?.onRestoreInstanceState(recyclerState)
     }
 
-    // Save recycler view state
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mGalleryRecyclerView?.layoutManager?.onSaveInstanceState())
@@ -452,7 +477,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     companion object {
         private var mNumberOfColumns = 3
-        private val TAG = GalleryFragment::class.java.simpleName
         private const val BUNDLE_RECYCLER_LAYOUT = "recycler_layout_key"
     }
 }
