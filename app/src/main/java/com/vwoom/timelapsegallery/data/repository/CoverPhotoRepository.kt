@@ -10,9 +10,6 @@ class CoverPhotoRepository private constructor(private val coverPhotoDao: CoverP
         coverPhotoDao.insertPhoto(CoverPhotoEntry(entry.project_id, entry.id))
     }
 
-    fun getCoverPhoto(id: Long): CoverPhotoEntry = coverPhotoDao.getCoverPhoto(id)
-
-
     companion object {
         @Volatile private var instance: CoverPhotoRepository? = null
 
