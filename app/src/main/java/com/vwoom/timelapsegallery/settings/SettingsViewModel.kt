@@ -9,11 +9,18 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils
 
 class SettingsViewModel : ViewModel() {
 
+    // Sync state
     var syncing: Boolean = false
+
+    // Dialog state
     var showingSyncDialog: Boolean = false
     var showingFileModDialog: Boolean = false
     var showingVerifySyncDialog: Boolean = false
+
+    // Validation response for syncing
     var response: ValidationResult<List<ProjectUtils.ProjectDataBundle>> = ValidationResult.InProgress
+
+    // For showing sync progress
     var projectMax: MutableLiveData<Int> = SyncProgressCounter.projectMax
     var projectProgress: MutableLiveData<Int> = SyncProgressCounter.projectProgress
     var photoMax: MutableLiveData<Int> = SyncProgressCounter.photoMax
@@ -23,6 +30,7 @@ class SettingsViewModel : ViewModel() {
         response = ValidationResult.InProgress
 
         val externalFilesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
         // Validate the directory if we have a directory
         if (externalFilesDir != null)
             response = ProjectUtils.validateFileStructure(externalFilesDir)
