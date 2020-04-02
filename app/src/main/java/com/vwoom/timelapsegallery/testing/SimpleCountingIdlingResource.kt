@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.testing
 import androidx.test.espresso.IdlingResource
 import java.util.concurrent.atomic.AtomicInteger
 
+// Idling resource definition used by espresso idling resource singleton
 class SimpleCountingIdlingResource(private val resourceName: String) : IdlingResource {
 
     private val counter = AtomicInteger(0)
