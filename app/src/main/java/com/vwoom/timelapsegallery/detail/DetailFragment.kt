@@ -743,19 +743,21 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         fullscreenBackFab?.setOnClickListener {
             stopPlaying()
             mFullscreenImageDialog?.dismiss()
+            detailViewModel.fullscreenDialogShowing = false
         }
         fullscreenExitFab?.setOnClickListener {
             stopPlaying()
             mFullscreenImageDialog?.dismiss()
+            detailViewModel.fullscreenDialogShowing = false
         }
         mFullscreenImageDialog?.setOnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 stopPlaying()
                 mFullscreenImageDialog?.dismiss()
+                detailViewModel.fullscreenDialogShowing = false
             }
             true
         }
-        mFullscreenImageDialog?.setOnDismissListener { detailViewModel.fullscreenDialogShowing = false }
         // Set a listener to change the current photo on swipe
         @Suppress("ClickableViewAccessibility")
         fullscreenImageBottom?.setOnTouchListener(mOnSwipeTouchListener)
