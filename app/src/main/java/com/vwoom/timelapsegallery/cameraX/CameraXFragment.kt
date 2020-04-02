@@ -130,7 +130,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
                 .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                 .build()
 
-        // TODO test out new camera set up
+        // TODO (update 1.2): test out new cameraX set up for possible future usage
         //preview?.setSurfaceProvider(previewView.previewSurfaceProvider)
 
         // Build the image capture use case and attach button click listener

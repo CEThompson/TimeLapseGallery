@@ -40,7 +40,7 @@ class NotificationAlarm : BroadcastReceiver() {
             ProjectUtils.isProjectDueToday(it)
         }
 
-        // TODO test and verify this
+        // TODO test that notification does not send if it fires up and no projects are due
         // If there are projects due today, send the notification
         if (dueProjects.isNotEmpty()) notifyUserOfScheduledProjects(context, requestCode)
         // Release the wake lock
