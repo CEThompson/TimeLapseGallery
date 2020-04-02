@@ -64,7 +64,7 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
     }
 
     override fun getItemCount(): Int {
-        return if (mPhotos == null) 0 else mPhotos!!.size
+        return mPhotos?.size ?: 0
     }
 
     fun setPhotoData(photoData: List<PhotoEntry>?, project: Project?) {
