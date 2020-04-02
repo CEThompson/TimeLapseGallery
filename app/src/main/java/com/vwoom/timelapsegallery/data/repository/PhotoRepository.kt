@@ -36,7 +36,9 @@ class PhotoRepository private constructor(private val photoDao: PhotoDao,
 
     suspend fun deletePhoto(externalFilesDir: File, photoEntry: PhotoEntry){
         val projectEntry = projectDao.getProjectById(photoEntry.project_id)
-        FileUtils.deletePhoto(externalFilesDir, projectEntry, photoEntry)
+        withContext(Dispatchers.IO) {
+            FileUtils.deletePhoto(externalFilesDir, projectEntry, photoEntry)
+        }
         photoDao.deletePhoto(photoEntry)
     }
 
