@@ -40,12 +40,12 @@ class NotificationWorker(context: Context, params: WorkerParameters)
             ProjectUtils.isProjectDueToday(it) || ProjectUtils.isProjectDueTomorrow(it)
         }
 
-        // If there are no scheduled projects cancel the worker
+        // If there are no projects due today or tomorrow cancel the worker
         if (dueProjects.isEmpty()) {
             Log.d(TAG, "Notification Tracker: No projects scheduled")
             NotificationUtils.cancelNotificationWorker(applicationContext)
         }
-        // Schedule an alarm for tomorrow if there are any scheduled projects
+        // Otherwise schedule the alarm to check for due projects tomorrow
         else {
             Log.d(TAG, "Notification Tracker: Projects scheduled")
             notificationAlarm.setAlarmForTomorrow(applicationContext)
