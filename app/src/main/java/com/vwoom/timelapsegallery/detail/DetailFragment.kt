@@ -28,6 +28,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
@@ -63,7 +64,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
-import kotlin.math.absoluteValue
 import kotlin.properties.Delegates
 
 // TODO: (update 1.2) use NDK to implement converting photo sets to .gif and .mp4/.mov etc
@@ -106,11 +106,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var playJob: Job? = null
     private var tagJob: Job? = null
 
-    // For fullscreen frag
+    // For fullscreen fragment
     private var photoUrls: Array<String> = arrayOf()
-
-    // Swipe listener for image navigation
-    private var mOnSwipeTouchListener: OnSwipeTouchListener? = null
 
     // Analytics
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
@@ -219,33 +216,31 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             detailViewModel.infoDialogShowing = true
         }
         binding?.fullscreenFab?.setOnClickListener {
-            // TODO navigate to fullscreen fragment
             exitTransition = TransitionInflater.from(context).inflateTransition(R.transition.details_to_fullscreen_transition)
             val action = DetailFragmentDirections.actionDetailsFragmentToFullscreenFragment(detailViewModel.photoIndex, photoUrls)
             val extras = FragmentNavigatorExtras(
                     binding!!.fullscreenFab as View to "fs_exit_fab",
-                    //binding!!.detailCurrentImage as View to "fullscreen_base_image",
                     binding!!.playAsVideoFab as View to "fs_play_fab")
             findNavController().navigate(action, extras)
         }
         // Set a swipe listener for the image
-        mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
+        val onRightSwipe = {detailViewModel.previousPhoto()}
+        val onLeftSwipe = {detailViewModel.nextPhoto()}
+        val swipeListener = OnSwipeTouchListener(
+                requireContext(),
+                onRightSwipe,
+                onLeftSwipe)
         @Suppress("ClickableViewAccessibility")
-        binding?.detailCurrentImage?.setOnTouchListener(mOnSwipeTouchListener)
+        binding?.detailCurrentImage?.setOnTouchListener(swipeListener)
 
         // Set the transition tags
         val transitionName = "${mCurrentProject!!.project_id}"
-        val cardTransitionName = "${transitionName}card"
-        val bottomTransitionName = "${transitionName}bottomGradient"
-        val topTransitionName = "${transitionName}topGradient"
-        val dueTransitionName = "${transitionName}due"
-        val intervalTransitionName = "${transitionName}interval"
         binding?.detailCurrentImage?.transitionName = transitionName
-        binding?.detailsCardContainer?.transitionName = cardTransitionName
-        binding?.detailsGradientOverlay?.transitionName = bottomTransitionName
-        binding?.detailScheduleLayout?.galleryGradientTopDown?.transitionName = topTransitionName
-        binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.transitionName = dueTransitionName
-        binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.transitionName = intervalTransitionName
+        binding?.detailsCardContainer?.transitionName = "${transitionName}card"
+        binding?.detailsGradientOverlay?.transitionName ="${transitionName}bottomGradient"
+        binding?.detailScheduleLayout?.galleryGradientTopDown?.transitionName = "${transitionName}topGradient"
+        binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.transitionName = "${transitionName}due"
+        binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.transitionName = "${transitionName}interval"
 
         // Finally set up the observables
         setupViewModel()
@@ -253,6 +248,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         return binding?.root
     }
 
+    // After creating the binding load the cover photo to start the postponed enter transition
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val timestamp = mCurrentProject!!.cover_photo_timestamp
@@ -267,7 +263,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         startPostponedEnterTransition()
                         return false
                     }
-
                     override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
                         startPostponedEnterTransition()
                         return false
@@ -327,14 +322,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onResume() {
         super.onResume()
         // Restore any showing dialogs
-        /*
-        if (detailViewModel.fullscreenDialogShowing) {
-            if (mFullscreenImageDialog == null) {
-                initializeFullscreenImageDialog()
-            }
-            mFullscreenImageDialog?.show()
-        }
-         */
         if (detailViewModel.infoDialogShowing) {
             if (mInfoDialog == null) initializeInfoDialog()
             mInfoDialog?.show()
@@ -455,22 +442,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-    // Loads an image into either the main photo view or the fullscreen dialog
+    // Loads the passed url
     private fun loadImage(imagePath: String) {
         mImageIsLoaded = false // this set to true after load image pair completes
         // Load the image to the fullscreen dialog if it is showing or to the detail cardview otherwise
         val f = File(imagePath)
-        /*
-        if (mFullscreenImageDialog?.isShowing == true) {
-            loadImagePair(f, fullscreenImageBottom!!, fullscreenImageTop!!)
-        } else {
-         */
         loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
-        // if we are not playing preload the fullscreen image for the user
-        // so that they do not have to wait for image load
-        /*
-        if (!mPlaying) setFullscreenImage()
-         */
     }
 
     // TODO: (update 1.2) re-evaluate and speed up image loading
@@ -559,11 +536,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
         binding?.playAsVideoFab?.setImageResource(R.drawable.ic_stop_white_24dp)
-        /*
-        val fullscreenPlayFab = mFullscreenImageDialog?.findViewById<FloatingActionButton>(R.id.fullscreen_play_fab)
-        fullscreenPlayFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
-        fullscreenPlayFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
-        fullscreenPlayFab?.setImageResource(R.drawable.ic_stop_white_24dp)*/
     }
 
     // Sets the two play buttons to green with a play icon
@@ -571,17 +543,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
         binding?.playAsVideoFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
-        /*
-        val fullscreenPlayFab = mFullscreenImageDialog?.findViewById<FloatingActionButton>(R.id.fullscreen_play_fab)
-        fullscreenPlayFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-        fullscreenPlayFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
-        fullscreenPlayFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
-
-         */
     }
 
     // Resets the UI & handles state after playing
-    private fun stopPlaying() { // Set color of play fab
+    private fun stopPlaying() {
         playJob?.cancel()
         mPlaying = false
         binding?.imageLoadingProgress?.progress = mCurrentPlayPosition ?: 0
@@ -886,8 +851,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             // Make sure to save the position of the max index in the view model
             detailViewModel.maxIndex = newMaxIndex
 
-            // TODO set up photos for fullscreen fragment
-            detailViewModel.viewModelScope.launch {
+            // Processes photo urls for the fullscreen fragment
+            lifecycleScope.launch {
                 val list = arrayListOf<String>()
                 for (photo in photoEntries) {
                     val photoUrl = FileUtils.getPhotoUrl(mExternalFilesDir!!, getProjectEntryFromProjectView(mCurrentProject!!), photo.timestamp)
@@ -1061,46 +1026,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     /**
      * User input
      */
-    // Changes photo on swipe
-    inner class OnSwipeTouchListener(ctx: Context?) : OnTouchListener {
-        private val gestureDetector: GestureDetector
-
-        @Suppress("ClickableViewAccessibility")
-        override fun onTouch(v: View, event: MotionEvent): Boolean {
-            return gestureDetector.onTouchEvent(event)
-        }
-
-        private inner class GestureListener : SimpleOnGestureListener() {
-            private val swipeThreshold = 100
-            private val swipeVelocityThreshold = 100
-            override fun onDown(e: MotionEvent): Boolean {
-                return true
-            }
-
-            override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-                var result = false
-                val diffY = e2.y - e1.y
-                val diffX = e2.x - e1.x
-                if (diffX.absoluteValue > diffY.absoluteValue)
-                    if (diffX.absoluteValue > swipeThreshold && velocityX.absoluteValue > swipeVelocityThreshold) {
-                        if (diffX > 0) {
-                            onSwipeRight()
-                        } else {
-                            onSwipeLeft()
-                        }
-                        result = true
-                    }
-                return result
-            }
-        }
-
-        fun onSwipeRight() = detailViewModel.previousPhoto()
-        fun onSwipeLeft() = detailViewModel.nextPhoto()
-
-        init {
-            gestureDetector = GestureDetector(ctx, GestureListener())
-        }
-    }
 
     // Sets the current photo from clicking on the bottom recycler view
     override fun onClick(clickedPhoto: PhotoEntry) {

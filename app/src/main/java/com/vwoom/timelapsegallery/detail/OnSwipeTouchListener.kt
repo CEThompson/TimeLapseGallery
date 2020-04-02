@@ -7,13 +7,13 @@ import android.view.View
 import kotlin.math.absoluteValue
 
 // Changes photo on swipe
-class OnSwipeTouchListener(ctx: Context?) : View.OnTouchListener {
+class OnSwipeTouchListener(ctx: Context?, private val onSwipeRight: ()-> Unit, private val onSwipeLeft: ()-> Unit) : View.OnTouchListener {
     private val gestureDetector: GestureDetector
 
-    interface SwipeHandler {
-        fun onSwipeLeft()
-        fun onSwipeRight()
-    }
+    //interface SwipeHandler {
+    //    fun onSwipeLeft()
+    //    fun onSwipeRight()
+    //}
 
     @Suppress("ClickableViewAccessibility")
     override fun onTouch(v: View, event: MotionEvent): Boolean {
@@ -44,8 +44,10 @@ class OnSwipeTouchListener(ctx: Context?) : View.OnTouchListener {
         }
     }
 
-    fun onSwipeRight() = detailViewModel.previousPhoto()
-    fun onSwipeLeft() = detailViewModel.nextPhoto()
+    fun onSwipeRight() = onSwipeRight.invoke()
+            //detailViewModel.previousPhoto()
+    fun onSwipeLeft() = onSwipeLeft.invoke()
+                //detailViewModel.nextPhoto()
 
     init {
         gestureDetector = GestureDetector(ctx, GestureListener())

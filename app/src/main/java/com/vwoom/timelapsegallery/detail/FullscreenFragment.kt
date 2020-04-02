@@ -92,9 +92,9 @@ class FullscreenFragment : Fragment() {
         }
 
         // Set a listener to change the current photo on swipe
-        //@Suppress("ClickableViewAccessibility")
-        //binding?.fullscreenImageBottom?.setOnTouchListener(mOnSwipeTouchListener)
-        setFullscreenImage()
+        val swipeListener = OnSwipeTouchListener(requireContext(), {previousPhoto()}, {nextPhoto()})
+        @Suppress("ClickableViewAccessibility")
+        binding?.fullscreenImageBottom?.setOnTouchListener(swipeListener)
         Glide.with(this)
                 .load(photos[position])
                 .listener(object: RequestListener<Drawable?>{
@@ -110,15 +110,11 @@ class FullscreenFragment : Fragment() {
                 .into(binding!!.fullscreenImageBottom)
     }
 
-    // Pre loads the selected image into the fullscreen dialogue
-    // This is so that the user can navigate to the fullscreen dialog without having to wait for image loading
-
-    private fun setFullscreenImage() {
-        val current = File(photos[position])
-        loadImagePair(current, binding!!.fullscreenImageBottom, binding!!.fullscreenImageTop)
-    }
-
-    private fun loadImagePair(f: File, bottomImage: ImageView, topImage: ImageView) {
+    // Loads the current position seamlessly
+    private fun loadImagePair() {
+        val f = photoFiles[position]
+        val bottomImage = binding!!.fullscreenImageBottom
+        val topImage = binding!!.fullscreenImageTop
         mImageIsLoaded = false
         // 1. The first glide call: First load the image into the next image view on top of the current
         Glide.with(this)
@@ -202,7 +198,7 @@ class FullscreenFragment : Fragment() {
             delay(playbackInterval)
             // If image is loaded load the next photo
             if (mImageIsLoaded) {
-                loadImagePair(photoFiles[position], binding!!.fullscreenImageBottom, binding!!.fullscreenImageTop)
+                loadImagePair()
                 position++
                 scheduleLoadPhoto()
             }
@@ -217,7 +213,7 @@ class FullscreenFragment : Fragment() {
         playJob?.cancel()
         playing = false
         setFabStateStopped()
-        loadImagePair(photoFiles[position], binding!!.fullscreenImageBottom, binding!!.fullscreenImageTop)
+        loadImagePair()
     }
 
     // Sets the two play buttons to red with a stop icon
@@ -236,5 +232,16 @@ class FullscreenFragment : Fragment() {
         fullscreenPlayFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
     }
 
+    private fun nextPhoto(){
+        if (position == photos.size-1) return
+        position++
+        loadImagePair()
+    }
+
+    private fun previousPhoto(){
+        if (position == 0) return
+        position--
+        loadImagePair()
+    }
 
 }
