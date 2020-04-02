@@ -23,10 +23,9 @@
         android:id="@+id/fullscreen_play_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:fabSize="mini"
-        android:layout_margin="@dimen/small"
+        android:layout_margin="@dimen/medium"
         android:src="@drawable/ic_play_arrow_white_24dp"
-        app:layout_constraintBottom_toTopOf="@id/fullscreen_exit_fab"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />
 
@@ -48,12 +47,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:fabSize="mini"
-        android:layout_margin="@dimen/detail_small_margin"
+        android:layout_margin="@dimen/medium"
         app:elevation="0dp"
         app:pressedTranslationZ="0dp"
         app:backgroundTint="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fullscreen_play_fab"
         android:src="@drawable/ic_fullscreen_exit_white_24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
