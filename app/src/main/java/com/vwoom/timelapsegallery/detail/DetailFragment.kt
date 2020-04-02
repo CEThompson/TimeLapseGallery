@@ -724,6 +724,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         setScheduleInformation()
     }
 
+    // TODO handle feedback when trying to play a set of 1 image within fullscreen dialog
     private fun initializeFullscreenImageDialog() {
         // Create the dialog
         mFullscreenImageDialog = Dialog(requireContext(), R.style.Theme_AppCompat_Light_NoActionBar_FullScreen)
