@@ -16,7 +16,7 @@ class Camera2ViewModel(
     suspend fun handleFinalPhotoFile(file: File, externalFilesDir: File){
         // If no project passed in when constructed then create a new project
         if (project == null) projectRepository.newProject(file, externalFilesDir,0)
-        // Otherwise add photo to project
+        // Otherwise add photo to the project
         else {
             photoRepository.addPhotoToProject(file, externalFilesDir, project)
         }
