@@ -18,6 +18,7 @@ class CameraFocusOnTouchHandler(
         private val mBackgroundHandler: Handler
 ) : OnTouchListener {
     private var mManualFocusEngaged = false
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         // Override in your touch-enabled view (this can be different than the view you use for displaying the cam preview)
@@ -30,10 +31,10 @@ class CameraFocusOnTouchHandler(
             return true
         }
         val sensorArraySize = mCameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE)
-        //TODO (update 1.2): correspond flipped x / y to actual sensor orientation
+        //TODO (update 1.2): investigate corresponding flipped x / y to actual sensor orientation
         val y = (motionEvent.x / view.width.toFloat() * sensorArraySize!!.height().toFloat()).toInt()
         val x = (motionEvent.y / view.height.toFloat() * sensorArraySize.width().toFloat()).toInt()
-        // TODO (update 1.2): represent actual touch size in pixels
+        // TODO (update 1.2): investigate representing actual touch size in pixels
         val halfTouchWidth = 50
         val halfTouchHeight = 50
         val focusAreaTouch = MeteringRectangle(max(x - halfTouchWidth, 0),
@@ -83,7 +84,6 @@ class CameraFocusOnTouchHandler(
         mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO)
         mCaptureRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_START)
         mCaptureRequestBuilder.setTag("FOCUS_TAG") // Capture this later for resuming the preview
-
         // Then ask for a single request
         try {
             mCaptureSession.capture(mCaptureRequestBuilder.build(), captureCallbackHandler, mBackgroundHandler)
@@ -107,5 +107,4 @@ class CameraFocusOnTouchHandler(
     companion object {
         private const val TAG = "FocusOnTouchHandler"
     }
-
 }
