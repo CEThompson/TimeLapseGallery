@@ -8,7 +8,7 @@ import androidx.exifinterface.media.ExifInterface
 import java.io.IOException
 
 object PhotoUtils {
-    
+
     fun findCamera(context: Context): String? {
         val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         for (id in cameraManager.cameraIdList) {

@@ -1,15 +1,15 @@
 package com.vwoom.timelapsegallery.utils
 
-import com.vwoom.timelapsegallery.data.entry.*
+import com.vwoom.timelapsegallery.data.entry.PhotoEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.view.Project
 import java.io.File
-import java.util.ArrayList
+import java.util.*
 
 object ProjectUtils {
-    private val TAG = ProjectUtils::class.java.simpleName
-
+    
     // Error for photo loading
-    const val ERROR_TIMESTAMP_TO_PHOTO = "error retrieving photo from timestamp"
+    private const val ERROR_TIMESTAMP_TO_PHOTO = "error retrieving photo from timestamp"
 
     fun getProjectFolder(externalFilesDir: File, projectEntry: ProjectEntry): File {
         val projectPath = getProjectDirectoryPath(projectEntry)
