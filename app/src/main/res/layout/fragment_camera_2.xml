@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="30dp"
             android:src="@drawable/ic_add_a_photo_white_24dp"
-            app:fabCustomSize="80dp"
+            app:fabCustomSize="@dimen/fab_jumbo"
             app:maxImageSize="@dimen/fab_max_image_size"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            app:fabCustomSize="65dp"
+            app:fabCustomSize="@dimen/fab_large"
             app:maxImageSize="@dimen/fab_max_image_size"
             android:src="@drawable/ic_compare_white_24dp"
             app:layout_constraintBottom_toBottomOf="parent"

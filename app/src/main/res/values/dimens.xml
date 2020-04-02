@@ -19,7 +19,8 @@
     <dimen name="medium">8dp</dimen>
     <dimen name="large">16dp</dimen>
 
-    <dimen name="fab_large">75dp</dimen>
+    <dimen name="fab_jumbo">80dp</dimen>
+    <dimen name="fab_large">65dp</dimen>
     <dimen name="fab_max_image_size">30dp</dimen>
 
     <dimen name="detail_project_info_width">200dp</dimen>
