@@ -17,8 +17,6 @@ class PhotoRepository private constructor(private val photoDao: PhotoDao,
 
     fun getPhotos(projectId: Long) = photoDao.getPhotosLiveDataByProjectId(projectId)
 
-    fun getPhoto(projectId: Long, photoId: Long) = photoDao.getPhoto(projectId, photoId)
-
     suspend fun addPhotoToProject(file: File,
                                   externalFilesDir: File,
                                   project: Project){
