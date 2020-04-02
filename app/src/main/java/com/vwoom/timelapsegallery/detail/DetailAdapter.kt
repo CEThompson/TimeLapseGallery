@@ -77,8 +77,4 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
         mCurrentPhoto = photo
         notifyDataSetChanged()
     }
-
-    companion object {
-        private val TAG = DetailAdapter::class.java.simpleName
-    }
 }
