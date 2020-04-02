@@ -9,7 +9,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.vwoom.timelapsegallery.data.dao.*
 import com.vwoom.timelapsegallery.data.entry.*
 
-@Database(entities = [ProjectEntry::class, PhotoEntry::class, TagEntry::class, ProjectTagEntry::class, ProjectScheduleEntry::class, CoverPhotoEntry::class],
+@Database(entities = [
+    ProjectEntry::class,
+    PhotoEntry::class,
+    TagEntry::class,
+    ProjectTagEntry::class,
+    ProjectScheduleEntry::class,
+    CoverPhotoEntry::class],
         version = 2,
         exportSchema = true)
 abstract class TimeLapseDatabase : RoomDatabase() {
@@ -52,7 +58,6 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                 database.execSQL("CREATE INDEX IF NOT EXISTS index_cover_photo_project_id ON cover_photo(project_id)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS index_cover_photo_photo_id ON cover_photo(photo_id)")
 
-
                 // Table 2: Project Schedule
                 // columns: project_id, interval_days
                 database.execSQL("CREATE TABLE IF NOT EXISTS project_schedule " +
@@ -65,7 +70,6 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                 // Table 3: Project
                 // initial columns: id, name, thumbnail_url, schedule, schedule_next_submission, timestamp
                 // altered columns: id, project_name
-
                 // Create the new table
                 database.execSQL("CREATE TABLE project_new " +
                         "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
@@ -81,7 +85,6 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                 // Table 4: Photo
                 // initial columns: id, project_id, url, timestamp
                 // altered columns: id, project_id, timestamp
-
                 // Create the new photo table
                 database.execSQL("CREATE TABLE photo_new " +
                         "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
@@ -114,7 +117,6 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                         "FOREIGN KEY(tag_id) REFERENCES tag(id) ON UPDATE NO ACTION ON DELETE CASCADE)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS index_project_tag_project_id ON project_tag(project_id)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS index_project_tag_tag_id ON project_tag(tag_id)")
-
 
                 // Table(6): Tag
                 // init: id, title
