@@ -41,6 +41,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
                     binding,
                     adapterPosition)
         }
+
         init {
             binding.root.setOnClickListener(this)
         }
@@ -75,7 +76,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         }
 
         val projectIsScheduled = (project.interval_days != 0)
-        if (projectIsScheduled){
+        if (projectIsScheduled) {
             setScheduleInformation(project, holder, project.interval_days, photoTakenToday)
             holder.binding.galleryScheduleLayout.scheduleLayout.visibility = VISIBLE
         } else {
@@ -84,18 +85,12 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
 
         // Set transition targets
         val imageTransitionName = project.project_id.toString()
-        val cardTransitionName = "${imageTransitionName}card"
-        val bottomGradientTransitionName = "${imageTransitionName}bottomGradient"
-        val topGradientTransitionName = "${imageTransitionName}topGradient"
-        val dueTransitionName = "${imageTransitionName}due"
-        val intervalTransitionName = "${imageTransitionName}interval"
         holder.binding.projectImage.transitionName = imageTransitionName
-        holder.binding.projectCardView.transitionName = cardTransitionName
-        holder.binding.galleryBottomGradient.transitionName = bottomGradientTransitionName
-        holder.binding.galleryScheduleLayout.galleryGradientTopDown.transitionName = topGradientTransitionName
-        holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.transitionName = dueTransitionName
-        holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.transitionName = intervalTransitionName
-
+        holder.binding.projectCardView.transitionName = "${imageTransitionName}card"
+        holder.binding.galleryBottomGradient.transitionName = "${imageTransitionName}bottomGradient"
+        holder.binding.galleryScheduleLayout.galleryGradientTopDown.transitionName = "${imageTransitionName}topGradient"
+        holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.transitionName = "${imageTransitionName}due"
+        holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.transitionName = "${imageTransitionName}interval"
 
         // Load the image
         Glide.with(holder.itemView.context)
@@ -136,10 +131,10 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         when {
             photoTakenToday -> holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = 0.3f
             daysUntilDue <= 0 -> holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = 1f
-            daysUntilDue == 1.toLong() ->  holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = .9f
+            daysUntilDue == 1.toLong() -> holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = .9f
             else -> {
                 val minOpacity = .5f
-                val dimFactor = (1f/log(daysUntilDue.toFloat(),2f))
+                val dimFactor = (1f / log(daysUntilDue.toFloat(), 2f))
                 val opacityAdjust = .4f * dimFactor
                 val opacity = minOpacity + opacityAdjust
                 holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = opacity
@@ -158,9 +153,5 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
             holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv
                     .setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_schedule_indicator_pending_24dp, 0, 0, 0)
         }
-    }
-
-    companion object {
-        private val TAG = GalleryAdapter::class.java.simpleName
     }
 }
