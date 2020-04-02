@@ -17,7 +17,7 @@ import java.io.File
 class ProjectRepository private constructor(private val projectDao: ProjectDao,
                                             private val photoDao: PhotoDao,
                                             private val coverPhotoDao: CoverPhotoDao,
-                                            private val projectScheduleDao: ProjectScheduleDao){
+                                            private val projectScheduleDao: ProjectScheduleDao) {
 
     fun getProjectViews() = projectDao.getProjectViewsLiveData()
 
@@ -25,17 +25,19 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
 
     fun getProjectView(projectId: Long) = projectDao.getProjectViewLiveData(projectId)
 
-    suspend fun updateProjectName(externalFilesDir: File, sourceProject: Project, name: String){
+    suspend fun updateProjectName(externalFilesDir: File, sourceProject: Project, name: String) {
         val source = projectDao.getProjectById(sourceProject.project_id)
         val destination = ProjectEntry(source.id, name)
-        val success = FileUtils.renameProject(externalFilesDir, source, destination)
-        if (success){
-            source.project_name = destination.project_name
-            projectDao.updateProject(source)
+        withContext(Dispatchers.IO) {
+            val success = FileUtils.renameProject(externalFilesDir, source, destination)
+            if (success) {
+                source.project_name = destination.project_name
+                projectDao.updateProject(source)
+            }
         }
     }
 
-    suspend fun newProject(file: File, externalFilesDir: File, scheduleInterval: Int = 0){
+    suspend fun newProject(file: File, externalFilesDir: File, scheduleInterval: Int = 0) {
         // Create database entries
         val timestamp = System.currentTimeMillis()
 
@@ -60,16 +62,19 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
         }
     }
 
-    suspend fun deleteProject(externalFilesDir: File, projectId: Long){
+    suspend fun deleteProject(externalFilesDir: File, projectId: Long) {
         val projectEntry = projectDao.getProjectById(projectId)
-        // Delete files first since there is a listener on the project
-        FileUtils.deleteProject(externalFilesDir, projectEntry)
-        // Now remove reference from the database
-        projectDao.deleteProjectByEntry(projectEntry)
+        withContext(Dispatchers.IO) {
+            // Delete files first since there is a listener on the project
+            FileUtils.deleteProject(externalFilesDir, projectEntry)
+            // Now remove reference from the database
+            projectDao.deleteProjectByEntry(projectEntry)
+        }
     }
 
     companion object {
-        @Volatile private var instance: ProjectRepository? = null
+        @Volatile
+        private var instance: ProjectRepository? = null
 
         fun getInstance(projectDao: ProjectDao,
                         photoDao: PhotoDao,
