@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
@@ -87,9 +88,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mDetailAdapter: DetailAdapter? = null
 
     // Dialogs
-    private var mFullscreenImageDialog: Dialog? = null
-    private var fullscreenImageBottom: ImageView? = null
-    private var fullscreenImageTop: ImageView? = null
     private var mTagDialog: Dialog? = null
     private var mInfoDialog: Dialog? = null
     private var mScheduleDialog: Dialog? = null
@@ -107,6 +105,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Jobs
     private var playJob: Job? = null
     private var tagJob: Job? = null
+
+    // For fullscreen frag
+    private var photoUrls: Array<String> = arrayOf()
 
     // Swipe listener for image navigation
     private var mOnSwipeTouchListener: OnSwipeTouchListener? = null
@@ -218,11 +219,22 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             detailViewModel.infoDialogShowing = true
         }
         binding?.fullscreenFab?.setOnClickListener {
+            // TODO navigate to fullscreen fragment
+            exitTransition = TransitionInflater.from(context).inflateTransition(R.transition.details_to_fullscreen_transition)
+            val action = DetailFragmentDirections.actionDetailsFragmentToFullscreenFragment(detailViewModel.photoIndex, photoUrls)
+            val extras = FragmentNavigatorExtras(
+                    //binding!!.fullscreenFab as View to "fs_exit_fab",
+                    //binding!!.detailCurrentImage as View to "fullscreen_base_image",
+                    binding!!.playAsVideoFab as View to "fs_play_fab")
+            findNavController().navigate(action, extras)
+
+            /*
             if (mFullscreenImageDialog == null) initializeFullscreenImageDialog()
             if (!mPlaying) {
                 mFullscreenImageDialog?.show()
                 detailViewModel.fullscreenDialogShowing = true
             }
+             */
         }
         // Set a swipe listener for the image
         mOnSwipeTouchListener = OnSwipeTouchListener(requireContext())
@@ -247,6 +259,29 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         setupViewModel()
 
         return binding?.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val timestamp = mCurrentProject!!.cover_photo_timestamp
+        val url = FileUtils.getPhotoUrl(mExternalFilesDir!!, getProjectEntryFromProjectView(mCurrentProject!!), timestamp)
+        val file = File(url)
+        Glide.with(this)
+                .load(file)
+                .listener(object : RequestListener<Drawable?> {
+                    override fun onLoadFailed(e: GlideException?,
+                                              model: Any,
+                                              target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
+
+                    override fun onResourceReady(resource: Drawable?, model: Any, target: Target<Drawable?>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
+                })
+                .into(binding!!.detailCurrentImage)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -300,12 +335,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onResume() {
         super.onResume()
         // Restore any showing dialogs
+        /*
         if (detailViewModel.fullscreenDialogShowing) {
             if (mFullscreenImageDialog == null) {
                 initializeFullscreenImageDialog()
             }
             mFullscreenImageDialog?.show()
         }
+         */
         if (detailViewModel.infoDialogShowing) {
             if (mInfoDialog == null) initializeInfoDialog()
             mInfoDialog?.show()
@@ -328,7 +365,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // Dismiss any dialogs
         mInfoDialog?.dismiss()
-        mFullscreenImageDialog?.dismiss()
         mTagDialog?.dismiss()
         mScheduleDialog?.dismiss()
     }
@@ -344,7 +380,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mTagDialog = null
         mScheduleDialog = null
         mInfoDialog = null
-        mFullscreenImageDialog = null
         mDetailAdapter = null
         toolbar = null
     }
@@ -433,14 +468,17 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mImageIsLoaded = false // this set to true after load image pair completes
         // Load the image to the fullscreen dialog if it is showing or to the detail cardview otherwise
         val f = File(imagePath)
+        /*
         if (mFullscreenImageDialog?.isShowing == true) {
             loadImagePair(f, fullscreenImageBottom!!, fullscreenImageTop!!)
         } else {
-            loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
-            // if we are not playing preload the fullscreen image for the user
-            // so that they do not have to wait for image load
-            if (!mPlaying) setFullscreenImage()
-        }
+         */
+        loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
+        // if we are not playing preload the fullscreen image for the user
+        // so that they do not have to wait for image load
+        /*
+        if (!mPlaying) setFullscreenImage()
+         */
     }
 
     // TODO: (update 1.2) re-evaluate and speed up image loading
@@ -467,7 +505,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                                 .load(f)
                                 .listener(object : RequestListener<Drawable?> {
                                     override fun onLoadFailed(e: GlideException?, model: Any, target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
-                                        startPostponedEnterTransition()
                                         val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
                                         toast.show()
                                         return false
@@ -479,7 +516,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                                         // Record state
                                         mImageIsLoaded = true
                                         // And begin the shared element transition if appropriate
-                                        startPostponedEnterTransition()
                                         return false
                                     }
                                 })
@@ -531,10 +567,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
         binding?.playAsVideoFab?.setImageResource(R.drawable.ic_stop_white_24dp)
+        /*
         val fullscreenPlayFab = mFullscreenImageDialog?.findViewById<FloatingActionButton>(R.id.fullscreen_play_fab)
         fullscreenPlayFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
         fullscreenPlayFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
-        fullscreenPlayFab?.setImageResource(R.drawable.ic_stop_white_24dp)
+        fullscreenPlayFab?.setImageResource(R.drawable.ic_stop_white_24dp)*/
     }
 
     // Sets the two play buttons to green with a play icon
@@ -542,10 +579,13 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
         binding?.playAsVideoFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
+        /*
         val fullscreenPlayFab = mFullscreenImageDialog?.findViewById<FloatingActionButton>(R.id.fullscreen_play_fab)
         fullscreenPlayFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
         fullscreenPlayFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
         fullscreenPlayFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
+
+         */
     }
 
     // Resets the UI & handles state after playing
@@ -724,46 +764,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         setScheduleInformation()
     }
 
-    // TODO handle feedback when trying to play a set of 1 image within fullscreen dialog
-    private fun initializeFullscreenImageDialog() {
-        // Create the dialog
-        mFullscreenImageDialog = Dialog(requireContext(), R.style.Theme_AppCompat_Light_NoActionBar_FullScreen)
-        mFullscreenImageDialog?.setCancelable(false)
-        mFullscreenImageDialog?.setContentView(R.layout.dialog_fullscreen_image)
-        fullscreenImageBottom = mFullscreenImageDialog?.findViewById(R.id.fullscreen_image_bottom)
-        fullscreenImageTop = mFullscreenImageDialog?.findViewById(R.id.fullscreen_image_top)
-        val fullscreenExitFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_exit_fab)
-        val fullscreenBackFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_back_fab)
-        val fullscreenPlayFab: FloatingActionButton? = mFullscreenImageDialog?.findViewById(R.id.fullscreen_play_fab)
-        // Init color of play fab
-        fullscreenPlayFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
-        fullscreenPlayFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
-        // Display the dialog on clicking the image
-        fullscreenPlayFab?.setOnClickListener { playSetOfImages() }
-        fullscreenBackFab?.setOnClickListener {
-            stopPlaying()
-            mFullscreenImageDialog?.dismiss()
-            detailViewModel.fullscreenDialogShowing = false
-        }
-        fullscreenExitFab?.setOnClickListener {
-            stopPlaying()
-            mFullscreenImageDialog?.dismiss()
-            detailViewModel.fullscreenDialogShowing = false
-        }
-        mFullscreenImageDialog?.setOnKeyListener { _, keyCode, _ ->
-            if (keyCode == KeyEvent.KEYCODE_BACK) {
-                stopPlaying()
-                mFullscreenImageDialog?.dismiss()
-                detailViewModel.fullscreenDialogShowing = false
-            }
-            true
-        }
-        // Set a listener to change the current photo on swipe
-        @Suppress("ClickableViewAccessibility")
-        fullscreenImageBottom?.setOnTouchListener(mOnSwipeTouchListener)
-        setFullscreenImage()
-    }
-
     /**
      * UI binding
      */
@@ -893,6 +893,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             detailViewModel.currentPhoto.value = newCurrentPhoto
             // Make sure to save the position of the max index in the view model
             detailViewModel.maxIndex = newMaxIndex
+
+            // TODO set up photos for fullscreen fragment
+            detailViewModel.viewModelScope.launch {
+                val list = arrayListOf<String>()
+                for (photo in photoEntries) {
+                    val photoUrl = FileUtils.getPhotoUrl(mExternalFilesDir!!, getProjectEntryFromProjectView(mCurrentProject!!), photo.timestamp)
+                    list.add(photoUrl)
+                }
+                photoUrls = list.map {it}.toTypedArray()
+            }
         })
 
         // Observes the currently selected photo
@@ -938,19 +948,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mAllTags = tagEntries.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
             setProjectTagDialog()
         })
-    }
-
-    // Pre loads the selected image into the fullscreen dialogue
-    // This is so that the user can navigate to the fullscreen dialog without having to wait for image loading
-    private fun setFullscreenImage() {
-        if (mFullscreenImageDialog == null) return
-        if (mCurrentPhoto == null) return
-        val path = FileUtils.getPhotoUrl(
-                mExternalFilesDir!!,
-                getProjectEntryFromProjectView(mCurrentProject!!),
-                mCurrentPhoto!!.timestamp)
-        val current = File(path)
-        loadImagePair(current, fullscreenImageBottom!!, fullscreenImageTop!!)
     }
 
     // This updates the tags in the project info dialog

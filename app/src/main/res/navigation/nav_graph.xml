@@ -45,6 +45,9 @@
         <argument
             android:name="transitionPosition"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_detailsFragment_to_fullscreenFragment"
+            app:destination="@id/fullscreenFragment" />
     </fragment>
 
     <fragment
@@ -81,6 +84,17 @@
             android:name="project"
             app:argType="com.vwoom.timelapsegallery.data.view.Project"
             app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/fullscreenFragment"
+        android:name="com.vwoom.timelapsegallery.detail.FullscreenFragment"
+        android:label="FullscreenFragment" >
+        <argument
+            android:name="position"
+            app:argType="integer" />
+        <argument
+            android:name="photoUrls"
+            app:argType="string[]" />
     </fragment>
 
 </navigation>
