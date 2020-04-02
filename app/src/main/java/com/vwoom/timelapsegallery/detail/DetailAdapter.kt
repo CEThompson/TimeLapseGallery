@@ -13,7 +13,7 @@ import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import java.io.File
 
-class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val externalFilesDir: File) : RecyclerView.Adapter<DetailAdapterViewHolder>() {
+class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val externalFilesDir: File?) : RecyclerView.Adapter<DetailAdapterViewHolder>() {
     private var mPhotos: List<PhotoEntry>? = null
     private var mProject: Project? = null
     private var mCurrentPhoto: PhotoEntry? = null
@@ -41,12 +41,13 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
         return DetailAdapterViewHolder(binding)
     }
 
+    // TODO figure out how to remove as many of these !! operators as possible for safer error handling
     override fun onBindViewHolder(holder: DetailAdapterViewHolder, position: Int) {
         val binding = holder.binding
         val context = holder.itemView.context
         val currentPhoto = mPhotos?.get(position)
         val photoPath = FileUtils.getPhotoUrl(
-                externalFilesDir,
+                externalFilesDir!!,
                 getProjectEntryFromProjectView(mProject!!),
                 currentPhoto!!.timestamp)
         val f = File(photoPath)
