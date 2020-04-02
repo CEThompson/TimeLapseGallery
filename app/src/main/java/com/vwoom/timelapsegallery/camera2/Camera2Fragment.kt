@@ -51,15 +51,11 @@ private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private val args: Camera2FragmentArgs by navArgs()
-
     private val cameraId: String by lazy { args.cameraId }
-
-    // Camera variables
     private val cameraManager: CameraManager by lazy {
         val context = requireContext().applicationContext
         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     }
-
     private val characteristics: CameraCharacteristics by lazy {
         cameraManager.getCameraCharacteristics(cameraId)
     }
@@ -72,6 +68,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private lateinit var captureRequestBuilder: CaptureRequest.Builder
     private var previewSize: Size? = null
 
+    // For capturing image to match preview output
     private var baseWidth: Int = 0
     private var baseHeight: Int = 0
 
@@ -82,20 +79,20 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private var mTakePictureFab: FloatingActionButton? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Set up bindings
         val binding = FragmentCamera2Binding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
         viewFinder = binding.cameraPreview
         mTakePictureFab = binding.takePictureFab
 
-        // Loads the last photo from a project into the compare view if available
+        // Load the last photo from a project into the compare view if available
         if (camera2ViewModel.photo != null) {
             val file = File(camera2ViewModel.photo?.photo_url!!)
             Glide.with(requireContext())
                     .load(file).into(binding.previousPhoto)
         }
-        // Set up quick compare function
+
+        // Set up quick compare to previous photo
         @Suppress("ClickableViewAccessibility")
         binding.quickCompareFab.setOnTouchListener { _, event ->
             when (event.action) {
@@ -110,12 +107,12 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 else -> false
             }
         }
+
         // If no project photo was passed hide the quick compare
         if (args.photo == null) binding.quickCompareFab.hide()
 
         mTakePictureFab?.setOnClickListener {
             it.isEnabled = false
-
             var outputPhoto: FileOutputStream? = null
             try {
                 val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
@@ -156,35 +153,31 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                         viewFinder.display,
                         characteristics,
                         SurfaceHolder::class.java)
-                //viewFinder.holder.setFixedSize(previewSize.width, previewSize.height)
                 Log.d(TAG, "previewSize is width ${previewSize!!.width} and height ${previewSize!!.height}")
                 viewFinder.setAspectRatio(previewSize!!.width, previewSize!!.height)
 
-                // Transforms the viewfinder if device is rotated
+                // Transform the viewfinder to device rotation
                 transformImage(width, height)
 
                 // Initialize camera in the viewfinders thread so that size is set
                 viewFinder.post {
-                    // but first request the permissions, if permissions cleared or granted then camera is initialized
+                    // But first request the permissions, if permissions cleared or granted then camera is initialized
+                    // Initialization occurs after request permission result
                     requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
                 }
                 baseHeight = height
                 baseWidth = width
             }
-
             override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
                 return false
             }
-
             override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
                 baseHeight = height
                 baseWidth = width
             }
-
             override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
             }
         }
-
         relativeOrientation = OrientationLiveData(requireContext(), characteristics).apply {
             observe(viewLifecycleOwner, Observer { orientation ->
                 Log.d(TAG, "Orientation changed to $orientation")
@@ -195,21 +188,18 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private fun initializeCamera() = lifecycleScope.launchIdling {
         camera = openCamera(cameraManager, cameraId, cameraHandler)
 
-        // This line would get the true sensor size but for now match the size of the preview view
-        // val size = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!.getOutputSizes(pixelFormat).maxBy {it.height * it.width}!!
-
         // Match size of image output to preview size
         previewSize = getPreviewOutputSize(
                 viewFinder.display,
                 characteristics,
                 SurfaceHolder::class.java)
 
+        // Set the surface of the texture view as a target
         val surfaceTexture = viewFinder.surfaceTexture
         surfaceTexture.setDefaultBufferSize(previewSize!!.width, previewSize!!.height)
         val previewSurface = Surface(surfaceTexture)
         val targets = listOf(previewSurface)
         session = createCaptureSession(camera, targets, cameraHandler)
-
         captureRequestBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
             addTarget(previewSurface)
         }
@@ -223,7 +213,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                         session,
                         cameraHandler))
 
-        // Set the initial request: Note the touch handler sets a repeated request as well likely overriding this
+        // Set the initial request.
+        // Note: the touch handler sets repeated request as well on touch
         session.setRepeatingRequest(captureRequestBuilder.build(), null, cameraHandler)
     }
 
@@ -240,7 +231,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 findNavController().popBackStack()
                 Log.d(TAG, "Camera disconnected")
             }
-
             override fun onError(camera: CameraDevice, error: Int) {
                 val msg = when (error) {
                     ERROR_CAMERA_DEVICE -> "Fatal (device"
@@ -282,6 +272,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         cameraThread.quitSafely()
     }
 
+    // Transforms the viewfinder to the device orientation
     private fun transformImage(viewWidth: Int, viewHeight: Int) {
         if (previewSize == null || !::viewFinder.isInitialized) return
         val matrix = Matrix()
@@ -305,6 +296,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         viewFinder.setTransform(matrix)
     }
 
+    // Returns a transform matrix for rotating the bitmap from the viewfinder on capture
     private fun getTransformMatrix(viewWidth: Int, viewHeight: Int): Matrix {
         val matrix = Matrix()
         val rotation = requireActivity().windowManager.defaultDisplay.rotation
@@ -327,10 +319,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         return matrix
     }
 
-    companion object {
-        val TAG = Camera2Fragment::class.java.simpleName
-    }
-
+    // Initializes the camera if permissions granted otherwise notifies user
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
@@ -347,5 +336,9 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
                 requireContext(), it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    companion object {
+        val TAG = Camera2Fragment::class.java.simpleName
     }
 }

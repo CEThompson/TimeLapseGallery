@@ -31,8 +31,6 @@ class OrientationLiveData(
         context: Context,
         characteristics: CameraCharacteristics
 ) : LiveData<Int>() {
-
-
     private val listener = object : OrientationEventListener(context.applicationContext) {
         override fun onOrientationChanged(orientation: Int) {
             val rotation = when {
@@ -47,22 +45,17 @@ class OrientationLiveData(
         }
     }
 
-
     override fun onActive() {
         super.onActive()
         listener.enable()
     }
-
 
     override fun onInactive() {
         super.onInactive()
         listener.disable()
     }
 
-
     companion object {
-
-
         /**
          * Computes rotation required to transform from the camera sensor orientation to the
          * device's current orientation in degrees.
@@ -79,7 +72,6 @@ class OrientationLiveData(
             val sensorOrientationDegrees =
                     characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
 
-
             val deviceOrientationDegrees = when (surfaceRotation) {
                 Surface.ROTATION_0 -> 0
                 Surface.ROTATION_90 -> 90
@@ -88,11 +80,9 @@ class OrientationLiveData(
                 else -> 0
             }
 
-
             // Reverse device orientation for front-facing cameras
             val sign = if (characteristics.get(CameraCharacteristics.LENS_FACING) ==
                     CameraCharacteristics.LENS_FACING_FRONT) 1 else -1
-
 
             // Calculate desired JPEG orientation relative to camera orientation to make
             // the image upright relative to the device orientation
