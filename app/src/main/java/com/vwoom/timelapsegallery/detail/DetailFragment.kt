@@ -224,8 +224,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             findNavController().navigate(action, extras)
         }
         // Set a swipe listener for the image
-        val onRightSwipe = {detailViewModel.previousPhoto()}
-        val onLeftSwipe = {detailViewModel.nextPhoto()}
+        val onRightSwipe = { if (!mPlaying) detailViewModel.previousPhoto() }
+        val onLeftSwipe = { if (!mPlaying) detailViewModel.nextPhoto() }
         val swipeListener = OnSwipeTouchListener(
                 requireContext(),
                 onRightSwipe,

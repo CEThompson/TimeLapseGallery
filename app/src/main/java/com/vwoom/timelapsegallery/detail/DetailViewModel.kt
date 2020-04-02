@@ -21,22 +21,20 @@ import java.io.File
 class DetailViewModel(private val projectRepository: ProjectRepository,
                       private val tagRepository: TagRepository,
                       projectId: Long) : ViewModel() {
-    // Project & Photo
-    val currentProject: LiveData<Project> = projectRepository.getProjectViewLiveData(projectId)
+    // Photo state
+    var lastPhoto: Photo? = null    // used to pass to the camera fragment
     val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
-    var lastPhoto: Photo? = null
+
+    // Live data
+    val currentProject: LiveData<Project> = projectRepository.getProjectViewLiveData(projectId)
     val photos: LiveData<List<PhotoEntry>> = projectRepository.getProjectPhotosLiveData(projectId)
     val projectTags: LiveData<List<ProjectTagEntry>> = tagRepository.getProjectTagsLiveData(projectId)
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
 
     // Dialog state
-    var fullscreenDialogShowing: Boolean = false
     var scheduleDialogShowing: Boolean = false
     var infoDialogShowing: Boolean = false
     var tagDialogShowing: Boolean = false
-
-    // Play state
-    private var isPlaying: Boolean = false
 
     var photoIndex: Int = 0
     var maxIndex: Int = 0
@@ -75,7 +73,6 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
     }
 
     fun nextPhoto() {
-        if (isPlaying) return
         if (photos.value == null || photos.value!!.size <= 1) return
         if (photoIndex == maxIndex) return
         photoIndex += 1
@@ -83,7 +80,6 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
     }
 
     fun previousPhoto() {
-        if (isPlaying) return
         if (photos.value == null || photos.value!!.isEmpty()) return
         if (photoIndex == 0) return
         photoIndex -= 1

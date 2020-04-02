@@ -234,12 +234,14 @@ class FullscreenFragment : Fragment() {
     }
 
     private fun nextPhoto() {
+        if (playing) return
         if (position == photos.size - 1) return
         position++
         loadImagePair()
     }
 
     private fun previousPhoto() {
+        if (playing) return
         if (position == 0) return
         position--
         loadImagePair()
