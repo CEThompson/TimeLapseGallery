@@ -14,7 +14,7 @@ class TimeLapseGalleryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_time_lapse_gallery)
     }
 
-    /* Ensure deletion of temporary photo files */
+    // On exit delete temp files and update notifications and widgets
     override fun onDestroy() {
         super.onDestroy()
         FileUtils.deleteTempFiles(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES))
