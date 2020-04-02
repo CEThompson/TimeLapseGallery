@@ -34,8 +34,10 @@ import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.coroutines.resume
@@ -113,33 +115,33 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
         mTakePictureFab?.setOnClickListener {
             it.isEnabled = false
-            var outputPhoto: FileOutputStream? = null
-            try {
-                val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-                val file = FileUtils.createTemporaryImageFile(externalFilesDir)
-                outputPhoto = FileOutputStream(file)
+            takePictureJob = lifecycleScope.launchIdling(Dispatchers.IO) {
+                var outputPhoto: FileOutputStream? = null
+                try {
+                    val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
+                    val file = FileUtils.createTemporaryImageFile(externalFilesDir)
+                    outputPhoto = FileOutputStream(file)
 
-                // Rotates and scales the bitmap based on the device rotation
-                val matrix = getTransformMatrix(baseWidth, baseHeight)
-                val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap, 0, 0, viewFinder.bitmap.width, viewFinder.bitmap.height, matrix, true)
-                adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
+                    // Rotates and scales the bitmap based on the device rotation
+                    val matrix = getTransformMatrix(baseWidth, baseHeight)
+                    val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap, 0, 0, viewFinder.bitmap.width, viewFinder.bitmap.height, matrix, true)
+                    adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
 
-                // TODO: (update 1.2) consider writing exif data for saved image
-                takePictureJob = lifecycleScope.launchIdling {
+                    // TODO: (update 1.2) consider writing exif data for saved image
                     camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir)
                     findNavController().popBackStack()
-                }
-            } catch (e: Exception) {
-                viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
-                Log.d(TAG, "Take picture exception: ${e.message}")
-            } finally {
-                try {
-                    outputPhoto?.close()
                 } catch (e: Exception) {
-                    Log.d(TAG, "Take picture exception in finally block, exception closing photo: ${e.message}")
+                    viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
+                    Log.d(TAG, "Take picture exception: ${e.message}")
+                } finally {
+                    try {
+                        outputPhoto?.close()
+                    } catch (e: Exception) {
+                        Log.d(TAG, "Take picture exception in finally block, exception closing photo: ${e.message}")
+                    }
                 }
+                it.post { it.isEnabled = true }
             }
-            it.post { it.isEnabled = true }
         }
         return binding.root
     }
