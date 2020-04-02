@@ -21,10 +21,6 @@ import java.io.File
 class DetailViewModel(private val projectRepository: ProjectRepository,
                       private val tagRepository: TagRepository,
                       projectId: Long) : ViewModel() {
-    // Photo state
-    var lastPhoto: Photo? = null    // used to pass to the camera fragment
-    val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
-
     // Live data
     val currentProject: LiveData<Project> = projectRepository.getProjectViewLiveData(projectId)
     val photos: LiveData<List<PhotoEntry>> = projectRepository.getProjectPhotosLiveData(projectId)
@@ -36,6 +32,9 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
     var infoDialogShowing: Boolean = false
     var tagDialogShowing: Boolean = false
 
+    // Photo state and positioning
+    val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
+    var lastPhoto: Photo? = null    // used to pass to the camera fragment
     var photoIndex: Int = 0
     var maxIndex: Int = 0
 
@@ -52,7 +51,7 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
         }
     }
 
-    fun deleteTagFromRepo(tagEntry: TagEntry) {
+    fun deleteTagFromDatabase(tagEntry: TagEntry) {
         viewModelScope.launch {
             tagRepository.deleteTag(tagEntry)
         }
@@ -64,6 +63,7 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
         }
     }
 
+    // For passing to the camera fragment
     fun setLastPhotoByEntry(externalFilesDir: File, project: Project, entry: PhotoEntry) {
         val url = FileUtils.getPhotoUrl(
                 externalFilesDir,
@@ -109,14 +109,14 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
 
     fun deleteCurrentPhoto(externalFilesDir: File) {
         viewModelScope.launch {
-            // First get the next photo entry to display
+            // First get the next photo entry to display. If no photo entry do nothing
             val currentPhotoEntry: PhotoEntry = currentPhoto.value ?: return@launch
 
+            // If photo was the last set the new index to the previous
             if (photoIndex == maxIndex) photoIndex--
 
             // Delete the current entry
             projectRepository.deleteProjectPhoto(externalFilesDir, currentPhotoEntry)
-
         }
     }
 

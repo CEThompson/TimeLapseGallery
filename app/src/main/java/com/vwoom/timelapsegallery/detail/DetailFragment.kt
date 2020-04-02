@@ -2,7 +2,6 @@ package com.vwoom.timelapsegallery.detail
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -16,7 +15,6 @@ import android.transition.Transition
 import android.transition.TransitionInflater
 import android.util.Log
 import android.view.*
-import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.*
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
@@ -1034,7 +1032,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     // If this photo is the last photo then set the new thumbnail to its previous
-                    detailViewModel.deleteTagFromRepo(tagEntry)
+                    detailViewModel.deleteTagFromDatabase(tagEntry)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
