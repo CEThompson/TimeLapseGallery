@@ -5,12 +5,10 @@ import androidx.lifecycle.ViewModel
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
-import com.vwoom.timelapsegallery.data.repository.ProjectTagRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Project
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import java.util.*
-import kotlin.collections.ArrayList
 
 const val SEARCH_TYPE_NONE = "none"
 const val SEARCH_TYPE_DUE_TODAY = "due_today"
@@ -19,10 +17,9 @@ const val SEARCH_TYPE_PENDING = "pending"
 const val SEARCH_TYPE_SCHEDULED = "scheduled"
 const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 
-class GalleryViewModel internal constructor(private val projectRepository: ProjectRepository,
-                                            private val tagRepository: TagRepository,
-                                            private val projectTagRepository: ProjectTagRepository) : ViewModel() {
-    val projects: LiveData<List<Project>> = projectRepository.getProjectViews()
+class GalleryViewModel internal constructor(projectRepository: ProjectRepository,
+                                            private val tagRepository: TagRepository) : ViewModel() {
+    val projects: LiveData<List<Project>> = projectRepository.getProjectViewsLiveData()
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
 
     // search data
@@ -45,7 +42,7 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
 
         if (searchTags.isNotEmpty()) {
             resultProjects = resultProjects.filter {
-                val projectTags: List<ProjectTagEntry> = projectTagRepository.getProjectTags(it.project_id)
+                val projectTags: List<ProjectTagEntry> = tagRepository.getProjectTags(it.project_id)
                 val tagEntriesForProject: List<TagEntry> = tagRepository.getTagsFromProjectTags(projectTags)
 
                 // Include projects with tags included in the search filter
@@ -64,7 +61,7 @@ class GalleryViewModel internal constructor(private val projectRepository: Proje
             }
         }
 
-        when(searchType) {
+        when (searchType) {
             SEARCH_TYPE_SCHEDULED -> {
                 resultProjects = resultProjects.filter {
                     return@filter it.interval_days > 0
