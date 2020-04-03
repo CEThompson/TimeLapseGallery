@@ -130,7 +130,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         try {
             mExternalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
         } catch (exc: KotlinNullPointerException) {
-            // TODO handle case of not being able to get external files drive!
+            // TODO (update 1.2): Investigate potential failurs with external files.
+            Log.e(TAG, "Couldn't get external files directory.")
+            Toast.makeText(requireContext(), "Fatal Error: Could not load external files!", Toast.LENGTH_LONG).show()
         }
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
