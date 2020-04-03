@@ -13,6 +13,8 @@ import com.vwoom.timelapsegallery.notification.NotificationUtils.convertDayOfYea
 import com.vwoom.timelapsegallery.notification.NotificationUtils.notifyUserOfScheduledProjects
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 
 class NotificationAlarm : BroadcastReceiver() {
@@ -33,18 +35,21 @@ class NotificationAlarm : BroadcastReceiver() {
         // Clear any previous notifications that are unused
         clearPreviousNotifications(context)
 
-        // Get the scheduled projects and figure out if any projects are due today
-        val projectRepo = InjectorUtils.getProjectRepository(context)
-        val scheduledProjects = projectRepo.getScheduledProjectViews()
-        val dueProjects = scheduledProjects.filter {
-            ProjectUtils.isProjectDueToday(it)
-        }
+        GlobalScope.launch{
+            // Get the scheduled projects and figure out if any projects are due today
+            val projectRepo = InjectorUtils.getProjectRepository(context)
+            val scheduledProjects = projectRepo.getScheduledProjectViews()
+            val dueProjects = scheduledProjects.filter {
+                ProjectUtils.isProjectDueToday(it)
+            }
 
-        // TODO test that notification does not send if it fires up and no projects are due
-        // If there are projects due today, send the notification
-        if (dueProjects.isNotEmpty()) notifyUserOfScheduledProjects(context, requestCode)
-        // Release the wake lock
-        w1.release()
+            Log.d(TAG, "there are ${dueProjects.size} projects due")
+            Log.d(TAG, "due projects is not empty ${dueProjects.isNotEmpty()}")
+            // If there are projects due today, send the notification
+            if (dueProjects.isNotEmpty()) notifyUserOfScheduledProjects(context, requestCode)
+            // Release the wake lock
+            w1.release()
+        }
     }
 
     // Sets an alarm for tomorrow at the shared preference time
