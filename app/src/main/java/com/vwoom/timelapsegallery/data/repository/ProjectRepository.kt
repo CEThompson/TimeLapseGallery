@@ -29,10 +29,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
     /**
      * Project updating and deletion
      */
-    suspend fun newProject(file: File, externalFilesDir: File, scheduleInterval: Int = 0) {
-        // Create database entries
-        val timestamp = System.currentTimeMillis()
-
+    suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int = 0) {
         // Create and insert the project
         val projectEntry = ProjectEntry(null)
         val projectId = projectDao.insertProject(projectEntry)
@@ -105,8 +102,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
 
     suspend fun addPhotoToProject(file: File,
                                   externalFilesDir: File,
-                                  project: Project) {
-        val timestamp = System.currentTimeMillis()
+                                  project: Project, timestamp: Long) {
         val photoEntry = PhotoEntry(project.project_id, timestamp)
         val photoId = photoDao.insertPhoto(photoEntry)
 
