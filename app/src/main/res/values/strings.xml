@@ -17,12 +17,6 @@
     <string name="by_schedule">by schedule:</string>
     <string name="by_due">due:</string>
 
-    <!-- Tracking -->
-    <string name="submit_project">Submit Project</string>
-    <string name="submitted">Submitted</string>
-    <string name="submit_photo">Submit Photo</string>
-    <string name="submitting">Submitting</string>
-
     <!-- Content descriptions -->
     <string name="gradient_content_description">Gradient to make schedule information more visible.</string>
     <string name="project_image_content_description">Thumbnail image for the time lapse project.</string>
@@ -75,23 +69,9 @@
     <string name="verify_delete_last_photo">This is the last photo in the project. Would you like to delete the project instead?</string>
     <string name="double_verify_project_deletion">Please verify to confirm.</string>
 
-    <!-- New project strings -->
     <string name="project_name">Project Name</string>
-    <string name="project_description">Project Description</string>
-    <string name="orientation">Orientation</string>
-    <string name="notification_schedule">Notification Schedule</string>
-    <string-array name="schedule_options">
-        <item>none</item>
-        <item>daily</item>
-        <item>weekly</item>
-    </string-array>
-
     <string name="unnamed">unnamed</string>
     <string name="none">none</string>
-    <string name="no_schedule">no schedule</string>
-    <string name="daily">daily</string>
-    <string name="weekly">weekly</string>
-
     <string name="no_projects_tagged">no projects tagged</string>
 
     <!-- Dialog resources -->
@@ -143,12 +123,8 @@
     <string name="error">Error</string>
     <string name="edit_failed">Edit failed to submit.</string>
 
-
     <!-- Error handling -->
-    <string name="error_creating_temporary_image_file">Error creating temporary image file.</string>
     <string name="error_loading_image">Error loading image.</string>
-    <string name="error_creating_final_file">Error creating final file.</string>
-    <string name="error_submitting_photo">Error submitting photo</string>
 
     <!-- Analytics user events-->
     <string name="analytics_add_photo" translatable="false">add_photo</string>
@@ -171,8 +147,6 @@
     <string name="analytics_manual_sync_enabled" translatable="false">manual_sync_enabled</string>
     <string name="analytics_manual_sync_executed" translatable="false">manual_sync_executed</string>
 
-
-
     <!-- Database sync warning information -->
     <string name="warning">Warning!</string>
     <string name="file_modification_information">
@@ -186,10 +160,8 @@
     <string name="database_sync_warning">Synchronization may take some time and must complete to be successful.
         \n\nPlease do not close the application.
         \n\n Do you still wish to proceed?</string>
-
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-
 
     <!-- Sync errors -->
     <string name="no_files_error">No files to synchronize</string>
@@ -203,7 +175,7 @@
         \n Exception message: %2$s</string>
 
     <string name="valid_file_structure" translatable="false">valid_file_structure</string>
-    <string name="executing_sync_notification">Executing synchronization...</string>
+    <string name="executing_sync_notification">Executing synchronization.</string>
     <string name="executing_sync_complete">Synchronization completed</string>
 
     <!-- Settings -->
