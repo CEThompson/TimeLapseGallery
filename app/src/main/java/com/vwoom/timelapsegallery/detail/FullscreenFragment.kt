@@ -60,7 +60,6 @@ class FullscreenFragment : Fragment() {
         val sharedElemTransition = TransitionInflater.from(context).inflateTransition(R.transition.fullscreen_shared_elem_transition)
         sharedElementEnterTransition = sharedElemTransition
         sharedElementReturnTransition = sharedElemTransition
-        enterTransition = TransitionInflater.from(context).inflateTransition(R.transition.fullscreen_transition)
         postponeEnterTransition()
     }
 
@@ -94,21 +93,7 @@ class FullscreenFragment : Fragment() {
         val swipeListener = OnSwipeTouchListener(requireContext(), { previousPhoto() }, { nextPhoto() })
         @Suppress("ClickableViewAccessibility")
         binding?.fullscreenImageBottom?.setOnTouchListener(swipeListener)
-        Glide.with(this)
-                .load(photos[position])
-                .listener(object : RequestListener<Drawable?> {
-                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable?>?, isFirstResource: Boolean): Boolean {
-                        startPostponedEnterTransition()
-                        return false
-                    }
-
-                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable?>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                        startPostponedEnterTransition()
-                        mImageIsLoaded = true
-                        return false
-                    }
-                })
-                .into(binding!!.fullscreenImageBottom)
+        loadImagePair()
     }
 
     // Loads the current position seamlessly
@@ -117,6 +102,9 @@ class FullscreenFragment : Fragment() {
         val bottomImage = binding!!.fullscreenImageBottom
         val topImage = binding!!.fullscreenImageTop
         mImageIsLoaded = false
+
+        binding?.fullscreenPositionTextview?.text = getString(R.string.details_photo_number_out_of, position+1,photos.size)
+
         // 1. The first glide call: First load the image into the next image view on top of the current
         Glide.with(this)
                 .load(photos[position])
@@ -137,9 +125,9 @@ class FullscreenFragment : Fragment() {
                                 .load(f)
                                 .listener(object : RequestListener<Drawable?> {
                                     override fun onLoadFailed(e: GlideException?, model: Any, target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
-                                        startPostponedEnterTransition()
                                         val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
                                         toast.show()
+                                        startPostponedEnterTransition()
                                         return false
                                     }
 

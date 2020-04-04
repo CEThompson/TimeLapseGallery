@@ -18,6 +18,7 @@ import android.util.Size
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
@@ -34,10 +35,10 @@ import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.utils.TimeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.coroutines.resume
@@ -127,8 +128,16 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap, 0, 0, viewFinder.bitmap.width, viewFinder.bitmap.height, matrix, true)
                     adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
 
-                    // TODO: (update 1.2) consider writing exif data for saved image
-                    camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir)
+                    // TODO update(1.2): re-evaluate exif data for future use
+                    // Write exif data for image
+                    val exif = ExifInterface(file.absolutePath)
+                    val timestamp = System.currentTimeMillis()
+                    val timeString = TimeUtils.getExifDateTimeFromTimestamp(timestamp)
+                    exif.setAttribute(ExifInterface.TAG_DATETIME_ORIGINAL, timeString)
+                    exif.saveAttributes()
+
+                    // Handle the final photo file: copies the final file to the projects directory and inserts into db
+                    camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir, timestamp)
                     findNavController().popBackStack()
                 } catch (e: Exception) {
                     viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
@@ -170,13 +179,16 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 baseHeight = height
                 baseWidth = width
             }
+
             override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
                 return false
             }
+
             override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
                 baseHeight = height
                 baseWidth = width
             }
+
             override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
             }
         }
@@ -233,6 +245,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 findNavController().popBackStack()
                 Log.d(TAG, "Camera disconnected")
             }
+
             override fun onError(camera: CameraDevice, error: Int) {
                 val msg = when (error) {
                     ERROR_CAMERA_DEVICE -> "Fatal (device"

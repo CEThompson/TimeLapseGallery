@@ -242,15 +242,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
      */
     private fun setupViewModel() {
         // Observe projects
-        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer {
+        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer {currentProjects ->
             // Detect if we have added a project and scroll to the end
             // If the size of the current list is larger a project has been added
-            val projectHasBeenAdded = (mPrevProjectsSize != null && mPrevProjectsSize!! < it.size)
+            val projectHasBeenAdded = (mPrevProjectsSize != null && mPrevProjectsSize!! < currentProjects.size)
             if (projectHasBeenAdded) {
                 mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.displayedProjects.size)
             }
             // Keep track of number of projects
-            mPrevProjectsSize = it.size
+            mPrevProjectsSize = currentProjects.size
 
             // Update the displayed projects in the gallery
             mGalleryViewModel.viewModelScope.launch {

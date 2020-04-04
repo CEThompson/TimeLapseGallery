@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -66,5 +67,22 @@
             android:transitionName="fs_play_fab"
             android:layout_gravity="bottom|end" />
 
+        <TextView
+            android:id="@+id/fullscreen_position_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="@dimen/large"
+            android:layout_marginBottom="@dimen/medium"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:alpha=".8"
+            android:layout_gravity="bottom|start"
+            tools:text="1/N"
+            />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </layout>
