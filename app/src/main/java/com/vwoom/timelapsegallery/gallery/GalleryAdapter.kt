@@ -129,15 +129,29 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
 
         // Calc opacity for due date
         when {
-            photoTakenToday -> holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = 0.3f
-            daysUntilDue <= 0 -> holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = 1f
-            daysUntilDue == 1.toLong() -> holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = .9f
+            // De-emphasize the schedule if the photo was already taken
+            photoTakenToday -> {
+                holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = 0.3f
+                holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.alpha = 0.3f
+            }
+            // Set at full strength if the project is due
+            daysUntilDue <= 0 -> {
+                holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = 1f
+                holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.alpha = 1f
+            }
+            // Indicate the project is coming up tomorrow
+            daysUntilDue == 1.toLong() -> {
+                holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = .9f
+                holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.alpha = 0.9f
+            }
             else -> {
-                val minOpacity = .5f
-                val dimFactor = (1f / log(daysUntilDue.toFloat(), 2f))
-                val opacityAdjust = .4f * dimFactor
-                val opacity = minOpacity + opacityAdjust
-                holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = opacity
+                // Calculate the opacity for mininum of 0.3f and maximum of 0.9f
+                val minOpacity = .3f
+                val maxFallOff = 0.6f
+                // opacity falls off at adjustment of 1/N to a minimum of 0.3f
+                val calcOpacity = maxFallOff * ( 1f / daysUntilDue.toFloat()) + minOpacity
+                holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.alpha = calcOpacity
+                holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.alpha = calcOpacity
             }
         }
 
