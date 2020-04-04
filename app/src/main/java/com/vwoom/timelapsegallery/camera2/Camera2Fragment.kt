@@ -28,6 +28,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
 import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
@@ -80,6 +82,13 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         InjectorUtils.provideCamera2ViewModelFactory(requireActivity(), args.photo, args.project)
     }
     private var mTakePictureFab: FloatingActionButton? = null
+
+    private var mFirebaseAnalytics: FirebaseAnalytics? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentCamera2Binding.inflate(inflater, container, false).apply {
@@ -138,6 +147,14 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
                     // Handle the final photo file: copies the final file to the projects directory and inserts into db
                     camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir, timestamp)
+
+                    // Log photo or project addition
+                    if (args.project == null){
+                        mFirebaseAnalytics?.logEvent(getString(R.string.analytics_new_project), null)
+                    } else {
+                        mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_photo), null)
+                    }
+
                     findNavController().popBackStack()
                 } catch (e: Exception) {
                     viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }

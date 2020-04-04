@@ -615,6 +615,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 tagText.length > 14 -> showTagValidationAlertDialog(getString(R.string.invalid_tag_length))
                 else -> {
                     detailViewModel.addTag(tagText, mCurrentProject)
+                    mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_tag), null)
                     editText?.text?.clear()
                 }
             }
@@ -649,6 +650,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         noneLayout?.addView(mNoneSelector)
         mNoneSelector?.setOnClickListener {
             detailViewModel.setSchedule(mExternalFilesDir, mCurrentProject, 0)
+            mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_schedule), null)
         }
 
         // Set up days selection
@@ -662,6 +664,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             textView.text = dayInterval.toString()
             selectionLayout.setOnClickListener {
                 detailViewModel.setSchedule(mExternalFilesDir, mCurrentProject, dayInterval)
+                mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_days), null)
             }
             daysLayout?.addView(selectionLayout)
             mDaySelectionViews.add(selectionLayout)
@@ -676,6 +679,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             textView.text = weekInterval.toString()
             selectionLayout.setOnClickListener {
                 detailViewModel.setSchedule(mExternalFilesDir, mCurrentProject, weekInterval * 7)
+                mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_weeks), null)
             }
             weeksLayout?.addView(selectionLayout)
             mWeekSelectionViews.add(selectionLayout)
@@ -686,8 +690,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             val interval = it.toString()
             if (interval.isNotEmpty()) {
                 detailViewModel.setSchedule(mExternalFilesDir, mCurrentProject, interval.toInt())
+                mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_custom), null)
             } else {
                 detailViewModel.setSchedule(mExternalFilesDir, mCurrentProject, 0)
+                mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_schedule), null)
             }
         }
 
@@ -1030,6 +1036,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     detailViewModel.deleteCurrentPhoto(mExternalFilesDir)
+                    mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_photo), null)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
@@ -1043,6 +1050,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     // If this photo is the last photo then set the new thumbnail to its previous
                     detailViewModel.deleteTagFromDatabase(tagEntry)
+                    mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_tag), null)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
@@ -1085,6 +1093,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         UpdateWidgetService.startActionUpdateWidgets(requireContext())
                     }
                     sharedElementReturnTransition = null
+
+                    // Log project deletion to analytics
+                    mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_project), null)
+
                     findNavController().popBackStack()
                 }
                 .setNegativeButton(android.R.string.no, null).show()

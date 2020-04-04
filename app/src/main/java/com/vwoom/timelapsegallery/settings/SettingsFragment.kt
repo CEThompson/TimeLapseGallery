@@ -120,7 +120,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 // Log notifications
                 val notificationsEnabled = prefs.getBoolean(activity?.getString(R.string.key_notifications_enabled), true)
                 if (!notificationsEnabled)
-                    mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_notifications_disabled)!!, null)
+                    mFirebaseAnalytics?.logEvent(requireContext().getString(R.string.analytics_notifications_disabled), null)
             }
 
             if (key == this.getString(R.string.key_notification_time)) {
@@ -130,7 +130,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 val notificationTime = prefs.getString(activity?.getString(R.string.key_notification_time), getString(R.string.notification_time_default))
                 val params = Bundle()
                 params.putString(context?.getString(R.string.analytics_notification_time)!!, notificationTime)
-                mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_select_notification_time)!!, params)
+                mFirebaseAnalytics?.logEvent(requireContext().getString(R.string.analytics_notification_time), params)
             }
 
             // Track playback interval selection
@@ -138,7 +138,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 val interval = prefs.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
                 val params = Bundle()
                 params.putString(context?.getString(R.string.analytics_playback_interval)!!, interval)
-                mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_select_playback_interval)!!, params)
+                mFirebaseAnalytics?.logEvent(requireContext().getString(R.string.analytics_playback_interval), params)
             }
 
             // If the user enables manual file mSyncing give some info
@@ -147,7 +147,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 if (isSyncAllowed) {
                     showFileModificationDialog()
                     // Log manual syncing
-                    mFirebaseAnalytics?.logEvent(context?.getString(R.string.analytics_manual_sync_enabled)!!, null)
+                    mFirebaseAnalytics?.logEvent(requireContext().getString(R.string.analytics_manual_sync_enabled), null)
                 }
             }
         }
@@ -299,6 +299,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
             updateSyncDialog(settingsViewModel.response)
             // Restore screen orientation
             requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+
+            // Log sync to analytics
+            mFirebaseAnalytics?.logEvent(getString(R.string.analytics_manual_sync_executed), null)
         }
     }
 
