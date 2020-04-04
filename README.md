@@ -1,7 +1,7 @@
 ﻿# Time Lapse Gallery
 An open-source android application for managing a collection of time-lapse photo projects.
 
-#### TLG 1.1
+#### 1.1
 * Converted codebase from java to kotlin
 * Restructured database schema to implement project tagging and scheduling 
 * Refactored to Camera2 to take photos and improve UX
@@ -18,27 +18,25 @@ Or install the latest published version at:
 
 ----------
 ## Privacy Policy
-Time Lapse Gallery was developed as an open-source application.
+Time Lapse Gallery is an open-source application.
 
-This policy describes how the application collects, uses, or discloses your personal information as you use it.
+This policy describes how the application collects, uses, or discloses your personal information.
 
-If you choose to use this application, then you agree to the collection and use of information in relation to this policy. The information that is collected is used to improve the application. Your information will not be used or shared with anyone except as described.
+If you choose to use this application, then you agree to the collection and use of information in relation to this policy. The information that is collected is used in order to improve the application. Your information will not be used or shared with anyone except as described.
 
 #### Information Collection and Usage
-This application uses Firebase Analytics to collect information  regarding interactions with the user interface and settings configurations.
-The number of projects and photos added and deleted will be tracked. 
-Configuration and enabling of notifications, notification times, playback speeds, and usage of the manual file modification system will be tracked. Additionally crashlytics is used to track stability for the application.
+This application uses Firebase Analytics and Crashlytics to collect information. The information collected regards interactions with the user interface and settings configurations such as the number of projects and photos added or deleted and the configuration of notifications, notification times, playback speeds, and so forth. Crashlytics is used to track any trending stability issues for the application.
 
 #### Camera Data
-This application requires the use of the camera. The date time of the photos taken will be stored as EXIF data with the jpeg images, however this information is not tracked with analytics. This application does not tag photos with other metadata such as GPS location. Photos taken by this application are for your use as you see fit.
+This application requires the use of the camera. The date time of photos taken are stored as EXIF data with the images, however this information is not tracked with analytics. This application does not tag photos with other metadata such as GPS location. Photos taken by this application are for use as you see fit.
 
-#### Purpose of Data Collection
-This data collection is intended to improve the application so that it can better help you keep track of time-lapse projects. This application does not intend to track identifiable information about you or your photos, such as GPS data, device identifications numbers, and so forth. However, third party libraries may be collecting such information used to identify you. This application is open-source so you may inspect those dependencies manually. Or privacy policies for those services are provided below:
+#### The Purpose of Data Collection
+This data collection is intended to improve the application so that it can better help you keep track of time-lapse projects. This application does not intend to track identifiable information about you or your photos, such as GPS data, and device identifications numbers. However, third party libraries may be collecting such information used to identify you. This application is open-source so you may inspect those dependencies. Privacy policies for those services are provided below:
 
 * [Google Play Services Privacy Policy](https://policies.google.com/privacy?hl=en-US "Google Services Privacy Policy")
 
 
-#### Conclusion
-You have a right to your data and this application does not intend to collect or store that information. This Privacy Policy may be updated from time to time and changes will be listed here. If you have any questions or suggestions please contact vwoomdev@gmail.com.
+#### Your Rights
+You have a right to your personal data. This application does not intend to collect that information beyond what is necessary to take great time-lapse pictures. This Privacy Policy may be updated and changes will be made available through the store listing. If you have any questions or concerns please contact vwoomdev@gmail.com. Thanks for using Time Lapse Gallery!
 
-This privacy policy is effective as of April 3rd, 2020. Thanks for using the app!
+April 3rd, 2020. 
