@@ -39,6 +39,16 @@
 
     </PreferenceCategory>
 
+    <!-- Notifications -->
+    <PreferenceCategory app:title="@string/scheduling_header">
+        <SwitchPreferenceCompat
+            app:key="@string/key_schedule_display"
+            app:title="@string/enable_schedule_display_title"
+            app:summaryOff="@string/schedule_display_summary_off"
+            app:summaryOn="@string/schedule_display_summary_on"
+            app:defaultValue="true"/>
+    </PreferenceCategory>
+
     <!-- Playback settings -->
     <PreferenceCategory app:title="@string/playback_header">
 

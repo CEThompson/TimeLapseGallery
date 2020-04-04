@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
@@ -125,9 +126,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             Configuration.ORIENTATION_PORTRAIT -> mNumberOfColumns = 3
         }
 
+        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val schedulesDisplayed = preferences.getBoolean(getString(R.string.key_schedule_display), true)
+
         // Set up the adapter for the recycler view
         val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        mGalleryAdapter = GalleryAdapter(this, externalFilesDir!!)
+        mGalleryAdapter = GalleryAdapter(this, externalFilesDir!!, schedulesDisplayed)
 
         // Set up the recycler view
         mGridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)

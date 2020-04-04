@@ -150,6 +150,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     mFirebaseAnalytics?.logEvent(requireContext().getString(R.string.analytics_manual_sync_enabled), null)
                 }
             }
+
+            if (key == requireContext().getString(R.string.key_schedule_display)) {
+                val schedulesDisplayed = prefs.getBoolean(key, true)
+                if (!schedulesDisplayed) {
+                    mFirebaseAnalytics?.logEvent(requireContext().getString(R.string.analytics_schedule_displays_disabled), null)
+                }
+            }
         }
 
         // Verify the user wants to sync files to the database

@@ -19,9 +19,11 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectV
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 import java.util.*
-import kotlin.math.log
 
-class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, val externalFilesDir: File) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
+class GalleryAdapter(
+        private val mClickHandler: GalleryAdapterOnClickHandler,
+        val externalFilesDir: File,
+        private val scheduleDisplaysEnabled: Boolean) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
     private var mProjectData: List<Project>? = null
     private var mProjectsToCoverPhotos: HashMap<Project, File> = hashMapOf()
     private var mCoverPhotosToRatios: HashMap<File, String> = hashMapOf()
@@ -76,7 +78,7 @@ class GalleryAdapter(private val mClickHandler: GalleryAdapterOnClickHandler, va
         }
 
         val projectIsScheduled = (project.interval_days != 0)
-        if (projectIsScheduled) {
+        if (projectIsScheduled && scheduleDisplaysEnabled) {
             setScheduleInformation(project, holder, project.interval_days, photoTakenToday)
             holder.binding.galleryScheduleLayout.scheduleLayout.visibility = VISIBLE
         } else {

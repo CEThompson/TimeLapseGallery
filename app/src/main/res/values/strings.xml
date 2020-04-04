@@ -146,6 +146,7 @@
     <string name="analytics_playback_interval" translatable="false">playback_interval</string>
     <string name="analytics_manual_sync_enabled" translatable="false">manual_sync_enabled</string>
     <string name="analytics_manual_sync_executed" translatable="false">manual_sync_executed</string>
+    <string name="analytics_schedule_displays_disabled" translatable="false">schedule_displays_disabled</string>
 
     <!-- Database sync warning information -->
     <string name="warning">Warning!</string>
@@ -184,9 +185,15 @@
     <!-- Notifications -->
     <string name="notifications_header">Notifications</string>
     <string name="enable_notifications_title">Enable notifications</string>
-    <string name="notifications_summary_on">Notifications enabled</string>
+    <string name="notifications_summary_on">Notifications allowed</string>
     <string name="notifications_summary_off">Notifications disabled</string>
     <string name="notification_time_title">Notification time</string>
+
+    <!-- Schedule -->
+    <string name ="scheduling_header">Scheduling</string>
+    <string name ="enable_schedule_display_title">Schedule Display</string>
+    <string name ="schedule_display_summary_on">Schedules are shown in the gallery</string>
+    <string name ="schedule_display_summary_off">Schedules are hidden from the gallery</string>
 
     <!-- Playback -->
     <string name="playback_header">Playback</string>
@@ -209,6 +216,7 @@
     <string name="key_playback_interval" translatable="false">playback_interval</string>
     <string name="key_sync" translatable="false">sync</string>
     <string name="key_sync_allowed" translatable="false">sync_allowed</string>
+    <string name="key_schedule_display" translatable="false">schedule_display</string>
 
     <!-- Shared preference -->
     <string name="key_add_transition" translatable="false">add</string>
