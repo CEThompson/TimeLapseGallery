@@ -1,5 +1,5 @@
 ![Time Lapse Gallery Branding](branding_small.png)<br/>
-![Time Lapse Gallery Preview](preview.png)<br/>
+![Time Lapse Gallery Preview](preview.png)![Time Lapse Example](mgeo.gif)<br/>
 
 ### Time Lapse Gallery
 A tool for managing a collection of time-lapse photo projects.
