@@ -1,9 +1,9 @@
 # Time Lapse Gallery
 A tool for managing a collection of time-lapse photo projects.
-![Time Lapse Gallery Branding](branding_small.png)
-![Gallery Screenshot](gallery.png)
-![Detail Screenshot](detail.png)
-![Camera Screenshot](camera.png)
+![Time Lapse Gallery Branding](branding_small.png | width=100)
+![Gallery Screenshot](gallery.png | width=100 ?display=inline-block)
+![Detail Screenshot](detail.png | width=100 ?display=inline-block)
+![Camera Screenshot](camera.png | width=100 ?display=inline-block)
 #### 1.1
 
 * Now handling camera directly with Camera2
