@@ -2,7 +2,7 @@
 ![Time Lapse Gallery Preview](preview.png)![Time Lapse Example](mgeo.gif)<br/>
 
 ### Time Lapse Gallery
-A tool for managing a collection of time-lapse photo projects.
+A tool for creating time-lapse photo sequences.
 #### 1.1
 
 * Now handling camera directly with Camera2
