@@ -1,9 +1,12 @@
 package com.vwoom.timelapsegallery.data.view
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import androidx.room.DatabaseView
 import kotlinx.android.parcel.Parcelize
 
+@Keep
+@Parcelize
 @DatabaseView("SELECT " +
         "project.id AS project_id, " +
         "project.project_name AS project_name, " +
@@ -14,7 +17,6 @@ import kotlinx.android.parcel.Parcelize
         "LEFT JOIN project_schedule ON project.id = project_schedule.project_id " +
         "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
         "LEFT JOIN photo ON cover_photo.photo_id = photo.id")
-@Parcelize
 data class ProjectView(
         val project_id: Long,
         val project_name: String?,
