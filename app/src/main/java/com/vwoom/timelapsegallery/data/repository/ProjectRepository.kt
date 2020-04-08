@@ -8,7 +8,7 @@ import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
 import kotlinx.coroutines.Dispatchers
@@ -51,8 +51,8 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
         }
     }
 
-    suspend fun updateProjectName(externalFilesDir: File, sourceProject: Project, name: String) {
-        val source = projectDao.getProjectById(sourceProject.project_id)
+    suspend fun updateProjectName(externalFilesDir: File, sourceProjectView: ProjectView, name: String) {
+        val source = projectDao.getProjectById(sourceProjectView.project_id)
         val destination = ProjectEntry(source.id, name)
         withContext(Dispatchers.IO) {
             val success = ProjectUtils.renameProject(externalFilesDir, source, destination)
@@ -78,7 +78,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
      */
     suspend fun setProjectSchedule(
             externalFilesDir: File,
-            project: Project,
+            projectView: ProjectView,
             projectScheduleEntry: ProjectScheduleEntry) {
 
         // Write the project schedule to the database
@@ -86,7 +86,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
 
         withContext(Dispatchers.IO) {
             // Handle the file representation of the schedule
-            FileUtils.writeProjectScheduleFile(externalFilesDir, project.project_id, projectScheduleEntry)
+            FileUtils.writeProjectScheduleFile(externalFilesDir, projectView.project_id, projectScheduleEntry)
         }
     }
 
@@ -102,14 +102,14 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
 
     suspend fun addPhotoToProject(file: File,
                                   externalFilesDir: File,
-                                  project: Project, timestamp: Long) {
-        val photoEntry = PhotoEntry(project.project_id, timestamp)
+                                  projectView: ProjectView, timestamp: Long) {
+        val photoEntry = PhotoEntry(projectView.project_id, timestamp)
         val photoId = photoDao.insertPhoto(photoEntry)
 
-        val coverPhotoEntry = CoverPhotoEntry(project.project_id, photoId)
+        val coverPhotoEntry = CoverPhotoEntry(projectView.project_id, photoId)
         coverPhotoDao.insertPhoto(coverPhotoEntry)
 
-        val projectEntry = projectDao.getProjectById(project.project_id)
+        val projectEntry = projectDao.getProjectById(projectView.project_id)
 
         withContext(Dispatchers.IO) {
             FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)

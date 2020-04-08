@@ -51,7 +51,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
     private val args: CameraXFragmentArgs by navArgs()
 
     private val cameraViewModel: CameraXViewModel by viewModels {
-        InjectorUtils.provideCameraXViewModelFactory(requireActivity(), args.photo, args.project)
+        InjectorUtils.provideCameraXViewModelFactory(requireActivity(), args.photo, args.projectView)
     }
 
     private var mLastClickTime: Long? = null

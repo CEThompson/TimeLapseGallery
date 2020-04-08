@@ -2,8 +2,7 @@ package com.vwoom.timelapsegallery.utils
 
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
-import com.vwoom.timelapsegallery.data.view.Project
-import com.vwoom.timelapsegallery.settings.ValidationResult
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getPhotoEntriesInProjectDirectory
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
@@ -180,7 +179,7 @@ class ProjectUtilsTest {
     fun isProjectDueToday() {
         // Given
         val timestampTwoDaysAgo = System.currentTimeMillis() - (DAY_IN_MILLISECONDS*2)
-        val project = Project(1, null, 2, 1, timestampTwoDaysAgo)
+        val project = ProjectView(1, null, 2, 1, timestampTwoDaysAgo)
         // When
         val isProjectDueToday = ProjectUtils.isProjectDueToday(project)
         // Then
@@ -190,7 +189,7 @@ class ProjectUtilsTest {
     @Test
     fun isProjectDueTomorrow() {
         // Given
-        val project = Project(1, null, 1, 1, System.currentTimeMillis())
+        val project = ProjectView(1, null, 1, 1, System.currentTimeMillis())
         // When
         val isProjectDueTomorrow = ProjectUtils.isProjectDueTomorrow(project)
         // Then

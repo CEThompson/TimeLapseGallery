@@ -8,7 +8,7 @@ import android.widget.RemoteViews
 import androidx.navigation.NavDeepLinkBuilder
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.ProjectUtils
 
 // TODO (update 1.2): showcase a random project per day
@@ -21,14 +21,14 @@ class WidgetProvider : AppWidgetProvider() {
         val TAG = WidgetProvider::class.java.simpleName
 
         @JvmStatic
-        fun updateWidgets(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, projects: List<Project>) {
+        fun updateWidgets(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, projectViews: List<ProjectView>) {
             for (appWidgetId in appWidgetIds) {
-                updateAppWidget(context, appWidgetManager, appWidgetId, projects)
+                updateAppWidget(context, appWidgetManager, appWidgetId, projectViews)
             }
         }
 
-        private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, projects: List<Project>) {
-            val projectsDueToday = projects.filter { ProjectUtils.isProjectDueToday(it) }
+        private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, projectViews: List<ProjectView>) {
+            val projectsDueToday = projectViews.filter { ProjectUtils.isProjectDueToday(it) }
 
             val views = RemoteViews(context.packageName, R.layout.widget_layout)
             views.setTextViewText(R.id.widget_text_view, context.getString(R.string.x_projects_due_today, projectsDueToday.size))

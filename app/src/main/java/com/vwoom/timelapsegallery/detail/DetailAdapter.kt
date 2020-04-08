@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.DetailRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.detail.DetailAdapter.DetailAdapterViewHolder
 import com.vwoom.timelapsegallery.utils.ProjectUtils
@@ -15,7 +15,7 @@ import java.io.File
 
 class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val externalFilesDir: File) : RecyclerView.Adapter<DetailAdapterViewHolder>() {
     private var mPhotos: List<PhotoEntry> = emptyList()
-    private lateinit var mProject: Project
+    private lateinit var mProjectView: ProjectView
     private lateinit var mCurrentPhoto: PhotoEntry
 
     interface DetailAdapterOnClickHandler {
@@ -48,7 +48,7 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
         val currentPhoto = mPhotos[position]
         val photoPath = ProjectUtils.getProjectPhotoUrl(
                 externalFilesDir,
-                getProjectEntryFromProjectView(mProject),
+                getProjectEntryFromProjectView(mProjectView),
                 currentPhoto.timestamp)
         val f = File(photoPath)
 
@@ -68,9 +68,9 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
         return mPhotos.size
     }
 
-    fun setPhotoData(photoData: List<PhotoEntry>, project: Project) {
+    fun setPhotoData(photoData: List<PhotoEntry>, projectView: ProjectView) {
         mPhotos = photoData
-        mProject = project
+        mProjectView = projectView
         notifyDataSetChanged()
     }
 

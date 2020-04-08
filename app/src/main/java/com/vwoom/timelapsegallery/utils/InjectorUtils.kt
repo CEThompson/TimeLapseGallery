@@ -7,7 +7,7 @@ import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Photo
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.detail.DetailViewModelFactory
 import com.vwoom.timelapsegallery.gallery.GalleryViewModelFactory
 import com.vwoom.timelapsegallery.settings.SettingsViewModelFactory
@@ -28,29 +28,29 @@ object InjectorUtils {
                 TimeLapseDatabase.getInstance(context.applicationContext).tagDao())
     }
 
-    fun provideCamera2ViewModelFactory(context: Context, photo: Photo?, project: Project?): Camera2ViewModelFactory {
+    fun provideCamera2ViewModelFactory(context: Context, photo: Photo?, projectView: ProjectView?): Camera2ViewModelFactory {
         val projectRepository = getProjectRepository(context)
         return Camera2ViewModelFactory(
                 projectRepository,
                 photo,
-                project)
+                projectView)
     }
 
-    fun provideCameraXViewModelFactory(context: Context, photo: Photo?, project: Project?): CameraXViewModelFactory {
+    fun provideCameraXViewModelFactory(context: Context, photo: Photo?, projectView: ProjectView?): CameraXViewModelFactory {
         val projectRepository = getProjectRepository(context)
         return CameraXViewModelFactory(
                 projectRepository,
                 photo,
-                project)
+                projectView)
     }
 
-    fun provideDetailsViewModelFactory(context: Context, project: Project): DetailViewModelFactory {
+    fun provideDetailsViewModelFactory(context: Context, projectView: ProjectView): DetailViewModelFactory {
         val projectRepository = getProjectRepository(context)
         val tagRepository = getTagRepository(context)
         return DetailViewModelFactory(
                 projectRepository,
                 tagRepository,
-                project.project_id)
+                projectView.project_id)
     }
 
     fun provideGalleryViewModelFactory(context: Context): GalleryViewModelFactory {

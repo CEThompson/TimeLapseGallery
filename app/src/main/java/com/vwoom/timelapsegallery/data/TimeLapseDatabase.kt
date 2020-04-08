@@ -8,8 +8,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.vwoom.timelapsegallery.data.dao.*
 import com.vwoom.timelapsegallery.data.entry.*
-import com.vwoom.timelapsegallery.data.view.Photo
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 
 @Database(entities = [
     ProjectEntry::class,
@@ -18,7 +17,7 @@ import com.vwoom.timelapsegallery.data.view.Project
     ProjectTagEntry::class,
     ProjectScheduleEntry::class,
     CoverPhotoEntry::class],
-        views = [Project::class],
+        views = [ProjectView::class],
         version = 2,
         exportSchema = true)
 abstract class TimeLapseDatabase : RoomDatabase() {
@@ -128,6 +127,22 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS tag " +
                         "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                         "text TEXT NOT NULL)")
+
+                // Create the project view
+                database.execSQL("CREATE VIEW IF NOT EXISTS project_view AS " +
+                        "SELECT " +
+                        "project.id AS project_id, " +
+                        "project.project_name AS project_name, " +
+                        "project_schedule.interval_days AS interval_days, " +
+                        "cover_photo.photo_id AS cover_photo_id, " +
+                        "photo.timestamp AS cover_photo_timestamp " +
+                        "FROM project " +
+                        "LEFT JOIN project_schedule " +
+                        "ON project.id = project_schedule.project_id " +
+                        "LEFT JOIN cover_photo " +
+                        "ON project.id = cover_photo.project_id " +
+                        "LEFT JOIN photo " +
+                        "ON cover_photo.photo_id = photo.id")
             }
         }
     }

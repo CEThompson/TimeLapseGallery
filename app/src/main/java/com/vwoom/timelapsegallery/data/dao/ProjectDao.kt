@@ -1,10 +1,9 @@
 package com.vwoom.timelapsegallery.data.dao
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 
 @Dao
 interface ProjectDao {
@@ -43,7 +42,7 @@ interface ProjectDao {
             "LEFT JOIN project_schedule ON project.id = project_schedule.project_id " +
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id")
-    fun getProjectViewsLiveData(): LiveData<List<Project>>
+    fun getProjectViewsLiveData(): LiveData<List<ProjectView>>
 
     @Query("SELECT " +
             "project.id AS project_id, " +
@@ -56,7 +55,7 @@ interface ProjectDao {
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id " +
             "WHERE project.id =:id")
-    fun getProjectViewLiveData(id: Long): LiveData<Project>
+    fun getProjectViewLiveData(id: Long): LiveData<ProjectView>
 
     @Query("SELECT " +
             "project.id AS project_id, " +
@@ -69,7 +68,7 @@ interface ProjectDao {
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id " +
             "WHERE project.id =:id")
-    suspend fun getProjectViewById(id: Long): Project
+    suspend fun getProjectViewById(id: Long): ProjectView
 
     @Query("SELECT " +
             "project.id AS project_id, " +
@@ -82,5 +81,5 @@ interface ProjectDao {
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id " +
             "WHERE interval_days > 0")
-    fun getScheduledProjectViews(): List<Project>
+    fun getScheduledProjectViews(): List<ProjectView>
 }

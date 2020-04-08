@@ -6,7 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.entry.*
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.settings.ValidationResult
 import com.vwoom.timelapsegallery.utils.ImportUtils.validateFileStructure
 import com.vwoom.timelapsegallery.utils.ImportUtils.importProjects
@@ -72,7 +72,7 @@ class ImportUtilsTest {
         projectOnePhoto.createNewFile()
         val projectOneMetaDir = File(projectOneDir, FileUtils.META_FILE_SUBDIRECTORY)
         projectOneMetaDir.mkdirs()
-        val projectOneDefinition = Project(1,"test",0,1,300)
+        val projectOneDefinition = ProjectView(1,"test",0,1,300)
         FileUtils.writeProjectTagsFile(
                 externalFilesTestDir,
                 projectOneDefinition.project_id,
@@ -88,7 +88,7 @@ class ImportUtilsTest {
         projectTwoPhoto.createNewFile()
         val projectTwoMetaDir = File(projectTwoDir, FileUtils.META_FILE_SUBDIRECTORY)
         projectTwoMetaDir.mkdirs()
-        val projectTwoDefinition = Project(3,"test two",0,2,400)
+        val projectTwoDefinition = ProjectView(3,"test two",0,2,400)
         FileUtils.writeProjectTagsFile(
                 externalFilesTestDir,
                 projectTwoDefinition.project_id,

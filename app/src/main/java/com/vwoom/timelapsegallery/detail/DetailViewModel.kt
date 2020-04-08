@@ -11,7 +11,7 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Photo
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import kotlinx.coroutines.launch
@@ -22,7 +22,7 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
                       private val tagRepository: TagRepository,
                       projectId: Long) : ViewModel() {
     // Live data
-    val currentProject: LiveData<Project> = projectRepository.getProjectViewLiveData(projectId)
+    val currentProjectView: LiveData<ProjectView> = projectRepository.getProjectViewLiveData(projectId)
     val photos: LiveData<List<PhotoEntry>> = projectRepository.getProjectPhotosLiveData(projectId)
     val projectTags: LiveData<List<ProjectTagEntry>> = tagRepository.getProjectTagsLiveData(projectId)
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
@@ -38,16 +38,16 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
     var photoIndex: Int = 0
     var maxIndex: Int = 0
 
-    fun setSchedule(externalFilesDir: File, project: Project, intervalInDays: Int) {
+    fun setSchedule(externalFilesDir: File, projectView: ProjectView, intervalInDays: Int) {
         viewModelScope.launch {
-            val projectScheduleEntry = ProjectScheduleEntry(project.project_id, intervalInDays)
-            projectRepository.setProjectSchedule(externalFilesDir, project, projectScheduleEntry)
+            val projectScheduleEntry = ProjectScheduleEntry(projectView.project_id, intervalInDays)
+            projectRepository.setProjectSchedule(externalFilesDir, projectView, projectScheduleEntry)
         }
     }
 
-    fun deleteTagFromProject(tagEntry: TagEntry, project: Project) {
+    fun deleteTagFromProject(tagEntry: TagEntry, projectView: ProjectView) {
         viewModelScope.launch {
-            tagRepository.deleteTagFromProject(tagEntry, project)
+            tagRepository.deleteTagFromProject(tagEntry, projectView)
         }
     }
 
@@ -57,17 +57,17 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
         }
     }
 
-    fun updateProjectName(externalFilesDir: File, name: String, source: Project) {
+    fun updateProjectName(externalFilesDir: File, name: String, source: ProjectView) {
         viewModelScope.launch {
             projectRepository.updateProjectName(externalFilesDir, source, name)
         }
     }
 
     // For passing to the camera fragment
-    fun setLastPhotoByEntry(externalFilesDir: File, project: Project, entry: PhotoEntry) {
+    fun setLastPhotoByEntry(externalFilesDir: File, projectView: ProjectView, entry: PhotoEntry) {
         val url = ProjectUtils.getProjectPhotoUrl(
                 externalFilesDir,
-                getProjectEntryFromProjectView(project),
+                getProjectEntryFromProjectView(projectView),
                 entry.timestamp)
         lastPhoto = Photo(entry.project_id, entry.id, entry.timestamp, url)
     }
@@ -97,9 +97,9 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
         }
     }
 
-    fun addTag(tagText: String, project: Project) {
+    fun addTag(tagText: String, projectView: ProjectView) {
         viewModelScope.launch {
-            tagRepository.addTagToProject(tagText, project)
+            tagRepository.addTagToProject(tagText, projectView)
         }
     }
 
@@ -122,7 +122,7 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
 
     fun deleteCurrentProject(externalFilesDir: File) {
         viewModelScope.launch {
-            projectRepository.deleteProject(externalFilesDir, currentProject.value?.project_id!!)
+            projectRepository.deleteProject(externalFilesDir, currentProjectView.value?.project_id!!)
         }
     }
 }

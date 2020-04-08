@@ -2,7 +2,7 @@ package com.vwoom.timelapsegallery.utils
 
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import java.io.File
 import java.util.*
 
@@ -16,7 +16,7 @@ object ProjectUtils {
         return File(externalFilesDir, projectPath)
     }
 
-    fun getProjectEntryFromProjectView(project: Project): ProjectEntry = ProjectEntry(project.project_id, project.project_name)
+    fun getProjectEntryFromProjectView(projectView: ProjectView): ProjectEntry = ProjectEntry(projectView.project_id, projectView.project_name)
 
     fun getMetaDirectoryForProject(externalFilesDir: File, projectId: Long): File {
         val metaDir = File(externalFilesDir, FileUtils.META_FILE_SUBDIRECTORY)
@@ -105,17 +105,17 @@ object ProjectUtils {
         return ERROR_TIMESTAMP_TO_PHOTO
     }
 
-    fun isProjectDueToday(project: Project): Boolean {
-        if (project.interval_days == 0) return false
-        val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
-        val daysUntilDue = project.interval_days - daysSinceLastPhoto
+    fun isProjectDueToday(projectView: ProjectView): Boolean {
+        if (projectView.interval_days == 0) return false
+        val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(projectView.cover_photo_timestamp, System.currentTimeMillis())
+        val daysUntilDue = projectView.interval_days - daysSinceLastPhoto
         return daysUntilDue <= 0
     }
 
-    fun isProjectDueTomorrow(project: Project): Boolean {
-        if (project.interval_days == 0) return false
-        val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
-        val daysUntilDue = project.interval_days - daysSinceLastPhoto
+    fun isProjectDueTomorrow(projectView: ProjectView): Boolean {
+        if (projectView.interval_days == 0) return false
+        val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(projectView.cover_photo_timestamp, System.currentTimeMillis())
+        val daysUntilDue = projectView.interval_days - daysSinceLastPhoto
         return daysUntilDue == 1.toLong()
     }
 }

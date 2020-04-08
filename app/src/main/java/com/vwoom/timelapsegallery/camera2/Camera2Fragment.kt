@@ -79,7 +79,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     private var takePictureJob: Job? = null
     private val camera2ViewModel: Camera2ViewModel by viewModels {
-        InjectorUtils.provideCamera2ViewModelFactory(requireActivity(), args.photo, args.project)
+        InjectorUtils.provideCamera2ViewModelFactory(requireActivity(), args.photo, args.projectView)
     }
     private var mTakePictureFab: FloatingActionButton? = null
 
@@ -149,7 +149,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir, timestamp)
 
                     // Log photo or project addition
-                    if (args.project == null){
+                    if (args.projectView == null){
                         mFirebaseAnalytics?.logEvent(getString(R.string.analytics_new_project), null)
                     } else {
                         mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_photo), null)

@@ -6,7 +6,7 @@ import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import java.util.*
 
@@ -20,7 +20,7 @@ const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 class GalleryViewModel internal constructor(projectRepository: ProjectRepository,
                                             private val tagRepository: TagRepository) : ViewModel() {
     // Tag Live Data
-    val projects: LiveData<List<Project>> = projectRepository.getProjectViewsLiveData()
+    val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
 
     // Inputted search data
@@ -29,7 +29,7 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     var searchType: String = SEARCH_TYPE_NONE
 
     // The resulting projects
-    var displayedProjects: List<Project> = listOf()
+    var displayedProjectViews: List<ProjectView> = listOf()
 
     // State of user interaction
     var searchDialogShowing = false
@@ -41,7 +41,7 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     }
 
     // Filters the projects by the inputted search parameters
-    suspend fun filterProjects(): List<Project> {
+    suspend fun filterProjects(): List<ProjectView> {
         if (projects.value == null) return listOf()
         var resultProjects = projects.value!!
 

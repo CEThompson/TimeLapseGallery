@@ -33,7 +33,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
@@ -144,8 +144,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // TODO: (update 1.2) re-evaluate transition after taking pictures of a project, filtered projects do not update immediately
-        if (mGalleryViewModel.displayedProjects.isNotEmpty())
-            mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
+        if (mGalleryViewModel.displayedProjectViews.isNotEmpty())
+            mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjectViews)
 
         mGalleryRecyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -251,15 +251,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             // If the size of the current list is larger a project has been added
             val projectHasBeenAdded = (mPrevProjectsSize != null && mPrevProjectsSize!! < currentProjects.size)
             if (projectHasBeenAdded) {
-                mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.displayedProjects.size)
+                mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.displayedProjectViews.size)
             }
             // Keep track of number of projects
             mPrevProjectsSize = currentProjects.size
 
             // Update the displayed projects in the gallery
             mGalleryViewModel.viewModelScope.launch {
-                mGalleryViewModel.displayedProjects = mGalleryViewModel.filterProjects()
-                mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
+                mGalleryViewModel.displayedProjectViews = mGalleryViewModel.filterProjects()
+                mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjectViews)
             }
         })
 
@@ -347,8 +347,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private fun updateSearchFilter() {
         searchJob?.cancel()
         searchJob = mGalleryViewModel.viewModelScope.launch {
-            mGalleryViewModel.displayedProjects = mGalleryViewModel.filterProjects()
-            mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjects)
+            mGalleryViewModel.displayedProjectViews = mGalleryViewModel.filterProjects()
+            mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjectViews)
             // show search fab if actively searching
             if (userIsNotSearching())
                 mSearchActiveFAB?.hide()
@@ -441,7 +441,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
      * User Input
      */
 
-    override fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int) {
+    override fun onClick(clickedProjectView: ProjectView, binding: GalleryRecyclerviewItemBinding, position: Int) {
         // Prevents multiple clicks
         if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 250) return
         mLastClickTime = SystemClock.elapsedRealtime()
@@ -452,7 +452,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         if (reenterTransition == null) reenterTransition = galleryReenterTransition
 
         // Navigate to the detail fragment
-        val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProject, position)
+        val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProjectView, position)
         val extras = FragmentNavigatorExtras(
                 mAddProjectFAB as View to getString(R.string.key_add_transition),
                 binding.projectImage to binding.projectImage.transitionName,

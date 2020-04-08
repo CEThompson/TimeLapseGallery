@@ -1,6 +1,6 @@
 package com.vwoom.timelapsegallery.utils
 
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToLong
@@ -50,9 +50,9 @@ object TimeUtils {
         return calendar.timeInMillis
     }
 
-    fun daysUntilDue(project: Project): Long {
-        val daysSinceLastPhotoTaken = getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
-        val interval: Int = project.interval_days
+    fun daysUntilDue(projectView: ProjectView): Long {
+        val daysSinceLastPhotoTaken = getDaysSinceTimeStamp(projectView.cover_photo_timestamp, System.currentTimeMillis())
+        val interval: Int = projectView.interval_days
         return interval - daysSinceLastPhotoTaken
     }
 

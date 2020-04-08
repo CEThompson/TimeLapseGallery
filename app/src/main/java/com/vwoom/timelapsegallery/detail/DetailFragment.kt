@@ -47,7 +47,7 @@ import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentDetailBinding
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
@@ -67,14 +67,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private val args: DetailFragmentArgs by navArgs()
     private val detailViewModel: DetailViewModel by viewModels {
-        InjectorUtils.provideDetailsViewModelFactory(requireActivity(), args.clickedProject)
+        InjectorUtils.provideDetailsViewModelFactory(requireActivity(), args.clickedProjectView)
     }
     private lateinit var mExternalFilesDir: File
     private var binding: FragmentDetailBinding? = null
     private var toolbar: Toolbar? = null
 
     // Photo and project Information
-    private lateinit var mCurrentProject: Project
+    private lateinit var mCurrentProjectView: ProjectView
     private var mPhotos: List<PhotoEntry> = emptyList()
     private var mProjectTags: List<TagEntry> = emptyList()
     private var mAllTags: List<TagEntry> = emptyList()
@@ -124,7 +124,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mCurrentProject = args.clickedProject
+        mCurrentProjectView = args.clickedProjectView
         mPlaybackInterval = getString(R.string.playback_interval_default).toLong()
 
         try {
@@ -199,7 +199,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
             } else {
                 val action = DetailFragmentDirections
-                        .actionDetailsFragmentToCamera2Fragment(cameraId, detailViewModel.lastPhoto, mCurrentProject)
+                        .actionDetailsFragmentToCamera2Fragment(cameraId, detailViewModel.lastPhoto, mCurrentProjectView)
                 findNavController().navigate(action)
             }
         }
@@ -238,7 +238,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.detailCurrentImage?.setOnTouchListener(swipeListener)
 
         // Set the transition tags
-        val transitionName = "${mCurrentProject.project_id}"
+        val transitionName = "${mCurrentProjectView.project_id}"
         binding?.detailCurrentImage?.transitionName = transitionName
         binding?.detailsCardContainer?.transitionName = "${transitionName}card"
         binding?.detailsGradientOverlay?.transitionName = "${transitionName}bottomGradient"
@@ -266,7 +266,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     val photoFile = File(ProjectUtils
                             .getProjectPhotoUrl(
                                     mExternalFilesDir,
-                                    getProjectEntryFromProjectView(mCurrentProject),
+                                    getProjectEntryFromProjectView(mCurrentProjectView),
                                     mCurrentPhoto.timestamp))
                     Log.d(TAG, photoFile.absolutePath)
                     putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile))
@@ -376,7 +376,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Get the image path, handle orientation indicator and load the image
         val imagePath = ProjectUtils.getProjectPhotoUrl(
                 mExternalFilesDir,
-                getProjectEntryFromProjectView(mCurrentProject),
+                getProjectEntryFromProjectView(mCurrentProjectView),
                 photoEntry.timestamp)
         if (!mPlaying) handleOrientationIndicator(imagePath)
         loadImage(imagePath)
@@ -614,7 +614,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 tagText.contains(' ') -> showTagValidationAlertDialog(getString(R.string.invalid_tag_one_word))
                 tagText.length > 14 -> showTagValidationAlertDialog(getString(R.string.invalid_tag_length))
                 else -> {
-                    detailViewModel.addTag(tagText, mCurrentProject)
+                    detailViewModel.addTag(tagText, mCurrentProjectView)
                     mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_tag), null)
                     editText?.text?.clear()
                 }
@@ -649,7 +649,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         noneTv?.text = getString(R.string.unscheduled)
         noneLayout?.addView(mNoneSelector)
         mNoneSelector?.setOnClickListener {
-            detailViewModel.setSchedule(mExternalFilesDir, mCurrentProject, 0)
+            detailViewModel.setSchedule(mExternalFilesDir, mCurrentProjectView, 0)
             mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_schedule), null)
         }
 
@@ -663,7 +663,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             val textView = selectionLayout.findViewById<TextView>(R.id.selector_child_tv)
             textView.text = dayInterval.toString()
             selectionLayout.setOnClickListener {
-                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProject, dayInterval)
+                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProjectView, dayInterval)
                 mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_days), null)
             }
             daysLayout?.addView(selectionLayout)
@@ -678,7 +678,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             val textView = selectionLayout.findViewById<TextView>(R.id.selector_child_tv)
             textView.text = weekInterval.toString()
             selectionLayout.setOnClickListener {
-                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProject, weekInterval * 7)
+                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProjectView, weekInterval * 7)
                 mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_weeks), null)
             }
             weeksLayout?.addView(selectionLayout)
@@ -689,10 +689,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mScheduleDialog?.findViewById<EditText>(R.id.custom_schedule_input)?.addTextChangedListener {
             val interval = it.toString()
             if (interval.isNotEmpty()) {
-                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProject, interval.toInt())
+                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProjectView, interval.toInt())
                 mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_custom), null)
             } else {
-                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProject, 0)
+                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProjectView, 0)
                 mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_schedule), null)
             }
         }
@@ -721,14 +721,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Observe the current selected project
         // This updates the project information card, project info dialog,
         // schedule layout over the image and the schedule dialog
-        detailViewModel.currentProject.observe(viewLifecycleOwner, Observer { currentProject: Project ->
-            mCurrentProject = currentProject
+        detailViewModel.currentProjectView.observe(viewLifecycleOwner, Observer { currentProjectView: ProjectView ->
+            mCurrentProjectView = currentProjectView
 
             // Set the ui for the project information layout cardview
             // 1. Set the ID
-            binding?.projectInformationLayout?.detailsProjectId?.text = mCurrentProject.project_id.toString()
+            binding?.projectInformationLayout?.detailsProjectId?.text = mCurrentProjectView.project_id.toString()
             // 2. Set the name, handle appropriately if no name specified
-            val name = mCurrentProject.project_name
+            val name = mCurrentProjectView.project_name
             // Style for no name
             if (name == null || name.isEmpty()) {
                 binding?.projectInformationLayout
@@ -756,7 +756,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
             // 3. Set the schedule information
             // If there isn't a schedule set the color of the fab to white and hide the layout
-            if (currentProject.interval_days == 0) {
+            if (currentProjectView.interval_days == 0) {
                 binding?.projectScheduleFab?.backgroundTintList =
                         ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
                 binding?.detailScheduleLayout?.scheduleLayout?.visibility = INVISIBLE
@@ -767,9 +767,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
                 // Show the interval of the schedule
                 binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.text =
-                        currentProject.interval_days.toString()
+                        currentProjectView.interval_days.toString()
 
-                val daysUntilDue = daysUntilDue(mCurrentProject)
+                val daysUntilDue = daysUntilDue(mCurrentProjectView)
                 // Show how many days until project is due
                 binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.text =
                         daysUntilDue.toString()
@@ -803,10 +803,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
             // Update the recycler view
             mPhotos = photoEntries
-            mDetailAdapter?.setPhotoData(mPhotos, mCurrentProject)
+            mDetailAdapter?.setPhotoData(mPhotos, mCurrentProjectView)
             // Bind cover photo to the end of the list always
             val lastPhotoEntry = photoEntries.last()
-            detailViewModel.setLastPhotoByEntry(mExternalFilesDir, mCurrentProject, lastPhotoEntry)
+            detailViewModel.setLastPhotoByEntry(mExternalFilesDir, mCurrentProjectView, lastPhotoEntry)
             detailViewModel.setCoverPhoto(lastPhotoEntry)
             // Update the UI based upon the range of photo dates
             val firstTimestamp = photoEntries[0].timestamp
@@ -849,7 +849,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 for (photo in photoEntries) {
                     val photoUrl = ProjectUtils.getProjectPhotoUrl(
                             mExternalFilesDir,
-                            getProjectEntryFromProjectView(mCurrentProject),
+                            getProjectEntryFromProjectView(mCurrentProjectView),
                             photo.timestamp)
                     list.add(photoUrl)
                 }
@@ -889,7 +889,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 }
 
                 // 5. Lastly write the list of tags to the text file (overwriting any previously)
-                FileUtils.writeProjectTagsFile(mExternalFilesDir, mCurrentProject.project_id, mProjectTags)
+                FileUtils.writeProjectTagsFile(mExternalFilesDir, mCurrentProjectView.project_id, mProjectTags)
             }
         })
 
@@ -922,16 +922,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         if (mInfoDialog == null) return
         // Set info dialog fields
         val projectInfoDialogId = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_field)
-        projectInfoDialogId?.text = mCurrentProject.project_id.toString()
+        projectInfoDialogId?.text = mCurrentProjectView.project_id.toString()
         val projectInfoNameTv = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
-        if (mCurrentProject.project_name == null || mCurrentProject.project_name!!.isEmpty()) {
+        if (mCurrentProjectView.project_name == null || mCurrentProjectView.project_name!!.isEmpty()) {
             projectInfoNameTv?.text = getString(R.string.unnamed)
-        } else projectInfoNameTv?.text = mCurrentProject.project_name
-        if (mCurrentProject.interval_days == 0) {
+        } else projectInfoNameTv?.text = mCurrentProjectView.project_name
+        if (mCurrentProjectView.interval_days == 0) {
             mInfoDialog?.findViewById<TextView>(R.id.info_dialog_schedule_description)?.text = getString(R.string.none)
         } else {
             mInfoDialog?.findViewById<TextView>(R.id.info_dialog_schedule_description)?.text =
-                    getString(R.string.every_x_days, mCurrentProject.interval_days.toString())
+                    getString(R.string.every_x_days, mCurrentProjectView.interval_days.toString())
         }
     }
 
@@ -958,10 +958,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 val tagInProject: Boolean = mProjectTags.contains(tagEntry)
                 if (tagInProject) {
                     textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
-                    textView.setOnClickListener { detailViewModel.deleteTagFromProject(tagEntry, mCurrentProject) }
+                    textView.setOnClickListener { detailViewModel.deleteTagFromProject(tagEntry, mCurrentProjectView) }
                 } else {
                     textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-                    textView.setOnClickListener { detailViewModel.addTag(tagEntry.text, mCurrentProject) }
+                    textView.setOnClickListener { detailViewModel.addTag(tagEntry.text, mCurrentProjectView) }
                 }
 
                 // Set tag deletion
@@ -984,7 +984,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val defaultElevation = 2f
         val selectedElevation = 6f
 
-        val currentInterval = mCurrentProject.interval_days
+        val currentInterval = mCurrentProjectView.interval_days
         if (currentInterval == 0) {
             mNoneSelector?.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
             mNoneSelector?.elevation = selectedElevation
@@ -1012,8 +1012,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             }
         }
         val scheduleOutput = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_result)
-        if (mCurrentProject.interval_days == 0) scheduleOutput?.text = getString(R.string.none)
-        else scheduleOutput?.text = getString(R.string.every_x_days, mCurrentProject.interval_days.toString())
+        if (mCurrentProjectView.interval_days == 0) scheduleOutput?.text = getString(R.string.none)
+        else scheduleOutput?.text = getString(R.string.every_x_days, mCurrentProjectView.interval_days.toString())
     }
 
     /**
@@ -1088,7 +1088,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     detailViewModel.deleteCurrentProject(mExternalFilesDir)
                     // If current project had a schedule remove the notification and update widgets
-                    if (mCurrentProject.interval_days != 0) {
+                    if (mCurrentProjectView.interval_days != 0) {
                         NotificationUtils.scheduleNotificationWorker(requireContext())
                         UpdateWidgetService.startActionUpdateWidgets(requireContext())
                     }
@@ -1112,7 +1112,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setView(input)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     val nameText = input.text.toString().trim()
-                    detailViewModel.updateProjectName(mExternalFilesDir, nameText, mCurrentProject)
+                    detailViewModel.updateProjectName(mExternalFilesDir, nameText, mCurrentProjectView)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }

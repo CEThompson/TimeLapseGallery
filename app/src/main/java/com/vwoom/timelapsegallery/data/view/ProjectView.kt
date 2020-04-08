@@ -15,7 +15,7 @@ import kotlinx.android.parcel.Parcelize
         "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
         "LEFT JOIN photo ON cover_photo.photo_id = photo.id")
 @Parcelize
-data class Project(
+data class ProjectView(
         val project_id: Long,
         val project_name: String?,
         val interval_days: Int,

@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.data.view.Project
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.gallery.GalleryAdapter.GalleryAdapterViewHolder
 import com.vwoom.timelapsegallery.utils.PhotoUtils
@@ -24,20 +24,20 @@ class GalleryAdapter(
         private val mClickHandler: GalleryAdapterOnClickHandler,
         val externalFilesDir: File,
         private val scheduleDisplaysEnabled: Boolean) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
-    private var mProjectData: List<Project>? = null
-    private var mProjectsToCoverPhotos: HashMap<Project, File> = hashMapOf()
+    private var mProjectViewData: List<ProjectView>? = null
+    private var mProjectsToCoverPhotos: HashMap<ProjectView, File> = hashMapOf()
     private var mCoverPhotosToRatios: HashMap<File, String> = hashMapOf()
     private val constraintSet: ConstraintSet = ConstraintSet()
 
     interface GalleryAdapterOnClickHandler {
-        fun onClick(clickedProject: Project, binding: GalleryRecyclerviewItemBinding, position: Int)
+        fun onClick(clickedProjectView: ProjectView, binding: GalleryRecyclerviewItemBinding, position: Int)
     }
 
     inner class GalleryAdapterViewHolder(val binding: GalleryRecyclerviewItemBinding)
         : RecyclerView.ViewHolder(binding.root), OnClickListener {
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
-            val clickedProject = mProjectData!![adapterPosition]
+            val clickedProject = mProjectViewData!![adapterPosition]
             mClickHandler.onClick(
                     clickedProject,
                     binding,
@@ -60,7 +60,7 @@ class GalleryAdapter(
 
     override fun onBindViewHolder(holder: GalleryAdapterViewHolder, position: Int) {
         // Get project information
-        val project = mProjectData!![position]
+        val project = mProjectViewData!![position]
         val photoFile = mProjectsToCoverPhotos[project]
 
         // Set the constraint ratio
@@ -101,14 +101,14 @@ class GalleryAdapter(
     }
 
     override fun getItemCount(): Int {
-        return if (mProjectData == null) 0 else mProjectData!!.size
+        return if (mProjectViewData == null) 0 else mProjectViewData!!.size
     }
 
     // TODO: (update 1.2) consider calculating this information somewhere else to speed up the gallery (perhaps a diff util?)
-    fun setProjectData(projectData: List<Project>) {
-        mProjectData = projectData
+    fun setProjectData(projectViewData: List<ProjectView>) {
+        mProjectViewData = projectViewData
         mProjectsToCoverPhotos.clear()
-        for (project in projectData) {
+        for (project in projectViewData) {
             val photoUrl = ProjectUtils.getProjectPhotoUrl(
                     externalFilesDir,
                     getProjectEntryFromProjectView(project),
@@ -122,10 +122,10 @@ class GalleryAdapter(
     }
 
     // Updates the UI for the schedule layout
-    private fun setScheduleInformation(project: Project, holder: GalleryAdapterViewHolder, interval_days: Int, photoTakenToday: Boolean) {
+    private fun setScheduleInformation(projectView: ProjectView, holder: GalleryAdapterViewHolder, interval_days: Int, photoTakenToday: Boolean) {
         // Calc the days until project is due
-        val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(project.cover_photo_timestamp, System.currentTimeMillis())
-        val daysUntilDue = project.interval_days - daysSinceLastPhoto
+        val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(projectView.cover_photo_timestamp, System.currentTimeMillis())
+        val daysUntilDue = projectView.interval_days - daysSinceLastPhoto
         holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.text = daysUntilDue.toString() // set days until due text
         holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.text = interval_days.toString() // set schedule interval
 

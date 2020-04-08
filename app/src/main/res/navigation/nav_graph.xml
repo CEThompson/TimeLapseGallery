@@ -40,8 +40,8 @@
             android:id="@+id/action_detailsFragment_to_camera2Fragment"
             app:destination="@id/camera2Fragment" />
         <argument
-            android:name="clickedProject"
-            app:argType="com.vwoom.timelapsegallery.data.view.Project" />
+            android:name="clickedProjectView"
+            app:argType="com.vwoom.timelapsegallery.data.view.ProjectView" />
         <argument
             android:name="transitionPosition"
             app:argType="integer" />
@@ -68,8 +68,8 @@
             app:argType="com.vwoom.timelapsegallery.data.view.Photo"
             app:nullable="true" />
         <argument
-            android:name="project"
-            app:argType="com.vwoom.timelapsegallery.data.view.Project"
+            android:name="projectView"
+            app:argType="com.vwoom.timelapsegallery.data.view.ProjectView"
             app:nullable="true" />
     </fragment>
     <fragment
@@ -81,8 +81,8 @@
             app:argType="com.vwoom.timelapsegallery.data.view.Photo"
             app:nullable="true" />
         <argument
-            android:name="project"
-            app:argType="com.vwoom.timelapsegallery.data.view.Project"
+            android:name="projectView"
+            app:argType="com.vwoom.timelapsegallery.data.view.ProjectView"
             app:nullable="true" />
     </fragment>
     <fragment
