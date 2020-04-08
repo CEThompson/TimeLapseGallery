@@ -18,7 +18,7 @@ import com.vwoom.timelapsegallery.data.view.Project
     ProjectTagEntry::class,
     ProjectScheduleEntry::class,
     CoverPhotoEntry::class],
-        views = [Photo::class, Project::class],
+        views = [Project::class],
         version = 2,
         exportSchema = true)
 abstract class TimeLapseDatabase : RoomDatabase() {
