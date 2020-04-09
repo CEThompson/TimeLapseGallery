@@ -63,6 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/medium"
+            android:contentDescription="@string/play_as_video_fab_content_description"
             android:src="@drawable/ic_play_arrow_white_24dp"
             android:transitionName="fs_play_fab"
             android:layout_gravity="bottom|end" />

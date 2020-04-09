@@ -12,6 +12,7 @@
         android:layout_margin="@dimen/small"
         android:src="@drawable/ic_clear_white_24dp"
         app:backgroundTint="@color/colorSubtleRedAccent"
+        android:contentDescription="@string/content_description_schedule_dialog_exit_fab"
         app:fabSize="mini" />
 
     <ScrollView android:layout_width="wrap_content"
