@@ -30,6 +30,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
 import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
@@ -216,6 +217,11 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        (activity as TimeLapseGalleryActivity).supportActionBar?.hide()
+    }
+
     private fun initializeCamera() = lifecycleScope.launchIdling {
         camera = openCamera(cameraManager, cameraId, cameraHandler)
 
@@ -297,6 +303,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         } catch (exc: Throwable) {
             Log.e(TAG, "Error closing camera", exc)
         }
+        (activity as TimeLapseGalleryActivity).supportActionBar?.show()
     }
 
     override fun onDestroy() {

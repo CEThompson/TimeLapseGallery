@@ -1114,6 +1114,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private fun verifyEditName() {
         val input = EditText(requireContext())
         input.inputType = InputType.TYPE_CLASS_TEXT
+        input.contentDescription = getString(R.string.content_description_edit_text_project_name)
         AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.edit_name))
                 .setView(input)

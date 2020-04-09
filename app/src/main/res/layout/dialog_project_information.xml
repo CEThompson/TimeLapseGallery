@@ -100,6 +100,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/large"
             android:src="@drawable/ic_edit_black_24dp"
+            android:contentDescription="@string/content_description_edit_project_name_fab"
             app:backgroundTint="@color/white"
             app:fabSize="mini"
             app:layout_constraintBottom_toBottomOf="@id/dialog_project_info_name"
