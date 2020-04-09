@@ -22,6 +22,7 @@ import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -269,7 +270,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                                     getProjectEntryFromProjectView(mCurrentProjectView),
                                     mCurrentPhoto.timestamp))
                     Log.d(TAG, photoFile.absolutePath)
-                    putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFile))
+                    val photoURI: Uri = FileProvider.getUriForFile(requireContext(),
+                            requireContext().applicationContext.packageName.toString() + ".fileprovider",
+                            photoFile)
+                    putExtra(Intent.EXTRA_STREAM, photoURI)
                 }
                 startActivity(Intent.createChooser(shareIntent, "Share Image"))
                 true
