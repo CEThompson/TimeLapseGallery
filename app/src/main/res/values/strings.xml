@@ -56,6 +56,11 @@
     <string name="content_description_edit_project_name_fab">Fab to edit the name of a project.</string>
     <string name="content_description_search_active_fab">Fab indicating a search is active that clears the search if clicked.</string>
     <string name="content_description_edit_text_project_name">Edit text field to edit the name of a project.</string>
+    <string name="content_description_schedule_selector_none">Field to select no schedule for a project.</string>
+    <string name="content_description_schedule_selector_days">Field to select an interval of %1$d days for a project schedule.</string>
+    <string name="content_description_schedule_selector_weeks">Field to select an interval of %1$d weeks for a project schedule.</string>
+    <string name="content_description_schedule_selector_custom">Field to select a custom interval for a project schedule.</string>
+    <string name="content_description_search_edit_text">Edit text field to search for a project by name.</string>
 
     <!-- Options -->
     <string name="disable_notifications">Disable notifications</string>

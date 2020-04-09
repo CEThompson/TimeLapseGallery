@@ -651,6 +651,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mNoneSelector = layoutInflater.inflate(R.layout.dialog_schedule_selector, noneLayout, false) as CardView
         val noneTv = mNoneSelector?.findViewById<TextView>(R.id.selector_child_tv)
         noneTv?.text = getString(R.string.unscheduled)
+        mNoneSelector?.contentDescription = getString(R.string.content_description_schedule_selector_none)
         noneLayout?.addView(mNoneSelector)
         mNoneSelector?.setOnClickListener {
             detailViewModel.setSchedule(mExternalFilesDir, mCurrentProjectView, 0)
@@ -671,6 +672,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_days), null)
             }
             daysLayout?.addView(selectionLayout)
+            selectionLayout.contentDescription = getString(R.string.content_description_schedule_selector_days, dayInterval)
             mDaySelectionViews.add(selectionLayout)
         }
 
@@ -686,6 +688,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_weeks), null)
             }
             weeksLayout?.addView(selectionLayout)
+            selectionLayout.contentDescription = getString(R.string.content_description_schedule_selector_weeks, weekInterval)
             mWeekSelectionViews.add(selectionLayout)
         }
 

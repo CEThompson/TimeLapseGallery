@@ -7,7 +7,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="@dimen/medium"
         android:orientation="vertical">
 
@@ -182,6 +182,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/medium"
+            android:contentDescription="@string/content_description_search_edit_text"
             android:gravity="start"
             android:hint="@string/project_name"
             android:minWidth="200dp"
