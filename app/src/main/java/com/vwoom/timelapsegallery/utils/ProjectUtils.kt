@@ -7,9 +7,6 @@ import java.io.File
 import java.util.*
 
 object ProjectUtils {
-    
-    // Error for photo loading
-    private const val ERROR_TIMESTAMP_TO_PHOTO = "error retrieving photo from timestamp"
 
     fun getProjectFolder(externalFilesDir: File, projectEntry: ProjectEntry): File {
         val projectPath = getProjectDirectoryPath(projectEntry)
@@ -78,8 +75,8 @@ object ProjectUtils {
 
     // Deletes file referred to in photo entry by project view
     fun deleteProjectPhoto(externalFilesDir: File, projectEntry: ProjectEntry, photoEntry: PhotoEntry) {
-        val photoUrl = getProjectPhotoUrl(externalFilesDir, projectEntry, photoEntry.timestamp)
-        if (photoUrl == ERROR_TIMESTAMP_TO_PHOTO) return // photo file does not exist already
+        // photo file does not exist already return
+        val photoUrl = getProjectPhotoUrl(externalFilesDir, projectEntry, photoEntry.timestamp) ?: return
         val photoFile = File(photoUrl)
         FileUtils.deleteRecursive(photoFile)
     }
@@ -92,7 +89,7 @@ object ProjectUtils {
         else projectEntry.id.toString() + "_" + projectEntry.project_name
     }
 
-    fun getProjectPhotoUrl(externalFilesDir: File, projectEntry: ProjectEntry, timestamp: Long): String {
+    fun getProjectPhotoUrl(externalFilesDir: File, projectEntry: ProjectEntry, timestamp: Long): String? {
         val imageFileNames = FileUtils.getPhotoFileExtensions(timestamp)
         val projectDir = getProjectFolder(externalFilesDir, projectEntry)
 
@@ -102,7 +99,7 @@ object ProjectUtils {
             photoFile = File(projectDir, fileName)
             if (photoFile.exists()) return photoFile.absolutePath
         }
-        return ERROR_TIMESTAMP_TO_PHOTO
+        return null
     }
 
     fun isProjectDueToday(projectView: ProjectView): Boolean {

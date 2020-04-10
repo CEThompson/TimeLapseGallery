@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.DetailRecyclerviewItemBinding
@@ -45,18 +46,29 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
     override fun onBindViewHolder(holder: DetailAdapterViewHolder, position: Int) {
         val binding = holder.binding
         val context = holder.itemView.context
-        val currentPhoto = mPhotos[position]
-        val photoPath = ProjectUtils.getProjectPhotoUrl(
+        val currentPhoto: PhotoEntry = mPhotos[position]
+        val photoPath: String? = ProjectUtils.getProjectPhotoUrl(
                 externalFilesDir,
                 getProjectEntryFromProjectView(mProjectView),
                 currentPhoto.timestamp)
-        val f = File(photoPath)
 
+        // Otherwise continue on to load the correct image
+        val f = if (photoPath == null) null else File(photoPath)
         // TODO (update 1.2) dynamically resize detail view
-        Glide.with(context)
-                .load(f)
-                .centerCrop()
-                .into(binding.detailThumbnail)
+
+        if (f == null){
+            Glide.with(context)
+                    .load(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
+                    .centerInside()
+                    .into(binding.detailThumbnail)
+        } else {
+            Glide.with(context)
+                    .load(f)
+                    .error(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
+                    .centerCrop()
+                    .into(binding.detailThumbnail)
+        }
+
         if (mPhotos[position] === mCurrentPhoto) {
             binding.selectionIndicator.visibility = View.VISIBLE
         } else {

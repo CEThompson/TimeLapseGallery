@@ -261,21 +261,23 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.share -> {
-                val shareIntent: Intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    type = "image/jpeg"
-                    val photoFile = File(ProjectUtils
-                            .getProjectPhotoUrl(
-                                    mExternalFilesDir,
-                                    getProjectEntryFromProjectView(mCurrentProjectView),
-                                    mCurrentPhoto.timestamp))
-                    Log.d(TAG, photoFile.absolutePath)
-                    val photoURI: Uri = FileProvider.getUriForFile(requireContext(),
-                            requireContext().applicationContext.packageName.toString() + ".fileprovider",
-                            photoFile)
-                    putExtra(Intent.EXTRA_STREAM, photoURI)
+                val photoUrl = ProjectUtils.getProjectPhotoUrl(mExternalFilesDir,
+                        getProjectEntryFromProjectView(mCurrentProjectView),
+                        mCurrentPhoto.timestamp)
+                if (photoUrl != null)
+                {
+                    val shareIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        type = "image/jpeg"
+                        val photoFile = File(photoUrl)
+                        Log.d(TAG, photoFile.absolutePath)
+                        val photoURI: Uri = FileProvider.getUriForFile(requireContext(),
+                                requireContext().applicationContext.packageName.toString() + ".fileprovider",
+                                photoFile)
+                        putExtra(Intent.EXTRA_STREAM, photoURI)
+                    }
+                    startActivity(Intent.createChooser(shareIntent, "Share Image"))
                 }
-                startActivity(Intent.createChooser(shareIntent, "Share Image"))
                 true
             }
             R.id.delete_photo -> {
@@ -378,10 +380,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mDetailAdapter?.setCurrentPhoto(photoEntry)
 
         // Get the image path, handle orientation indicator and load the image
-        val imagePath = ProjectUtils.getProjectPhotoUrl(
+        val imagePath: String? = ProjectUtils.getProjectPhotoUrl(
                 mExternalFilesDir,
                 getProjectEntryFromProjectView(mCurrentProjectView),
                 photoEntry.timestamp)
+
+
         if (!mPlaying) handleOrientationIndicator(imagePath)
         loadImage(imagePath)
 
@@ -414,8 +418,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     // Handles whether or not to display an indicator showing that an image is in the wrong orientation
-    private fun handleOrientationIndicator(imagePath: String) {
-        // Detect configuration
+    private fun handleOrientationIndicator(imagePath: String?) {
+        // If no path hide indicator
+        if (imagePath == null){
+            binding?.rotationIndicator?.startAnimation(stopAnimation)
+            return
+        }
+
+        // Otherwise Detect configuration
         val imageIsLandscape = PhotoUtils.isLandscape(imagePath)
         val deviceIsLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
@@ -431,26 +441,40 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     // Loads the passed url
-    private fun loadImage(imagePath: String) {
+    private fun loadImage(imagePath: String?) {
         mImageIsLoaded = false // this set to true after load image pair completes
         // Load the image to the fullscreen dialog if it is showing or to the detail cardview otherwise
-        val f = File(imagePath)
+        val f = if (imagePath==null) null else File(imagePath)
         loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
     }
 
     // TODO: (update 1.2) re-evaluate and speed up image loading
     // This function loads an image into a top view, then loads an image into the bottom view and hides the top view
     // This makes 'playing' the images look seamless
-    private fun loadImagePair(f: File, bottomImage: ImageView, topImage: ImageView) {
+    private fun loadImagePair(f: File?, bottomImage: ImageView, topImage: ImageView) {
+        // If error with file
+        if (f==null){
+            Glide.with(this)
+                    .load(R.color.darkImagePlaceHolder)
+                    .into(bottomImage)
+            startPostponedEnterTransition()
+            binding?.errorImage?.visibility = VISIBLE
+            if (mPlaying) stopPlaying()
+            return
+        } else {
+            binding?.errorImage?.visibility = INVISIBLE
+        }
+
         // 1. The first glide call: First load the image into the next image view on top of the current
         Glide.with(this)
                 .load(f)
+                .error(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
                 .listener(object : RequestListener<Drawable?> {
                     override fun onLoadFailed(e: GlideException?,
                                               model: Any,
                                               target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
-                        val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
-                        toast.show()
+                        //val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
+                        //toast.show()
                         return false
                     }
 
@@ -460,10 +484,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         // 2. The second glide call: Then load the image into the current image on the bottom
                         Glide.with(requireContext())
                                 .load(f)
+                                .error(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
                                 .listener(object : RequestListener<Drawable?> {
                                     override fun onLoadFailed(e: GlideException?, model: Any, target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
-                                        val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
-                                        toast.show()
+                                        //val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
+                                        //toast.show()
                                         startPostponedEnterTransition()
                                         return false
                                     }
@@ -785,6 +810,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                             mExternalFilesDir,
                             getProjectEntryFromProjectView(mCurrentProjectView),
                             photo.timestamp)
+                    if (photoUrl==null){
+                        Log.d(TAG, "error loading timestamp ${photo.timestamp}")
+                        continue
+                    }
                     list.add(photoUrl)
                 }
                 photoUrls = list.map { it }.toTypedArray()

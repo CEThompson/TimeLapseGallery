@@ -99,6 +99,20 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"/>
+                    <!-- Load error indicator -->
+                    <ImageView
+                        android:id="@+id/error_image"
+                        android:visibility="invisible"
+                        android:contentDescription="@string/content_description_image_load_error"
+                        android:layout_width="@dimen/image_load_error_indicator_size"
+                        android:layout_height="@dimen/image_load_error_indicator_size"
+                        android:src="@drawable/ic_sentiment_very_dissatisfied_white_24dp"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintVertical_bias="0.5"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
                     <!-- gradient overlay for image -->
                     <View
                         android:id="@+id/details_gradient_overlay"
@@ -154,6 +168,7 @@
 
                     <ImageView
                         android:id="@+id/rotation_indicator"
+                        android:contentDescription="@string/cd_rotation_indicator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_screen_rotation_white_24dp"

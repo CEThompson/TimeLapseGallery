@@ -67,7 +67,7 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
         val url = ProjectUtils.getProjectPhotoUrl(
                 externalFilesDir,
                 getProjectEntryFromProjectView(projectView),
-                entry.timestamp)
+                entry.timestamp) ?: return
         lastPhoto = Photo(entry.project_id, entry.id, entry.timestamp, url)
     }
 

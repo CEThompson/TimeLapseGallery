@@ -61,6 +61,8 @@
     <string name="content_description_schedule_selector_weeks">Field to select an interval of %1$d weeks for a project schedule.</string>
     <string name="content_description_schedule_selector_custom">Field to select a custom interval for a project schedule.</string>
     <string name="content_description_search_edit_text">Edit text field to search for a project by name.</string>
+    <string name="content_description_image_load_error">Indicator showing there was an error loading the current photo.</string>
+    <string name="cd_rotation_indicator">Indicator showing device orientation does not match image orientation</string>
 
     <!-- Options -->
     <string name="disable_notifications">Disable notifications</string>
@@ -126,7 +128,7 @@
     <string name="project_identification">%1$d %2$s</string>
 
     <string name="transition_tag" translatable="false">transition tag</string>
-    <string name="default_aspect_ratio" translatable="false">1:1</string>
+    <string name="default_aspect_ratio" translatable="false">3:4</string>
 
     <!-- Validation -->
     <string name="invalid_name">Invalid Name</string>

@@ -22,7 +22,7 @@ object PhotoUtils {
     }
 
     /* Returns the aspect ratio from the photo path */
-    fun getAspectRatioFromImagePath(path: String?): String {
+    fun getAspectRatioFromImagePath(path: String): String {
         val bmOptions = BitmapFactory.Options()
         bmOptions.inJustDecodeBounds = true
         BitmapFactory.decodeFile(path, bmOptions)
@@ -45,12 +45,12 @@ object PhotoUtils {
     /* Gets exif orientation from bitmap */
     @JvmStatic
     @Throws(IOException::class)
-    fun getOrientationFromImagePath(path: String?): Int {
-        val exif = ExifInterface(path!!)
+    fun getOrientationFromImagePath(path: String): Int {
+        val exif = ExifInterface(path)
         return exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
     }
 
-    fun isLandscape(imagePath: String?): Boolean {
+    fun isLandscape(imagePath: String): Boolean {
         val aspectRatio = getAspectRatioFromImagePath(imagePath)
         val res = aspectRatio.split(":").toTypedArray()
         val width = res[0].toInt()

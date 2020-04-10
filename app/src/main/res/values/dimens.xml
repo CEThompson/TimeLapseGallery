@@ -59,4 +59,6 @@
 
     <dimen name="welcome_padding">16dp</dimen>
 
+    <dimen name="image_load_error_indicator_size">100dp</dimen>
+
 </resources>
