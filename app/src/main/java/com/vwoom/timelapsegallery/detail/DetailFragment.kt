@@ -746,10 +746,85 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
      */
     // Bind the ui to observables
     private fun setupViewModel() {
-        // 1. First update the UI for the project
-        setProjectUi()
+        // Observe the project for name and schedule changes
+        detailViewModel.projectView.observe(viewLifecycleOwner, Observer { projectView ->
+            mCurrentProjectView = projectView
 
-        // 2. Now set up observables
+            // This updates the project information card, project info dialog,
+            // schedule layout over the image and the schedule dialog
+
+            // Set the ui for the project information layout cardview
+            // 1. Set the ID
+            binding?.projectInformationLayout?.detailsProjectId?.text = mCurrentProjectView.project_id.toString()
+            // 2. Set the name, handle appropriately if no name specified
+            val name = mCurrentProjectView.project_name
+            // Style for no name
+            if (name == null || name.isEmpty()) {
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.text = getString(R.string.unnamed)
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.setTypeface(binding!!.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.ITALIC)
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+            }
+            // Otherwise style for a set name
+            else {
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.text = name
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                binding?.projectInformationLayout
+                        ?.detailsProjectNameTextView
+                        ?.setTypeface(binding!!.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.BOLD)
+            }
+
+            // 3. Set the schedule information
+            // If there isn't a schedule set the color of the fab to white and hide the layout
+            if (mCurrentProjectView.interval_days == 0) {
+                binding?.projectScheduleFab?.backgroundTintList =
+                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+                binding?.detailScheduleLayout?.scheduleLayout?.visibility = INVISIBLE
+            }
+            // Otherwise set the color of the schedule fab to an accent and show the schedule layout
+            else {
+                binding?.projectScheduleFab?.backgroundTintList =
+                        ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
+                // Show the interval of the schedule
+                binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.text =
+                        mCurrentProjectView.interval_days.toString()
+
+                val daysUntilDue = daysUntilDue(mCurrentProjectView)
+                // Show how many days until project is due
+                binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.text =
+                        daysUntilDue.toString()
+
+                // Style schedule layout depending upon whether or not the project is due
+                if (daysUntilDue <= 0) {
+                    binding?.detailScheduleLayout?.scheduleDaysUntilDueTv
+                            ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorSubtleRedAccent))
+                    binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv
+                            ?.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_schedule_indicator_due_24dp, 0, 0, 0)
+                } else {
+                    binding?.detailScheduleLayout?.scheduleDaysUntilDueTv
+                            ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                    binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv
+                            ?.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_schedule_indicator_pending_24dp, 0, 0, 0)
+                }
+
+                // Show the layout
+                binding?.detailScheduleLayout?.scheduleLayout?.visibility = VISIBLE
+            }
+            // Also update the fields in the info dialog
+            setInfoDialog()
+            // And update the fields in the schedule dialog
+            setScheduleInformation()
+
+        })
 
         // Observe the list of photos
         // This keeps track of the last photo in the set and ensures that photo is the cover photo
@@ -859,82 +934,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mAllTags = tagEntries.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
             setProjectTagDialog()
         })
-    }
-
-    private fun setProjectUi() {
-        // This updates the project information card, project info dialog,
-        // schedule layout over the image and the schedule dialog
-
-        // Set the ui for the project information layout cardview
-        // 1. Set the ID
-        binding?.projectInformationLayout?.detailsProjectId?.text = mCurrentProjectView.project_id.toString()
-        // 2. Set the name, handle appropriately if no name specified
-        val name = mCurrentProjectView.project_name
-        // Style for no name
-        if (name == null || name.isEmpty()) {
-            binding?.projectInformationLayout
-                    ?.detailsProjectNameTextView
-                    ?.text = getString(R.string.unnamed)
-            binding?.projectInformationLayout
-                    ?.detailsProjectNameTextView
-                    ?.setTypeface(binding!!.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.ITALIC)
-            binding?.projectInformationLayout
-                    ?.detailsProjectNameTextView
-                    ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-        }
-        // Otherwise style for a set name
-        else {
-            binding?.projectInformationLayout
-                    ?.detailsProjectNameTextView
-                    ?.text = name
-            binding?.projectInformationLayout
-                    ?.detailsProjectNameTextView
-                    ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-            binding?.projectInformationLayout
-                    ?.detailsProjectNameTextView
-                    ?.setTypeface(binding!!.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.BOLD)
-        }
-
-        // 3. Set the schedule information
-        // If there isn't a schedule set the color of the fab to white and hide the layout
-        if (mCurrentProjectView.interval_days == 0) {
-            binding?.projectScheduleFab?.backgroundTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-            binding?.detailScheduleLayout?.scheduleLayout?.visibility = INVISIBLE
-        }
-        // Otherwise set the color of the schedule fab to an accent and show the schedule layout
-        else {
-            binding?.projectScheduleFab?.backgroundTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
-            // Show the interval of the schedule
-            binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.text =
-                    mCurrentProjectView.interval_days.toString()
-
-            val daysUntilDue = daysUntilDue(mCurrentProjectView)
-            // Show how many days until project is due
-            binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.text =
-                    daysUntilDue.toString()
-
-            // Style schedule layout depending upon whether or not the project is due
-            if (daysUntilDue <= 0) {
-                binding?.detailScheduleLayout?.scheduleDaysUntilDueTv
-                        ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorSubtleRedAccent))
-                binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv
-                        ?.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_schedule_indicator_due_24dp, 0, 0, 0)
-            } else {
-                binding?.detailScheduleLayout?.scheduleDaysUntilDueTv
-                        ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv
-                        ?.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_schedule_indicator_pending_24dp, 0, 0, 0)
-            }
-
-            // Show the layout
-            binding?.detailScheduleLayout?.scheduleLayout?.visibility = VISIBLE
-        }
-        // Also update the fields in the info dialog
-        setInfoDialog()
-        // And update the fields in the schedule dialog
-        setScheduleInformation()
     }
 
     // This updates the tags in the project info dialog
