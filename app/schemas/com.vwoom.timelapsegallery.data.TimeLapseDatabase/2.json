@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "e1b280e675116c277bd8b2174ccf9b59",
+    "identityHash": "11a78efd1b68f3f526b7a93415bdce74",
     "entities": [
       {
         "tableName": "project",
@@ -286,10 +286,15 @@
         ]
       }
     ],
-    "views": [],
+    "views": [
+      {
+        "viewName": "project_view",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT project.id AS project_id, project.project_name AS project_name, project_schedule.interval_days AS interval_days, cover_photo.photo_id AS cover_photo_id, photo.timestamp AS cover_photo_timestamp FROM project LEFT JOIN project_schedule ON project.id = project_schedule.project_id LEFT JOIN cover_photo ON project.id = cover_photo.project_id LEFT JOIN photo ON cover_photo.photo_id = photo.id"
+      }
+    ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e1b280e675116c277bd8b2174ccf9b59')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '11a78efd1b68f3f526b7a93415bdce74')"
     ]
   }
 }

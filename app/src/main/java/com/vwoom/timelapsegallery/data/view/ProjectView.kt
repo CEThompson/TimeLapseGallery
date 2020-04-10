@@ -7,7 +7,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Keep
 @Parcelize
-@DatabaseView("SELECT " +
+@DatabaseView(viewName = "project_view", value = "SELECT " +
         "project.id AS project_id, " +
         "project.project_name AS project_name, " +
         "project_schedule.interval_days AS interval_days, " +

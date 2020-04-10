@@ -129,7 +129,7 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                         "text TEXT NOT NULL)")
 
                 // Create the project view
-                database.execSQL("CREATE VIEW IF NOT EXISTS project_view AS " +
+                database.execSQL("CREATE VIEW `project_view` AS " +
                         "SELECT " +
                         "project.id AS project_id, " +
                         "project.project_name AS project_name, " +
