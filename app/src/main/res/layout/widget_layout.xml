@@ -15,6 +15,7 @@
 
         <ImageView
             android:id="@+id/widget_time_lapse_gallery_branding"
+            android:contentDescription="@string/cd_widget_branding"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -23,6 +24,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/cd_widget_branding_plus"
             android:layout_gravity="end"
             android:background="@drawable/widget_add_bg"
             android:src="@drawable/ic_add_white_24dp" />

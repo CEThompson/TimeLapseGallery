@@ -171,7 +171,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/medium"
             android:hint="@string/custom_interval_in_days_hint"
-            android:contentDescription="@string/content_description_schedule_selector_custom"
+            android:autofillHints="@string/custom_interval_in_days_hint"
             android:inputType="number" />
 
         <!-- output of resulting schedule -->

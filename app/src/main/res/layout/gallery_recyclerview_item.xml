@@ -46,6 +46,7 @@
                 app:layout_constraintBottom_toBottomOf="parent">
                 <ImageView
                     android:id="@+id/gallery_bottom_gradient"
+                    android:contentDescription="@string/cd_gallery_item_bottom_gradient"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:src="@drawable/gradient_overlay_bottom_up"

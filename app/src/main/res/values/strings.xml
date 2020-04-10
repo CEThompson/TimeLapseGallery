@@ -63,6 +63,11 @@
     <string name="content_description_search_edit_text">Edit text field to search for a project by name.</string>
     <string name="content_description_image_load_error">Indicator showing there was an error loading the current photo.</string>
     <string name="cd_rotation_indicator">Indicator showing device orientation does not match image orientation</string>
+    <string name="cd_widget_branding">Branding for the Time Lapse Gallery widget showing a camera with a clock.</string>
+    <string name="cd_widget_branding_plus">A small plus icon next to the Time Lapse Gallery brand indicating a link to adding photos.</string>
+    <string name="cd_info_dialog_icon">Info indicator for the project information dialog.</string>
+    <string name="cd_gallery_item_bottom_gradient">Gradient on the bottom of a gallery item for highlighting a check mark if a photo was taken today.</string>
+    <string name="cd_camera_previous_photo">The last photo for a time-lapse project if it exists.</string>
 
     <!-- Options -->
     <string name="disable_notifications">Disable notifications</string>

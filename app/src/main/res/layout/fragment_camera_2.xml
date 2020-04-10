@@ -21,6 +21,7 @@
 
         <ImageView
             android:id="@+id/previous_photo"
+            android:contentDescription="@string/cd_camera_previous_photo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="invisible" />

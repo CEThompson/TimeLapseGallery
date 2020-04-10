@@ -60,6 +60,7 @@
 
             <ImageView
                 android:id="@+id/project_information_layout_info_icon"
+                android:contentDescription="@string/cd_info_dialog_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_info_outline_grey_24dp"
