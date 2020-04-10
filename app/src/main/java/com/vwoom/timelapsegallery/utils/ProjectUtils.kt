@@ -85,7 +85,7 @@ object ProjectUtils {
     // Examples: 1_My Project, 2_Cactus, 3_Flower, etc.
     private fun getProjectDirectoryPath(projectEntry: ProjectEntry): String {
         val name = projectEntry.project_name
-        return if (name == null) projectEntry.id.toString()
+        return if (name.isNullOrEmpty()) projectEntry.id.toString()
         else projectEntry.id.toString() + "_" + projectEntry.project_name
     }
 
