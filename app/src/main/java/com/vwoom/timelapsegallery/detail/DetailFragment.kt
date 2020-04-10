@@ -473,8 +473,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     override fun onLoadFailed(e: GlideException?,
                                               model: Any,
                                               target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
-                        //val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
-                        //toast.show()
                         return false
                     }
 
@@ -487,8 +485,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                                 .error(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
                                 .listener(object : RequestListener<Drawable?> {
                                     override fun onLoadFailed(e: GlideException?, model: Any, target: Target<Drawable?>, isFirstResource: Boolean): Boolean {
-                                        //val toast = Toast.makeText(requireContext(), getString(R.string.error_loading_image), Toast.LENGTH_SHORT)
-                                        //toast.show()
                                         startPostponedEnterTransition()
                                         return false
                                     }
