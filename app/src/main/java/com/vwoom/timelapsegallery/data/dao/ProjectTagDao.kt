@@ -18,9 +18,6 @@ interface ProjectTagDao {
     @Query("SELECT * FROM project_tag WHERE project_id = :projectId AND tag_id = :tagId")
     suspend fun getProjectTag(projectId: Long, tagId: Long): ProjectTagEntry?
 
-    @Query("SELECT * FROM project_tag WHERE tag_id = :tagId")
-    suspend fun getProjectTagsByTagId(tagId: Long): List<ProjectTagEntry>
-
     @Insert
     suspend fun insertProjectTag(projectTagEntry: ProjectTagEntry)
 

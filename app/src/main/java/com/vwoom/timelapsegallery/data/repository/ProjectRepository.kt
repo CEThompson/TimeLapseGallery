@@ -52,7 +52,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
     }
 
     suspend fun updateProjectName(externalFilesDir: File, sourceProjectView: ProjectView, name: String) {
-        val source = projectDao.getProjectById(sourceProjectView.project_id)
+        val source: ProjectEntry = projectDao.getProjectById(sourceProjectView.project_id) ?: return
         val destination = ProjectEntry(source.id, name)
         withContext(Dispatchers.IO) {
             val success = ProjectUtils.renameProject(externalFilesDir, source, destination)
@@ -64,7 +64,7 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
     }
 
     suspend fun deleteProject(externalFilesDir: File, projectId: Long) {
-        val projectEntry = projectDao.getProjectById(projectId)
+        val projectEntry = projectDao.getProjectById(projectId) ?: return
         withContext(Dispatchers.IO) {
             // Delete files first since there is a listener on the project
             ProjectUtils.deleteProject(externalFilesDir, projectEntry)
@@ -103,21 +103,25 @@ class ProjectRepository private constructor(private val projectDao: ProjectDao,
     suspend fun addPhotoToProject(file: File,
                                   externalFilesDir: File,
                                   projectView: ProjectView, timestamp: Long) {
+        // Do not add photo if project cannot be found
+        val projectEntry = projectDao.getProjectById(projectView.project_id) ?: return
+
+        // Insert the photo
         val photoEntry = PhotoEntry(projectView.project_id, timestamp)
         val photoId = photoDao.insertPhoto(photoEntry)
 
+        // Insert the cover photo
         val coverPhotoEntry = CoverPhotoEntry(projectView.project_id, photoId)
         coverPhotoDao.insertPhoto(coverPhotoEntry)
 
-        val projectEntry = projectDao.getProjectById(projectView.project_id)
-
+        // Create the final file
         withContext(Dispatchers.IO) {
             FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
         }
     }
 
     suspend fun deleteProjectPhoto(externalFilesDir: File, photoEntry: PhotoEntry) {
-        val projectEntry = projectDao.getProjectById(photoEntry.project_id)
+        val projectEntry = projectDao.getProjectById(photoEntry.project_id) ?: return
         withContext(Dispatchers.IO) {
             ProjectUtils.deleteProjectPhoto(externalFilesDir, projectEntry, photoEntry)
         }

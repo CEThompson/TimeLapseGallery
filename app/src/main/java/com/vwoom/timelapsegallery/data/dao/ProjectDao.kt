@@ -14,10 +14,10 @@ interface ProjectDao {
     fun getProjectsLiveData(): LiveData<List<ProjectEntry>>
 
     @Query("SELECT * FROM project WHERE id = :id")
-    suspend fun getProjectById(id: Long): ProjectEntry
+    suspend fun getProjectById(id: Long): ProjectEntry?
 
     @Query("SELECT * FROM project WHERE id = :id")
-    fun getProjectLiveDataById(id: Long): LiveData<ProjectEntry>
+    fun getProjectLiveDataById(id: Long): LiveData<ProjectEntry?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProject(projectEntry: ProjectEntry): Long
@@ -55,7 +55,7 @@ interface ProjectDao {
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id " +
             "WHERE project.id =:id")
-    fun getProjectViewLiveData(id: Long): LiveData<ProjectView>
+    fun getProjectViewLiveData(id: Long): LiveData<ProjectView?>
 
     @Query("SELECT " +
             "project.id AS project_id, " +
@@ -68,7 +68,7 @@ interface ProjectDao {
             "LEFT JOIN cover_photo ON project.id = cover_photo.project_id " +
             "LEFT JOIN photo ON cover_photo.photo_id = photo.id " +
             "WHERE project.id =:id")
-    suspend fun getProjectViewById(id: Long): ProjectView
+    suspend fun getProjectViewById(id: Long): ProjectView?
 
     @Query("SELECT " +
             "project.id AS project_id, " +

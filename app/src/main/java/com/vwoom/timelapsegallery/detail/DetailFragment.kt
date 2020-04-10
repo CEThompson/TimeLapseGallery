@@ -747,9 +747,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Bind the ui to observables
     private fun setupViewModel() {
         // Observe the project for name and schedule changes
-        detailViewModel.projectView.observe(viewLifecycleOwner, Observer { projectView ->
-            mCurrentProjectView = projectView
+        detailViewModel.projectView.observe(viewLifecycleOwner, Observer { projectView: ProjectView? ->
+            if (projectView==null) return@Observer
 
+            mCurrentProjectView = projectView
             // This updates the project information card, project info dialog,
             // schedule layout over the image and the schedule dialog
 

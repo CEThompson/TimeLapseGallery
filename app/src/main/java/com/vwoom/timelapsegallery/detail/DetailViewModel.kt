@@ -22,7 +22,7 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
                       private val tagRepository: TagRepository,
                       private val projectId: Long) : ViewModel() {
     // Live data
-    val projectView: LiveData<ProjectView> = projectRepository.getProjectViewLiveData(projectId)
+    val projectView: LiveData<ProjectView?> = projectRepository.getProjectViewLiveData(projectId)
     val photos: LiveData<List<PhotoEntry>> = projectRepository.getProjectPhotosLiveData(projectId)
     val projectTags: LiveData<List<ProjectTagEntry>> = tagRepository.getProjectTagsLiveData(projectId)
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()

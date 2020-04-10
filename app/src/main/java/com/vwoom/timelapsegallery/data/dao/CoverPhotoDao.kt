@@ -10,10 +10,10 @@ interface CoverPhotoDao {
     fun getCoverPhotos(): List<CoverPhotoEntry>
 
     @Query("SELECT * FROM cover_photo WHERE project_id =:projectId")
-    fun getCoverPhotoLiveData(projectId: Long): LiveData<CoverPhotoEntry>
+    fun getCoverPhotoLiveData(projectId: Long): LiveData<CoverPhotoEntry?>
 
     @Query("SELECT * FROM cover_photo WHERE project_id =:projectId")
-    fun getCoverPhoto(projectId: Long): CoverPhotoEntry
+    fun getCoverPhoto(projectId: Long): CoverPhotoEntry?
 
     @Query("SELECT * FROM cover_photo")
     fun getAllCoverPhotosLiveData(): LiveData<List<CoverPhotoEntry>>

@@ -153,10 +153,12 @@ object ImportUtils {
                     SyncProgressCounter.incrementPhoto()
                 }
             }
-            val lastPhoto = db.photoDao().getLastPhoto(currentProject.id)
-            val coverPhoto = CoverPhotoEntry(lastPhoto.project_id, lastPhoto.id)
-            //Log.d(TAG, "inserting cover photo $coverPhoto")
-            db.coverPhotoDao().insertPhoto(coverPhoto)
+            val lastPhoto: PhotoEntry? = db.photoDao().getLastPhoto(currentProject.id)
+            if (lastPhoto != null) {
+                val coverPhoto = CoverPhotoEntry(lastPhoto.project_id, lastPhoto.id)
+                //Log.d(TAG, "inserting cover photo $coverPhoto")
+                db.coverPhotoDao().insertPhoto(coverPhoto)
+            }
         }
     }
 
