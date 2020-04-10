@@ -107,9 +107,9 @@ class ImportUtilsTest {
         runBlocking {
             // Assert state of project 1 files matches state of database
             var projectEntry = db.projectDao().getProjectById(1)
-            assert(projectEntry.project_name == "test")
+            assert(projectEntry?.project_name == "test")
             var photoEntry = db.photoDao().getLastPhoto(1)
-            assert(photoEntry.timestamp == 300.toLong())
+            assert(photoEntry?.timestamp == 300.toLong())
             var tags = db.projectTagDao().getProjectTagsByProjectId(1)
             assert(tags.size==1)
             var tag = db.tagDao().getTagById(tags[0].tag_id)
@@ -119,9 +119,9 @@ class ImportUtilsTest {
 
             // Assert state of project 2 files matches state of database
             projectEntry = db.projectDao().getProjectById(3)
-            assert(projectEntry.project_name =="test two")
+            assert(projectEntry?.project_name =="test two")
             photoEntry = db.photoDao().getLastPhoto(3)
-            assert (photoEntry.timestamp == 400.toLong())
+            assert (photoEntry?.timestamp == 400.toLong())
             tags = db.projectTagDao().getProjectTagsByProjectId(3)
             assert(tags.size==1)
             tag = db.tagDao().getTagById(tags[0].tag_id)
