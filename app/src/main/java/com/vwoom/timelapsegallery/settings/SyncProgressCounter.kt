@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.settings
 
 import androidx.lifecycle.MutableLiveData
 
+// TODO: consider refactoring this to constructor injection instead of singleton
 object SyncProgressCounter {
     // Position update on importing projects
     var projectProgress: MutableLiveData<Int> = MutableLiveData(0)

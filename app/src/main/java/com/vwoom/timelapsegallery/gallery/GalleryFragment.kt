@@ -42,6 +42,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
+// TODO: remove all instances of non-null assertion !!
+// TODO: increase test coverage, viewmodels? livedata?
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
@@ -49,7 +51,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private val mGalleryViewModel: GalleryViewModel by viewModels {
         InjectorUtils.provideGalleryViewModelFactory(requireActivity())
     }
-
 
     // Recyclerview
     private var mGalleryRecyclerView: RecyclerView? = null

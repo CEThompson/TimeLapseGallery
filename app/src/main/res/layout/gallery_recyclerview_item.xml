@@ -2,6 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- TODO: remove usage of cardview but retain material styling -->
     <androidx.cardview.widget.CardView
         android:id="@+id/project_card_view"
         android:layout_width="match_parent"

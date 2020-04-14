@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
+// TODO: consider refactoring this to combine project and tag repository and to use remote / local datasources
 class ProjectRepository private constructor(private val projectDao: ProjectDao,
                                             private val photoDao: PhotoDao,
                                             private val coverPhotoDao: CoverPhotoDao,
