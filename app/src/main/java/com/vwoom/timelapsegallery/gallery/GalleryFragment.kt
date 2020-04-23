@@ -44,6 +44,7 @@ import java.util.*
 
 // TODO: remove all instances of non-null assertion !!
 // TODO: increase test coverage, viewmodels? livedata?
+// TODO: add dialog to show weather for the next week
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
