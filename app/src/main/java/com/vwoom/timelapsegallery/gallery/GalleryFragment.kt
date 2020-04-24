@@ -21,6 +21,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
@@ -36,22 +37,27 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
+import com.vwoom.timelapsegallery.di.Injectable
+import com.vwoom.timelapsegallery.di.injectViewModel
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
 // TODO: remove all instances of non-null assertion !!
 // TODO: increase test coverage, viewmodels? livedata?
 // TODO: add dialog to show weather for the next week
-class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
+class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler, Injectable {
 
     private val args: GalleryFragmentArgs by navArgs()
 
-    private val mGalleryViewModel: GalleryViewModel by viewModels {
-        InjectorUtils.provideGalleryViewModelFactory(requireActivity())
-    }
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    //private val mGalleryViewModel: GalleryViewModel by viewModels { viewModelFactory }
+    lateinit var mGalleryViewModel: GalleryViewModel
 
     // Recyclerview
     private var mGalleryRecyclerView: RecyclerView? = null
@@ -111,6 +117,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        mGalleryViewModel = injectViewModel(viewModelFactory)
         binding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }

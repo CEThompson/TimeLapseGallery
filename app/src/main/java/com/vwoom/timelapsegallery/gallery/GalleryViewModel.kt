@@ -9,6 +9,7 @@ import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import java.util.*
+import javax.inject.Inject
 
 const val SEARCH_TYPE_NONE = "none"
 const val SEARCH_TYPE_DUE_TODAY = "due_today"
@@ -17,8 +18,8 @@ const val SEARCH_TYPE_PENDING = "pending"
 const val SEARCH_TYPE_SCHEDULED = "scheduled"
 const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 
-class GalleryViewModel internal constructor(projectRepository: ProjectRepository,
-                                            private val tagRepository: TagRepository) : ViewModel() {
+class GalleryViewModel
+@Inject constructor(projectRepository: ProjectRepository, private val tagRepository: TagRepository) : ViewModel() {
     // Tag Live Data
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()

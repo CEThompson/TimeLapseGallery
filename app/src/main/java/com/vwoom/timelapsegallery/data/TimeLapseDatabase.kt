@@ -31,7 +31,7 @@ abstract class TimeLapseDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var instance: TimeLapseDatabase? = null
-        private const val DATABASE_NAME = "time_lapse_db"
+        const val DATABASE_NAME = "time_lapse_db"
 
         fun getInstance(context: Context): TimeLapseDatabase {
             return instance ?: synchronized(this) {

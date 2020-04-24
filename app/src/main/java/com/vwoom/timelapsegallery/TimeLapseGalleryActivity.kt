@@ -1,13 +1,24 @@
 package com.vwoom.timelapsegallery
 
+import android.app.Fragment
 import android.os.Bundle
 import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.HasAndroidInjector
+import dagger.android.HasFragmentInjector
+import javax.inject.Inject
 
-class TimeLapseGalleryActivity : AppCompatActivity() {
+class TimeLapseGalleryActivity : AppCompatActivity(), HasFragmentInjector {
+
+    @Inject
+    lateinit var androidInjector: DispatchingAndroidInjector<Fragment>
+
+    override fun fragmentInjector() = androidInjector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

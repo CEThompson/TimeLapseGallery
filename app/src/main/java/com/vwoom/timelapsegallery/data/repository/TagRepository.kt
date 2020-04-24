@@ -5,9 +5,11 @@ import com.vwoom.timelapsegallery.data.dao.TagDao
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
+import javax.inject.Inject
 
-class TagRepository private constructor(private val projectTagDao: ProjectTagDao,
-                                        private val tagDao: TagDao) {
+class TagRepository
+@Inject constructor(private val projectTagDao: ProjectTagDao,
+                    private val tagDao: TagDao) {
 
     /**
      * Tag observables
