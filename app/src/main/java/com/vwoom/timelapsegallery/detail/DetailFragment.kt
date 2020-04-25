@@ -178,9 +178,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Set up toolbar
         setHasOptionsMenu(true)
         toolbar = binding?.detailsFragmentToolbar
-        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
+        // TODO handle action bar: (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar?.title = getString(R.string.project_details)
-        (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        // TODO handle action bar: (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Set up adapter and recycler view
         mDetailAdapter = DetailAdapter(this, mExternalFilesDir)

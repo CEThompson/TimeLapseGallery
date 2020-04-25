@@ -7,6 +7,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 
+/*
 @Module
 abstract class FragmentBindingModule {
     @Binds
@@ -18,4 +19,4 @@ abstract class FragmentBindingModule {
     abstract fun bindFragmentFactory(factory: InjectingFragmentFactory): FragmentFactory
 
     // TODO set up other fragments from nav graph
-}
+}*/

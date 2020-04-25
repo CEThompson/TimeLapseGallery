@@ -8,7 +8,7 @@ import com.vwoom.timelapsegallery.data.view.ProjectView
 import javax.inject.Inject
 
 class TagRepository
-@Inject constructor(private val projectTagDao: ProjectTagDao,
+@Inject constructor (private val projectTagDao: ProjectTagDao,
                     private val tagDao: TagDao) {
 
     /**

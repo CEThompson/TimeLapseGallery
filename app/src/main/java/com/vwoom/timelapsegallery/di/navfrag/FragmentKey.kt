@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import dagger.MapKey
 import kotlin.reflect.KClass
 
+/*
 @Target(
         AnnotationTarget.FUNCTION,
         AnnotationTarget.PROPERTY_GETTER,
@@ -11,4 +12,4 @@ import kotlin.reflect.KClass
 )
 @Retention(AnnotationRetention.RUNTIME)
 @MapKey
-annotation class FragmentKey(val value: KClass<out Fragment>)
+annotation class FragmentKey(val value: KClass<out Fragment>)*/

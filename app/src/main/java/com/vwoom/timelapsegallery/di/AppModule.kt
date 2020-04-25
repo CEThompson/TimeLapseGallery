@@ -7,45 +7,45 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module(includes = [ViewModelModule::class])
+@Module
 class AppModule {
-    @Singleton
+    /*@Provides
+    @JvmStatic
+    fun provideSharedPreferences(
+            app: Application
+    ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
+*/
     @Provides
+    @Singleton
     fun provideDb(app: Application): TimeLapseDatabase {
         return TimeLapseDatabase.getInstance(app)
     }
 
-    @Singleton
     @Provides
     fun provideCoverPhotoDao(db: TimeLapseDatabase): CoverPhotoDao {
         return db.coverPhotoDao()
     }
 
-    @Singleton
     @Provides
     fun providePhotoDao(db: TimeLapseDatabase): PhotoDao {
         return db.photoDao()
     }
 
-    @Singleton
     @Provides
     fun provideProjectDao(db: TimeLapseDatabase): ProjectDao {
         return db.projectDao()
     }
 
-    @Singleton
     @Provides
     fun provideProjectScheduleDao(db: TimeLapseDatabase): ProjectScheduleDao {
         return db.projectScheduleDao()
     }
 
-    @Singleton
     @Provides
-    fun provideProjectTag(db: TimeLapseDatabase): ProjectTagDao {
+    fun provideProjectTagDao(db: TimeLapseDatabase): ProjectTagDao {
         return db.projectTagDao()
     }
 
-    @Singleton
     @Provides
     fun provideTagDao(db: TimeLapseDatabase): TagDao {
         return db.tagDao()

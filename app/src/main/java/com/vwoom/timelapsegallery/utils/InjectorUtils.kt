@@ -9,7 +9,7 @@ import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.detail.DetailViewModelFactory
-import com.vwoom.timelapsegallery.gallery.GalleryViewModelFactory
+//import com.vwoom.timelapsegallery.gallery.GalleryViewModelFactory
 import com.vwoom.timelapsegallery.settings.SettingsViewModelFactory
 
 object InjectorUtils {
@@ -53,13 +53,13 @@ object InjectorUtils {
                 projectView.project_id)
     }
 
-    fun provideGalleryViewModelFactory(context: Context): GalleryViewModelFactory {
+    /*fun provideGalleryViewModelFactory(context: Context): GalleryViewModelFactory {
         val projectRepository = getProjectRepository(context)
         val tagRepository = getTagRepository(context)
         return GalleryViewModelFactory(
                 projectRepository,
                 tagRepository)
-    }
+    }*/
 
     fun provideSettingsViewModelFactory(): SettingsViewModelFactory {
         return SettingsViewModelFactory()

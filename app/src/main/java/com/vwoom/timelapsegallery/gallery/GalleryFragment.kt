@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.app.Dialog
+import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Typeface
 import android.os.Bundle
@@ -32,15 +33,16 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
-import com.vwoom.timelapsegallery.di.Injectable
-import com.vwoom.timelapsegallery.di.injectViewModel
+import com.vwoom.timelapsegallery.di.DaggerAppComponent
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
+import dagger.android.AndroidInjection
+import dagger.android.support.AndroidSupportInjection
+import dagger.android.support.DaggerFragment
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
@@ -49,14 +51,19 @@ import javax.inject.Inject
 // TODO: remove all instances of non-null assertion !!
 // TODO: increase test coverage, viewmodels? livedata?
 // TODO: add dialog to show weather for the next week
-class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler, Injectable {
+class GalleryFragment: Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
+    //lateinit var viewModelFactory: ViewModelProvider.Factory by lazy {
+    //    InjectorUtils.provideGalleryViewModelFactory(this)
+    //}
 
-    //private val mGalleryViewModel: GalleryViewModel by viewModels { viewModelFactory }
+
+    /*private val mGalleryViewModel: GalleryViewModel by viewModels {
+        InjectorUtils.provideGalleryViewModelFactory(requireContext())
+    }*/
+    @Inject
     lateinit var mGalleryViewModel: GalleryViewModel
 
     // Recyclerview
@@ -103,11 +110,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         }
     }
 
-    /**
-     * Lifecycle
-     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AndroidSupportInjection.inject(this)
+        //mGalleryViewModel = ViewModelProvider(this, viewModelFactory)[GalleryViewModel::class.java]
+
+
         galleryReenterTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
         galleryReenterTransition.addListener(reenterListener)
         galleryExitTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
@@ -117,7 +125,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        mGalleryViewModel = injectViewModel(viewModelFactory)
         binding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
             lifecycleOwner = viewLifecycleOwner
         }
@@ -125,9 +132,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         // Set up options menu
         setHasOptionsMenu(true)
         toolbar = binding?.galleryFragmentToolbar
-        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
+        // TODO handle action bar: (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar?.title = getString(R.string.app_name)
-        (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
+        // TODO handle action bar: (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
 
         // Increase columns for horizontal orientation
         when (resources.configuration.orientation) {
@@ -255,7 +262,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
      */
     private fun setupViewModel() {
         // Observe projects
-        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer {currentProjects ->
+        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer { currentProjects ->
             // Detect if we have added a project and scroll to the end
             // If the size of the current list is larger a project has been added
             val projectHasBeenAdded = (mPrevProjectsSize != null && mPrevProjectsSize!! < currentProjects.size)

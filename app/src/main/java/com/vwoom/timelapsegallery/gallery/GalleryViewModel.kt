@@ -19,7 +19,7 @@ const val SEARCH_TYPE_SCHEDULED = "scheduled"
 const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 
 class GalleryViewModel
-@Inject constructor(projectRepository: ProjectRepository, private val tagRepository: TagRepository) : ViewModel() {
+@Inject constructor (projectRepository: ProjectRepository, private val tagRepository: TagRepository) : ViewModel() {
     // Tag Live Data
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()

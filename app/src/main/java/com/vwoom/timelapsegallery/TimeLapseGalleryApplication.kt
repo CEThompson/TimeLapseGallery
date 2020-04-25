@@ -1,30 +1,36 @@
 package com.vwoom.timelapsegallery
 
-import android.app.Activity
 import android.app.Application
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
-import com.vwoom.timelapsegallery.di.AppInjector
+import com.vwoom.timelapsegallery.di.AppComponent
+import com.vwoom.timelapsegallery.di.DaggerAppComponent
 import dagger.android.AndroidInjector
-import dagger.android.HasAndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasActivityInjector
+import dagger.android.HasAndroidInjector
 import javax.inject.Inject
 
-class TimeLapseGalleryApplication : Application(),  CameraXConfig.Provider, HasActivityInjector {
+class TimeLapseGalleryApplication : Application(), CameraXConfig.Provider, HasAndroidInjector {
 
     @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
+    lateinit var androidInjector: DispatchingAndroidInjector<Any>
+
+    override fun androidInjector(): AndroidInjector<Any> {
+        return androidInjector
+    }
 
     override fun onCreate() {
+        val component: AppComponent = DaggerAppComponent.builder()
+                .application(this)
+                .context(this)
+                .build()
+        component.inject(this)
+
         super.onCreate()
-        AppInjector.init(this)
     }
 
     override fun getCameraXConfig(): CameraXConfig {
         return Camera2Config.defaultConfig()
     }
-
-    override fun activityInjector() = dispatchingAndroidInjector
 
 }

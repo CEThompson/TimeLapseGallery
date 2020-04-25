@@ -8,10 +8,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.vwoom.timelapsegallery.TimeLapseGalleryApplication
 import dagger.android.AndroidInjection
-import dagger.android.HasAndroidInjector
 import dagger.android.support.AndroidSupportInjection
-import dagger.android.support.HasSupportFragmentInjector
 
+
+/*
 object AppInjector {
     fun init(timeLapseGalleryApplication: TimeLapseGalleryApplication) {
         DaggerAppComponent
@@ -48,9 +48,8 @@ object AppInjector {
 
     // TODO refactor for HasAndroidInjector
     private fun handleActivity(activity: Activity) {
-        if (activity is HasSupportFragmentInjector) {
-            AndroidInjection.inject(activity)
-        }
+        AndroidInjection.inject(activity)
+
         if (activity is FragmentActivity) {
             activity.supportFragmentManager
                     .registerFragmentLifecycleCallbacks(
@@ -63,4 +62,4 @@ object AppInjector {
                             }, true)
         }
     }
-}
+}*/
