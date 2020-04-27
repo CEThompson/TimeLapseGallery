@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
@@ -54,15 +55,7 @@ import javax.inject.Inject
 class GalleryFragment: Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
-
-    //lateinit var viewModelFactory: ViewModelProvider.Factory by lazy {
-    //    InjectorUtils.provideGalleryViewModelFactory(this)
-    //}
-
-
-    /*private val mGalleryViewModel: GalleryViewModel by viewModels {
-        InjectorUtils.provideGalleryViewModelFactory(requireContext())
-    }*/
+    
     @Inject
     lateinit var mGalleryViewModel: GalleryViewModel
 
@@ -130,11 +123,12 @@ class GalleryFragment: Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
         }
 
         // Set up options menu
+        // TODO refactor toolbar so that it does not violate inversion of control
         setHasOptionsMenu(true)
         toolbar = binding?.galleryFragmentToolbar
-        // TODO handle action bar: (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
+        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar?.title = getString(R.string.app_name)
-        // TODO handle action bar: (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
+        (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
 
         // Increase columns for horizontal orientation
         when (resources.configuration.orientation) {

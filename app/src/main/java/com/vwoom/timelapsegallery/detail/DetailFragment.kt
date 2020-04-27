@@ -175,12 +175,13 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
         mPlaybackInterval = playbackIntervalSharedPref?.toLong() ?: 50
 
+        // TODO refactor toolbar so that it does not violate inversion of control
         // Set up toolbar
         setHasOptionsMenu(true)
         toolbar = binding?.detailsFragmentToolbar
-        // TODO handle action bar: (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
+        (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         toolbar?.title = getString(R.string.project_details)
-        // TODO handle action bar: (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Set up adapter and recycler view
         mDetailAdapter = DetailAdapter(this, mExternalFilesDir)
