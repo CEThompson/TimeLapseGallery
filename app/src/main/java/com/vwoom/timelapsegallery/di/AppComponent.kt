@@ -14,10 +14,8 @@ import javax.inject.Singleton
         modules = [
             AndroidInjectionModule::class,
             AndroidSupportInjectionModule::class,
-            AppModule::class,
+            DataModule::class,
             GalleryModule::class
-            //TimeLapseGalleryActivityModule::class,
-            //FactoryModule::class
         ]
 )
 interface AppComponent {
@@ -29,7 +27,5 @@ interface AppComponent {
         fun context(context: Context): Builder
         fun build(): AppComponent
     }
-    //@Component.Factory
-    //abstract class Factory: AndroidInjector.Factory<TimeLapseGalleryApplication>
     fun inject(app: TimeLapseGalleryApplication)
 }

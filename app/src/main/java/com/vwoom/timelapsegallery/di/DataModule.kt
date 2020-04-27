@@ -1,6 +1,8 @@
 package com.vwoom.timelapsegallery.di
 
 import android.app.Application
+import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.dao.*
 import dagger.Module
@@ -8,13 +10,12 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class AppModule {
+class DataModule {
     /*@Provides
-    @JvmStatic
     fun provideSharedPreferences(
             app: Application
-    ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
-*/
+    ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)*/
+
     @Provides
     @Singleton
     fun provideDb(app: Application): TimeLapseDatabase {

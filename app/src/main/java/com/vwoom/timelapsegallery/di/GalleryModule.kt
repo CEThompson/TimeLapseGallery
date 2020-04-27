@@ -12,28 +12,19 @@ import dagger.android.ContributesAndroidInjector
 import dagger.multibindings.IntoMap
 import javax.inject.Provider
 
-@Module(includes = [GalleryModule.ProvideViewModel::class])
+@Module
 abstract class GalleryModule {
-    @ContributesAndroidInjector(modules = [InjectViewModel::class])
+    @Suppress("unused")
+    @ContributesAndroidInjector
     abstract fun bind(): GalleryFragment
 
     @Module
     class InjectViewModel {
         @Provides
-        fun provideGalleryViewModel(
-                factory: ViewModelProvider.Factory,
-                target: GalleryFragment
-        ) = ViewModelProvider(target, factory)[GalleryViewModel::class.java]
-
-        @Provides
         fun provideGalleryViewModelFactory(
                 providers: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModel>>
         ) : ViewModelProvider.Factory = ViewModelFactory(providers)
 
-    }
-
-    @Module
-    class ProvideViewModel {
         @Provides
         @IntoMap
         @ViewModelKey(GalleryViewModel::class)
