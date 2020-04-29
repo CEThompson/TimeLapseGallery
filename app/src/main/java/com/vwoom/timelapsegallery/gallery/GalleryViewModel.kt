@@ -33,6 +33,7 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
 
     // State of user interaction
     var searchDialogShowing = false
+    var weatherDialogShowing = false
     var userClickedToStopSearch = false
 
     // Returns whether or not a tag was selected by the user

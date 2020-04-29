@@ -11,4 +11,9 @@
         android:title="@string/title_activity_settings"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/weather_option"
+        android:title="@string/weather"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_cloud_white_24dp"/>
+
 </menu>

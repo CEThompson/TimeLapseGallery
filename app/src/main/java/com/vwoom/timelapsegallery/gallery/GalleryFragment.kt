@@ -1,8 +1,12 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.app.Dialog
+import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Typeface
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
@@ -21,6 +25,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
@@ -30,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.gson.JsonObject
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.TagEntry
@@ -38,8 +44,18 @@ import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
+import com.vwoom.timelapsegallery.weather.ForecastLocationResult
+import com.vwoom.timelapsegallery.weather.WeatherService
+import com.vwoom.timelapsegallery.weather.baseUrl
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import okhttp3.ResponseBody
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 
 // TODO: remove all instances of non-null assertion !!
@@ -67,6 +83,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     // Searching
     private var mSearchDialog: Dialog? = null
     private var searchJob: Job? = null
+
+    // Weather
+    // TODO implement retrofit call to weather API
+    private var mWeatherDialog: Dialog? = null
 
     // For scrolling to the end when adding a new project
     private var mPrevProjectsSize: Int? = null
@@ -210,6 +230,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 findNavController().navigate(action)
                 true
             }
+            R.id.weather_option -> {
+                if (mWeatherDialog == null) initializeWeatherDialog()
+                updateWeatherDialog()
+                mWeatherDialog?.show()
+                mGalleryViewModel.weatherDialogShowing = true
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -248,7 +275,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
      */
     private fun setupViewModel() {
         // Observe projects
-        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer {currentProjects ->
+        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer { currentProjects ->
             // Detect if we have added a project and scroll to the end
             // If the size of the current list is larger a project has been added
             val projectHasBeenAdded = (mPrevProjectsSize != null && mPrevProjectsSize!! < currentProjects.size)
@@ -344,6 +371,58 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             updateSearchFilter()
         }
         updateSearchDialog()
+    }
+
+    private fun initializeWeatherDialog() {
+        mWeatherDialog = Dialog(requireContext())
+        mWeatherDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        mWeatherDialog?.setContentView(R.layout.dialog_weather)
+        mWeatherDialog?.setOnCancelListener { mGalleryViewModel.searchDialogShowing = false }
+
+
+    }
+
+    private fun updateWeatherDialog() {
+        // TODO make retrofit call
+        val retrofit = Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+        val weatherService = retrofit.create(WeatherService::class.java)
+
+        val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        /*val location: Location? = if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            null
+        } else lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)*/
+
+        val weatherTv = mWeatherDialog?.findViewById<TextView>(R.id.weather_textview)
+
+        // TODO implement location in a robust fashion and remove temporary hardcoded location
+        val loc: Pair<Double, Double> = Pair(33.886208, -117.853435)
+
+        val forecastCall: Call<ForecastLocationResult> = weatherService
+                .getForecastForLocation(latitude = loc.first.toString(), longitude = loc.second.toString())
+        forecastCall.enqueue(object : Callback<ForecastLocationResult> {
+            override fun onFailure(call: Call<ForecastLocationResult>, t: Throwable) {
+                weatherTv?.text = "failure"
+            }
+
+            override fun onResponse(call: Call<ForecastLocationResult>, response: Response<ForecastLocationResult>) {
+                weatherTv?.text = response.body().toString()
+            }
+        })
+
     }
 
     private fun updateSearchFilter() {

@@ -271,4 +271,7 @@
 
     <string name="project_information">Project Information</string>
 
+    <!-- Weather -->
+    <string name="weather">Weather</string>
+
 </resources>
