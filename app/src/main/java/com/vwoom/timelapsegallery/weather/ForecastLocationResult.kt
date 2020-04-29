@@ -1,70 +1,55 @@
 package com.vwoom.timelapsegallery.weather
 
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
+// TODO remove this  class
+/*
 data class ForecastLocationResult(
-    @SerializedName("@id")
-    @Expose
-    var id: Any? = null,
+        @SerializedName("@id")
+    var id: String? = null,
 
-    @SerializedName("@type")
-    @Expose
+        @SerializedName("@type")
     var type: Any? = null,
 
-    @SerializedName("cwa")
-    @Expose
+        @SerializedName("cwa")
     var cwa: Any? = null,
 
-    @SerializedName("forecastOffice")
-    @Expose
+        @SerializedName("forecastOffice")
     var forecastOffice: Any? = null,
 
-    @SerializedName("gridX")
-    @Expose
+        @SerializedName("gridX")
     var gridX: Any? = null,
 
-    @SerializedName("gridY")
-    @Expose
+        @SerializedName("gridY")
     var gridY: Any? = null,
 
-    @SerializedName("forecast")
-    @Expose
-    var forecast: Any? = null,
+        @SerializedName("forecast")
+    var forecast: String? = null,
 
-    @SerializedName("forecastHourly")
-    @Expose
+        @SerializedName("forecastHourly")
     var forecastHourly: Any? = null,
 
-    @SerializedName("forecastGridData")
-    @Expose
+        @SerializedName("forecastGridData")
     var forecastGridData: Any? = null,
 
-    @SerializedName("observationStations")
-    @Expose
+        @SerializedName("observationStations")
     var observationStations: Any? = null,
 
-    @SerializedName("relativeLocation")
-    @Expose
-    var relativeLocation: RelativeLocation? = null,
+        @SerializedName("relativeLocation")
+    var relativeLocation: RelativeLocationRes? = null,
 
-    @SerializedName("forecastZone")
-    @Expose
+        @SerializedName("forecastZone")
     var forecastZone: Any? = null,
 
-    @SerializedName("county")
-    @Expose
+        @SerializedName("county")
     var county: Any? = null,
 
-    @SerializedName("fireWeatherZone")
-    @Expose
+        @SerializedName("fireWeatherZone")
     var fireWeatherZone: Any? = null,
 
-    @SerializedName("timeZone")
-    @Expose
+        @SerializedName("timeZone")
     var timeZone: Any? = null,
 
-    @SerializedName("radarStation")
-    @Expose
+        @SerializedName("radarStation")
     var radarStation: Any? = null
-)
+)*/

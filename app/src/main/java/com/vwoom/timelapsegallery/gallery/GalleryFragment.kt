@@ -13,6 +13,7 @@ import android.os.Parcelable
 import android.os.SystemClock
 import android.transition.Transition
 import android.transition.TransitionInflater
+import android.util.Log
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.widget.CheckBox
@@ -44,9 +45,7 @@ import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
-import com.vwoom.timelapsegallery.weather.ForecastLocationResult
-import com.vwoom.timelapsegallery.weather.WeatherService
-import com.vwoom.timelapsegallery.weather.baseUrl
+import com.vwoom.timelapsegallery.weather.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
@@ -409,20 +408,44 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         val weatherTv = mWeatherDialog?.findViewById<TextView>(R.id.weather_textview)
 
         // TODO implement location in a robust fashion and remove temporary hardcoded location
-        val loc: Pair<Double, Double> = Pair(33.886208, -117.853435)
+        val loc: Pair<Double, Double> = Pair(38.8894, -77.0352)
 
-        val forecastCall: Call<ForecastLocationResult> = weatherService
+        val forecastCall: Call<ForecastLocationResponse> = weatherService
                 .getForecastForLocation(latitude = loc.first.toString(), longitude = loc.second.toString())
-        forecastCall.enqueue(object : Callback<ForecastLocationResult> {
-            override fun onFailure(call: Call<ForecastLocationResult>, t: Throwable) {
+        forecastCall.enqueue(object : Callback<ForecastLocationResponse> {
+            override fun onFailure(call: Call<ForecastLocationResponse>, t: Throwable) {
                 weatherTv?.text = "failure"
             }
 
-            override fun onResponse(call: Call<ForecastLocationResult>, response: Response<ForecastLocationResult>) {
-                weatherTv?.text = response.body().toString()
+            override fun onResponse(call: Call<ForecastLocationResponse>, response: Response<ForecastLocationResponse>) {
+                Log.d(TAG, "onResponse fired")
+                Log.d(TAG, response.body().toString())
+                val result: ForecastLocationResponse? = response.body()
+                val forecastUrl = result?.properties?.forecast.toString()
+                weatherTv?.text = result?.properties?.forecast.toString()
+
+                getForecast(forecastUrl, weatherService, weatherTv)
+
             }
         })
 
+        Log.d(TAG, "called : ${forecastCall.request().url()}")
+
+    }
+
+    private fun getForecast(url: String?, weatherService: WeatherService, tv: TextView?){
+        url ?: return
+        val forecastResponseCall: Call<ForecastResponse> = weatherService.getForecast(url)
+        forecastResponseCall.enqueue(object: Callback<ForecastResponse>{
+            override fun onFailure(call: Call<ForecastResponse>, t: Throwable) {
+                tv?.text = "getting forecast failed"
+            }
+
+            override fun onResponse(call: Call<ForecastResponse>, response: Response<ForecastResponse>) {
+                val forecast: ForecastResponse? = response.body()
+                tv?.text = forecast?.properties?.periods.toString()
+            }
+        })
     }
 
     private fun updateSearchFilter() {
@@ -563,5 +586,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     companion object {
         private var mNumberOfColumns = 3
         private const val BUNDLE_RECYCLER_LAYOUT = "recycler_layout_key"
+        private val TAG = GalleryFragment::class.simpleName
     }
 }

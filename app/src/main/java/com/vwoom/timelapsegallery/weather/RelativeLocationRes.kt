@@ -1,22 +1,19 @@
 package com.vwoom.timelapsegallery.weather
 
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-data class RelativeLocation (
+// TODO analyze then remove class
+/*
+data class RelativeLocationRes (
     @SerializedName("city")
-    @Expose
     var city: Any? = null,
 
     @SerializedName("state")
-    @Expose
     var state: Any? = null,
 
     @SerializedName("distance")
-    @Expose
     var distance: Any? = null,
 
     @SerializedName("bearing")
-    @Expose
     var bearing: Any? = null
-)
+)*/

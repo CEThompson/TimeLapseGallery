@@ -4,6 +4,7 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:layout_margin="@dimen/medium"
         android:id="@+id/weather_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
