@@ -31,6 +31,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
@@ -391,7 +392,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         // Set up the weather dialog recycler view
         mWeatherRecyclerView = mWeatherDialog?.findViewById(R.id.weather_recycler_view)
         mWeatherAdapter = WeatherAdapter(this)
-        val weatherLayoutManager = GridLayoutManager(requireContext(), 7, GridLayoutManager.HORIZONTAL, false)
+        val weatherLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         mWeatherRecyclerView?.apply {
             layoutManager = weatherLayoutManager
             setHasFixedSize(false)

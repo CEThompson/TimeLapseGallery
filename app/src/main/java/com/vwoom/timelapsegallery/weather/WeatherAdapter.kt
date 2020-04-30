@@ -39,7 +39,14 @@ class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : 
     override fun onBindViewHolder(holder: WeatherAdapterViewHolder, position: Int) {
         //TODO("Not yet implemented")
 
-        holder.binding.periodName.text = periods!![position].name
+        if (periods!=null){
+            val period = periods!![position]
+
+            holder.binding.periodName.text = period.name
+            holder.binding.temperature.text = period.temperature.toString()
+        }
+
+
     }
 
     override fun getItemCount(): Int {
