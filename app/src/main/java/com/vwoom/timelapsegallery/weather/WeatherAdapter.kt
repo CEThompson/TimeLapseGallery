@@ -4,10 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.databinding.DialogWeatherRecyclerviewItemBinding
 
 class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHolder>() {
 
+    // TODO process periods into weather per day (split into day and evening)
     private var periods: List<ForecastResponse.Period>? = null
 
     interface WeatherAdapterOnClickHandler {
@@ -44,6 +46,15 @@ class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : 
 
             holder.binding.periodName.text = period.name
             holder.binding.temperature.text = period.temperature.toString()
+            holder.binding.temperatureUnit.text = period.temperatureUnit
+            holder.binding.windDirection.text = period.windDirection
+            holder.binding.windSpeed.text = period.windSpeed
+
+            // TODO implement my own weather icons
+            /*
+            Glide.with(holder.itemView.context)
+                    .load(period.icon).into(holder.binding.icon)
+             */
         }
 
 

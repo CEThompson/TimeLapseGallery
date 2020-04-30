@@ -232,6 +232,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
                 true
             }
             R.id.weather_option -> {
+                // TODO if network disabled show feedback
                 if (mWeatherDialog == null) initializeWeatherDialog()
                 getDeviceLocation()
                 mWeatherDialog?.show()
