@@ -30,6 +30,7 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
@@ -55,7 +56,7 @@ import java.util.*
 // TODO: remove all instances of non-null assertion !!
 // TODO: increase test coverage, viewmodels? livedata?
 // TODO: add dialog to show weather for the next week
-class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
+class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler, WeatherAdapter.WeatherAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
 
@@ -82,6 +83,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     // TODO implement retrofit call to weather API
     private var mWeatherDialog: Dialog? = null
     private var mLocation: Location? = null
+    private var mWeatherRecyclerView: RecyclerView? = null
+    private var mWeatherAdapter: WeatherAdapter? = null
 
     // For scrolling to the end when adding a new project
     private var mPrevProjectsSize: Int? = null
@@ -205,7 +208,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         else mSearchActiveFAB?.hide()
 
         // TODO handle getting the device location with shared preferences
-        getDeviceLocation()
+        val gpsAllowed = preferences.getBoolean(getString(R.string.key_gps_allowed), true)
+        if (gpsAllowed)
+            getDeviceLocation()
 
         return binding?.root
     }
@@ -382,6 +387,18 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mWeatherDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         mWeatherDialog?.setContentView(R.layout.dialog_weather)
         mWeatherDialog?.setOnCancelListener { mGalleryViewModel.searchDialogShowing = false }
+
+        // Set up the weather dialog recycler view
+        mWeatherRecyclerView = mWeatherDialog?.findViewById(R.id.weather_recycler_view)
+        mWeatherAdapter = WeatherAdapter(this)
+        val weatherLayoutManager = GridLayoutManager(requireContext(), 7, GridLayoutManager.HORIZONTAL, false)
+        mWeatherRecyclerView?.apply {
+            layoutManager = weatherLayoutManager
+            setHasFixedSize(false)
+            adapter = mWeatherAdapter
+        }
+
+
     }
 
     private fun updateWeatherDialog(latitude: String, longitude: String) {
@@ -392,13 +409,14 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         val weatherService = retrofit.create(WeatherService::class.java)
 
-        val weatherTv = mWeatherDialog?.findViewById<TextView>(R.id.weather_textview)
+        //val weatherTv = mWeatherDialog?.findViewById<TextView>(R.id.weather_textview)
 
         val forecastCall: Call<ForecastLocationResponse> = weatherService
                 .getForecastLocation(latitude = latitude, longitude = longitude)
         forecastCall.enqueue(object : Callback<ForecastLocationResponse> {
             override fun onFailure(call: Call<ForecastLocationResponse>, t: Throwable) {
-                weatherTv?.text = "failure"
+                //weatherTv?.text = "failure"
+                // TODO handle fail case
             }
 
             override fun onResponse(call: Call<ForecastLocationResponse>, response: Response<ForecastLocationResponse>) {
@@ -406,9 +424,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 Log.d(TAG, response.body().toString())
                 val result: ForecastLocationResponse? = response.body()
                 val forecastUrl = result?.properties?.forecast.toString()
-                weatherTv?.text = result?.properties?.forecast.toString()
+                //weatherTv?.text = result?.properties?.forecast.toString()
 
-                getForecast(forecastUrl, weatherService, weatherTv)
+                getForecast(forecastUrl, weatherService) //, weatherTv)
 
             }
         })
@@ -436,19 +454,30 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
-    private fun getForecast(url: String?, weatherService: WeatherService, tv: TextView?){
+    private fun getForecast(url: String?, weatherService: WeatherService){ // , tv: TextView?){
         url ?: return
         val forecastResponseCall: Call<ForecastResponse> = weatherService.getForecast(url)
         forecastResponseCall.enqueue(object: Callback<ForecastResponse>{
             override fun onFailure(call: Call<ForecastResponse>, t: Throwable) {
-                tv?.text = "getting forecast failed"
+                //tv?.text = "getting forecast failed"
+                // TODO handle failure case
             }
 
             override fun onResponse(call: Call<ForecastResponse>, response: Response<ForecastResponse>) {
                 val forecast: ForecastResponse? = response.body()
-                tv?.text = forecast?.properties?.periods.toString()
+                val periods : List<ForecastResponse.Period>? = forecast?.properties?.periods
+                if (periods != null){
+                    for (period in periods) Log.d(TAG, period.name)
+                    mWeatherAdapter?.setWeatherData(periods)
+                }
+                //tv?.text = forecast?.properties?.periods.toString()
+
             }
         })
+    }
+
+    override fun onClick(clickedPeriod: ForecastResponse.Period) {
+        TODO("Not yet implemented: show period details")
     }
 
     private fun updateSearchFilter() {
