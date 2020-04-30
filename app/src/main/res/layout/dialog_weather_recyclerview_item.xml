@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
@@ -7,13 +7,21 @@
         android:layout_margin="@dimen/medium"
         android:orientation="vertical">
 
-        <include
-            android:id="@+id/night"
-            layout="@layout/dialog_weather_night_layout" />
+        <TextView
+            android:id="@+id/period_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/small"
+            android:textSize="18sp"
+            tools:text="Monday" />
 
         <include
             android:id="@+id/day"
             layout="@layout/dialog_weather_day_layout" />
+
+        <include
+            android:id="@+id/night"
+            layout="@layout/dialog_weather_night_layout" />
 
     </LinearLayout>
 </layout>

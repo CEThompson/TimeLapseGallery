@@ -390,7 +390,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         // Set up the weather dialog recycler view
         mWeatherRecyclerView = mWeatherDialog?.findViewById(R.id.weather_recycler_view)
         mWeatherAdapter = WeatherAdapter(this)
-        val weatherLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        val weatherLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         mWeatherRecyclerView?.apply {
             layoutManager = weatherLayoutManager
             setHasFixedSize(false)

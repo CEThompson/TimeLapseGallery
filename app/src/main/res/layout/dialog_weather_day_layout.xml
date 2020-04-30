@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
 
-    <!--<merge xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        tools:showIn="@layout/dialog_weather_recyclerview_item">-->
-
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/day_layout"
         android:layout_width="wrap_content"
@@ -15,42 +9,55 @@
         android:orientation="vertical"
         tools:showIn="@layout/dialog_weather_recyclerview_item">
 
-        <ImageView
-            android:id="@+id/icon"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/small"
-            android:src="@drawable/ic_wb_sunny_black_24dp" />
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/temperature"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/small"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/period_name"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="50F" />
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small"
+                android:src="@drawable/ic_wb_sunny_black_24dp" />
 
-        <!--<TextView
-            android:id="@+id/temperature_trend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/small"
-            tools:text="trend" />-->
+            <TextView
+                android:id="@+id/temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="80F" />
 
-        <TextView
-            android:id="@+id/wind_direction"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/small"
-            tools:text="north" />
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small"
+                tools:text="sunny with a chance of rain" />
 
-        <TextView
-            android:id="@+id/wind_speed"
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/small"
-            tools:text="gusty" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/wind_direction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small"
+                tools:text="WNW" />
+
+            <TextView
+                android:id="@+id/wind_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small"
+                tools:text="0 to 2 mph" />
+
+        </LinearLayout>
     </LinearLayout>
 </layout>

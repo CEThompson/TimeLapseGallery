@@ -50,16 +50,19 @@ class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : 
 
         var degree = if (isF) FAHRENHEIT else CELSIUS
 
-        // Set info for night / top
-        holder.binding.night.periodName.text = day?.name ?: night?.name
+        // Set info for the day
+        holder.binding.periodName.text = day?.name ?: night?.name
 
+        // Bind info for night
         holder.binding.night.temperature.text = holder.itemView.context
                 .getString(R.string.degree, night?.temperature, degree)
         //holder.binding.night.temperatureTrend.text = night?.temperatureTrend.toString()
         holder.binding.night.windDirection.text = night?.windDirection
         holder.binding.night.windSpeed.text = night?.windSpeed
 
-        // Set info for day / bottom
+        holder.binding.night.description.text = night?.shortForecast
+
+        // Bind info for day
         if (day == null) {
             // TODO handle blank day
             holder.binding.day.dayLayout.visibility = View.INVISIBLE
@@ -69,6 +72,7 @@ class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : 
             //holder.binding.day.temperatureTrend.text = day.temperatureTrend.toString()
             holder.binding.day.windDirection.text = day.windDirection
             holder.binding.day.windSpeed.text = day.windSpeed
+            holder.binding.day.description.text = day.shortForecast
             holder.binding.day.dayLayout.visibility = View.VISIBLE
         }
 

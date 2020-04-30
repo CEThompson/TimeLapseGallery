@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/medium"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_margin="@dimen/medium">
 
     <ProgressBar
         android:id="@+id/weather_progress"
+        style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:visibility="gone"
-        style="@style/Widget.AppCompat.ProgressBar"
-        />
+        tools:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/weather_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:orientation="horizontal"
-        tools:listitem="@layout/dialog_weather_recyclerview_item"
-        tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:contentDescription="@string/cd_weather_recyclerview"
-        />
+        tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/dialog_weather_recyclerview_item"
+        tools:orientation="vertical" />
 
 </FrameLayout>
