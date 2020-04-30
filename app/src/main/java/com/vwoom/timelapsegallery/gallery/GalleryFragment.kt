@@ -385,7 +385,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         mWeatherDialog = Dialog(requireContext())
         mWeatherDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         mWeatherDialog?.setContentView(R.layout.dialog_weather)
-        mWeatherDialog?.setOnCancelListener { mGalleryViewModel.searchDialogShowing = false }
+        mWeatherDialog?.setOnCancelListener { mGalleryViewModel.weatherDialogShowing = false }
 
         // Set up the weather dialog recycler view
         mWeatherRecyclerView = mWeatherDialog?.findViewById(R.id.weather_recycler_view)
