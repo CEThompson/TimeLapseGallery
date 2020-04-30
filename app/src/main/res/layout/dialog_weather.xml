@@ -11,6 +11,13 @@
         android:id="@+id/weather_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />-->
+    <ProgressBar
+        android:id="@+id/weather_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:visibility="gone"
+        style="@style/Widget.AppCompat.ProgressBar"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/weather_recycler_view"
@@ -19,6 +26,7 @@
         tools:orientation="vertical"
         tools:listitem="@layout/dialog_weather_recyclerview_item"
         tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:contentDescription="@string/cd_weather_recyclerview" />
+        android:contentDescription="@string/cd_weather_recyclerview"
+        />
 
 </FrameLayout>

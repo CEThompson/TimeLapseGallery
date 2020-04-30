@@ -15,10 +15,7 @@ import android.transition.TransitionInflater
 import android.util.Log
 import android.view.*
 import android.view.animation.AlphaAnimation
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -398,8 +395,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
             setHasFixedSize(false)
             adapter = mWeatherAdapter
         }
-
-
     }
 
     private fun updateWeatherDialog(latitude: String, longitude: String) {
@@ -428,7 +423,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
                 //weatherTv?.text = result?.properties?.forecast.toString()
 
                 getForecast(forecastUrl, weatherService) //, weatherTv)
-
+                mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_progress)?.visibility = View.GONE
             }
         })
         Log.d(TAG, "called : ${forecastCall.request().url()}")
