@@ -3,14 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/medium"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!--<TextView
-        android:layout_margin="@dimen/medium"
-        android:id="@+id/weather_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />-->
     <ProgressBar
         android:id="@+id/weather_progress"
         android:layout_width="wrap_content"
@@ -23,7 +17,7 @@
         android:id="@+id/weather_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:orientation="vertical"
+        tools:orientation="horizontal"
         tools:listitem="@layout/dialog_weather_recyclerview_item"
         tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:contentDescription="@string/cd_weather_recyclerview"

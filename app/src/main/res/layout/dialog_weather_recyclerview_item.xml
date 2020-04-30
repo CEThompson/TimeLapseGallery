@@ -1,82 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout>
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_margin="@dimen/medium"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/icon"
-            android:layout_margin="@dimen/small"
-            android:visibility="gone"
-            android:layout_width="@dimen/touch_target_min"
-            android:layout_height="@dimen/touch_target_min"/>
+        <include
+            android:id="@+id/night"
+            layout="@layout/dialog_weather_night_layout" />
 
-        <TextView
-            android:id="@+id/period_name"
-            android:layout_margin="@dimen/small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="name"/>
-
-        <TextView
-            android:id="@+id/temperature"
-            android:layout_margin="@dimen/small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/period_name"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="50"/>
-
-        <TextView
-            android:id="@+id/temperature_unit"
-            android:layout_margin="@dimen/small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="C"
-            />
-
-        <TextView
-            android:id="@+id/temperature_trend"
-            android:layout_margin="@dimen/small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="trend"
-            />
-
-        <TextView
-            android:id="@+id/wind_direction"
-            android:layout_margin="@dimen/small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="north"
-            />
-
-        <TextView
-            android:id="@+id/wind_speed"
-            android:layout_margin="@dimen/small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="gusty"
-            />
-
-        <!--
-        val detailedForecast: String,
-        val endTime: String,
-
-        val isDaytime: Boolean,
-
-        val number: Int,
-        val shortForecast: String,
-        val startTime: String,
-         -->
+        <include
+            android:id="@+id/day"
+            layout="@layout/dialog_weather_day_layout" />
 
     </LinearLayout>
 </layout>

@@ -390,7 +390,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         // Set up the weather dialog recycler view
         mWeatherRecyclerView = mWeatherDialog?.findViewById(R.id.weather_recycler_view)
         mWeatherAdapter = WeatherAdapter(this)
-        val weatherLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        val weatherLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         mWeatherRecyclerView?.apply {
             layoutManager = weatherLayoutManager
             setHasFixedSize(false)
@@ -473,8 +473,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         })
     }
 
-    override fun onClick(clickedPeriod: ForecastResponse.Period) {
-        TODO("Not yet implemented: show period details")
+    override fun onClick(clickedDay: WeatherAdapter.ForecastDay) {
+        //TODO("Not yet implemented: show period details")
     }
 
     private fun updateSearchFilter() {

@@ -275,5 +275,6 @@
 
     <!-- Weather -->
     <string name="weather">Weather</string>
+    <string name="degree">%1$d%2$s</string>
 
 </resources>

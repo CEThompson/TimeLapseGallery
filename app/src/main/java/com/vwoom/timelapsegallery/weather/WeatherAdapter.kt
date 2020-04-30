@@ -5,23 +5,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.DialogWeatherRecyclerviewItemBinding
 
 class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHolder>() {
 
     // TODO process periods into weather per day (split into day and evening)
-    private var periods: List<ForecastResponse.Period>? = null
+    //private var periods: List<ForecastResponse.Period> = emptyList()
+
+    private var days: List<ForecastDay> = emptyList()
 
     interface WeatherAdapterOnClickHandler {
-        fun onClick(clickedPeriod: ForecastResponse.Period)
+        fun onClick(clickedDay: ForecastDay)
     }
 
     inner class WeatherAdapterViewHolder(val binding: DialogWeatherRecyclerviewItemBinding)
         : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
-            val clickedPeriod = periods!![adapterPosition]
-            mClickHandler.onClick(clickedPeriod)
+            val clickedDay = days[adapterPosition]
+            mClickHandler.onClick(clickedDay)
         }
 
         init {
@@ -40,33 +43,87 @@ class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : 
 
     override fun onBindViewHolder(holder: WeatherAdapterViewHolder, position: Int) {
         //TODO("Not yet implemented")
+        val day = days[position].day
+        val night = days[position].night
 
-        if (periods!=null){
-            val period = periods!![position]
+        var isF: Boolean = night?.temperatureUnit?.equals("F") ?: false
 
-            holder.binding.periodName.text = period.name
-            holder.binding.temperature.text = period.temperature.toString()
-            holder.binding.temperatureUnit.text = period.temperatureUnit
-            holder.binding.windDirection.text = period.windDirection
-            holder.binding.windSpeed.text = period.windSpeed
+        var degree = if (isF) FAHRENHEIT else CELSIUS
 
-            // TODO implement my own weather icons
-            /*
-            Glide.with(holder.itemView.context)
-                    .load(period.icon).into(holder.binding.icon)
-             */
+        // Set info for night / top
+        holder.binding.night.periodName.text = day?.name ?: night?.name
+
+        holder.binding.night.temperature.text = holder.itemView.context
+                .getString(R.string.degree, night?.temperature, degree)
+        //holder.binding.night.temperatureTrend.text = night?.temperatureTrend.toString()
+        holder.binding.night.windDirection.text = night?.windDirection
+        holder.binding.night.windSpeed.text = night?.windSpeed
+
+        // Set info for day / bottom
+        if (day == null) {
+            // TODO handle blank day
+            holder.binding.day.dayLayout.visibility = View.INVISIBLE
+        } else {
+            holder.binding.day.temperature.text = holder.itemView.context
+                    .getString(R.string.degree, day.temperature, degree)
+            //holder.binding.day.temperatureTrend.text = day.temperatureTrend.toString()
+            holder.binding.day.windDirection.text = day.windDirection
+            holder.binding.day.windSpeed.text = day.windSpeed
+            holder.binding.day.dayLayout.visibility = View.VISIBLE
         }
+
+        /*holder.binding.periodName.text = period.name
+        holder.binding.temperature.text = period.temperature.toString()
+        holder.binding.temperatureUnit.text = period.temperatureUnit
+        holder.binding.windDirection.text = period.windDirection
+        holder.binding.windSpeed.text = period.windSpeed*/
+
+        // TODO implement my own weather icons
+        /*
+        Glide.with(holder.itemView.context)
+                .load(period.icon).into(holder.binding.icon)
+         */
+
 
 
     }
 
     override fun getItemCount(): Int {
-        return periods?.size ?: 0
+        return days.size
     }
 
     fun setWeatherData(data: List<ForecastResponse.Period>){
-        periods = data
+        //periods = data
+        days = convertPeriodsToForecastDays(data)
         notifyDataSetChanged()
     }
 
+    private fun convertPeriodsToForecastDays(periods: List<ForecastResponse.Period>): List<ForecastDay> {
+        val result = arrayListOf<ForecastDay>()
+
+        if (!periods.first().isDaytime) {
+            val night = periods.first()
+            result.add(ForecastDay(null, night))
+        }
+
+        val start = if (periods.first().isDaytime) 0 else 1
+
+        for (i in start..periods.size step 2){
+            if (i>=periods.size) break
+            val day = periods[i]
+            val night = if ( (i+1) < periods.size) periods[i+1] else null
+            result.add(ForecastDay(day, night))
+        }
+        return result.toList()
+    }
+
+    data class ForecastDay(
+            var day: ForecastResponse.Period?,
+            var night: ForecastResponse.Period?
+    )
+
+    companion object {
+        const val CELSIUS = "\u2103"
+        const val FAHRENHEIT = "\u2109"
+    }
 }
