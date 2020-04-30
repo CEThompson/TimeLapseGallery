@@ -1,12 +1,11 @@
 package com.vwoom.timelapsegallery.gallery
 
+import android.Manifest
 import android.app.Dialog
-import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Typeface
 import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
 import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
@@ -26,7 +25,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
@@ -36,7 +34,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.gson.JsonObject
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.TagEntry
@@ -48,8 +45,6 @@ import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.weather.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import okhttp3.ResponseBody
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -86,6 +81,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     // Weather
     // TODO implement retrofit call to weather API
     private var mWeatherDialog: Dialog? = null
+    private var mLocation: Location? = null
 
     // For scrolling to the end when adding a new project
     private var mPrevProjectsSize: Int? = null
@@ -208,6 +204,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         if (!userIsNotSearching()) mSearchActiveFAB?.show()
         else mSearchActiveFAB?.hide()
 
+        // TODO handle getting the device location with shared preferences
+        getDeviceLocation()
+
         return binding?.root
     }
 
@@ -231,7 +230,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
             R.id.weather_option -> {
                 if (mWeatherDialog == null) initializeWeatherDialog()
-                updateWeatherDialog()
+                getDeviceLocation()
                 mWeatherDialog?.show()
                 mGalleryViewModel.weatherDialogShowing = true
                 true
@@ -246,11 +245,17 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             initializeSearchDialog()
             mSearchDialog?.show()
         }
+        if (mGalleryViewModel.weatherDialogShowing){
+            initializeWeatherDialog()
+            getDeviceLocation()
+            mWeatherDialog?.show()
+        }
     }
 
     override fun onPause() {
         super.onPause()
         mSearchDialog?.dismiss()
+        mWeatherDialog?.dismiss()
     }
 
     override fun onStop() {
@@ -377,41 +382,20 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mWeatherDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         mWeatherDialog?.setContentView(R.layout.dialog_weather)
         mWeatherDialog?.setOnCancelListener { mGalleryViewModel.searchDialogShowing = false }
-
-
     }
 
-    private fun updateWeatherDialog() {
-        // TODO make retrofit call
+    private fun updateWeatherDialog(latitude: String, longitude: String) {
         val retrofit = Retrofit.Builder()
-                .baseUrl(baseUrl)
+                .baseUrl(weatherServiceBaseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 
         val weatherService = retrofit.create(WeatherService::class.java)
 
-        val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        /*val location: Location? = if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            null
-        } else lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)*/
-
         val weatherTv = mWeatherDialog?.findViewById<TextView>(R.id.weather_textview)
 
-        // TODO implement location in a robust fashion and remove temporary hardcoded location
-        val loc: Pair<Double, Double> = Pair(38.8894, -77.0352)
-
         val forecastCall: Call<ForecastLocationResponse> = weatherService
-                .getForecastForLocation(latitude = loc.first.toString(), longitude = loc.second.toString())
+                .getForecastLocation(latitude = latitude, longitude = longitude)
         forecastCall.enqueue(object : Callback<ForecastLocationResponse> {
             override fun onFailure(call: Call<ForecastLocationResponse>, t: Throwable) {
                 weatherTv?.text = "failure"
@@ -428,9 +412,28 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
             }
         })
-
         Log.d(TAG, "called : ${forecastCall.request().url()}")
+    }
 
+    private fun getDeviceLocation(){
+        Log.d(TAG, "getting device location")
+        if (gpsPermissionsGranted()) {
+            Log.d(TAG, "permissions granted: requesting single shot location")
+
+            SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
+                override fun onNewLocationAvailable(location: Location?) {
+                    mLocation = location
+                    if (location!=null)
+                        updateWeatherDialog(location.latitude.toString(), location.longitude.toString())
+                    else {
+                        Toast.makeText(requireContext(), "Permissions are required to get localized weather data.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            })
+        } else {
+            Log.d(TAG, "permissions not granted")
+            requestPermissions(GPS_PERMISSIONS, GPS_REQUEST_CODE_PERMISSIONS)
+        }
     }
 
     private fun getForecast(url: String?, weatherService: WeatherService, tv: TextView?){
@@ -583,9 +586,24 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mGalleryRecyclerView?.layoutManager?.onSaveInstanceState())
     }
 
+    private fun gpsPermissionsGranted() = GPS_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(
+                requireContext(), it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == GPS_REQUEST_CODE_PERMISSIONS && gpsPermissionsGranted()) {
+            getDeviceLocation()
+        } else {
+            Toast.makeText(this.requireContext(), "Permissions are required to get localized weather data.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     companion object {
         private var mNumberOfColumns = 3
         private const val BUNDLE_RECYCLER_LAYOUT = "recycler_layout_key"
         private val TAG = GalleryFragment::class.simpleName
+        private const val GPS_REQUEST_CODE_PERMISSIONS = 1
+        private val GPS_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
     }
 }
