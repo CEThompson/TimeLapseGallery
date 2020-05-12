@@ -17,12 +17,14 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
         val localResponse = weatherLocalDataSource.getForecast(externalFilesDir)
         Log.d("WeatherRepository", "local response is $localResponse")
 
+        if (localResponse != null) return localResponse
+
         // TODO Update from remote if there is no local response or the response is not up to date
         Log.d("WeatherRepository", "getting forecast for lat/lng: $latitude/$longitude")
-        val response = weatherRemoteDataSource.getForecast(latitude, longitude, externalFilesDir)
-        Log.d("WeatherRepository", "response is : $response")
+        val remoteResponse = weatherRemoteDataSource.getForecast(latitude, longitude, externalFilesDir)
+        Log.d("WeatherRepository", "response is : $remoteResponse")
 
-        return response
+        return remoteResponse
     }
 
 }
