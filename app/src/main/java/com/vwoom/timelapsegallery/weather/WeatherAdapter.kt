@@ -8,9 +8,10 @@ import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.DialogWeatherRecyclerviewItemBinding
 
+
 class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHolder>() {
 
-    // TODO process periods into weather per day (split into day and evening)
+
     //private var periods: List<ForecastResponse.Period> = emptyList()
 
     private var days: List<ForecastDay> = emptyList()
@@ -58,11 +59,11 @@ class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : 
         } else {
             // Bind info for night
             holder.binding.night.temperature.text = holder.itemView.context
-                    .getString(R.string.degree, night?.temperature, degree)
+                    .getString(R.string.degree, night.temperature, degree)
             //holder.binding.night.temperatureTrend.text = night?.temperatureTrend.toString()
-            holder.binding.night.windDirection.text = night?.windDirection
-            holder.binding.night.windSpeed.text = night?.windSpeed
-            holder.binding.night.description.text = night?.shortForecast
+            holder.binding.night.windDirection.text = night.windDirection
+            holder.binding.night.windSpeed.text = night.windSpeed
+            holder.binding.night.description.text = night.shortForecast
         }
         // Bind info for day
         if (day == null) {
@@ -104,25 +105,6 @@ class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : 
         notifyDataSetChanged()
     }
 
-    private fun convertPeriodsToForecastDays(periods: List<ForecastResponse.Period>): List<ForecastDay> {
-        val result = arrayListOf<ForecastDay>()
-
-        if (!periods.first().isDaytime) {
-            val night = periods.first()
-            result.add(ForecastDay(null, night))
-        }
-
-        val start = if (periods.first().isDaytime) 0 else 1
-
-        for (i in start..periods.size step 2){
-            if (i>=periods.size) break
-            val day = periods[i]
-            val night = if ( (i+1) < periods.size) periods[i+1] else null
-            result.add(ForecastDay(day, night))
-        }
-        return result.toList()
-    }
-
     data class ForecastDay(
             var day: ForecastResponse.Period?,
             var night: ForecastResponse.Period?
@@ -131,5 +113,25 @@ class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : 
     companion object {
         const val CELSIUS = "\u2103"
         const val FAHRENHEIT = "\u2109"
+
+        fun convertPeriodsToForecastDays(periods: List<ForecastResponse.Period>): List<ForecastDay> {
+            val result = arrayListOf<ForecastDay>()
+
+            if (!periods.first().isDaytime) {
+                val night = periods.first()
+                result.add(ForecastDay(null, night))
+            }
+
+            val start = if (periods.first().isDaytime) 0 else 1
+
+            for (i in start..periods.size step 2){
+                if (i>=periods.size) break
+                val day = periods[i]
+                val night = if ( (i+1) < periods.size) periods[i+1] else null
+                result.add(ForecastDay(day, night))
+            }
+            return result.toList()
+        }
+
     }
 }

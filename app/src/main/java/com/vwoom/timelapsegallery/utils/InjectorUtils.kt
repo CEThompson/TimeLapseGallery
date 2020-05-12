@@ -4,8 +4,7 @@ import android.content.Context
 import com.vwoom.timelapsegallery.camera2.Camera2ViewModelFactory
 import com.vwoom.timelapsegallery.cameraX.CameraXViewModelFactory
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
-import com.vwoom.timelapsegallery.data.repository.ProjectRepository
-import com.vwoom.timelapsegallery.data.repository.TagRepository
+import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.detail.DetailViewModelFactory
@@ -26,6 +25,12 @@ object InjectorUtils {
         return TagRepository.getInstance(
                 TimeLapseDatabase.getInstance(context.applicationContext).projectTagDao(),
                 TimeLapseDatabase.getInstance(context.applicationContext).tagDao())
+    }
+
+    private fun getWeatherRepository(): WeatherRepository {
+        val localDataSource = WeatherLocalDataSource()
+        val remoteDataSource = WeatherRemoteDataSource()
+        return WeatherRepository(localDataSource, remoteDataSource)
     }
 
     fun provideCamera2ViewModelFactory(context: Context, photo: Photo?, projectView: ProjectView?): Camera2ViewModelFactory {
@@ -56,9 +61,11 @@ object InjectorUtils {
     fun provideGalleryViewModelFactory(context: Context): GalleryViewModelFactory {
         val projectRepository = getProjectRepository(context)
         val tagRepository = getTagRepository(context)
+        val weatherRepository = getWeatherRepository()
         return GalleryViewModelFactory(
                 projectRepository,
-                tagRepository)
+                tagRepository,
+                weatherRepository)
     }
 
     fun provideSettingsViewModelFactory(): SettingsViewModelFactory {

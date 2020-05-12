@@ -27,10 +27,15 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
@@ -49,12 +54,15 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.text.DecimalFormat
 import java.util.*
 
 // TODO: remove all instances of non-null assertion !!
 // TODO: increase test coverage, viewmodels? livedata?
 // TODO: add dialog to show weather for the next week
-class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler, WeatherAdapter.WeatherAdapterOnClickHandler {
+class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
+        //, WeatherAdapter.WeatherAdapterOnClickHandler
+{
 
     private val args: GalleryFragmentArgs by navArgs()
 
@@ -384,11 +392,20 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
     private fun initializeWeatherDialog() {
         mWeatherDialog = Dialog(requireContext())
         mWeatherDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        mWeatherDialog?.setContentView(R.layout.dialog_weather)
+        mWeatherDialog?.setContentView(R.layout.dialog_weather_chart)
         mWeatherDialog?.setOnCancelListener { mGalleryViewModel.weatherDialogShowing = false }
 
+        mWeatherDialog?.findViewById<FloatingActionButton>(R.id.weather_chart_exit_fab)?.setOnClickListener {
+            mWeatherDialog?.cancel()
+        }
+
+        // Set up the list detail view for the forecast
+        /*mWeatherDialog?.findViewById<TextView>(R.id.weather_chart_dismiss)?.setOnClickListener {
+            mWeatherDialog?.cancel()
+        }*/
+
         // Set up the weather dialog recycler view
-        mWeatherRecyclerView = mWeatherDialog?.findViewById(R.id.weather_recycler_view)
+        /*mWeatherRecyclerView = mWeatherDialog?.findViewById(R.id.weather_recycler_view)
         mWeatherAdapter = WeatherAdapter(this)
         val weatherLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         mWeatherRecyclerView?.apply {
@@ -396,38 +413,64 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
             setHasFixedSize(false)
             adapter = mWeatherAdapter
         }
+        */
     }
 
     private fun updateWeatherDialog(latitude: String, longitude: String) {
+        //val forecast = mGalleryViewModel.getForecast()
+        //setWeatherChart(forecast)
         val retrofit = Retrofit.Builder()
                 .baseUrl(weatherServiceBaseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 
         val weatherService = retrofit.create(WeatherService::class.java)
+        Log.d(TAG, "location ${mLocation.toString()}")
+        getForecastLocation(mLocation?.latitude.toString(), mLocation?.longitude.toString(), weatherService)
+    }
 
-        //val weatherTv = mWeatherDialog?.findViewById<TextView>(R.id.weather_textview)
+    private fun getForecast(url: String, weatherService: WeatherService) {
+        //val url = getForecastLocation(latitude, longitude)?.properties?.forecast.toString()
+        val forecastResponseCall: Call<ForecastResponse> = weatherService.getForecast(url)
+        forecastResponseCall.enqueue(object: Callback<ForecastResponse> {
+            override fun onFailure(call: Call<ForecastResponse>, t: Throwable) {
+                // TODO handle failure case
+                Log.d(TAG, "get forecast failed: ${t.localizedMessage}")
+            }
+
+            override fun onResponse(call: Call<ForecastResponse>, response: Response<ForecastResponse>) {
+                Log.d(TAG, "get forecast success")
+                val forecast: ForecastResponse? = response.body()
+                val weatherProgress = mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_progress)
+                weatherProgress?.visibility = View.INVISIBLE
+                val chart = weatherProgress?.findViewById<LineChart>(R.id.weather_chart)
+                chart?.visibility = View.VISIBLE
+                setWeatherChart(forecast)
+            }
+        })
+    }
+
+    private fun getForecastLocation(latitude: String?, longitude: String?, weatherService: WeatherService) {
+        latitude ?: return
+        longitude ?: return
 
         val forecastCall: Call<ForecastLocationResponse> = weatherService
                 .getForecastLocation(latitude = latitude, longitude = longitude)
+
+        Log.d(TAG, "getting forecast location, call is: ${forecastCall.request().url()}")
         forecastCall.enqueue(object : Callback<ForecastLocationResponse> {
             override fun onFailure(call: Call<ForecastLocationResponse>, t: Throwable) {
-                //weatherTv?.text = "failure"
                 // TODO handle fail case
+                Log.d(TAG, "get forecast location failed: ${t.localizedMessage}")
             }
-
             override fun onResponse(call: Call<ForecastLocationResponse>, response: Response<ForecastLocationResponse>) {
-                Log.d(TAG, "onResponse fired")
-                Log.d(TAG, response.body().toString())
                 val result: ForecastLocationResponse? = response.body()
+                Log.d(TAG, "get forecast location success: ${result.toString()}")
                 val forecastUrl = result?.properties?.forecast.toString()
-                //weatherTv?.text = result?.properties?.forecast.toString()
-
-                getForecast(forecastUrl, weatherService) //, weatherTv)
-                mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_progress)?.visibility = View.GONE
+                //Log.d(TAG, "get forecast location success: $forecastUrl")
+                getForecast(forecastUrl, weatherService)
             }
         })
-        Log.d(TAG, "called : ${forecastCall.request().url()}")
     }
 
     private fun getDeviceLocation(){
@@ -451,30 +494,133 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         }
     }
 
-    private fun getForecast(url: String?, weatherService: WeatherService){ // , tv: TextView?){
-        url ?: return
-        val forecastResponseCall: Call<ForecastResponse> = weatherService.getForecast(url)
-        forecastResponseCall.enqueue(object: Callback<ForecastResponse>{
-            override fun onFailure(call: Call<ForecastResponse>, t: Throwable) {
-                //tv?.text = "getting forecast failed"
-                // TODO handle failure case
-            }
+    private fun setWeatherChart(forecast: ForecastResponse?){
+        forecast ?: return
 
-            override fun onResponse(call: Call<ForecastResponse>, response: Response<ForecastResponse>) {
-                val forecast: ForecastResponse? = response.body()
-                val periods : List<ForecastResponse.Period>? = forecast?.properties?.periods
-                if (periods != null){
-                    for (period in periods) Log.d(TAG, period.name)
-                    mWeatherAdapter?.setWeatherData(periods)
+        val periods : List<ForecastResponse.Period>? = forecast.properties.periods
+        if (periods != null){
+            val chart = mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)
+            //periods = periods.subList(1,periods.size-1)
+            // Set the entries for the chart
+            val weatherEntries: ArrayList<Entry> = arrayListOf()
+            val averages: ArrayList<Entry> = arrayListOf()
+            val iconEntries : ArrayList<Entry> = arrayListOf()
+            val axisLabels: ArrayList<String> = arrayListOf()
+
+            for (i in periods.indices) {
+
+                weatherEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()))
+
+                // Set the label
+                //if (periods[i].isDaytime){
+                //    axisLabels.add(periods[i].name.substring(0,3).toUpperCase(Locale.getDefault()))
+                //}
+
+                // Handle icon per period
+                // TODO adjust icons per weather type, clear, rainy, cloudy, etc.
+                if (periods[i].isDaytime){
+                    iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()+5f,
+                            ContextCompat.getDrawable(requireContext(),R.drawable.ic_wb_sunny_black_24dp)))
+                } else {
+                    iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()+5f,
+                            ContextCompat.getDrawable(requireContext(),R.drawable.ic_star_black_24dp)))
                 }
-                //tv?.text = forecast?.properties?.periods.toString()
-
             }
-        })
-    }
 
-    override fun onClick(clickedDay: WeatherAdapter.ForecastDay) {
-        //TODO("Not yet implemented: show period details")
+            // Handle averages
+            val start = if (periods[0].isDaytime) 0 else 1
+            for (i in start until periods.size-1 step 2){
+                //if ( (i+1) !in periods.indices) break
+                val avg = (periods[i].temperature.toFloat() + periods[i+1].temperature.toFloat()) / 2f
+                averages.add(Entry((i.toFloat()+(i+1).toFloat())/2f, avg))
+            }
+            if (start == 1) {
+                val first = (periods[0].temperature.toFloat() + periods[1].temperature.toFloat()) / 2f
+                val entry = Entry(0.5f, first)
+                //val entry = Entry(0.5f, averages[0].y)
+                averages.add(0,entry)
+
+                val last = (periods[periods.size-1].temperature.toFloat() + periods[periods.size-2].temperature.toFloat()) / 2f
+                val lastEntry = Entry(((periods.size-1 + periods.size-2).toFloat() / 2f), last)
+                //val lastEntry = Entry(((periods.size-1 + periods.size-2).toFloat() / 2f), averages.last().y)
+                averages.add(lastEntry)
+            }
+            /*for (i in 0 until periods.size-1){
+                val avg = (periods[i].temperature.toFloat() + periods[i+1].temperature.toFloat()) / 2f
+                averages.add(Entry((i.toFloat()+(i+1).toFloat())/2f, avg))
+            }*/
+
+            // Handle labels
+            for (i in 0 until periods.size-1 step 1){
+                axisLabels.add(periods[i].name.substring(0,3).toUpperCase(Locale.getDefault()))
+            }
+
+            Log.d(TAG, axisLabels.toString())
+            // Set axis info
+            val valueFormatter = object: ValueFormatter(){
+                override fun getAxisLabel(value: Float, axis: AxisBase?): String {
+                    //return axisLabels[value.toInt()]
+                    return if (value.toInt() < axisLabels.size)
+                        axisLabels[value.toInt()]
+                    else ""
+                }
+            }
+
+            //if (!periods[0].isDaytime)
+            chart?.xAxis?.granularity = 1f
+            chart?.xAxis?.valueFormatter = valueFormatter
+
+            // Hide axis lines
+            chart?.xAxis?.setDrawGridLines(false)
+            chart?.xAxis?.setDrawAxisLine(false)
+            chart?.axisRight?.isEnabled = false
+            chart?.axisLeft?.isEnabled = false
+            chart?.description?.isEnabled = false
+            //chart?.legend?.isEnabled = false
+
+
+            // Set the dataSet
+            val tempType = if (periods[0].temperatureUnit == "F") WeatherAdapter.FAHRENHEIT else WeatherAdapter.CELSIUS
+            val weatherDataSet = LineDataSet(weatherEntries, tempType)
+            val iconDataSet = LineDataSet(iconEntries, "Weather Type")
+            val avgDataSet = LineDataSet(averages, "Average Temp")
+            avgDataSet.setDrawCircles(false)
+            avgDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
+            avgDataSet.setDrawValues(false)
+
+            weatherDataSet.enableDashedLine(0.8f,1f,0f)
+            weatherDataSet.setDrawCircles(false)
+
+            iconDataSet.setDrawIcons(true)
+            iconDataSet.setDrawCircles(false)
+            iconDataSet.setDrawValues(false)
+            iconDataSet.enableDashedLine(0f,1f,0f)
+            iconDataSet.color = ContextCompat.getColor(requireContext(), R.color.black)
+            // Style the dataSet
+            weatherDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+            weatherDataSet.cubicIntensity = .2f
+            weatherDataSet.color = ContextCompat.getColor(requireContext(), R.color.colorAccent)
+
+
+            val tempFormatter = object: ValueFormatter() {
+                private val format = DecimalFormat("###,##0")
+                override fun getPointLabel(entry: Entry?): String {
+                    return format.format(entry?.y)
+                }
+            }
+            weatherDataSet.valueFormatter = tempFormatter
+            //dataset.valueTextColor
+
+            weatherDataSet.valueTextSize = 14f
+
+            // Assign the data to the chart
+            val lineData = LineData(weatherDataSet, iconDataSet, avgDataSet)
+            chart?.data = lineData
+            chart?.invalidate()
+
+            mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+            mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
+        }
     }
 
     private fun updateSearchFilter() {

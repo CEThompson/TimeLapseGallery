@@ -6,8 +6,10 @@ import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
+import com.vwoom.timelapsegallery.data.repository.WeatherRepository
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
+import com.vwoom.timelapsegallery.weather.ForecastResponse
 import java.util.*
 
 const val SEARCH_TYPE_NONE = "none"
@@ -18,7 +20,8 @@ const val SEARCH_TYPE_SCHEDULED = "scheduled"
 const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 
 class GalleryViewModel internal constructor(projectRepository: ProjectRepository,
-                                            private val tagRepository: TagRepository) : ViewModel() {
+                                            private val tagRepository: TagRepository,
+                                            private val weatherRepository: WeatherRepository) : ViewModel() {
     // Tag Live Data
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
@@ -40,6 +43,8 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     fun tagSelected(tag: TagEntry): Boolean {
         return searchTags.contains(tag)
     }
+
+    fun getForecast(): ForecastResponse? = weatherRepository.getForecast()
 
     // Filters the projects by the inputted search parameters
     suspend fun filterProjects(): List<ProjectView> {
