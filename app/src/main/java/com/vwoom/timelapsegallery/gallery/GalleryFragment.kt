@@ -215,8 +215,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
 
         // TODO handle getting the device location with shared preferences
         val gpsAllowed = preferences.getBoolean(getString(R.string.key_gps_allowed), true)
-        if (gpsAllowed)
-            getDeviceLocation()
+        /*if (gpsAllowed)
+            getDeviceLocation()*/
 
         return binding?.root
     }
@@ -441,15 +441,16 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
             }
 
             override fun onResponse(call: Call<ForecastResponse>, response: Response<ForecastResponse>) {
-                Log.d(TAG, "get forecast success")
                 val forecast: ForecastResponse? = response.body()
 
                 if (forecast == null) {
+                    Log.d(TAG, "get forecast success but recieved null response")
                     showWeatherFailure()
                 }
                 else {
-                    mWeatherDialog?.findViewById<TextView>(R.id.weather_failure)?.visibility = View.INVISIBLE
-                    mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_progress)?.visibility = View.INVISIBLE
+                    Log.d(TAG, "get forecast success, showing weather data")
+                    mWeatherDialog?.findViewById<TextView>(R.id.weather_chart_failure)?.visibility = View.INVISIBLE
+                    mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
                     mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
                     setWeatherChart(forecast)
                 }
@@ -458,14 +459,16 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
     }
 
     private fun showWeatherLoading(){
-        mWeatherDialog?.findViewById<TextView>(R.id.weather_failure)?.visibility = View.INVISIBLE
-        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_progress)?.visibility = View.VISIBLE
+        mWeatherDialog?.findViewById<TextView>(R.id.weather_chart_failure)?.visibility = View.INVISIBLE
+        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.INVISIBLE
     }
 
     private fun showWeatherFailure(){
-        mWeatherDialog?.findViewById<TextView>(R.id.weather_failure)?.visibility = View.VISIBLE
-        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_progress)?.visibility = View.INVISIBLE
+        mWeatherDialog?.findViewById<TextView>(R.id.weather_chart_failure)?.visibility = View.VISIBLE
+        //val progress = mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)
+        //Log.d(TAG, "trying to hide progress: ${progress.toString()}")
+        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.INVISIBLE
     }
 
@@ -488,6 +491,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
                 val result: ForecastLocationResponse? = response.body()
 
                 if (result == null) {
+                    Log.d(TAG, "get forecast location but recieved null response")
                     showWeatherFailure()
                 } else {
                     Log.d(TAG, "get forecast location success: ${result.toString()}")
