@@ -9,8 +9,8 @@ const val weatherServiceBaseUrl = "https://api.weather.gov/"
 
 interface WeatherService {
     @GET("points/{latitude},{longitude}")
-    fun getForecastLocation(@Path("latitude") latitude: String, @Path("longitude") longitude: String): Call<ForecastLocationResponse>
+    suspend fun getForecastLocation(@Path("latitude") latitude: String, @Path("longitude") longitude: String): ForecastLocationResponse
 
     @GET
-    fun getForecast(@Url stringUrl: String): Call<ForecastResponse>
+    suspend fun getForecast(@Url stringUrl: String): ForecastResponse
 }

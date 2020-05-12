@@ -5,5 +5,5 @@ import com.vwoom.timelapsegallery.weather.ForecastResponse
 
 interface WeatherDataSource {
     //fun getForecastLocation(): ForecastLocationResponse
-    fun getForecast(): ForecastResponse?
+    suspend fun getForecast(latitude: String?, longitude: String?): ForecastResponse?
 }

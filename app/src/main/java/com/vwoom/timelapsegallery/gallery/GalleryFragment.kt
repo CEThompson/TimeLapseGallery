@@ -27,7 +27,6 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.github.mikephil.charting.charts.LineChart
@@ -312,6 +311,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer {
             updateSearchDialog()
         })
+
+        // Observe forecast
+        mGalleryViewModel.weather.observe(viewLifecycleOwner, Observer{
+            if (it == null) showWeatherFailure()
+            else {
+                setWeatherChart(it)
+                showWeatherSuccess()
+            }
+        })
     }
 
     /**
@@ -399,6 +407,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
             mWeatherDialog?.cancel()
         }
 
+        setWeatherChart(mGalleryViewModel.weather.value)
+
         // Set up the list detail view for the forecast
         /*mWeatherDialog?.findViewById<TextView>(R.id.weather_chart_dismiss)?.setOnClickListener {
             mWeatherDialog?.cancel()
@@ -416,9 +426,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         */
     }
 
-    private fun updateWeatherDialog(latitude: String, longitude: String) {
-        //val forecast = mGalleryViewModel.getForecast()
-        //setWeatherChart(forecast)
+    /*private fun updateWeatherDialog() {
         val retrofit = Retrofit.Builder()
                 .baseUrl(weatherServiceBaseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -428,9 +436,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         Log.d(TAG, "location ${mLocation.toString()}")
         showWeatherLoading()
         getForecastLocation(mLocation?.latitude.toString(), mLocation?.longitude.toString(), weatherService)
-    }
+    }*/
 
-    private fun getForecast(url: String, weatherService: WeatherService) {
+    /*private fun getForecast(url: String, weatherService: WeatherService) {
         //val url = getForecastLocation(latitude, longitude)?.properties?.forecast.toString()
         val forecastResponseCall: Call<ForecastResponse> = weatherService.getForecast(url)
         forecastResponseCall.enqueue(object: Callback<ForecastResponse> {
@@ -456,6 +464,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
                 }
             }
         })
+    }*/
+
+    private fun showWeatherSuccess(){
+        mWeatherDialog?.findViewById<TextView>(R.id.weather_chart_failure)?.visibility = View.INVISIBLE
+        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
+        mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
     private fun showWeatherLoading(){
@@ -472,7 +486,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.INVISIBLE
     }
 
-    private fun getForecastLocation(latitude: String?, longitude: String?, weatherService: WeatherService) {
+    /*private fun getForecastLocation(latitude: String?, longitude: String?, weatherService: WeatherService) {
         latitude ?: return
         longitude ?: return
 
@@ -501,7 +515,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
                 }
             }
         })
-    }
+    }*/
 
     private fun getDeviceLocation(){
         Log.d(TAG, "getting device location")
@@ -511,11 +525,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
             SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
                 override fun onNewLocationAvailable(location: Location?) {
                     mLocation = location
-                    if (location!=null)
+                    mGalleryViewModel.getForecast(location?.latitude.toString(), location?.longitude.toString())
+                    /*if (location!=null)
                         updateWeatherDialog(location.latitude.toString(), location.longitude.toString())
                     else {
                         Toast.makeText(requireContext(), "Permissions are required to get localized weather data.", Toast.LENGTH_SHORT).show()
-                    }
+                    }*/
                 }
             })
         } else {
