@@ -7,6 +7,18 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/medium">
 
+        <TextView
+            android:id="@+id/weather_failure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text = "failed to get forecast"
+            tools:text = "failed to get weather data"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
         <ProgressBar
             android:id="@+id/weather_chart_progress"
             android:layout_width="wrap_content"

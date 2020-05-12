@@ -426,6 +426,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
 
         val weatherService = retrofit.create(WeatherService::class.java)
         Log.d(TAG, "location ${mLocation.toString()}")
+        showWeatherLoading()
         getForecastLocation(mLocation?.latitude.toString(), mLocation?.longitude.toString(), weatherService)
     }
 
@@ -435,19 +436,37 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         forecastResponseCall.enqueue(object: Callback<ForecastResponse> {
             override fun onFailure(call: Call<ForecastResponse>, t: Throwable) {
                 // TODO handle failure case
+                showWeatherFailure()
                 Log.d(TAG, "get forecast failed: ${t.localizedMessage}")
             }
 
             override fun onResponse(call: Call<ForecastResponse>, response: Response<ForecastResponse>) {
                 Log.d(TAG, "get forecast success")
                 val forecast: ForecastResponse? = response.body()
-                val weatherProgress = mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_progress)
-                weatherProgress?.visibility = View.INVISIBLE
-                val chart = weatherProgress?.findViewById<LineChart>(R.id.weather_chart)
-                chart?.visibility = View.VISIBLE
-                setWeatherChart(forecast)
+
+                if (forecast == null) {
+                    showWeatherFailure()
+                }
+                else {
+                    mWeatherDialog?.findViewById<TextView>(R.id.weather_failure)?.visibility = View.INVISIBLE
+                    mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_progress)?.visibility = View.INVISIBLE
+                    mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+                    setWeatherChart(forecast)
+                }
             }
         })
+    }
+
+    private fun showWeatherLoading(){
+        mWeatherDialog?.findViewById<TextView>(R.id.weather_failure)?.visibility = View.INVISIBLE
+        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_progress)?.visibility = View.VISIBLE
+        mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.INVISIBLE
+    }
+
+    private fun showWeatherFailure(){
+        mWeatherDialog?.findViewById<TextView>(R.id.weather_failure)?.visibility = View.VISIBLE
+        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_progress)?.visibility = View.INVISIBLE
+        mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.INVISIBLE
     }
 
     private fun getForecastLocation(latitude: String?, longitude: String?, weatherService: WeatherService) {
@@ -461,14 +480,21 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         forecastCall.enqueue(object : Callback<ForecastLocationResponse> {
             override fun onFailure(call: Call<ForecastLocationResponse>, t: Throwable) {
                 // TODO handle fail case
+                showWeatherFailure()
+
                 Log.d(TAG, "get forecast location failed: ${t.localizedMessage}")
             }
             override fun onResponse(call: Call<ForecastLocationResponse>, response: Response<ForecastLocationResponse>) {
                 val result: ForecastLocationResponse? = response.body()
-                Log.d(TAG, "get forecast location success: ${result.toString()}")
-                val forecastUrl = result?.properties?.forecast.toString()
-                //Log.d(TAG, "get forecast location success: $forecastUrl")
-                getForecast(forecastUrl, weatherService)
+
+                if (result == null) {
+                    showWeatherFailure()
+                } else {
+                    Log.d(TAG, "get forecast location success: ${result.toString()}")
+                    val forecastUrl = result.properties.forecast.toString()
+                    //Log.d(TAG, "get forecast location success: $forecastUrl")
+                    getForecast(forecastUrl, weatherService)
+                }
             }
         })
     }
