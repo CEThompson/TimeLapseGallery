@@ -14,6 +14,7 @@ import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.*
 
 const val SEARCH_TYPE_NONE = "none"
@@ -50,10 +51,10 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
         return searchTags.contains(tag)
     }
 
-    fun getForecast(latitude: String, longitude: String) {
+    fun getForecast(latitude: String, longitude: String, externalFilesDir: File) {
         Log.d(TAG, "getting forecast in view model")
         viewModelScope.launch {
-            weather.value = weatherRepository.getForecast(latitude, longitude)
+            weather.value = weatherRepository.getForecast(latitude, longitude, externalFilesDir)
             Log.d(TAG, "setting weather value to ${weather.value}")
         }
     }

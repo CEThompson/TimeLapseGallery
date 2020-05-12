@@ -6,6 +6,7 @@ import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getMetaDirectoryForProject
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectFolder
+import com.vwoom.timelapsegallery.weather.ForecastResponse
 import java.io.*
 
 const val RESERVED_CHARACTERS = "|\\?*<\":>+[]/'"
@@ -20,6 +21,7 @@ object FileUtils {
     // Text files for metadata
     const val SCHEDULE_TEXT_FILE = "schedule.txt"
     const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
+    const val WEATHER_RESPONSE_TEXT_FILE = "weather.txt"
 
     // Creates an image file for a project in the projects folder by project view
     private fun createImageFileForProject(storageDirectory: File, projectEntry: ProjectEntry, timestamp: Long): File {
@@ -148,6 +150,21 @@ object FileUtils {
             outputStreamWriter.close()
         } catch (exception: IOException) {
             Log.e(TAG, "error writing schedule to text file: ${exception.message}")
+        }
+    }
+
+    fun writeWeatherForecastResponse(externalFilesDir: File, jsonString: String){
+        val metaDir = File(externalFilesDir, META_FILE_SUBDIRECTORY)
+        val weatherFile = File(metaDir, WEATHER_RESPONSE_TEXT_FILE)
+        try {
+            val output = FileOutputStream(weatherFile)
+            val outputStreamWriter = OutputStreamWriter(output)
+            outputStreamWriter.write(jsonString)
+            outputStreamWriter.flush()
+            output.fd.sync()
+            outputStreamWriter.close()
+        } catch (exception: IOException) {
+            Log.e(TAG, "error writing forecast to text file: ${exception.message}")
         }
     }
 }

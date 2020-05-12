@@ -53,6 +53,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 import java.text.DecimalFormat
 import java.util.*
 
@@ -96,6 +97,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
 
     // For preventing double click crash
     private var mLastClickTime: Long? = null
+
+    private var mExternalFilesDir: File? = null
 
     // Transitions
     private lateinit var galleryExitTransition: Transition
@@ -155,8 +158,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         val schedulesDisplayed = preferences.getBoolean(getString(R.string.key_schedule_display), true)
 
         // Set up the adapter for the recycler view
-        val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        mGalleryAdapter = GalleryAdapter(this, externalFilesDir!!, schedulesDisplayed)
+        mExternalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        mGalleryAdapter = GalleryAdapter(this, mExternalFilesDir!!, schedulesDisplayed)
 
         // Set up the recycler view
         mGridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
@@ -525,12 +528,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
             SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
                 override fun onNewLocationAvailable(location: Location?) {
                     mLocation = location
-                    mGalleryViewModel.getForecast(location?.latitude.toString(), location?.longitude.toString())
-                    /*if (location!=null)
-                        updateWeatherDialog(location.latitude.toString(), location.longitude.toString())
-                    else {
-                        Toast.makeText(requireContext(), "Permissions are required to get localized weather data.", Toast.LENGTH_SHORT).show()
-                    }*/
+                    mGalleryViewModel.getForecast(
+                            location?.latitude.toString(),
+                            location?.longitude.toString(),
+                            mExternalFilesDir!!)
                 }
             })
         } else {
