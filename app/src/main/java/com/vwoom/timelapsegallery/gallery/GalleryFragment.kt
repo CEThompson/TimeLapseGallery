@@ -57,6 +57,7 @@ import java.io.File
 import java.text.DecimalFormat
 import java.util.*
 
+// TODO: create gifs or mp4s from photo sets
 // TODO: remove all instances of non-null assertion !!
 // TODO: increase test coverage, viewmodels? livedata?
 // TODO: add dialog to show weather for the next week
