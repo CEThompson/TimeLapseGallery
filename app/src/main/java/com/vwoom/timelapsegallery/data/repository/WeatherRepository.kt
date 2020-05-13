@@ -9,34 +9,41 @@ import com.vwoom.timelapsegallery.weather.ForecastResponse
 class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSource,
                         private val weatherRemoteDataSource: WeatherRemoteDataSource) {
 
-    // Retrieve the forecast from a the database
-    // If the forecast does not belong to today, try to retrieve the forecast from remote
-    suspend fun getForecast(latitude: String, longitude: String): ForecastResponse? {
-
+    // Retrieves the forecast from a the database or the remote api
+    suspend fun getForecast(latitude: String, longitude: String): WeatherResult<Any> {
         when (val localWeatherEntry: WeatherEntry? = weatherLocalDataSource.getWeather()) {
-            // When local weather entry is null return the remote response
+            // If there is no local saved entry defer to remote
             null -> {
+                // Get and return the remote response
                 val remoteResponse = weatherRemoteDataSource.getForecast(latitude, longitude)
-                if (remoteResponse != null) weatherLocalDataSource.cacheForecast(remoteResponse)
-                return remoteResponse
+                if (remoteResponse != null) {
+                    weatherLocalDataSource.cacheForecast(remoteResponse)
+                    return WeatherResult.Success(remoteResponse)
+                }
+
+                // Otherwise return a failure
+                return WeatherResult.Failure.NoResponse()
             }
-            // Otherwise determine if the entry belongs to today
+            // Determine if the local entry belongs to today
             else -> {
+                val localResponse = Gson().fromJson(localWeatherEntry.forecast, ForecastResponse::class.java)
+
                 // If the entry belongs to today return it
-                var localResponse = Gson().fromJson(localWeatherEntry.forecast, ForecastResponse::class.java)
                 return if (DateUtils.isToday(localWeatherEntry.timestamp)) {
-                    localResponse
+                    WeatherResult.Success(localResponse)
                 }
                 // Otherwise try to get a remote response
                 else {
                     val remoteResponse = weatherRemoteDataSource.getForecast(latitude, longitude)
+
                     // If we get a remote response return it
                     if (remoteResponse != null) {
                         weatherLocalDataSource.cacheForecast(remoteResponse)
-                        remoteResponse
+                        WeatherResult.Success(remoteResponse)
                     }
+
                     // Otherwise return the cached local response
-                    else localResponse
+                    else WeatherResult.Cached(localResponse)
                 }
             }
         }

@@ -1,19 +1,11 @@
 package com.vwoom.timelapsegallery.data.repository
 
 import android.util.Log
-import com.google.gson.Gson
-import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherService
 import com.vwoom.timelapsegallery.weather.weatherServiceBaseUrl
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.File
 
 class WeatherRemoteDataSource {
 
@@ -25,6 +17,7 @@ class WeatherRemoteDataSource {
     private val weatherService = retrofit.create(WeatherService::class.java)
 
     // Get the forecast from the national weather service api
+    // TODO convert this to a response for error handling?
     suspend fun getForecast(latitude: String, longitude: String): ForecastResponse? {
         // 1. Get the url to query for the devices latitude / longitude
         val forecastLocationResponse = weatherService.getForecastLocation(latitude, longitude)

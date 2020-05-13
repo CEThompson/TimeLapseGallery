@@ -2,10 +2,12 @@ package com.vwoom.timelapsegallery.gallery
 
 import android.Manifest
 import android.app.Dialog
+import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Typeface
 import android.location.Location
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
@@ -40,6 +42,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.TagEntry
+import com.vwoom.timelapsegallery.data.repository.WeatherResult
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
@@ -55,9 +58,7 @@ import java.util.*
 // TODO: remove all instances of non-null assertion !!
 // TODO: increase test coverage, viewmodels? livedata?
 // TODO: add dialog to show weather for the next week
-class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
-        //, WeatherAdapter.WeatherAdapterOnClickHandler
-{
+class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
 
@@ -81,7 +82,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
     private var searchJob: Job? = null
 
     // Weather
-    // TODO implement retrofit call to weather API
     private var mWeatherDialog: Dialog? = null
     private var mLocation: Location? = null
     private var mWeatherRecyclerView: RecyclerView? = null
@@ -209,11 +209,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         if (!userIsNotSearching()) mSearchActiveFAB?.show()
         else mSearchActiveFAB?.hide()
 
-        // TODO handle getting the device location with shared preferences
-        val gpsAllowed = preferences.getBoolean(getString(R.string.key_gps_allowed), true)
-        /*if (gpsAllowed)
-            getDeviceLocation()*/
-
         return binding?.root
     }
 
@@ -310,12 +305,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         })
 
         // Observe forecast
+        // TODO handle different states of weather data
         mGalleryViewModel.weather.observe(viewLifecycleOwner, Observer{
-            if (it == null) showWeatherFailure()
-            else {
-                setWeatherChart(it)
-                showWeatherSuccess()
-            }
+            handleWeatherChart(it)
         })
     }
 
@@ -404,7 +396,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
             mWeatherDialog?.cancel()
         }
 
-        setWeatherChart(mGalleryViewModel.weather.value)
+        if (mGalleryViewModel.weather.value != null)
+            handleWeatherChart(mGalleryViewModel.weather.value!!)
 
         // TODO set up weather details
         // Set up the list detail view for the forecast
@@ -423,46 +416,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         }
         */
     }
-
-    /*private fun updateWeatherDialog() {
-        val retrofit = Retrofit.Builder()
-                .baseUrl(weatherServiceBaseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-
-        val weatherService = retrofit.create(WeatherService::class.java)
-        Log.d(TAG, "location ${mLocation.toString()}")
-        showWeatherLoading()
-        getForecastLocation(mLocation?.latitude.toString(), mLocation?.longitude.toString(), weatherService)
-    }*/
-
-    /*private fun getForecast(url: String, weatherService: WeatherService) {
-        //val url = getForecastLocation(latitude, longitude)?.properties?.forecast.toString()
-        val forecastResponseCall: Call<ForecastResponse> = weatherService.getForecast(url)
-        forecastResponseCall.enqueue(object: Callback<ForecastResponse> {
-            override fun onFailure(call: Call<ForecastResponse>, t: Throwable) {
-                // TODO handle failure case
-                showWeatherFailure()
-                Log.d(TAG, "get forecast failed: ${t.localizedMessage}")
-            }
-
-            override fun onResponse(call: Call<ForecastResponse>, response: Response<ForecastResponse>) {
-                val forecast: ForecastResponse? = response.body()
-
-                if (forecast == null) {
-                    Log.d(TAG, "get forecast success but recieved null response")
-                    showWeatherFailure()
-                }
-                else {
-                    Log.d(TAG, "get forecast success, showing weather data")
-                    mWeatherDialog?.findViewById<TextView>(R.id.weather_chart_failure)?.visibility = View.INVISIBLE
-                    mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
-                    mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-                    setWeatherChart(forecast)
-                }
-            }
-        })
-    }*/
 
     private fun showWeatherSuccess(){
         mWeatherDialog?.findViewById<TextView>(R.id.weather_chart_failure)?.visibility = View.INVISIBLE
@@ -483,37 +436,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.INVISIBLE
     }
-
-    /*private fun getForecastLocation(latitude: String?, longitude: String?, weatherService: WeatherService) {
-        latitude ?: return
-        longitude ?: return
-
-        val forecastCall: Call<ForecastLocationResponse> = weatherService
-                .getForecastLocation(latitude = latitude, longitude = longitude)
-
-        Log.d(TAG, "getting forecast location, call is: ${forecastCall.request().url()}")
-        forecastCall.enqueue(object : Callback<ForecastLocationResponse> {
-            override fun onFailure(call: Call<ForecastLocationResponse>, t: Throwable) {
-                // TODO handle fail case
-                showWeatherFailure()
-
-                Log.d(TAG, "get forecast location failed: ${t.localizedMessage}")
-            }
-            override fun onResponse(call: Call<ForecastLocationResponse>, response: Response<ForecastLocationResponse>) {
-                val result: ForecastLocationResponse? = response.body()
-
-                if (result == null) {
-                    Log.d(TAG, "get forecast location but recieved null response")
-                    showWeatherFailure()
-                } else {
-                    Log.d(TAG, "get forecast location success: ${result.toString()}")
-                    val forecastUrl = result.properties.forecast.toString()
-                    //Log.d(TAG, "get forecast location success: $forecastUrl")
-                    getForecast(forecastUrl, weatherService)
-                }
-            }
-        })
-    }*/
 
     private fun getDeviceLocation(){
         Log.d(TAG, "getting device location")
@@ -540,12 +462,26 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
     // TODO fix days of week
     // TODO fix clickability / detail list view of periods
     // TODO show the number of projects due per day during the week
-    private fun setWeatherChart(forecast: ForecastResponse?){
-        forecast ?: return
+    private fun handleWeatherChart(result: WeatherResult<Any>){
+        when (result){
+            is WeatherResult.Loading -> {
+                showWeatherLoading()
+            }
+            is WeatherResult.Success -> {
+                setWeatherChart(result.data as ForecastResponse)
+                showWeatherSuccess()
+            }
+            is WeatherResult.Failure -> {
+                showWeatherFailure()
+            }
+        }
+    }
 
+    private fun setWeatherChart(forecast: ForecastResponse){
         val periods : List<ForecastResponse.Period>? = forecast.properties.periods
         if (periods != null){
-            val chart = mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)
+            val chart = mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart) ?: return
+
             //periods = periods.subList(1,periods.size-1)
             // Set the entries for the chart
             val weatherEntries: ArrayList<Entry> = arrayListOf()
@@ -613,15 +549,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
             }
 
             //if (!periods[0].isDaytime)
-            chart?.xAxis?.granularity = 1f
-            chart?.xAxis?.valueFormatter = valueFormatter
+            chart.xAxis?.granularity = 1f
+            chart.xAxis?.valueFormatter = valueFormatter
 
             // Hide axis lines
-            chart?.xAxis?.setDrawGridLines(false)
-            chart?.xAxis?.setDrawAxisLine(false)
-            chart?.axisRight?.isEnabled = false
-            chart?.axisLeft?.isEnabled = false
-            chart?.description?.isEnabled = false
+            chart.xAxis?.setDrawGridLines(false)
+            chart.xAxis?.setDrawAxisLine(false)
+            chart.axisRight?.isEnabled = false
+            chart.axisLeft?.isEnabled = false
+            chart.description?.isEnabled = false
             //chart?.legend?.isEnabled = false
 
 
@@ -661,8 +597,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
 
             // Assign the data to the chart
             val lineData = LineData(weatherDataSet, iconDataSet, avgDataSet)
-            chart?.data = lineData
-            chart?.invalidate()
+            chart.data = lineData
+            chart.invalidate()
 
             mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
             mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE

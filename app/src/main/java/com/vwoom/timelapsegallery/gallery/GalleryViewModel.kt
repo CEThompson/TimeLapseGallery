@@ -11,6 +11,7 @@ import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.repository.WeatherRepository
+import com.vwoom.timelapsegallery.data.repository.WeatherResult
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.weather.ForecastResponse
@@ -30,7 +31,11 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     // Live Data
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
-    val weather = MutableLiveData<ForecastResponse?>()
+    val weather = MutableLiveData<WeatherResult<Any>>()
+
+    init {
+        weather.value = WeatherResult.Loading
+    }
 
     // Inputted search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
@@ -54,7 +59,6 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
         Log.d(TAG, "getting forecast in view model")
         viewModelScope.launch {
             weather.value = weatherRepository.getForecast(latitude, longitude)
-            //weatherRepository.updateForecast(latitude, longitude)
             Log.d(TAG, "setting weather value to ${weather.value}")
         }
     }

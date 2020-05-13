@@ -61,4 +61,7 @@
 
     <dimen name="image_load_error_indicator_size">100dp</dimen>
 
+    <!-- Weather Dialog -->
+    <dimen name="weather_chart_size">350dp</dimen>
+
 </resources>

@@ -4,22 +4,13 @@ package com.vwoom.timelapsegallery.data.repository
 sealed class WeatherResult<out T : Any> {
     class Success<out T : Any>(val data: T) : WeatherResult<T>()
 
-    sealed class Error(val exception: Exception?) : WeatherResult<Nothing>() {
-        class NoFilesError(exception: Exception? = null,
-                           val directoryUrl: String) : Error(exception)
+    class Cached<out T : Any>(val data: T) : WeatherResult<T>()
 
-        class InvalidCharacterError(exception: Exception? = null,
-                                    val projectName: String?) : Error(exception)
+    object Loading : WeatherResult<Nothing>()
 
-        class DuplicateIdError(exception: Exception? = null,
-                               val projectName: String?) : Error(exception)
+    sealed class Failure(val exception: Exception?) : WeatherResult<Nothing>() {
+        class NetworkRequired(exception: Exception? = null) : Failure(exception)
 
-        class InvalidPhotoFileError(exception: Exception? = null,
-                                    val photoUrl: String,
-                                    val projectName: String?) : Error(exception)
-
-        class InvalidFolder(exception: Exception, val url: String) : Error(exception)
+        class NoResponse(exception: Exception? = null) : Failure(exception)
     }
-
-    //object InProgress : ValidationResult<Nothing>()
 }
