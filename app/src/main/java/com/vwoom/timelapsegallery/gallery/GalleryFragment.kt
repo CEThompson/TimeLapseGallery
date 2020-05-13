@@ -545,6 +545,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
     // TODO set up refresh
     // TODO fix days of week
     // TODO fix clickability / detail list view of periods
+    // TODO show the number of projects due per day during the week
     private fun setWeatherChart(forecast: ForecastResponse?){
         forecast ?: return
 
