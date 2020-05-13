@@ -540,6 +540,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler
         }
     }
 
+    // TODO bind different icons for weather types, cloudy, rainy, clear
+    // TODO bind wind conditions
+    // TODO set up refresh
+    // TODO fix days of week
+    // TODO fix clickability / detail list view of periods
     private fun setWeatherChart(forecast: ForecastResponse?){
         forecast ?: return
 
