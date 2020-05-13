@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
+import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.repository.WeatherRepository
@@ -14,7 +15,6 @@ import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import kotlinx.coroutines.launch
-import java.io.File
 import java.util.*
 
 const val SEARCH_TYPE_NONE = "none"
@@ -30,7 +30,6 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     // Live Data
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
-
     val weather = MutableLiveData<ForecastResponse?>()
 
     // Inputted search data
@@ -51,10 +50,11 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
         return searchTags.contains(tag)
     }
 
-    fun getForecast(latitude: String, longitude: String, externalFilesDir: File) {
+    fun getForecast(latitude: String, longitude: String) {
         Log.d(TAG, "getting forecast in view model")
         viewModelScope.launch {
-            weather.value = weatherRepository.getForecast(latitude, longitude, externalFilesDir)
+            weather.value = weatherRepository.getForecast(latitude, longitude)
+            //weatherRepository.updateForecast(latitude, longitude)
             Log.d(TAG, "setting weather value to ${weather.value}")
         }
     }

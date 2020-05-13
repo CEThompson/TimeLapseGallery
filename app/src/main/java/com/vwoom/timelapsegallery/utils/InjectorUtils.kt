@@ -27,8 +27,9 @@ object InjectorUtils {
                 TimeLapseDatabase.getInstance(context.applicationContext).tagDao())
     }
 
-    private fun getWeatherRepository(): WeatherRepository {
-        val localDataSource = WeatherLocalDataSource()
+    private fun getWeatherRepository(context: Context): WeatherRepository {
+        val weatherDao = TimeLapseDatabase.getInstance(context.applicationContext).weatherDao()
+        val localDataSource = WeatherLocalDataSource(weatherDao)
         val remoteDataSource = WeatherRemoteDataSource()
         return WeatherRepository(localDataSource, remoteDataSource)
     }
@@ -61,7 +62,7 @@ object InjectorUtils {
     fun provideGalleryViewModelFactory(context: Context): GalleryViewModelFactory {
         val projectRepository = getProjectRepository(context)
         val tagRepository = getTagRepository(context)
-        val weatherRepository = getWeatherRepository()
+        val weatherRepository = getWeatherRepository(context)
         return GalleryViewModelFactory(
                 projectRepository,
                 tagRepository,

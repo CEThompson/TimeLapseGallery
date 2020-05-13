@@ -17,29 +17,25 @@ import java.io.File
 
 class WeatherRemoteDataSource {
 
+    // TODO figure out whether or not to inject retrofit / weather service
     private val retrofit = Retrofit.Builder()
             .baseUrl(weatherServiceBaseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-
     private val weatherService = retrofit.create(WeatherService::class.java)
 
-    suspend fun getForecast(latitude: String, longitude: String, externalFilesDir: File): ForecastResponse? {
-        Log.d("WeatherRemoteDataSource", "getting forecast")
+    // Get the forecast from the national weather service api
+    suspend fun getForecast(latitude: String, longitude: String): ForecastResponse? {
+        // 1. Get the url to query for the devices latitude / longitude
         val forecastLocationResponse = weatherService.getForecastLocation(latitude, longitude)
-        Log.d("WeatherRemoteDataSource", "forecast location response: $forecastLocationResponse")
         val url = forecastLocationResponse?.properties?.forecast ?: return null
 
-        Log.d("WeatherRemoteDataSource", "forecast location url: $url")
-        val result: ForecastResponse? = weatherService.getForecast(url)
+        Log.d("WeatherRemoteDataSource", "getting forecast")
+        Log.d("WeatherRemoteDataSource", "forecast location response: $forecastLocationResponse")
+        Log.d("WeatherRemoteDataSource", "forecast location url from response: $url")
 
-        withContext(Dispatchers.IO){
-            val jsonString = Gson().toJson(result)
-            Log.d("WeatherRemoteDataSource", "preparing to write response to text file: $jsonString")
-            FileUtils.writeWeatherForecastResponse(externalFilesDir, jsonString)
-        }
-
-        return result
+        // 2. Call the url to get the forecast for the devices area and return the result
+        return weatherService.getForecast(url)
     }
 
 }

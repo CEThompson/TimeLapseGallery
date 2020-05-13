@@ -16,9 +16,10 @@ import com.vwoom.timelapsegallery.data.view.ProjectView
     TagEntry::class,
     ProjectTagEntry::class,
     ProjectScheduleEntry::class,
-    CoverPhotoEntry::class],
+    CoverPhotoEntry::class,
+    WeatherEntry::class],
         views = [ProjectView::class],
-        version = 2,
+        version = 3,
         exportSchema = true)
 abstract class TimeLapseDatabase : RoomDatabase() {
     abstract fun projectDao(): ProjectDao
@@ -27,6 +28,7 @@ abstract class TimeLapseDatabase : RoomDatabase() {
     abstract fun projectTagDao(): ProjectTagDao
     abstract fun coverPhotoDao(): CoverPhotoDao
     abstract fun projectScheduleDao(): ProjectScheduleDao
+    abstract fun weatherDao(): WeatherDao
 
     companion object {
         @Volatile
@@ -42,6 +44,7 @@ abstract class TimeLapseDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context): TimeLapseDatabase {
             return Room.databaseBuilder(context, TimeLapseDatabase::class.java, DATABASE_NAME)
                     .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_2_3)
                     .build()
         }
 
@@ -143,6 +146,19 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                         "ON project.id = cover_photo.project_id " +
                         "LEFT JOIN photo " +
                         "ON cover_photo.photo_id = photo.id")
+            }
+        }
+
+        // TODO implement migration from 2 to 3
+        // TODO test migration from 2 to 3
+        private val MIGRATION_2_3: Migration = object : Migration (2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS weather " +
+                        "(id INTEGER NOT NULL, " +
+                        "forecast TEXT NOT NULL," +
+                        "timestamp INTEGER NOT NULL, " +
+                        "PRIMARY KEY(id)" +
+                        ")")
             }
         }
     }

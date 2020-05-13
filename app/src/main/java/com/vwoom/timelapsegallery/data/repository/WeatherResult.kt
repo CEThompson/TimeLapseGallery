@@ -4,7 +4,7 @@ package com.vwoom.timelapsegallery.data.repository
 sealed class WeatherResult<out T : Any> {
     class Success<out T : Any>(val data: T) : WeatherResult<T>()
 
-    /*sealed class Error(val exception: Exception?) : WeatherResult<Nothing>() {
+    sealed class Error(val exception: Exception?) : WeatherResult<Nothing>() {
         class NoFilesError(exception: Exception? = null,
                            val directoryUrl: String) : Error(exception)
 
@@ -19,7 +19,7 @@ sealed class WeatherResult<out T : Any> {
                                     val projectName: String?) : Error(exception)
 
         class InvalidFolder(exception: Exception, val url: String) : Error(exception)
-    }*/
+    }
 
     //object InProgress : ValidationResult<Nothing>()
 }
