@@ -8,6 +8,28 @@
         android:layout_margin="@dimen/medium">
 
         <TextView
+            android:id="@+id/update_status_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/weather_chart"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text = "last updated: "/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/sync_weather_data_fab"
+            app:fabSize="mini"
+            android:layout_margin="@dimen/small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_sync_black_24dp"
+            android:backgroundTint="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <TextView
             android:id="@+id/weather_chart_failure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -26,8 +48,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            tools:visibility="invisible"
         />
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+
+        <!--<com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/weather_chart_exit_fab"
             android:visibility="gone"
             android:layout_width="wrap_content"
@@ -36,7 +60,7 @@
             app:backgroundTint="@color/colorSubtleRedAccent"
             app:fabSize="mini"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />-->
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/weather_chart"
@@ -45,10 +69,12 @@
             android:layout_width="@dimen/weather_chart_size"
             android:layout_height="@dimen/weather_chart_size"
             android:layout_margin="@dimen/medium"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/update_status_tv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/weather_chart_exit_fab" />
+            app:layout_constraintTop_toBottomOf="@id/sync_weather_data_fab" />
+
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

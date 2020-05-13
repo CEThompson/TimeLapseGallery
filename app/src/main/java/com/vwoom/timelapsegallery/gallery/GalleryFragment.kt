@@ -392,10 +392,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mWeatherDialog?.setContentView(R.layout.dialog_weather_chart)
         mWeatherDialog?.setOnCancelListener { mGalleryViewModel.weatherDialogShowing = false }
 
-        mWeatherDialog?.findViewById<FloatingActionButton>(R.id.weather_chart_exit_fab)?.setOnClickListener {
+        /*mWeatherDialog?.findViewById<FloatingActionButton>(R.id.weather_chart_exit_fab)?.setOnClickListener {
             mWeatherDialog?.cancel()
-        }
+        }*/
 
+        mWeatherDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
+            updateWeatherData()
+        }
         if (mGalleryViewModel.weather.value != null)
             handleWeatherChart(mGalleryViewModel.weather.value!!)
 
@@ -430,11 +433,31 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     private fun showWeatherFailure(){
-        mWeatherDialog?.findViewById<TextView>(R.id.weather_chart_failure)?.visibility = View.VISIBLE
+        mWeatherDialog?.findViewById<TextView>(R.id.weather_chart_failure)?.visibility = View.INVISIBLE
         //val progress = mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)
         //Log.d(TAG, "trying to hide progress: ${progress.toString()}")
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
-        mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.INVISIBLE
+        mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+    }
+
+    private fun updateWeatherData(){
+        mGalleryViewModel.weather.value = WeatherResult.Loading
+        Log.d(TAG, "getting device location")
+        if (gpsPermissionsGranted()) {
+            Log.d(TAG, "permissions granted: requesting single shot location")
+
+            SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
+                override fun onNewLocationAvailable(location: Location?) {
+                    mLocation = location
+                    mGalleryViewModel.updateForecast(
+                            location?.latitude.toString(),
+                            location?.longitude.toString())
+                }
+            })
+        } else {
+            Log.d(TAG, "permissions not granted")
+            requestPermissions(GPS_PERMISSIONS, GPS_REQUEST_CODE_PERMISSIONS)
+        }
     }
 
     private fun getDeviceLocation(){
@@ -468,15 +491,24 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 showWeatherLoading()
             }
             is WeatherResult.Success -> {
+                mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text =
+                        (result.data as ForecastResponse).properties.generatedAt
                 setWeatherChart(result.data as ForecastResponse)
                 showWeatherSuccess()
             }
             is WeatherResult.Failure -> {
+                mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text = //"failed to retrieve weather data, showing cached forecast"
+                        result.exception?.localizedMessage ?: "failed to retrieve updated data, showing cached data"
                 showWeatherFailure()
             }
+            //is WeatherResult.Cached -> {
+            //    // TODO handle cached state
+           // }
+
         }
     }
 
+    // TODO calc projects due per day
     private fun setWeatherChart(forecast: ForecastResponse){
         val periods : List<ForecastResponse.Period>? = forecast.properties.periods
         if (periods != null){

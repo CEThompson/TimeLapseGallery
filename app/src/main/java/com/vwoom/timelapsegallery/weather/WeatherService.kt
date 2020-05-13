@@ -1,7 +1,5 @@
 package com.vwoom.timelapsegallery.weather
 
-import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Url
@@ -16,6 +14,4 @@ interface WeatherService {
     @GET
     suspend fun getForecast(@Url stringUrl: String): ForecastResponse?
 
-    @GET
-    fun getRawForecast(@Url stringUrl: String): Call<ForecastResponse?>
 }

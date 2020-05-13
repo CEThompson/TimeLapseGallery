@@ -63,6 +63,14 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
         }
     }
 
+    fun updateForecast(latitude: String, longitude: String) {
+        Log.d(TAG, "updating forecast in view model")
+        viewModelScope.launch {
+            weather.value = weatherRepository.updateForecast(latitude, longitude)
+            Log.d(TAG, "setting weather value to ${weather.value}")
+        }
+    }
+
     // Filters the projects by the inputted search parameters
     suspend fun filterProjects(): List<ProjectView> {
         if (projects.value == null) return listOf()
