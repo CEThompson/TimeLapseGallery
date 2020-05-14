@@ -2,12 +2,10 @@ package com.vwoom.timelapsegallery.gallery
 
 import android.Manifest
 import android.app.Dialog
-import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Typeface
 import android.location.Location
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
@@ -490,20 +488,26 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             is WeatherResult.Loading -> {
                 showWeatherLoading()
             }
-            is WeatherResult.Success -> {
+            is WeatherResult.TodaysForecast -> {
+                Log.d(TAG, "showing todays forecast")
                 mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text =
                         (result.data as ForecastResponse).properties.generatedAt
                 setWeatherChart(result.data as ForecastResponse)
                 showWeatherSuccess()
             }
-            is WeatherResult.Failure -> {
-                mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text = //"failed to retrieve weather data, showing cached forecast"
-                        result.exception?.localizedMessage ?: "failed to retrieve updated data, showing cached data"
+            // TODO convert error messages to string resources
+            is WeatherResult.Error -> {
+                Log.d(TAG, "showing error")
+                mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text = "error: ${result.exception?.localizedMessage}"
                 showWeatherFailure()
             }
-            //is WeatherResult.Cached -> {
-            //    // TODO handle cached state
-           // }
+            // TODO modify to clearly show that cached data is shown
+            is WeatherResult.CachedForecast -> {
+                Log.d(TAG, "showing cached forecast")
+                mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text= "showing cached data: reason ${result.exception?.localizedMessage}"
+                setWeatherChart(result.data as ForecastResponse)
+                showWeatherSuccess()
+            }
 
         }
     }

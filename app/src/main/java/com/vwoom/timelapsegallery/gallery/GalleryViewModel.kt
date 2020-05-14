@@ -1,20 +1,17 @@
 package com.vwoom.timelapsegallery.gallery
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.repository.WeatherRepository
 import com.vwoom.timelapsegallery.data.repository.WeatherResult
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
-import com.vwoom.timelapsegallery.weather.ForecastResponse
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -55,19 +52,21 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
         return searchTags.contains(tag)
     }
 
+    // Retrieves today's forecast or a cached forecast if unable to query
     fun getForecast(latitude: String, longitude: String) {
-        Log.d(TAG, "getting forecast in view model")
+        //Log.d(TAG, "getting forecast in view model")
         viewModelScope.launch {
             weather.value = weatherRepository.getForecast(latitude, longitude)
-            Log.d(TAG, "setting weather value to ${weather.value}")
+            //Log.d(TAG, "setting weather value to ${weather.value}")
         }
     }
 
+    // Attempts to force update the forecast
     fun updateForecast(latitude: String, longitude: String) {
-        Log.d(TAG, "updating forecast in view model")
+        //Log.d(TAG, "updating forecast in view model")
         viewModelScope.launch {
-            weather.value = weatherRepository.updateForecast(latitude, longitude)
-            Log.d(TAG, "setting weather value to ${weather.value}")
+            weather.value = weatherRepository.forceUpdateForecast(latitude, longitude)
+            //Log.d(TAG, "setting weather value to ${weather.value}")
         }
     }
 

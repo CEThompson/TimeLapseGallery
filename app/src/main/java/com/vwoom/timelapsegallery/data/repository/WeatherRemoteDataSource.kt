@@ -1,7 +1,7 @@
 package com.vwoom.timelapsegallery.data.repository
 
 import android.util.Log
-import com.vwoom.timelapsegallery.weather.ForecastResponse
+import com.vwoom.timelapsegallery.weather.ForecastLocationResponse
 import com.vwoom.timelapsegallery.weather.WeatherService
 import com.vwoom.timelapsegallery.weather.weatherServiceBaseUrl
 import retrofit2.Retrofit
@@ -16,21 +16,34 @@ class WeatherRemoteDataSource {
 
     // Get the forecast from the national weather service api
     // TODO convert this to a response for error handling?
-    @Throws(Exception::class)
-    suspend fun getForecast(latitude: String, longitude: String): ForecastResponse? {
+    suspend fun getForecast(latitude: String, longitude: String): WeatherResult<Any> {
         Log.d("WeatherRemoteDataSource", "getting forecast")
         // 1. Get the url to query for the devices latitude / longitude
-        val forecastLocationResponse = weatherService.getForecastLocation(latitude, longitude)
+
+        val forecastLocationResponse: ForecastLocationResponse?
+        try {
+            forecastLocationResponse = weatherService.getForecastLocation(latitude, longitude)
+        } catch (e: Exception) {
+            return WeatherResult.Error(e)
+        }
+
         Log.d("WeatherRemoteDataSource", "forecast location response: $forecastLocationResponse")
-        if (forecastLocationResponse == null) return null
+        if (forecastLocationResponse == null) return WeatherResult.Error(null)
 
         val url = forecastLocationResponse.properties.forecast
         Log.d("WeatherRemoteDataSource", "forecast location url from response: $url")
 
         // 2. Call the url to get the forecast for the devices area and return the result
-        val forecastResponse = weatherService.getForecast(url)
-        Log.d("WeatherRemoteDataSource", "forecast response is: $forecastResponse")
-        return forecastResponse
+
+        return try {
+            val forecastResponse = weatherService.getForecast(url)
+            Log.d("WeatherRemoteDataSource", "forecast response is: $forecastResponse")
+            if (forecastResponse != null)
+                WeatherResult.TodaysForecast(forecastResponse)
+            else WeatherResult.Error()
+        } catch (e: Exception) {
+            WeatherResult.Error(e)
+        }
     }
 
 }

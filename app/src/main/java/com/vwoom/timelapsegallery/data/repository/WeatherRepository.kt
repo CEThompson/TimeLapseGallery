@@ -1,77 +1,77 @@
 package com.vwoom.timelapsegallery.data.repository
 
 import android.text.format.DateUtils
-import android.util.Log
 import com.google.gson.Gson
 import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import com.vwoom.timelapsegallery.weather.ForecastResponse
-import java.lang.Exception
 
 // TODO test repository and local/remote datasources
 class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSource,
                         private val weatherRemoteDataSource: WeatherRemoteDataSource) {
 
-    suspend fun updateForecast(latitude: String, longitude: String): WeatherResult<Any> {
-        try {
-            Log.d("WeatherRepository", "getting remote response to update forecast for lat/lng $latitude / $longitude")
-            val remoteResponse = weatherRemoteDataSource.getForecast(latitude, longitude)
-            Log.d("WeatherRepository", "response is $remoteResponse")
-            if (remoteResponse == null) return WeatherResult.Failure(null)
-
-            Log.d("WeatherRepository", "remote response recieved, caching and returning")
-            weatherLocalDataSource.cacheForecast(remoteResponse)
-            return WeatherResult.Success(remoteResponse)
-        } catch (e: Exception) {
-            val cachedData = weatherLocalDataSource.getWeather()
-            if (cachedData!=null) {
-                val cachedForecast = Gson().fromJson(cachedData?.forecast, ForecastResponse::class.java)
-                return WeatherResult.Failure(null, e)
+    suspend fun forceUpdateForecast(latitude: String, longitude: String): WeatherResult<Any> {
+        return when (val remoteResponse = weatherRemoteDataSource.getForecast(latitude, longitude)) {
+            is WeatherResult.TodaysForecast -> {
+                val forecast: ForecastResponse = remoteResponse.data as ForecastResponse
+                weatherLocalDataSource.cacheForecast(forecast)
+                remoteResponse
             }
-            return WeatherResult.Failure(null, e)
+            is WeatherResult.Error -> {
+                val localWeatherEntry = weatherLocalDataSource.getWeather()
+                if (localWeatherEntry == null) {
+                    remoteResponse
+                } else {
+                    val localResponse = Gson().fromJson(localWeatherEntry.forecast, ForecastResponse::class.java)
+                    WeatherResult.CachedForecast(localResponse, remoteResponse.exception)
+                }
+            }
+            else -> {
+                WeatherResult.Error()
+            }
         }
     }
 
-    // Retrieves the forecast from a the database or the remote api
+    // Retrieves the forecast from the database
+    // If the forecast is not today's then attempts to call the national weather service api
     suspend fun getForecast(latitude: String, longitude: String): WeatherResult<Any> {
-        try {
-            when (val localWeatherEntry: WeatherEntry? = weatherLocalDataSource.getWeather()) {
-                // If there is no local saved entry defer to remote
-                null -> {
-                    // Get and return the remote response
-                    val remoteResponse = weatherRemoteDataSource.getForecast(latitude, longitude)
-                    if (remoteResponse != null) {
-                        weatherLocalDataSource.cacheForecast(remoteResponse)
-                        return WeatherResult.Success(remoteResponse)
-                    }
 
-                    // Otherwise return a failure
-                    return WeatherResult.Failure(null)
+        when (val localWeatherEntry: WeatherEntry? = weatherLocalDataSource.getWeather()) {
+            // If there is no local saved entry defer to remote
+            null -> {
+                return weatherRemoteDataSource.getForecast(latitude, longitude)
+            }
+
+            else -> {
+                val localResponse = Gson().fromJson(localWeatherEntry.forecast, ForecastResponse::class.java)
+
+                // If the entry belongs to today return it
+                return if (DateUtils.isToday(localWeatherEntry.timestamp)) {
+                    WeatherResult.TodaysForecast(localResponse)
                 }
-                // Determine if the local entry belongs to today
-                else -> {
-                    val localResponse = Gson().fromJson(localWeatherEntry.forecast, ForecastResponse::class.java)
 
-                    // If the entry belongs to today return it
-                    return if (DateUtils.isToday(localWeatherEntry.timestamp)) {
-                        WeatherResult.Success(localResponse)
-                    }
-                    // Otherwise try to get a remote response
-                    else {
-                        val remoteResponse = weatherRemoteDataSource.getForecast(latitude, longitude)
-
-                        // If we get a remote response return it
-                        if (remoteResponse != null) {
-                            weatherLocalDataSource.cacheForecast(remoteResponse)
-                            WeatherResult.Success(remoteResponse)
+                // Otherwise try to get a remote response
+                else {
+                    return when (val remoteResponse =
+                            weatherRemoteDataSource.getForecast(latitude, longitude)) {
+                        // If the remote response got today's forecast then cache and return
+                        is WeatherResult.TodaysForecast -> {
+                            val weatherData: ForecastResponse = remoteResponse.data as ForecastResponse
+                            weatherLocalDataSource.cacheForecast(weatherData)
+                            remoteResponse
+                        }
+                        // Otherwise return the cached forecast and propagate the exception message
+                        is WeatherResult.Error -> {
+                            WeatherResult.CachedForecast(localResponse, remoteResponse.exception)
                         }
 
-                        // Otherwise return the cached local response
-                        else WeatherResult.Failure(localResponse)
+                        // This case should not fire since remote
+                        else -> {
+                            // TODO pass a meaningful error message here
+                            WeatherResult.Error()
+                        }
                     }
                 }
             }
-        } catch (e: Exception){
-            return WeatherResult.Failure(null)
         }
     }
 }
