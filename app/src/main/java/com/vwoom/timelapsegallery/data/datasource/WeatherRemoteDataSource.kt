@@ -1,6 +1,7 @@
-package com.vwoom.timelapsegallery.data.repository
+package com.vwoom.timelapsegallery.data.datasource
 
 import android.util.Log
+import com.vwoom.timelapsegallery.weather.WeatherResult
 import com.vwoom.timelapsegallery.weather.ForecastLocationResponse
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherService

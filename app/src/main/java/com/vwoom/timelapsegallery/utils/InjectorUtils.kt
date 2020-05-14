@@ -4,6 +4,8 @@ import android.content.Context
 import com.vwoom.timelapsegallery.camera2.Camera2ViewModelFactory
 import com.vwoom.timelapsegallery.cameraX.CameraXViewModelFactory
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
+import com.vwoom.timelapsegallery.data.datasource.WeatherLocalDataSource
+import com.vwoom.timelapsegallery.data.datasource.WeatherRemoteDataSource
 import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.ProjectView

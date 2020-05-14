@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.data.repository
+package com.vwoom.timelapsegallery.data.datasource
 
 import com.google.gson.Gson
 import com.vwoom.timelapsegallery.data.dao.WeatherDao

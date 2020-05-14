@@ -9,7 +9,7 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.repository.WeatherRepository
-import com.vwoom.timelapsegallery.data.repository.WeatherResult
+import com.vwoom.timelapsegallery.weather.WeatherResult
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.weather.ForecastResponse

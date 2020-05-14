@@ -40,7 +40,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.data.repository.WeatherResult
+import com.vwoom.timelapsegallery.weather.WeatherResult
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding

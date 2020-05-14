@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.data.repository
+package com.vwoom.timelapsegallery.weather
 
 sealed class WeatherResult<out T : Any> {
     // TODO propagate weather entry timestamp with today's forecast

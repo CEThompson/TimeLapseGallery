@@ -2,8 +2,11 @@ package com.vwoom.timelapsegallery.data.repository
 
 import android.text.format.DateUtils
 import com.google.gson.Gson
+import com.vwoom.timelapsegallery.data.datasource.WeatherLocalDataSource
+import com.vwoom.timelapsegallery.data.datasource.WeatherRemoteDataSource
 import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import com.vwoom.timelapsegallery.weather.ForecastResponse
+import com.vwoom.timelapsegallery.weather.WeatherResult
 
 // TODO test repository and local/remote datasources
 class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSource,
