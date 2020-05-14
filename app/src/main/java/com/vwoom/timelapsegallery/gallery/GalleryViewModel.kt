@@ -12,6 +12,7 @@ import com.vwoom.timelapsegallery.data.repository.WeatherRepository
 import com.vwoom.timelapsegallery.data.repository.WeatherResult
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
+import com.vwoom.timelapsegallery.weather.ForecastResponse
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -28,7 +29,7 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     // Live Data
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
-    val weather = MutableLiveData<WeatherResult<Any>>()
+    val weather = MutableLiveData<WeatherResult<ForecastResponse>>()
 
     init {
         weather.value = WeatherResult.Loading

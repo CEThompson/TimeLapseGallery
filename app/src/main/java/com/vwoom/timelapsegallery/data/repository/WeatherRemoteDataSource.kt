@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.data.repository
 
 import android.util.Log
 import com.vwoom.timelapsegallery.weather.ForecastLocationResponse
+import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherService
 import com.vwoom.timelapsegallery.weather.weatherServiceBaseUrl
 import retrofit2.Retrofit
@@ -16,7 +17,7 @@ class WeatherRemoteDataSource {
 
     // Get the forecast from the national weather service api
     // TODO convert this to a response for error handling?
-    suspend fun getForecast(latitude: String, longitude: String): WeatherResult<Any> {
+    suspend fun getForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
         Log.d("WeatherRemoteDataSource", "getting forecast")
         // 1. Get the url to query for the devices latitude / longitude
 
@@ -39,7 +40,7 @@ class WeatherRemoteDataSource {
             val forecastResponse = weatherService.getForecast(url)
             Log.d("WeatherRemoteDataSource", "forecast response is: $forecastResponse")
             if (forecastResponse != null)
-                WeatherResult.TodaysForecast(forecastResponse)
+                WeatherResult.TodaysForecast(forecastResponse, System.currentTimeMillis())
             else WeatherResult.Error()
         } catch (e: Exception) {
             WeatherResult.Error(e)

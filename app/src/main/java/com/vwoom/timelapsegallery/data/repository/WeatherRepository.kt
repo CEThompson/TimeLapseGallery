@@ -9,10 +9,10 @@ import com.vwoom.timelapsegallery.weather.ForecastResponse
 class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSource,
                         private val weatherRemoteDataSource: WeatherRemoteDataSource) {
 
-    suspend fun forceUpdateForecast(latitude: String, longitude: String): WeatherResult<Any> {
+    suspend fun forceUpdateForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
         return when (val remoteResponse = weatherRemoteDataSource.getForecast(latitude, longitude)) {
             is WeatherResult.TodaysForecast -> {
-                val forecast: ForecastResponse = remoteResponse.data as ForecastResponse
+                val forecast: ForecastResponse = remoteResponse.data
                 weatherLocalDataSource.cacheForecast(forecast)
                 remoteResponse
             }
@@ -22,7 +22,7 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
                     remoteResponse
                 } else {
                     val localResponse = Gson().fromJson(localWeatherEntry.forecast, ForecastResponse::class.java)
-                    WeatherResult.CachedForecast(localResponse, remoteResponse.exception)
+                    WeatherResult.CachedForecast(localResponse, localWeatherEntry.timestamp, remoteResponse.exception)
                 }
             }
             else -> {
@@ -33,7 +33,7 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
 
     // Retrieves the forecast from the database
     // If the forecast is not today's then attempts to call the national weather service api
-    suspend fun getForecast(latitude: String, longitude: String): WeatherResult<Any> {
+    suspend fun getForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
 
         when (val localWeatherEntry: WeatherEntry? = weatherLocalDataSource.getWeather()) {
             // If there is no local saved entry defer to remote
@@ -46,7 +46,7 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
 
                 // If the entry belongs to today return it
                 return if (DateUtils.isToday(localWeatherEntry.timestamp)) {
-                    WeatherResult.TodaysForecast(localResponse)
+                    WeatherResult.TodaysForecast(localResponse, localWeatherEntry.timestamp)
                 }
 
                 // Otherwise try to get a remote response
@@ -55,13 +55,13 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
                             weatherRemoteDataSource.getForecast(latitude, longitude)) {
                         // If the remote response got today's forecast then cache and return
                         is WeatherResult.TodaysForecast -> {
-                            val weatherData: ForecastResponse = remoteResponse.data as ForecastResponse
+                            val weatherData: ForecastResponse = remoteResponse.data
                             weatherLocalDataSource.cacheForecast(weatherData)
                             remoteResponse
                         }
                         // Otherwise return the cached forecast and propagate the exception message
                         is WeatherResult.Error -> {
-                            WeatherResult.CachedForecast(localResponse, remoteResponse.exception)
+                            WeatherResult.CachedForecast(localResponse, localWeatherEntry.timestamp, remoteResponse.exception)
                         }
 
                         // This case should not fire since remote
