@@ -10,6 +10,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class WeatherRemoteDataSource {
+    // Set up retrofit instance for data source
     private val retrofit = Retrofit.Builder()
             .baseUrl(weatherServiceBaseUrl)
             .addConverterFactory(GsonConverterFactory.create())
@@ -17,35 +18,28 @@ class WeatherRemoteDataSource {
     private val weatherService = retrofit.create(WeatherService::class.java)
 
     // Get the forecast from the national weather service api
-    // TODO convert this to a response for error handling?
     suspend fun getForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
-        Log.d("WeatherRemoteDataSource", "getting forecast")
-        // 1. Get the url to query for the devices latitude / longitude
-
+        // 1. Get the url to query the forecast for this devices location
         val forecastLocationResponse: ForecastLocationResponse?
         try {
             forecastLocationResponse = weatherService.getForecastLocation(latitude, longitude)
         } catch (e: Exception) {
             return WeatherResult.Error(e)
         }
-
-        Log.d("WeatherRemoteDataSource", "forecast location response: $forecastLocationResponse")
+        // If the url did not return then no record the error
         if (forecastLocationResponse == null) return WeatherResult.Error(null)
 
+        // 2. Call the url to get the forecast for the location and return the result
         val url = forecastLocationResponse.properties.forecast
-        Log.d("WeatherRemoteDataSource", "forecast location url from response: $url")
-
-        // 2. Call the url to get the forecast for the devices area and return the result
-
         return try {
             val forecastResponse = weatherService.getForecast(url)
-            Log.d("WeatherRemoteDataSource", "forecast response is: $forecastResponse")
+            // If we have a response return a weather result with the forecast packaged as data and the timestamp
             if (forecastResponse != null)
                 WeatherResult.TodaysForecast(forecastResponse, System.currentTimeMillis())
+            // Otherwise give back an error
             else WeatherResult.Error()
         } catch (e: Exception) {
             WeatherResult.Error(e)
         }
     }
-
 }
