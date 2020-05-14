@@ -1,11 +1,6 @@
 package com.vwoom.timelapsegallery.data.datasource
 
-import android.util.Log
-import com.vwoom.timelapsegallery.weather.WeatherResult
-import com.vwoom.timelapsegallery.weather.ForecastLocationResponse
-import com.vwoom.timelapsegallery.weather.ForecastResponse
-import com.vwoom.timelapsegallery.weather.WeatherService
-import com.vwoom.timelapsegallery.weather.weatherServiceBaseUrl
+import com.vwoom.timelapsegallery.weather.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
