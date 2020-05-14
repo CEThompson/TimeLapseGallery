@@ -67,8 +67,7 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
                         is WeatherResult.Error -> {
                             WeatherResult.CachedForecast(localResponse, localWeatherEntry.timestamp, remoteResponse.exception)
                         }
-                        // This case should not fire since remote only returns today's forecast or an error
-                        // The two cases above
+                        // Note: This case should not fire since remote only returns today's forecast or an error
                         else -> {
                             WeatherResult.Error()
                         }
