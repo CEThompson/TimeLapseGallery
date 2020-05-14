@@ -428,7 +428,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     private fun showWeatherSuccess(result: WeatherResult.TodaysForecast<ForecastResponse>){
-        mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text = "updated at: ${TimeUtils.getDateFromTimestamp(result.timestamp)}"
+        mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text = "updated at: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
         mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
