@@ -1,82 +1,42 @@
 package com.vwoom.timelapsegallery.data.repository
 
-import android.text.format.DateUtils
-import com.google.gson.Gson
 import com.vwoom.timelapsegallery.data.datasource.WeatherLocalDataSource
 import com.vwoom.timelapsegallery.data.datasource.WeatherRemoteDataSource
-import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 
-// TODO test repository and local/remote datasources
+// TODO test repository and local/remote data sources
 class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSource,
                         private val weatherRemoteDataSource: WeatherRemoteDataSource) {
 
-    suspend fun forceUpdateForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
-        return when (val remoteResponse = weatherRemoteDataSource.getForecast(latitude, longitude)) {
-            // If the remote result is today's forecast then return it
-            is WeatherResult.TodaysForecast -> {
-                val forecast: ForecastResponse = remoteResponse.data
-                weatherLocalDataSource.cacheForecast(forecast)
-                remoteResponse
-            }
-            // Otherwise return the cached forecast is available
-            is WeatherResult.Error -> {
-                val localWeatherEntry = weatherLocalDataSource.getWeather()
-                // If no cache return the original failed response
-                if (localWeatherEntry == null) {
-                    remoteResponse
-                }
-                // Otherwise returned the cached response
-                else {
-                    val localResponse = Gson().fromJson(localWeatherEntry.forecast, ForecastResponse::class.java)
-                    WeatherResult.CachedForecast(localResponse, localWeatherEntry.timestamp, remoteResponse.exception)
-                }
-            }
-            // Note: This case should not fire since the remote data source only returns the above two cases
-            else -> {
-                WeatherResult.Error()
-            }
+    // This function calls the national weather service API to attempt to update the forecast stored in the database
+    // Returns either (1) Weather Result: Update Success or (2) Weather Result: Update Failure
+    suspend fun updateForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
+        val remoteResponse = weatherRemoteDataSource.getForecast(latitude, longitude)
+        return if (remoteResponse is WeatherResult.TodaysForecast) {
+            weatherLocalDataSource.cacheForecast(remoteResponse.data)
+            WeatherResult.UpdateForecast.Success(remoteResponse.data, remoteResponse.timestamp)
+        }
+        else {
+            WeatherResult.UpdateForecast.Failure((remoteResponse as WeatherResult.NoData).exception)
+            //WeatherResult.NoData((remoteResponse as WeatherResult.NoData).exception, "Failed to update forecast")
         }
     }
 
     // Retrieves the forecast from the database
-    // If the forecast is not today's then attempts to call the national weather service api
+    // Also if the forecast is not today's then attempts to update the national weather service api
+    // Returns (1) Weather Result: No Data (2) Weather Result: Cached Forecast or (3) Weather Result: Today's Forecast
     suspend fun getForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
-        when (val localWeatherEntry: WeatherEntry? = weatherLocalDataSource.getWeather()) {
-            // If there is no local entry defer to the remote result
-            null -> {
-                return weatherRemoteDataSource.getForecast(latitude, longitude)
-            }
+        val databaseForecast = weatherLocalDataSource.getWeather()  // Can be (2) cached or (3) today's forecast
 
-            else -> {
-                // Parse the forecast response for later usage
-                val localResponse = Gson().fromJson(localWeatherEntry.forecast, ForecastResponse::class.java)
-
-                // If the entry belongs to today return it
-                return if (DateUtils.isToday(localWeatherEntry.timestamp)) {
-                    WeatherResult.TodaysForecast(localResponse, localWeatherEntry.timestamp)
-                }
-                // Otherwise try to get a remote response
-                else {
-                    return when (val remoteResponse = weatherRemoteDataSource.getForecast(latitude, longitude)) {
-                        // If the remote response got today's forecast then cache and return
-                        is WeatherResult.TodaysForecast -> {
-                            val weatherData: ForecastResponse = remoteResponse.data
-                            weatherLocalDataSource.cacheForecast(weatherData)
-                            remoteResponse
-                        }
-                        // Otherwise return the cached forecast and propagate the exception message
-                        is WeatherResult.Error -> {
-                            WeatherResult.CachedForecast(localResponse, localWeatherEntry.timestamp, remoteResponse.exception)
-                        }
-                        // Note: This case should not fire since remote only returns today's forecast or an error
-                        else -> {
-                            WeatherResult.Error()
-                        }
-                    }
-                }
+        if (databaseForecast !is WeatherResult.TodaysForecast){
+            val remoteResponse = updateForecast(latitude, longitude)
+            if (remoteResponse is WeatherResult.TodaysForecast) {
+                weatherLocalDataSource.cacheForecast(remoteResponse.data)
+                return remoteResponse   // Can be (1) no data or (3) today's forecast
             }
         }
+
+        return databaseForecast
     }
 }

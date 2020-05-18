@@ -13,16 +13,17 @@ class WeatherRemoteDataSource {
     private val weatherService = retrofit.create(WeatherService::class.java)
 
     // Get the forecast from the national weather service api
+    // Returns either (1) Weather Result: No Data or (2) Weather Result: Today's Forecast
     suspend fun getForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
         // 1. Get the url to query the forecast for this devices location
         val forecastLocationResponse: ForecastLocationResponse?
         try {
             forecastLocationResponse = weatherService.getForecastLocation(latitude, longitude)
         } catch (e: Exception) {
-            return WeatherResult.Error(e)
+            return WeatherResult.NoData(e, "Exception Retrieving forecast location")
         }
-        // If the url did not return then no record the error
-        if (forecastLocationResponse == null) return WeatherResult.Error(null)
+        // If the url did not return then no data can be returned
+        if (forecastLocationResponse == null) return WeatherResult.NoData(null, "Error retrieving forecast location")
 
         // 2. Call the url to get the forecast for the location and return the result
         val url = forecastLocationResponse.properties.forecast
@@ -32,9 +33,9 @@ class WeatherRemoteDataSource {
             if (forecastResponse != null)
                 WeatherResult.TodaysForecast(forecastResponse, System.currentTimeMillis())
             // Otherwise give back an error
-            else WeatherResult.Error()
+            else WeatherResult.NoData(null, "Exception retrieving forecast")
         } catch (e: Exception) {
-            WeatherResult.Error(e)
+            WeatherResult.NoData(e)
         }
     }
 }
