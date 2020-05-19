@@ -393,9 +393,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mGalleryViewModel.weatherDialogShowing = false
         }
 
-        /*mWeatherDialog?.findViewById<FloatingActionButton>(R.id.weather_chart_exit_fab)?.setOnClickListener {
-            mWeatherDialog?.cancel()
-        }*/
 
         mWeatherDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
             updateWeatherData()
@@ -552,7 +549,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     // TODO bind different icons for weather types, cloudy, rainy, clear
     // TODO bind wind conditions
-    // TODO set up refresh
     // TODO fix days of week
     // TODO fix clickability / detail list view of periods
     // TODO show the number of projects due per day during the week
@@ -599,14 +595,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             val iconEntries : ArrayList<Entry> = arrayListOf()
             val axisLabels: ArrayList<String> = arrayListOf()
 
+            // Set the weather and icons
             for (i in periods.indices) {
-
                 weatherEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()))
-
-                // Set the label
-                //if (periods[i].isDaytime){
-                //    axisLabels.add(periods[i].name.substring(0,3).toUpperCase(Locale.getDefault()))
-                //}
 
                 // Handle icon per period
                 // TODO adjust icons per weather type, clear, rainy, cloudy, etc.
@@ -637,17 +628,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 //val lastEntry = Entry(((periods.size-1 + periods.size-2).toFloat() / 2f), averages.last().y)
                 averages.add(lastEntry)
             }
-            /*for (i in 0 until periods.size-1){
-                val avg = (periods[i].temperature.toFloat() + periods[i+1].temperature.toFloat()) / 2f
-                averages.add(Entry((i.toFloat()+(i+1).toFloat())/2f, avg))
-            }*/
 
             // Handle labels
             for (i in 0 until periods.size-1 step 1){
+                // TODO: get day of period and convert to string
                 axisLabels.add(periods[i].name.substring(0,3).toUpperCase(Locale.getDefault()))
             }
 
-            Log.d(TAG, axisLabels.toString())
             // Set axis info
             val valueFormatter = object: ValueFormatter(){
                 override fun getAxisLabel(value: Float, axis: AxisBase?): String {
@@ -658,7 +645,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 }
             }
 
-            //if (!periods[0].isDaytime)
+            // Set the chart characteristics
+            chart.setTouchEnabled(false)
             chart.xAxis?.granularity = 1f
             chart.xAxis?.valueFormatter = valueFormatter
 
@@ -668,7 +656,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             chart.axisRight?.isEnabled = false
             chart.axisLeft?.isEnabled = false
             chart.description?.isEnabled = false
-            //chart?.legend?.isEnabled = false
 
 
             // Set the dataSet
@@ -688,11 +675,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             iconDataSet.setDrawValues(false)
             iconDataSet.enableDashedLine(0f,1f,0f)
             iconDataSet.color = ContextCompat.getColor(requireContext(), R.color.black)
+
             // Style the dataSet
             weatherDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
             weatherDataSet.cubicIntensity = .2f
             weatherDataSet.color = ContextCompat.getColor(requireContext(), R.color.colorAccent)
-
 
             val tempFormatter = object: ValueFormatter() {
                 private val format = DecimalFormat("###,##0")
@@ -701,8 +688,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 }
             }
             weatherDataSet.valueFormatter = tempFormatter
-            //dataset.valueTextColor
-
             weatherDataSet.valueTextSize = 14f
 
             // Assign the data to the chart
