@@ -10,6 +10,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
+            <!-- Confirmation check or x for updating the forecast -->
+            <ImageView
+                android:id="@+id/update_confirmation_image_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_check_green_24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="gone"/>
+
             <!-- Update time -->
             <TextView
                 android:id="@+id/update_time_tv"
@@ -20,7 +30,7 @@
                 app:layout_constraintVertical_bias="0"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/weather_chart"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/update_confirmation_image_view"
                 app:layout_constraintEnd_toStartOf="@id/weather_chart_progress"
                 tools:text="Updated: May 18, 2020 2:17 PM" />
 
@@ -84,7 +94,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/medium"
-                android:gravity="center"
+                android:textColor="@color/colorRedAccent"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

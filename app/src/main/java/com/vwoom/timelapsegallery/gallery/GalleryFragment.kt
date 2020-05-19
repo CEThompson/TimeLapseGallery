@@ -442,6 +442,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Show the chart
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
     private fun showTodaysForecast(result: WeatherResult.TodaysForecast<ForecastResponse>){
@@ -456,6 +458,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Show chart and hide loading progress
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
     private fun showUpdateSuccess(result: WeatherResult.UpdateForecast.Success<ForecastResponse>){
@@ -465,9 +469,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 "Updated: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
         mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
+        // Handle the check image
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_check_green_24dp)
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
+
         // Hide loading indicator and error, show the chart
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "Update successful"
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
+        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
@@ -479,6 +486,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Show the reason for the failure
         mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
         mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "Update failed: ${result.message}"
+
+        // Handle the check image
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_clear_red_24dp)
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
 
         // Show the chart and hide the loading indicator
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
@@ -493,6 +504,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Show the loading indicator
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
     private fun showWeatherNoData(result: WeatherResult.NoData){
@@ -503,6 +515,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "No data: ${result.exception?.localizedMessage}"
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
     private fun updateWeatherData(){
