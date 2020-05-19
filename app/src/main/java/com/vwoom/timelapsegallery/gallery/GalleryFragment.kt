@@ -27,6 +27,7 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.github.mikephil.charting.charts.LineChart
@@ -81,7 +82,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var searchJob: Job? = null
 
     // Weather
-    private var mWeatherDialog: Dialog? = null
+    private var mWeatherChartDialog: Dialog? = null
+    private var mWeatherDetailsDialog: Dialog? = null
     private var mLocation: Location? = null
     private var mWeatherRecyclerView: RecyclerView? = null
     private var mWeatherAdapter: WeatherAdapter? = null
@@ -231,10 +233,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
             R.id.weather_option -> {
                 // TODO if network disabled show feedback
-                if (mWeatherDialog == null) initializeWeatherDialog()
+                if (mWeatherChartDialog == null) initializeWeatherChartDialog()
                 getDeviceLocation()
-                mWeatherDialog?.show()
-                mGalleryViewModel.weatherDialogShowing = true
+                mWeatherChartDialog?.show()
+                mGalleryViewModel.weatherChartDialogShowing = true
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -247,17 +249,21 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             initializeSearchDialog()
             mSearchDialog?.show()
         }
-        if (mGalleryViewModel.weatherDialogShowing){
-            initializeWeatherDialog()
+        if (mGalleryViewModel.weatherChartDialogShowing){
+            initializeWeatherChartDialog()
             getDeviceLocation()
-            mWeatherDialog?.show()
+            mWeatherChartDialog?.show()
+        }
+        if (mGalleryViewModel.weatherDetailsDialogShowing){
+            initializeWeatherDetailsDialog()
+            mWeatherDetailsDialog?.show()
         }
     }
 
     override fun onPause() {
         super.onPause()
         mSearchDialog?.dismiss()
-        mWeatherDialog?.dismiss()
+        mWeatherChartDialog?.dismiss()
     }
 
     override fun onStop() {
@@ -385,127 +391,138 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         updateSearchDialog()
     }
 
-    private fun initializeWeatherDialog() {
-        mWeatherDialog = Dialog(requireContext())
-        mWeatherDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        mWeatherDialog?.setContentView(R.layout.dialog_weather_chart)
-        mWeatherDialog?.setOnCancelListener {
-            mGalleryViewModel.weatherDialogShowing = false
+    private fun initializeWeatherChartDialog() {
+        mWeatherChartDialog = Dialog(requireContext())
+        mWeatherChartDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        mWeatherChartDialog?.setContentView(R.layout.dialog_weather_chart)
+        mWeatherChartDialog?.setOnCancelListener {
+            mGalleryViewModel.weatherChartDialogShowing = false
         }
 
+        initializeWeatherDetailsDialog()
 
-        mWeatherDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
+        mWeatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
             updateWeatherData()
         }
         if (mGalleryViewModel.weather.value != null)
             handleWeatherChart(mGalleryViewModel.weather.value!!)
 
-        // TODO set up weather details
-        // Set up the list detail view for the forecast
-        /*mWeatherDialog?.findViewById<TextView>(R.id.weather_chart_dismiss)?.setOnClickListener {
-            mWeatherDialog?.cancel()
-        }*/
+        mWeatherChartDialog?.findViewById<TextView>(R.id.show_weather_details_tv)?.setOnClickListener {
+            if (mWeatherDetailsDialog == null) initializeWeatherDetailsDialog()
+            mWeatherDetailsDialog?.show()
+        }
 
-        // Set up the weather dialog recycler view
-        /*mWeatherRecyclerView = mWeatherDialog?.findViewById(R.id.weather_recycler_view)
-        mWeatherAdapter = WeatherAdapter(this)
+
+    }
+
+    private fun initializeWeatherDetailsDialog(){
+        mWeatherDetailsDialog = Dialog(requireContext())
+        mWeatherDetailsDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        mWeatherDetailsDialog?.setContentView(R.layout.dialog_weather_details)
+        mWeatherDetailsDialog?.setOnCancelListener {
+            mGalleryViewModel.weatherChartDialogShowing = false
+        }
+        mWeatherDetailsDialog?.findViewById<FloatingActionButton>(R.id.weather_details_dialog_exit_fab)?.setOnClickListener {
+            mWeatherDetailsDialog?.cancel()
+        }
+        mWeatherRecyclerView = mWeatherDetailsDialog?.findViewById(R.id.weather_recycler_view)
+        mWeatherAdapter = WeatherAdapter()
         val weatherLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         mWeatherRecyclerView?.apply {
             layoutManager = weatherLayoutManager
             setHasFixedSize(false)
             adapter = mWeatherAdapter
         }
-        */
     }
 
     private fun showCachedForecast(result: WeatherResult.CachedForecast<ForecastResponse>) {
         // Handle the check image
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_clear_red_24dp)
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_clear_red_24dp)
+        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
 
         // Show the time of the forecast
-        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
+        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
                 "Cached: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
-        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
         // Show reason for showing forecast that hasn't been updated today
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text= "Showing cached data: ${result.message}"
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.text= "Showing cached data: ${result.message}"
+        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
 
         // Hide the progress
-        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
+        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
 
         // Show the chart
-        mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
     private fun showTodaysForecast(result: WeatherResult.TodaysForecast<ForecastResponse>){
         // Handle the check image
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_check_green_24dp)
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_check_green_24dp)
+        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
 
         // Set and show the time the forecast was updated
-        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
+        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
                 "Updated Today: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
-        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
         // No error message shown
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
+        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
 
         // Show chart and hide loading progress
-        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
-        mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
+        mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
     private fun showUpdateSuccess(result: WeatherResult.UpdateForecast.Success<ForecastResponse>){
         // Bind and show the time of the update
         if (result.timestamp!=null)
-            mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
+            mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
                 "Updated Today: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
-        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
         // Handle the check image
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_check_green_24dp)
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_check_green_24dp)
+        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
 
         // Hide loading indicator and error, show the chart
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
-        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
-        mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
+        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
+        mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
     private fun showUpdateFailure(result: WeatherResult.UpdateForecast.Failure<ForecastResponse>){
         // Show the forecast time?
-        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
         // Show the reason for the failure
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "Update failed: ${result.message}"
+        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "Update failed: ${result.message}"
 
         // Handle the check image
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_clear_red_24dp)
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_clear_red_24dp)
+        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
 
         // Show the chart and hide the loading indicator
-        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
-        mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
+        mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
     private fun showWeatherLoading(){
         // Show the loading indicator
-        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
         //mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
     private fun showWeatherNoData(result: WeatherResult.NoData){
-        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
+        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
                 "No forecast data available"
         //mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text = "error"
-        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "No data: ${result.exception?.localizedMessage}"
-        mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
-        mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
+        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
+        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "No data: ${result.exception?.localizedMessage}"
+        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
+        mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
     private fun updateWeatherData(){
@@ -586,7 +603,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private fun setWeatherChart(forecast: ForecastResponse){
         val periods : List<ForecastResponse.Period>? = forecast.properties.periods
         if (periods != null){
-            val chart = mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart) ?: return
+            mWeatherAdapter?.setWeatherData(periods)
+
+            val chart = mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart) ?: return
 
             //periods = periods.subList(1,periods.size-1)
             // Set the entries for the chart
@@ -695,8 +714,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             chart.data = lineData
             chart.invalidate()
 
-            mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-            mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
+            mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+            mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         }
     }
 

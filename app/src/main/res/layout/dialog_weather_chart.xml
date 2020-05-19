@@ -88,6 +88,17 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 tools:visibility="visible" />
 
+            <!-- Show details -->
+            <TextView
+                android:id="@+id/show_weather_details_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/medium"
+                android:textColor="@color/colorTag"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weather_chart"
+                android:text="@string/show_details" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </layout>

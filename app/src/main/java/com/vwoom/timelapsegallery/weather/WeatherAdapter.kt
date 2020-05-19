@@ -9,29 +9,29 @@ import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.DialogWeatherRecyclerviewItemBinding
 
 
-class WeatherAdapter(private val mClickHandler: WeatherAdapterOnClickHandler) : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHolder>() {
+class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHolder>() {
 
 
     //private var periods: List<ForecastResponse.Period> = emptyList()
 
     private var days: List<ForecastDay> = emptyList()
 
-    interface WeatherAdapterOnClickHandler {
+    /*interface WeatherAdapterOnClickHandler {
         fun onClick(clickedDay: ForecastDay)
-    }
+    }*/
 
     inner class WeatherAdapterViewHolder(val binding: DialogWeatherRecyclerviewItemBinding)
-        : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
-        override fun onClick(view: View) {
+        : RecyclerView.ViewHolder(binding.root)//, View.OnClickListener {
+        /*override fun onClick(view: View) {
             val adapterPosition = adapterPosition
             val clickedDay = days[adapterPosition]
-            mClickHandler.onClick(clickedDay)
-        }
+            //mClickHandler.onClick(clickedDay)
+        }*/
 
-        init {
+        /*init {
             binding.root.setOnClickListener(this)
-        }
-    }
+        }*/
+    //}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeatherAdapterViewHolder {
         val context = parent.context
