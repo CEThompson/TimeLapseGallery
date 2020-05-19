@@ -1,11 +1,6 @@
 package com.vwoom.timelapsegallery.utils
 
-import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
-import junit.framework.Assert.assertFalse
-import junit.framework.Assert.assertTrue
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -89,7 +84,7 @@ class FileUtilsTest {
         val containsReservedCharacters = FileUtils.pathContainsReservedCharacter(testString)
 
         // Then - the utility should indicate false: the path does not contain a reserved character
-        assertFalse(containsReservedCharacters)
+        assert(!containsReservedCharacters)
     }
 
     @Test
@@ -101,7 +96,7 @@ class FileUtilsTest {
         val containsReservedCharacters = FileUtils.pathContainsReservedCharacter(testString)
 
         // Then - the utility should indicate true
-        assertTrue(containsReservedCharacters)
+        assert(containsReservedCharacters)
     }
 
     @Test
