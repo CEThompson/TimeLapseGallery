@@ -57,23 +57,14 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     fun getForecast(latitude: String, longitude: String) {
         //Log.d(TAG, "getting forecast in view model")
         viewModelScope.launch {
-            /*val result = weatherRepository.getForecast(latitude, longitude)
-            if (result is WeatherResult.TodaysForecast)  {
-                weather.value = result
-            } else {
-                weatherRepository.updateForecast(latitude, longitude)
-            }*/
             weather.value = weatherRepository.getForecast(latitude, longitude)
-            //Log.d(TAG, "setting weather value to ${weather.value}")
         }
     }
 
     // Attempts to force update the forecast
     fun updateForecast(latitude: String, longitude: String) {
-        //Log.d(TAG, "updating forecast in view model")
         viewModelScope.launch {
             weather.value = weatherRepository.updateForecast(latitude, longitude)
-            //Log.d(TAG, "setting weather value to ${weather.value}")
         }
     }
 

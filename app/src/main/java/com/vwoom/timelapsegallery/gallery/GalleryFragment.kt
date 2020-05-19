@@ -389,7 +389,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mWeatherDialog = Dialog(requireContext())
         mWeatherDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         mWeatherDialog?.setContentView(R.layout.dialog_weather_chart)
-        mWeatherDialog?.setOnCancelListener { mGalleryViewModel.weatherDialogShowing = false }
+        mWeatherDialog?.setOnCancelListener {
+            mGalleryViewModel.weatherDialogShowing = false
+
+            // When dialog is dismissed, convert mutable livedata if an update type
+            if (mGalleryViewModel.weather.value is (WeatherResult.UpdateForecast.Success)){
+                if (mLocation!=null)
+                    mGalleryViewModel.getForecast(mLocation!!.latitude.toString(), mLocation!!.longitude.toString())
+            }
+        }
 
         /*mWeatherDialog?.findViewById<FloatingActionButton>(R.id.weather_chart_exit_fab)?.setOnClickListener {
             mWeatherDialog?.cancel()
@@ -419,49 +427,80 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         */
     }
 
-    private fun showCachedWeather(result: WeatherResult.CachedForecast<ForecastResponse>) {
-        mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text = TimeUtils.getDateFromTimestamp(result.timestamp)
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text= "showing cached data: reason ${result.message}"
+    private fun showCachedForecast(result: WeatherResult.CachedForecast<ForecastResponse>) {
+        // Show the time of the forecast
+        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
+                "Updated: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
+        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
+
+        // Show reason for showing forecast that hasn't been updated today
+        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text= "Showing cached data: reason ${result.message}"
         mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
+
+        // Hide the progress
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
+
+        // Show the chart
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
-    private fun showWeatherSuccess(result: WeatherResult.TodaysForecast<ForecastResponse>){
-        mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text =
-                "updated at: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
+    private fun showTodaysForecast(result: WeatherResult.TodaysForecast<ForecastResponse>){
+        // Set and show the time the forecast was updated
+        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
+                "Updated: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
+        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
+
+        // No error message shown
         mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
+
+        // Show chart and hide loading progress
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
     private fun showUpdateSuccess(result: WeatherResult.UpdateForecast.Success<ForecastResponse>){
-        // TODO implement update success
-        mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text =
-                "update successful"
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
+        // Bind and show the time of the update
+        if (result.timestamp!=null)
+            mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
+                "Updated: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
+        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
+
+        // Hide loading indicator and error, show the chart
+        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "Update successful"
+        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
     private fun showUpdateFailure(result: WeatherResult.UpdateForecast.Failure<ForecastResponse>){
-        // TODO implement update failure
-        mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text =
-                "update failed, showing cached data: ${result.message}"
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
+        // Show the forecast time?
+        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
+
+        // Show the reason for the failure
+        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
+        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "Update failed: ${result.message}"
+
+        // Show the chart and hide the loading indicator
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
     private fun showWeatherLoading(){
+        // Hide the update time, chart and error message
+        //mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
+        //mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.INVISIBLE
+        //mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
+
+        // Show the loading indicator
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
-        mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.INVISIBLE
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
     }
 
-    private fun showWeatherFailure(result: WeatherResult.NoData){
-        mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text = "error"
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "error: ${result.exception?.localizedMessage}"
+    private fun showWeatherNoData(result: WeatherResult.NoData){
+        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
+                "No forecast data available"
+        //mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text = "error"
+        mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
+        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "No data: ${result.exception?.localizedMessage}"
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
@@ -519,18 +558,18 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             is WeatherResult.TodaysForecast -> {
                 Log.d(TAG, "showing todays forecast")
                 setWeatherChart(result.data)
-                showWeatherSuccess(result)
+                showTodaysForecast(result)
             }
             // TODO convert error messages to string resources
             is WeatherResult.NoData -> {
                 //Log.d(TAG, "showing error")
-                showWeatherFailure(result)
+                showWeatherNoData(result)
             }
             // TODO modify to clearly show that cached data is shown
             is WeatherResult.CachedForecast -> {
-                Log.d(TAG, "showing cached forecast")
+                //Log.d(TAG, "showing cached forecast")
                 setWeatherChart(result.data)
-                showCachedWeather(result)
+                showCachedForecast(result)
             }
             is WeatherResult.UpdateForecast.Failure -> {
                 showUpdateFailure(result)
