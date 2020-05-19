@@ -46,10 +46,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
+// TODO bind different icons for weather types, cloudy, rainy, clear
+// TODO bind wind conditions
+// TODO fix days of week
+// TODO show the number of projects due per day during the week
 // TODO: create gifs or mp4s from photo sets
 // TODO: remove all instances of non-null assertion !!
 // TODO: increase test coverage, viewmodels? livedata?
-// TODO: add dialog to show weather for the next week
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
@@ -77,8 +80,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mWeatherChartDialog: WeatherChartDialog? = null
     private var mWeatherDetailsDialog: WeatherDetailsDialog? = null
     private var mLocation: Location? = null
-    private var mWeatherRecyclerView: RecyclerView? = null
-    private var mWeatherAdapter: WeatherAdapter? = null
 
     // For scrolling to the end when adding a new project
     private var mPrevProjectsSize: Int? = null
@@ -306,7 +307,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Observe forecast
         // TODO handle different states of weather data
         mGalleryViewModel.weather.observe(viewLifecycleOwner, Observer{
-            handleWeatherChart(it)
+            mWeatherChartDialog?.handleWeatherChart(it)
+            mWeatherDetailsDialog?.handleWeatherResult(it)
         })
     }
 
@@ -388,13 +390,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private fun initializeWeatherDialogs(){
         initializeWeatherChartDialog()
         initializeWeatherDetailsDialog()
-        if (mGalleryViewModel.weather.value != null)
-            handleWeatherChart(mGalleryViewModel.weather.value!!)
+        if (mGalleryViewModel.weather.value != null) {
+            mWeatherChartDialog?.handleWeatherChart(mGalleryViewModel.weather.value!!)
+            mWeatherDetailsDialog?.handleWeatherResult(mGalleryViewModel.weather.value!!)
+        }
     }
     private fun initializeWeatherChartDialog() {
         mWeatherChartDialog = WeatherChartDialog(requireContext())
-        mWeatherChartDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        mWeatherChartDialog?.setContentView(R.layout.dialog_weather_chart)
         mWeatherChartDialog?.setOnCancelListener {
             mGalleryViewModel.weatherChartDialogShowing = false
         }
@@ -409,21 +411,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     private fun initializeWeatherDetailsDialog(){
         mWeatherDetailsDialog = WeatherDetailsDialog(requireContext())
-        mWeatherDetailsDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        mWeatherDetailsDialog?.setContentView(R.layout.dialog_weather_details)
         mWeatherDetailsDialog?.setOnCancelListener {
             mGalleryViewModel.weatherChartDialogShowing = false
         }
         mWeatherDetailsDialog?.findViewById<FloatingActionButton>(R.id.weather_details_dialog_exit_fab)?.setOnClickListener {
             mWeatherDetailsDialog?.cancel()
-        }
-        mWeatherRecyclerView = mWeatherDetailsDialog?.findViewById(R.id.weather_recycler_view)
-        mWeatherAdapter = WeatherAdapter()
-        val weatherLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        mWeatherRecyclerView?.apply {
-            layoutManager = weatherLayoutManager
-            setHasFixedSize(false)
-            adapter = mWeatherAdapter
         }
     }
 
@@ -463,43 +455,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         } else {
             Log.d(TAG, "permissions not granted")
             requestPermissions(GPS_PERMISSIONS, GPS_REQUEST_CODE_PERMISSIONS)
-        }
-    }
-
-    // TODO bind different icons for weather types, cloudy, rainy, clear
-    // TODO bind wind conditions
-    // TODO fix days of week
-    // TODO fix clickability / detail list view of periods
-    // TODO show the number of projects due per day during the week
-    private fun handleWeatherChart(result: WeatherResult<ForecastResponse>){
-        when (result){
-            is WeatherResult.Loading -> {
-                mWeatherChartDialog?.showWeatherLoading()
-            }
-            is WeatherResult.TodaysForecast -> {
-                Log.d(TAG, "showing todays forecast")
-                mWeatherChartDialog?.setWeatherChart(result.data)
-                mWeatherAdapter?.setWeatherData(result.data.properties.periods)
-                mWeatherChartDialog?.showTodaysForecast(result)
-            }
-            // TODO convert error messages to string resources
-            is WeatherResult.NoData -> {
-                //Log.d(TAG, "showing error")
-                mWeatherChartDialog?.showWeatherNoData(result)
-            }
-            // TODO modify to clearly show that cached data is shown
-            is WeatherResult.CachedForecast -> {
-                //Log.d(TAG, "showing cached forecast")
-                mWeatherChartDialog?.setWeatherChart(result.data)
-                mWeatherAdapter?.setWeatherData(result.data.properties.periods)
-                mWeatherChartDialog?.showCachedForecast(result)
-            }
-            is WeatherResult.UpdateForecast.Failure -> {
-                mWeatherChartDialog?.showUpdateFailure(result)
-            }
-            is WeatherResult.UpdateForecast.Success -> {
-                mWeatherChartDialog?.showUpdateSuccess(result)
-            }
         }
     }
 

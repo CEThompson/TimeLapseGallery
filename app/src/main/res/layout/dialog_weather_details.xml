@@ -6,14 +6,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="@dimen/medium">
 
-    <!--
     <ProgressBar
-        android:id="@+id/weather_progress"
+        android:id="@+id/weather_details_progress"
         style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:visibility="gone" />
-    -->
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/weather_details_dialog_exit_fab"
         android:layout_width="wrap_content"

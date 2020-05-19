@@ -21,7 +21,13 @@ import java.util.*
 
 class WeatherChartDialog(context: Context): Dialog(context) {
 
-    fun showCachedForecast(result: WeatherResult.CachedForecast<ForecastResponse>) {
+    init {
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        this.setContentView(R.layout.dialog_weather_chart)
+    }
+
+    // TODO convert to string resources
+    private fun showCachedForecast(result: WeatherResult.CachedForecast<ForecastResponse>) {
         // Handle the check image
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_clear_red_24dp)
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
@@ -42,7 +48,7 @@ class WeatherChartDialog(context: Context): Dialog(context) {
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
-    fun showTodaysForecast(result: WeatherResult.TodaysForecast<ForecastResponse>){
+    private fun showTodaysForecast(result: WeatherResult.TodaysForecast<ForecastResponse>){
         // Handle the check image
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_check_green_24dp)
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
@@ -60,7 +66,7 @@ class WeatherChartDialog(context: Context): Dialog(context) {
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
-    fun showUpdateSuccess(result: WeatherResult.UpdateForecast.Success<ForecastResponse>){
+    private fun showUpdateSuccess(result: WeatherResult.UpdateForecast.Success<ForecastResponse>){
         // Bind and show the time of the update
         if (result.timestamp!=null)
             this.findViewById<TextView>(R.id.update_time_tv)?.text =
@@ -77,7 +83,7 @@ class WeatherChartDialog(context: Context): Dialog(context) {
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
-    fun showUpdateFailure(result: WeatherResult.UpdateForecast.Failure<ForecastResponse>){
+    private fun showUpdateFailure(result: WeatherResult.UpdateForecast.Failure<ForecastResponse>){
         // Show the forecast time?
         this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
@@ -94,13 +100,13 @@ class WeatherChartDialog(context: Context): Dialog(context) {
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
-    fun showWeatherLoading(){
+    private fun showWeatherLoading(){
         // Show the loading indicator
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
         //mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
-    fun showWeatherNoData(result: WeatherResult.NoData){
+    private fun showWeatherNoData(result: WeatherResult.NoData){
         this.findViewById<TextView>(R.id.update_time_tv)?.text =
                 "No forecast data available"
         //mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text = "error"
@@ -112,7 +118,7 @@ class WeatherChartDialog(context: Context): Dialog(context) {
     }
 
     // TODO calc projects due per day
-    fun setWeatherChart(forecast: ForecastResponse){
+    private fun setWeatherChart(forecast: ForecastResponse){
         val periods : List<ForecastResponse.Period>? = forecast.properties.periods
         if (periods != null){
 
@@ -227,6 +233,33 @@ class WeatherChartDialog(context: Context): Dialog(context) {
 
             this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
             this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
+        }
+    }
+
+    fun handleWeatherChart(result: WeatherResult<ForecastResponse>){
+        when (result){
+            is WeatherResult.Loading -> this.showWeatherLoading()
+            is WeatherResult.TodaysForecast -> {
+                this.setWeatherChart(result.data)
+                //mWeatherAdapter?.setWeatherData(result.data.properties.periods)
+                this.showTodaysForecast(result)
+            }
+            // TODO convert error messages to string resources
+            is WeatherResult.NoData -> {
+                //Log.d(TAG, "showing error")
+                this.showWeatherNoData(result)
+            }
+            // TODO modify to clearly show that cached data is shown
+            is WeatherResult.CachedForecast -> {
+                //Log.d(TAG, "showing cached forecast")
+                this.setWeatherChart(result.data)
+                //mWeatherAdapter?.setWeatherData(result.data.properties.periods)
+                this.showCachedForecast(result)
+            }
+            is WeatherResult.UpdateForecast.Failure -> this.showUpdateFailure(result)
+
+            is WeatherResult.UpdateForecast.Success -> this.showUpdateSuccess(result)
+
         }
     }
 }
