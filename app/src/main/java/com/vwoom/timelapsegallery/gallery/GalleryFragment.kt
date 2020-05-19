@@ -30,12 +30,6 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
@@ -47,11 +41,9 @@ import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
-import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.weather.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.text.DecimalFormat
 import java.util.*
 
 // TODO: create gifs or mp4s from photo sets
@@ -82,8 +74,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var searchJob: Job? = null
 
     // Weather
-    private var mWeatherChartDialog: Dialog? = null
-    private var mWeatherDetailsDialog: Dialog? = null
+    private var mWeatherChartDialog: WeatherChartDialog? = null
+    private var mWeatherDetailsDialog: WeatherDetailsDialog? = null
     private var mLocation: Location? = null
     private var mWeatherRecyclerView: RecyclerView? = null
     private var mWeatherAdapter: WeatherAdapter? = null
@@ -233,8 +225,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
             R.id.weather_option -> {
                 // TODO if network disabled show feedback
-                if (mWeatherChartDialog == null) initializeWeatherChartDialog()
-                getDeviceLocation()
+                if (mWeatherChartDialog == null) {
+                    initializeWeatherDialogs()
+                    getLastForecast()
+                }
                 mWeatherChartDialog?.show()
                 mGalleryViewModel.weatherChartDialogShowing = true
                 true
@@ -250,12 +244,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mSearchDialog?.show()
         }
         if (mGalleryViewModel.weatherChartDialogShowing){
-            initializeWeatherChartDialog()
-            getDeviceLocation()
+            initializeWeatherDialogs()
+            //getDeviceLocation()
             mWeatherChartDialog?.show()
         }
         if (mGalleryViewModel.weatherDetailsDialogShowing){
-            initializeWeatherDetailsDialog()
+            initializeWeatherDialogs()
             mWeatherDetailsDialog?.show()
         }
     }
@@ -391,32 +385,30 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         updateSearchDialog()
     }
 
+    private fun initializeWeatherDialogs(){
+        initializeWeatherChartDialog()
+        initializeWeatherDetailsDialog()
+        if (mGalleryViewModel.weather.value != null)
+            handleWeatherChart(mGalleryViewModel.weather.value!!)
+    }
     private fun initializeWeatherChartDialog() {
-        mWeatherChartDialog = Dialog(requireContext())
+        mWeatherChartDialog = WeatherChartDialog(requireContext())
         mWeatherChartDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         mWeatherChartDialog?.setContentView(R.layout.dialog_weather_chart)
         mWeatherChartDialog?.setOnCancelListener {
             mGalleryViewModel.weatherChartDialogShowing = false
         }
-
-        initializeWeatherDetailsDialog()
-
         mWeatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
             updateWeatherData()
         }
-        if (mGalleryViewModel.weather.value != null)
-            handleWeatherChart(mGalleryViewModel.weather.value!!)
-
         mWeatherChartDialog?.findViewById<TextView>(R.id.show_weather_details_tv)?.setOnClickListener {
             if (mWeatherDetailsDialog == null) initializeWeatherDetailsDialog()
             mWeatherDetailsDialog?.show()
         }
-
-
     }
 
     private fun initializeWeatherDetailsDialog(){
-        mWeatherDetailsDialog = Dialog(requireContext())
+        mWeatherDetailsDialog = WeatherDetailsDialog(requireContext())
         mWeatherDetailsDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         mWeatherDetailsDialog?.setContentView(R.layout.dialog_weather_details)
         mWeatherDetailsDialog?.setOnCancelListener {
@@ -433,96 +425,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             setHasFixedSize(false)
             adapter = mWeatherAdapter
         }
-    }
-
-    private fun showCachedForecast(result: WeatherResult.CachedForecast<ForecastResponse>) {
-        // Handle the check image
-        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_clear_red_24dp)
-        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
-
-        // Show the time of the forecast
-        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
-                "Cached: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
-        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
-
-        // Show reason for showing forecast that hasn't been updated today
-        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.text= "Showing cached data: ${result.message}"
-        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
-
-        // Hide the progress
-        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
-
-        // Show the chart
-        mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-    }
-
-    private fun showTodaysForecast(result: WeatherResult.TodaysForecast<ForecastResponse>){
-        // Handle the check image
-        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_check_green_24dp)
-        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
-
-        // Set and show the time the forecast was updated
-        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
-                "Updated Today: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
-        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
-
-        // No error message shown
-        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
-
-        // Show chart and hide loading progress
-        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
-        mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-    }
-
-    private fun showUpdateSuccess(result: WeatherResult.UpdateForecast.Success<ForecastResponse>){
-        // Bind and show the time of the update
-        if (result.timestamp!=null)
-            mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
-                "Updated Today: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
-        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
-
-        // Handle the check image
-        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_check_green_24dp)
-        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
-
-        // Hide loading indicator and error, show the chart
-        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
-        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
-        mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-    }
-
-    private fun showUpdateFailure(result: WeatherResult.UpdateForecast.Failure<ForecastResponse>){
-        // Show the forecast time?
-        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
-
-        // Show the reason for the failure
-        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
-        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "Update failed: ${result.message}"
-
-        // Handle the check image
-        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_clear_red_24dp)
-        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
-
-        // Show the chart and hide the loading indicator
-        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
-        mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-    }
-
-    private fun showWeatherLoading(){
-        // Show the loading indicator
-        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
-        //mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
-    }
-
-    private fun showWeatherNoData(result: WeatherResult.NoData){
-        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
-                "No forecast data available"
-        //mWeatherDialog?.findViewById<TextView>(R.id.update_status_tv)?.text = "error"
-        mWeatherChartDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
-        mWeatherChartDialog?.findViewById<TextView>(R.id.error_message_tv)?.text = "No data: ${result.exception?.localizedMessage}"
-        mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
-        mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-        mWeatherChartDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
     private fun updateWeatherData(){
@@ -545,7 +447,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
-    private fun getDeviceLocation(){
+    private fun getLastForecast(){
         Log.d(TAG, "getting device location")
         if (gpsPermissionsGranted()) {
             Log.d(TAG, "permissions granted: requesting single shot location")
@@ -572,150 +474,32 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private fun handleWeatherChart(result: WeatherResult<ForecastResponse>){
         when (result){
             is WeatherResult.Loading -> {
-                showWeatherLoading()
+                mWeatherChartDialog?.showWeatherLoading()
             }
             is WeatherResult.TodaysForecast -> {
                 Log.d(TAG, "showing todays forecast")
-                setWeatherChart(result.data)
-                showTodaysForecast(result)
+                mWeatherChartDialog?.setWeatherChart(result.data)
+                mWeatherAdapter?.setWeatherData(result.data.properties.periods)
+                mWeatherChartDialog?.showTodaysForecast(result)
             }
             // TODO convert error messages to string resources
             is WeatherResult.NoData -> {
                 //Log.d(TAG, "showing error")
-                showWeatherNoData(result)
+                mWeatherChartDialog?.showWeatherNoData(result)
             }
             // TODO modify to clearly show that cached data is shown
             is WeatherResult.CachedForecast -> {
                 //Log.d(TAG, "showing cached forecast")
-                setWeatherChart(result.data)
-                showCachedForecast(result)
+                mWeatherChartDialog?.setWeatherChart(result.data)
+                mWeatherAdapter?.setWeatherData(result.data.properties.periods)
+                mWeatherChartDialog?.showCachedForecast(result)
             }
             is WeatherResult.UpdateForecast.Failure -> {
-                showUpdateFailure(result)
+                mWeatherChartDialog?.showUpdateFailure(result)
             }
             is WeatherResult.UpdateForecast.Success -> {
-                showUpdateSuccess(result)
+                mWeatherChartDialog?.showUpdateSuccess(result)
             }
-        }
-    }
-
-    // TODO calc projects due per day
-    private fun setWeatherChart(forecast: ForecastResponse){
-        val periods : List<ForecastResponse.Period>? = forecast.properties.periods
-        if (periods != null){
-            mWeatherAdapter?.setWeatherData(periods)
-
-            val chart = mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart) ?: return
-
-            //periods = periods.subList(1,periods.size-1)
-            // Set the entries for the chart
-            val weatherEntries: ArrayList<Entry> = arrayListOf()
-            val averages: ArrayList<Entry> = arrayListOf()
-            val iconEntries : ArrayList<Entry> = arrayListOf()
-            val axisLabels: ArrayList<String> = arrayListOf()
-
-            // Set the weather and icons
-            for (i in periods.indices) {
-                weatherEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()))
-
-                // Handle icon per period
-                // TODO adjust icons per weather type, clear, rainy, cloudy, etc.
-                if (periods[i].isDaytime){
-                    iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()+5f,
-                            ContextCompat.getDrawable(requireContext(),R.drawable.ic_wb_sunny_black_24dp)))
-                } else {
-                    iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()+5f,
-                            ContextCompat.getDrawable(requireContext(),R.drawable.ic_star_black_24dp)))
-                }
-            }
-
-            // Handle averages
-            val start = if (periods[0].isDaytime) 0 else 1
-            for (i in start until periods.size-1 step 2){
-                //if ( (i+1) !in periods.indices) break
-                val avg = (periods[i].temperature.toFloat() + periods[i+1].temperature.toFloat()) / 2f
-                averages.add(Entry((i.toFloat()+(i+1).toFloat())/2f, avg))
-            }
-            if (start == 1) {
-                val first = (periods[0].temperature.toFloat() + periods[1].temperature.toFloat()) / 2f
-                val entry = Entry(0.5f, first)
-                //val entry = Entry(0.5f, averages[0].y)
-                averages.add(0,entry)
-
-                val last = (periods[periods.size-1].temperature.toFloat() + periods[periods.size-2].temperature.toFloat()) / 2f
-                val lastEntry = Entry(((periods.size-1 + periods.size-2).toFloat() / 2f), last)
-                //val lastEntry = Entry(((periods.size-1 + periods.size-2).toFloat() / 2f), averages.last().y)
-                averages.add(lastEntry)
-            }
-
-            // Handle labels
-            for (i in 0 until periods.size-1 step 1){
-                // TODO: get day of period and convert to string
-                axisLabels.add(periods[i].name.substring(0,3).toUpperCase(Locale.getDefault()))
-            }
-
-            // Set axis info
-            val valueFormatter = object: ValueFormatter(){
-                override fun getAxisLabel(value: Float, axis: AxisBase?): String {
-                    //return axisLabels[value.toInt()]
-                    return if (value.toInt() < axisLabels.size)
-                        axisLabels[value.toInt()]
-                    else ""
-                }
-            }
-
-            // Set the chart characteristics
-            chart.setTouchEnabled(false)
-            chart.xAxis?.granularity = 1f
-            chart.xAxis?.valueFormatter = valueFormatter
-
-            // Hide axis lines
-            chart.xAxis?.setDrawGridLines(false)
-            chart.xAxis?.setDrawAxisLine(false)
-            chart.axisRight?.isEnabled = false
-            chart.axisLeft?.isEnabled = false
-            chart.description?.isEnabled = false
-
-
-            // Set the dataSet
-            val tempType = if (periods[0].temperatureUnit == "F") WeatherAdapter.FAHRENHEIT else WeatherAdapter.CELSIUS
-            val weatherDataSet = LineDataSet(weatherEntries, tempType)
-            val iconDataSet = LineDataSet(iconEntries, "Weather Type")
-            val avgDataSet = LineDataSet(averages, "Average Temp")
-            avgDataSet.setDrawCircles(false)
-            avgDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
-            avgDataSet.setDrawValues(false)
-
-            weatherDataSet.enableDashedLine(0.8f,1f,0f)
-            weatherDataSet.setDrawCircles(false)
-
-            iconDataSet.setDrawIcons(true)
-            iconDataSet.setDrawCircles(false)
-            iconDataSet.setDrawValues(false)
-            iconDataSet.enableDashedLine(0f,1f,0f)
-            iconDataSet.color = ContextCompat.getColor(requireContext(), R.color.black)
-
-            // Style the dataSet
-            weatherDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-            weatherDataSet.cubicIntensity = .2f
-            weatherDataSet.color = ContextCompat.getColor(requireContext(), R.color.colorAccent)
-
-            val tempFormatter = object: ValueFormatter() {
-                private val format = DecimalFormat("###,##0")
-                override fun getPointLabel(entry: Entry?): String {
-                    return format.format(entry?.y)
-                }
-            }
-            weatherDataSet.valueFormatter = tempFormatter
-            weatherDataSet.valueTextSize = 14f
-
-            // Assign the data to the chart
-            val lineData = LineData(weatherDataSet, iconDataSet, avgDataSet)
-            chart.data = lineData
-            chart.invalidate()
-
-            mWeatherChartDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-            mWeatherChartDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         }
     }
 
@@ -861,7 +645,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == GPS_REQUEST_CODE_PERMISSIONS && gpsPermissionsGranted()) {
-            getDeviceLocation()
+            getLastForecast()
         } else {
             Toast.makeText(this.requireContext(), "Permissions are required to get localized weather data.", Toast.LENGTH_SHORT).show()
         }
