@@ -16,8 +16,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_check_green_24dp"
+                android:layout_margin="@dimen/medium"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible"
+                tools:src="@drawable/ic_clear_red_24dp"
                 android:visibility="gone"/>
 
             <!-- Update time -->
@@ -27,9 +30,9 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/medium"
                 app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintVertical_bias="0"
+                app:layout_constraintVertical_bias="0.5"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/weather_chart"
+                app:layout_constraintBottom_toTopOf="@id/error_message_tv"
                 app:layout_constraintStart_toEndOf="@id/update_confirmation_image_view"
                 app:layout_constraintEnd_toStartOf="@id/weather_chart_progress"
                 tools:text="Updated: May 18, 2020 2:17 PM" />
@@ -57,6 +60,19 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/weather_chart"/>
 
+            <!-- Error message -->
+            <TextView
+                android:id="@+id/error_message_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/medium"
+                android:textColor="@color/colorRedAccent"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintEnd_toStartOf="@id/sync_weather_data_fab"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/update_time_tv"
+                tools:text="Sync failed: timeout" />
 
             <!-- Weather Chart -->
             <com.github.mikephil.charting.charts.LineChart
@@ -65,42 +81,12 @@
                 android:layout_height="@dimen/weather_chart_size"
                 android:layout_margin="@dimen/medium"
                 android:visibility="invisible"
-                app:layout_constraintTop_toBottomOf="@id/sync_weather_data_fab"
+                app:layout_constraintTop_toBottomOf="@id/error_message_tv"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/sync_weather_data_fab"
-                tools:visibility="visible" />
-
-
-            <!-- Update status -->
-            <!--
-            <TextView
-                android:id="@+id/update_status_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/medium"
-                app:layout_constraintHorizontal_bias="1"
-                android:gravity="end"
-                app:layout_constraintBottom_toTopOf="@id/error_message_tv"
-                app:layout_constraintEnd_toStartOf="@id/sync_weather_data_fab"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/weather_chart"
-                tools:text="update successful " />
--->
-            <!-- Error message -->
-            <TextView
-                android:id="@+id/error_message_tv"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/medium"
-                android:textColor="@color/colorRedAccent"
-                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/weather_chart"
-                tools:text="Sync failed: due to error" />
+                tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

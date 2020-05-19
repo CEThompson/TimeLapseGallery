@@ -391,12 +391,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mWeatherDialog?.setContentView(R.layout.dialog_weather_chart)
         mWeatherDialog?.setOnCancelListener {
             mGalleryViewModel.weatherDialogShowing = false
-
-            // When dialog is dismissed, convert mutable livedata if an update type
-            if (mGalleryViewModel.weather.value is (WeatherResult.UpdateForecast.Success)){
-                if (mLocation!=null)
-                    mGalleryViewModel.getForecast(mLocation!!.latitude.toString(), mLocation!!.longitude.toString())
-            }
         }
 
         /*mWeatherDialog?.findViewById<FloatingActionButton>(R.id.weather_chart_exit_fab)?.setOnClickListener {
@@ -428,13 +422,17 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     private fun showCachedForecast(result: WeatherResult.CachedForecast<ForecastResponse>) {
+        // Handle the check image
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_clear_red_24dp)
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
+
         // Show the time of the forecast
         mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
-                "Updated: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
+                "Cached: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
         mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
         // Show reason for showing forecast that hasn't been updated today
-        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text= "Showing cached data: reason ${result.message}"
+        mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.text= "Showing cached data: ${result.message}"
         mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
 
         // Hide the progress
@@ -442,14 +440,16 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Show the chart
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
     private fun showTodaysForecast(result: WeatherResult.TodaysForecast<ForecastResponse>){
+        // Handle the check image
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_check_green_24dp)
+        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
+
         // Set and show the time the forecast was updated
         mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
-                "Updated: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
+                "Updated Today: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
         mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
         // No error message shown
@@ -458,15 +458,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Show chart and hide loading progress
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
     private fun showUpdateSuccess(result: WeatherResult.UpdateForecast.Success<ForecastResponse>){
         // Bind and show the time of the update
         if (result.timestamp!=null)
             mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.text =
-                "Updated: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
+                "Updated Today: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
         mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
         // Handle the check image
@@ -497,14 +495,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     private fun showWeatherLoading(){
-        // Hide the update time, chart and error message
-        //mWeatherDialog?.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
-        //mWeatherDialog?.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.INVISIBLE
-        //mWeatherDialog?.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
-
         // Show the loading indicator
         mWeatherDialog?.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
-        mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
+        //mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
     private fun showWeatherNoData(result: WeatherResult.NoData){

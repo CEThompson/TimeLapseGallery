@@ -14,13 +14,13 @@ class WeatherLocalDataSource(private val weatherDao: WeatherDao) {
     suspend fun getWeather(): WeatherResult<ForecastResponse> {
         val weatherEntry: WeatherEntry? = weatherDao.getWeather()
 
-        return if (weatherEntry == null) WeatherResult.NoData(null, "No forecast in database")
+        return if (weatherEntry == null) WeatherResult.NoData()
         else {
             val localResponse = Gson().fromJson(weatherEntry.forecast, ForecastResponse::class.java)
             if (DateUtils.isToday(weatherEntry.timestamp)) {
                 WeatherResult.TodaysForecast(localResponse, weatherEntry.timestamp)
             } else {
-                WeatherResult.CachedForecast(localResponse, weatherEntry.timestamp, message = "database forecast not from today")
+                WeatherResult.CachedForecast(localResponse, weatherEntry.timestamp)
             }
         }
     }

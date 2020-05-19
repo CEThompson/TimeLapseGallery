@@ -9,6 +9,7 @@ import com.vwoom.timelapsegallery.weather.WeatherResult
 class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSource,
                         private val weatherRemoteDataSource: WeatherRemoteDataSource) {
 
+    private val message = "Could not retrieve forecast from remote source"
     // This function calls the national weather service API to attempt to update the forecast stored in the database
     // Returns either (1) Weather Result: Update Success or (2) Weather Result: Update Failure
     suspend fun updateForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
@@ -18,8 +19,8 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
             WeatherResult.UpdateForecast.Success(remoteResponse.data, remoteResponse.timestamp)
         }
         else {
-            WeatherResult.UpdateForecast.Failure((remoteResponse as WeatherResult.NoData).exception)
-            //WeatherResult.NoData((remoteResponse as WeatherResult.NoData).exception, "Failed to update forecast")
+            val noDataResponse = remoteResponse as WeatherResult.NoData
+            WeatherResult.UpdateForecast.Failure(noDataResponse.exception, message)
         }
     }
 
@@ -27,7 +28,7 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
     // Also if the forecast is not today's then attempts to update the national weather service api
     // Returns (1) Weather Result: No Data (2) Weather Result: Cached Forecast or (3) Weather Result: Today's Forecast
     suspend fun getForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
-        val databaseForecast = weatherLocalDataSource.getWeather()  // Can be (2) cached or (3) today's forecast
+        val databaseForecast: WeatherResult<ForecastResponse> = weatherLocalDataSource.getWeather()  // Can be (2) cached or (3) today's forecast
 
         if (databaseForecast !is WeatherResult.TodaysForecast){
             val remoteResponse = updateForecast(latitude, longitude)
@@ -37,6 +38,11 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
             }
         }
 
+        if (databaseForecast is WeatherResult.NoData)
+            databaseForecast.message = message
+        else if (databaseForecast is WeatherResult.CachedForecast) {
+            databaseForecast.message = message
+        }
         return databaseForecast
     }
 }

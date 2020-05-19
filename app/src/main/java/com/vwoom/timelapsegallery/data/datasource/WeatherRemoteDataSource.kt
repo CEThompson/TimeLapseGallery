@@ -20,7 +20,7 @@ class WeatherRemoteDataSource {
         try {
             forecastLocationResponse = weatherService.getForecastLocation(latitude, longitude)
         } catch (e: Exception) {
-            return WeatherResult.NoData(e, "Exception Retrieving forecast location")
+            return WeatherResult.NoData(e, "Error retrieving forecast location")
         }
         // If the url did not return then no data can be returned
         if (forecastLocationResponse == null) return WeatherResult.NoData(null, "Error retrieving forecast location")
@@ -33,7 +33,7 @@ class WeatherRemoteDataSource {
             if (forecastResponse != null)
                 WeatherResult.TodaysForecast(forecastResponse, System.currentTimeMillis())
             // Otherwise give back an error
-            else WeatherResult.NoData(null, "Exception retrieving forecast")
+            else WeatherResult.NoData(null, "Error retrieving forecast")
         } catch (e: Exception) {
             WeatherResult.NoData(e)
         }
