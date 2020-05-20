@@ -7,6 +7,8 @@
 
     <color name="colorSubtleAccent">#F1B86E</color>
 
+    <color name="colorWeatherChartLight">#4DFF9100</color>
+
     <color name="colorTag">#03A9F4</color>
 
     <color name="colorYellow">#FFC107</color>
