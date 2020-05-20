@@ -31,7 +31,7 @@ class FilesUtilsDbTest {
     private lateinit var db: TimeLapseDatabase
 
     @Before
-    fun createDb(){
+    fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(context, TimeLapseDatabase::class.java).build()
         externalFilesTestDir = testFolder.newFolder("pictures")
@@ -39,7 +39,7 @@ class FilesUtilsDbTest {
 
     @After
     @Throws(IOException::class)
-    fun closeDb(){
+    fun closeDb() {
         db.close()
     }
 
@@ -66,7 +66,7 @@ class FilesUtilsDbTest {
         // each tag retrieved from the database should be in the list passed to the utility
         val projectTagEntries = runBlocking { db.projectTagDao().getProjectTagsByProjectId(projectEntry.id) }
         assert(projectTagEntries.size == tags.size) // two tags should be retrieved since we fed in two tags
-        for (tag in projectTagEntries){
+        for (tag in projectTagEntries) {
             val currentTag = runBlocking { db.tagDao().getTagById(tag.tag_id) }
             assert(tags.contains(currentTag)) // make the assertions
         }
@@ -117,7 +117,7 @@ class FilesUtilsDbTest {
     }
 
     @Test
-    fun scheduleProject(){
+    fun scheduleProject() {
         // begin with empty directory and database
         externalFilesTestDir.deleteRecursively()
         runBlocking {
@@ -144,10 +144,8 @@ class FilesUtilsDbTest {
         // and the text file exists and represents the interval
         val meta = getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
         val scheduleFile = File(meta, FileUtils.SCHEDULE_TEXT_FILE)
-        assert (scheduleFile.exists())
+        assert(scheduleFile.exists())
         val inputAsString = FileInputStream(scheduleFile).bufferedReader().use { it.readText() }
         assert(inputAsString.toInt() == 7)
-
     }
-
 }
