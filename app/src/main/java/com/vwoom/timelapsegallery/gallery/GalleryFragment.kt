@@ -46,6 +46,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
+// TODO if network disabled show feedback
 // TODO bind different icons for weather types, cloudy, rainy, clear
 // TODO bind wind conditions
 // TODO fix days of week
@@ -225,14 +226,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 true
             }
             R.id.weather_option -> {
-                // TODO if network disabled show feedback
                 if (mWeatherChartDialog == null) {
                     initializeWeatherDialogs()
                     getLastForecast()
                 }
-                /*if (mGalleryViewModel.weather.value !is WeatherResult.TodaysForecast){
-                    getLastForecast()
-                }*/
                 mWeatherChartDialog?.show()
                 mGalleryViewModel.weatherChartDialogShowing = true
                 true
@@ -308,7 +305,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         })
 
         // Observe forecast
-        // TODO handle different states of weather data
         mGalleryViewModel.weather.observe(viewLifecycleOwner, Observer{
             mWeatherChartDialog?.handleWeatherChart(it)
             mWeatherDetailsDialog?.handleWeatherResult(it)
@@ -423,6 +419,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
+    // TODO simplify updateWeatherData and getLastForecast
     private fun updateWeatherData(){
         mGalleryViewModel.weather.value = WeatherResult.Loading
         Log.d(TAG, "getting device location")
