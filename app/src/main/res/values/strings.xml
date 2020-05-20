@@ -280,7 +280,7 @@
     <string name="error_no_forecast_data">No forecast data available</string>
     <string name="cache_time">Cached: %1$s %2$s</string>
     <string name="cache_error">Showing cached data: %1$s</string>
-    <string name="update_time">Updated Today: %1$s %2$s</string>
+    <string name="update_time">Today: %1$s %2$s</string>
     <string name="no_data_error">No data: %1$s</string>
 
 </resources>
