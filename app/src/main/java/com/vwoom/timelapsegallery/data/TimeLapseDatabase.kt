@@ -151,7 +151,7 @@ abstract class TimeLapseDatabase : RoomDatabase() {
 
         // TODO implement migration from 2 to 3
         // TODO test migration from 2 to 3
-        private val MIGRATION_2_3: Migration = object : Migration (2, 3) {
+        val MIGRATION_2_3: Migration = object : Migration (2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS weather " +
                         "(id INTEGER NOT NULL, " +

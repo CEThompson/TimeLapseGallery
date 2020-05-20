@@ -1,9 +1,6 @@
 package com.vwoom.timelapsegallery.data.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 
 @Dao
@@ -15,4 +12,6 @@ interface WeatherDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWeather(weatherEntry: WeatherEntry)
 
+    @Query("DELETE FROM weather")
+    suspend fun deleteWeather()
 }
