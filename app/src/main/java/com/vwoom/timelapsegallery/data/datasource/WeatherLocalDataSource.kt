@@ -25,6 +25,16 @@ class WeatherLocalDataSource(private val weatherDao: WeatherDao) {
         }
     }
 
+    suspend fun getCache(): WeatherResult<ForecastResponse> {
+        val weatherEntry: WeatherEntry? = weatherDao.getWeather()
+
+        return if (weatherEntry == null) WeatherResult.NoData()
+        else {
+            val localResponse = Gson().fromJson(weatherEntry.forecast, ForecastResponse::class.java)
+            WeatherResult.CachedForecast(localResponse, weatherEntry.timestamp)
+        }
+    }
+
     // Saves the forecast as a json string to the database
     suspend fun cacheForecast(forecastResponse: ForecastResponse) {
         val jsonString = Gson().toJson(forecastResponse)

@@ -11,18 +11,6 @@ import com.vwoom.timelapsegallery.R
 
 class WeatherDetailsDialog(context: Context): Dialog(context) {
 
-    fun showWeatherLoading(){
-        // Show the loading indicator
-        this.findViewById<ProgressBar>(R.id.weather_details_progress)?.visibility = View.VISIBLE
-        this.findViewById<RecyclerView>(R.id.weather_recycler_view)?.visibility = View.INVISIBLE
-        //mWeatherDialog?.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
-    }
-
-    fun showWeatherData(){
-        this.findViewById<ProgressBar>(R.id.weather_details_progress)?.visibility = View.INVISIBLE
-        this.findViewById<RecyclerView>(R.id.weather_recycler_view)?.visibility = View.VISIBLE
-    }
-
     private val mWeatherRecyclerView: RecyclerView
     private val mWeatherAdapter: WeatherAdapter
 
@@ -39,6 +27,17 @@ class WeatherDetailsDialog(context: Context): Dialog(context) {
         }
     }
 
+    private fun showWeatherLoading(){
+        // Show the loading indicator
+        this.findViewById<ProgressBar>(R.id.weather_details_progress)?.visibility = View.VISIBLE
+        this.findViewById<RecyclerView>(R.id.weather_recycler_view)?.visibility = View.INVISIBLE
+    }
+
+    private fun showWeatherData(){
+        this.findViewById<ProgressBar>(R.id.weather_details_progress)?.visibility = View.INVISIBLE
+        this.findViewById<RecyclerView>(R.id.weather_recycler_view)?.visibility = View.VISIBLE
+    }
+
     fun handleWeatherResult(result: WeatherResult<ForecastResponse>){
         when (result){
             is WeatherResult.Loading -> this.showWeatherLoading()
@@ -46,27 +45,13 @@ class WeatherDetailsDialog(context: Context): Dialog(context) {
                 mWeatherAdapter.setWeatherData(result.data.properties.periods)
                 showWeatherData()
             }
-            // TODO convert error messages to string resources
             is WeatherResult.NoData -> {
-                // TODO show no data
+                // TODO handle no data state
             }
-            // TODO modify to clearly show that cached data is shown
             is WeatherResult.CachedForecast -> {
                 mWeatherAdapter.setWeatherData(result.data.properties.periods)
                 showWeatherData()
             }
-            is WeatherResult.UpdateForecast.Failure -> {
-                if (result.data != null)
-                    mWeatherAdapter.setWeatherData(result.data.properties.periods)
-                showWeatherData()
-            }
-
-            is WeatherResult.UpdateForecast.Success -> {
-                if (result.data != null)
-                    mWeatherAdapter.setWeatherData(result.data.properties.periods)
-                showWeatherData()
-            }
-
         }
     }
 

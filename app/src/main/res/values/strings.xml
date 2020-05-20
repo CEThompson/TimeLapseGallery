@@ -277,5 +277,6 @@
     <string name="weather">Weather</string>
     <string name="degree">%1$d%2$s</string>
     <string name="show_details">Show Details</string>
+    <string name="error_no_forecast_data">No forecast data available</string>
 
 </resources>
