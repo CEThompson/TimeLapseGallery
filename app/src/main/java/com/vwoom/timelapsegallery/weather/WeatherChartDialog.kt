@@ -24,6 +24,14 @@ class WeatherChartDialog(context: Context): Dialog(context) {
     init {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.dialog_weather_chart)
+
+        // Constrain the size of the chart to 80% of the smallest dimension
+        val dm = context.resources.displayMetrics
+        val width = dm.widthPixels
+        val height = dm.heightPixels
+        val minSize = (width.coerceAtMost(height) * 0.8).toInt()
+        this.findViewById<LineChart>(R.id.weather_chart)?.layoutParams?.height = minSize
+        this.findViewById<LineChart>(R.id.weather_chart)?.layoutParams?.width = minSize
     }
 
     // TODO convert to string resources

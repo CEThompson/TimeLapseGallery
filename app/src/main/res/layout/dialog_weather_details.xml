@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="300dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="@dimen/medium">
@@ -26,7 +26,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/weather_recycler_view"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/weather_details_width_placeholder"
         android:layout_height="match_parent"
         android:contentDescription="@string/cd_weather_recyclerview"
         tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

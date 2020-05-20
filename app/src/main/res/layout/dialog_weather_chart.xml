@@ -80,8 +80,8 @@
             <!-- Weather Chart -->
             <com.github.mikephil.charting.charts.LineChart
                 android:id="@+id/weather_chart"
-                android:layout_width="@dimen/weather_chart_size"
-                android:layout_height="@dimen/weather_chart_size"
+                android:layout_width="@dimen/weather_chart_size_placeholder"
+                android:layout_height="@dimen/weather_chart_size_placeholder"
                 android:layout_margin="@dimen/medium"
                 android:visibility="invisible"
                 app:layout_constraintHorizontal_bias="0.5"

@@ -25,6 +25,14 @@ class WeatherDetailsDialog(context: Context): Dialog(context) {
             setHasFixedSize(false)
             adapter = mWeatherAdapter
         }
+
+        // Constrain the size of the chart to 80% of the smallest dimension
+        val dm = context.resources.displayMetrics
+        val width = dm.widthPixels
+        val height = dm.heightPixels
+        val minSize = (width.coerceAtMost(height) * 0.7).toInt()
+        this.findViewById<RecyclerView>(R.id.weather_recycler_view)?.layoutParams?.width = minSize
+
     }
 
     private fun showWeatherLoading(){
