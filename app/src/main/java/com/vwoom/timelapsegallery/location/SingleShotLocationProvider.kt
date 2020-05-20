@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.weather
+package com.vwoom.timelapsegallery.location
 
 import android.content.Context
 import android.location.Criteria

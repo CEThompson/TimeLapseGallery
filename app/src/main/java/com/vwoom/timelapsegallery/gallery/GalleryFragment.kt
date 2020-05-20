@@ -27,7 +27,6 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.flexbox.FlexboxLayout
@@ -39,6 +38,7 @@ import com.vwoom.timelapsegallery.weather.WeatherResult
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
+import com.vwoom.timelapsegallery.location.SingleShotLocationProvider
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.weather.*
