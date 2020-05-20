@@ -13,6 +13,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/small"
             android:textSize="18sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
             tools:text="Monday" />
 
         <include
