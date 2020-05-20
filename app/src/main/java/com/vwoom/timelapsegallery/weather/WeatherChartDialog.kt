@@ -47,6 +47,8 @@ class WeatherChartDialog(context: Context): Dialog(context) {
 
         // Show the chart
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+
+        this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.VISIBLE
     }
 
     private fun showTodaysForecast(result: WeatherResult.TodaysForecast<ForecastResponse>){
@@ -66,20 +68,25 @@ class WeatherChartDialog(context: Context): Dialog(context) {
         // Show chart and hide loading progress
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+
+        this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.VISIBLE
     }
 
     private fun showWeatherLoading(){
         // Show the loading indicator
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
+        this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.INVISIBLE
     }
 
-    private fun showWeatherNoData(result: WeatherResult.NoData){
+    private fun showWeatherNoData(){
         this.findViewById<TextView>(R.id.update_time_tv)?.text = context.getString(R.string.error_no_forecast_data)
         this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
         this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString(R.string.forecast_error)
+        this.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
+        this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.INVISIBLE
     }
 
     // TODO calculate and show projects due per day
@@ -209,7 +216,7 @@ class WeatherChartDialog(context: Context): Dialog(context) {
                 this.showTodaysForecast(result)
             }
             is WeatherResult.NoData -> {
-                this.showWeatherNoData(result)
+                this.showWeatherNoData()
             }
             is WeatherResult.CachedForecast -> {
                 this.setWeatherChart(result.data)

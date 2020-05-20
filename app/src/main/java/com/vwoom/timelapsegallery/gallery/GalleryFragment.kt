@@ -228,7 +228,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             R.id.weather_option -> {
                 if (mWeatherChartDialog == null) {
                     initializeWeatherDialogs()
-                    getLastForecast()
+                    getForecast()
+                } else if (mGalleryViewModel.weather.value !is WeatherResult.TodaysForecast){
+                    getForecast()
                 }
                 mWeatherChartDialog?.show()
                 mGalleryViewModel.weatherChartDialogShowing = true
@@ -440,7 +442,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
-    private fun getLastForecast(){
+    private fun getForecast(){
         Log.d(TAG, "getting device location")
         if (gpsPermissionsGranted()) {
             Log.d(TAG, "permissions granted: requesting single shot location")
@@ -601,9 +603,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == GPS_REQUEST_CODE_PERMISSIONS && gpsPermissionsGranted()) {
-            getLastForecast()
+            getForecast()
         } else {
             Toast.makeText(this.requireContext(), "Permissions are required to get localized weather data.", Toast.LENGTH_SHORT).show()
+            mGalleryViewModel.weather.value = WeatherResult.NoData()
         }
     }
 
