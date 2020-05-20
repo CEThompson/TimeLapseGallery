@@ -33,12 +33,13 @@ class WeatherChartDialog(context: Context): Dialog(context) {
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
 
         // Show the time of the forecast
-        this.findViewById<TextView>(R.id.update_time_tv)?.text =
-                "Cached: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
+        val date = TimeUtils.getDateFromTimestamp(result.timestamp)
+        val time = TimeUtils.getTimeFromTimestamp(result.timestamp)
+        this.findViewById<TextView>(R.id.update_time_tv)?.text = context.getString(R.string.cache_time, date, time)
         this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
         // Show reason for showing forecast that hasn't been updated today
-        this.findViewById<TextView>(R.id.error_message_tv)?.text= "Showing cached data: ${result.message}"
+        this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString(R.string.cache_error, result.message)
         this.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
 
         // Hide the progress
@@ -54,8 +55,9 @@ class WeatherChartDialog(context: Context): Dialog(context) {
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
 
         // Set and show the time the forecast was updated
-        this.findViewById<TextView>(R.id.update_time_tv)?.text =
-                "Updated Today: ${TimeUtils.getDateFromTimestamp(result.timestamp)} ${TimeUtils.getTimeFromTimestamp(result.timestamp)}"
+        val date = TimeUtils.getDateFromTimestamp(result.timestamp)
+        val time = TimeUtils.getTimeFromTimestamp(result.timestamp)
+        this.findViewById<TextView>(R.id.update_time_tv)?.text = context.getString(R.string.update_time, date, time)
         this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
         // No error message shown
@@ -74,13 +76,13 @@ class WeatherChartDialog(context: Context): Dialog(context) {
     private fun showWeatherNoData(result: WeatherResult.NoData){
         this.findViewById<TextView>(R.id.update_time_tv)?.text = context.getString(R.string.error_no_forecast_data)
         this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
-        this.findViewById<TextView>(R.id.error_message_tv)?.text = "No data: ${result.exception?.localizedMessage}"
+        this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString(R.string.no_data_error, result.message)
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
     }
 
-    // TODO calc projects due per day
+    // TODO calculate and show projects due per day
     private fun setWeatherChart(forecast: ForecastResponse){
         val periods : List<ForecastResponse.Period>? = forecast.properties.periods
         if (periods != null){
