@@ -230,6 +230,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                     initializeWeatherDialogs()
                     getLastForecast()
                 }
+                /*if (mGalleryViewModel.weather.value !is WeatherResult.TodaysForecast){
+                    getLastForecast()
+                }*/
                 mWeatherChartDialog?.show()
                 mGalleryViewModel.weatherChartDialogShowing = true
                 true

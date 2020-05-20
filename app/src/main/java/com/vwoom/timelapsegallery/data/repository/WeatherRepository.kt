@@ -9,7 +9,6 @@ import com.vwoom.timelapsegallery.weather.WeatherResult
 class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSource,
                         private val weatherRemoteDataSource: WeatherRemoteDataSource) {
 
-    private val message = "Could not retrieve forecast from remote source"
     // This function calls the national weather service API to attempt to update the forecast stored in the database
     // Returns either (1) Weather Result: Update Success or (2) Weather Result: Update Failure
     suspend fun updateForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
@@ -44,11 +43,6 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
             }
         }
 
-        if (databaseForecast is WeatherResult.NoData)
-            databaseForecast.message = message
-        else if (databaseForecast is WeatherResult.CachedForecast) {
-            databaseForecast.message = message
-        }
         return databaseForecast
     }
 }
