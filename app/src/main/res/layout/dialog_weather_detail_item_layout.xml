@@ -3,7 +3,7 @@
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/day_layout"
+        android:id="@+id/detail_item_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -35,15 +35,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/small"
-                tools:text="sunny with a chance of rain" />
+                tools:text="Sunny with a chance of rain" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/weather_detail_item_long_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/large"
+            android:textStyle="italic"
+            tools:text="Long description of the weather conditions for a period." />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:layout_gravity="end"
             android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small"
+                android:text="Wind Conditions: " />
 
             <TextView
                 android:id="@+id/wind_direction"

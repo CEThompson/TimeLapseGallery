@@ -2,8 +2,6 @@ package com.vwoom.timelapsegallery.weather
 
 import android.app.Dialog
 import android.content.Context
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.ImageView
@@ -12,13 +10,13 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.utils.TimeUtils
+import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherIcon
 import java.text.DecimalFormat
 import java.util.*
 
@@ -37,7 +35,6 @@ class WeatherChartDialog(context: Context): Dialog(context) {
         this.findViewById<LineChart>(R.id.weather_chart)?.layoutParams?.width = minSize
     }
 
-    // TODO convert to string resources
     private fun showCachedForecast(result: WeatherResult.CachedForecast<ForecastResponse>) {
         // Handle the check image
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_clear_red_24dp)
@@ -119,8 +116,7 @@ class WeatherChartDialog(context: Context): Dialog(context) {
                 weatherEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()))
 
                 // Handle icon per period
-                // TODO adjust icons per weather type, clear, rainy, cloudy, etc.
-                val drawable = getWeatherIcon(periods[i].isDaytime, periods[i].shortForecast)
+                val drawable = getWeatherIcon(this.context, periods[i].isDaytime, periods[i].shortForecast)
 
                 iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()+5f, drawable))
             }
@@ -230,43 +226,5 @@ class WeatherChartDialog(context: Context): Dialog(context) {
             }
 
         }
-    }
-
-    private fun getWeatherIcon(isDay: Boolean, forecastDescription: String): Drawable? {
-        val description = forecastDescription.toLowerCase()
-        val drawableInt: Int = when {
-            // If cloudy or foggy
-            description.contains("cloud") ||
-            description.contains("fog") -> {
-                R.drawable.ic_cloud_black_24dp
-            }
-            // If rain or showers
-            description.contains("rain") ||
-            description.contains("shower") -> {
-                R.drawable.ic_invert_colors_black_24dp
-            }
-            // If snow or ice
-            description.contains("snow") ||
-            description.contains("ice") -> {
-                R.drawable.ic_invert_colors_black_24dp
-            }
-            // Otherwise clear
-            else -> {
-                if (isDay) R.drawable.ic_wb_sunny_black_24dp
-                // TODO handle moon phases here
-                else {
-                    // NEW MOON -> STAR
-                    //R.drawable.ic_star_black_24dp
-                    // WAXING -> Brightness 2
-                    R.drawable.ic_brightness_2_black_24dp
-                    // WANING -> Brightness 1
-                    //R.drawable.ic_brightness_1_black_24dp
-                    // FULL MOON -> Brightness 3
-                    //R.drawable.ic_brightness_3_black_24dp
-                }
-            }
-        }
-
-        return ContextCompat.getDrawable(this.context, drawableInt)
     }
 }

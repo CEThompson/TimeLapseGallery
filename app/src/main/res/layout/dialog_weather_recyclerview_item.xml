@@ -17,11 +17,11 @@
 
         <include
             android:id="@+id/day"
-            layout="@layout/dialog_weather_day_layout" />
+            layout="@layout/dialog_weather_detail_item_layout" />
 
         <include
             android:id="@+id/night"
-            layout="@layout/dialog_weather_night_layout" />
+            layout="@layout/dialog_weather_detail_item_layout" />
 
     </LinearLayout>
 </layout>
