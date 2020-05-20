@@ -247,13 +247,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             initializeSearchDialog()
             mSearchDialog?.show()
         }
+
         if (mGalleryViewModel.weatherChartDialogShowing){
             initializeWeatherDialogs()
-            //getDeviceLocation()
             mWeatherChartDialog?.show()
         }
         if (mGalleryViewModel.weatherDetailsDialogShowing){
-            initializeWeatherDialogs()
+            // Note: since weather details depends upon chart, weather details will always be initialized if the chart is showing
             mWeatherDetailsDialog?.show()
         }
     }
@@ -408,6 +408,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
         mWeatherChartDialog?.findViewById<TextView>(R.id.show_weather_details_tv)?.setOnClickListener {
             if (mWeatherDetailsDialog == null) initializeWeatherDetailsDialog()
+            mGalleryViewModel.weatherDetailsDialogShowing = true
             mWeatherDetailsDialog?.show()
         }
     }
@@ -415,7 +416,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private fun initializeWeatherDetailsDialog(){
         mWeatherDetailsDialog = WeatherDetailsDialog(requireContext())
         mWeatherDetailsDialog?.setOnCancelListener {
-            mGalleryViewModel.weatherChartDialogShowing = false
+            mGalleryViewModel.weatherDetailsDialogShowing = false
         }
         mWeatherDetailsDialog?.findViewById<FloatingActionButton>(R.id.weather_details_dialog_exit_fab)?.setOnClickListener {
             mWeatherDetailsDialog?.cancel()
