@@ -2,10 +2,16 @@ package com.vwoom.timelapsegallery.weather
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.vwoom.timelapsegallery.R
+import java.text.SimpleDateFormat
+import java.util.*
 
 object WeatherUtils {
+
+    private val TAG = WeatherUtils::class.simpleName
+
     fun getWeatherIcon(context: Context, isDay: Boolean, forecastDescription: String): Drawable? {
         val description = forecastDescription.toLowerCase()
         val drawableInt: Int = when {
@@ -40,7 +46,20 @@ object WeatherUtils {
                 }
             }
         }
-
         return ContextCompat.getDrawable(context, drawableInt)
     }
+
+    fun getTimestampFromPeriod(period: ForecastResponse.Period): Long? {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return try {
+            val dateString = period.startTime.split("T")[0]
+            val date = dateFormat.parse(dateString)
+            date?.time
+        } catch (e: Exception) {
+            Log.d(TAG, "Error getting timestamp from period: ${e.message}")
+            null
+        }
+    }
+
+
 }

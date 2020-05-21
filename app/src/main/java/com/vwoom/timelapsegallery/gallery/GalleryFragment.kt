@@ -47,8 +47,6 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 // TODO if network disabled show feedback
-// TODO bind different icons for weather types, cloudy, rainy, clear
-// TODO bind wind conditions
 // TODO fix days of week
 // TODO show the number of projects due per day during the week
 // TODO: create gifs or mp4s from photo sets

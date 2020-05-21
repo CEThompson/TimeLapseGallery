@@ -16,11 +16,12 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.utils.TimeUtils
+import com.vwoom.timelapsegallery.weather.WeatherUtils.getTimestampFromPeriod
 import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherIcon
 import java.text.DecimalFormat
 import java.util.*
 
-class WeatherChartDialog(context: Context): Dialog(context) {
+class WeatherChartDialog(context: Context) : Dialog(context) {
 
     init {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -59,7 +60,7 @@ class WeatherChartDialog(context: Context): Dialog(context) {
         this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.VISIBLE
     }
 
-    private fun showTodaysForecast(result: WeatherResult.TodaysForecast<ForecastResponse>){
+    private fun showTodaysForecast(result: WeatherResult.TodaysForecast<ForecastResponse>) {
         // Handle the check image
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.setImageResource(R.drawable.ic_check_green_24dp)
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.VISIBLE
@@ -80,13 +81,13 @@ class WeatherChartDialog(context: Context): Dialog(context) {
         this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.VISIBLE
     }
 
-    private fun showWeatherLoading(){
+    private fun showWeatherLoading() {
         // Show the loading indicator
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
         this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.INVISIBLE
     }
 
-    private fun showWeatherNoData(){
+    private fun showWeatherNoData() {
         this.findViewById<TextView>(R.id.update_time_tv)?.text = context.getString(R.string.error_no_forecast_data)
         this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
         this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString(R.string.forecast_error)
@@ -98,58 +99,57 @@ class WeatherChartDialog(context: Context): Dialog(context) {
     }
 
     // TODO calculate and show projects due per day
-    private fun setWeatherChart(forecast: ForecastResponse){
-        val periods : List<ForecastResponse.Period>? = forecast.properties.periods
-        if (periods != null){
+    private fun setWeatherChart(forecast: ForecastResponse) {
+        val periods: List<ForecastResponse.Period>? = forecast.properties.periods
+        if (periods != null) {
 
             val chart = this.findViewById<LineChart>(R.id.weather_chart) ?: return
 
-            //periods = periods.subList(1,periods.size-1)
             // Set the entries for the chart
             val weatherEntries: ArrayList<Entry> = arrayListOf()
             val averages: ArrayList<Entry> = arrayListOf()
-            val iconEntries : ArrayList<Entry> = arrayListOf()
+            val iconEntries: ArrayList<Entry> = arrayListOf()
             val axisLabels: ArrayList<String> = arrayListOf()
 
             // Set the weather and icons
             for (i in periods.indices) {
                 weatherEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()))
-
                 // Handle icon per period
                 val drawable = getWeatherIcon(this.context, periods[i].isDaytime, periods[i].shortForecast)
-
-                iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()+5f, drawable))
+                iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat() + 5f, drawable))
             }
 
             // Handle averages
             val start = if (periods[0].isDaytime) 0 else 1
-            for (i in start until periods.size-1 step 2){
+            for (i in start until periods.size - 1 step 2) {
                 //if ( (i+1) !in periods.indices) break
-                val avg = (periods[i].temperature.toFloat() + periods[i+1].temperature.toFloat()) / 2f
-                averages.add(Entry((i.toFloat()+(i+1).toFloat())/2f, avg))
+                val avg = (periods[i].temperature.toFloat() + periods[i + 1].temperature.toFloat()) / 2f
+                averages.add(Entry((i.toFloat() + (i + 1).toFloat()) / 2f, avg))
             }
             if (start == 1) {
                 val first = (periods[0].temperature.toFloat() + periods[1].temperature.toFloat()) / 2f
                 val entry = Entry(0.5f, first)
-                //val entry = Entry(0.5f, averages[0].y)
-                averages.add(0,entry)
+                averages.add(0, entry)
 
-                val last = (periods[periods.size-1].temperature.toFloat() + periods[periods.size-2].temperature.toFloat()) / 2f
-                val lastEntry = Entry(((periods.size-1 + periods.size-2).toFloat() / 2f), last)
-                //val lastEntry = Entry(((periods.size-1 + periods.size-2).toFloat() / 2f), averages.last().y)
+                val last = (periods[periods.size - 1].temperature.toFloat() + periods[periods.size - 2].temperature.toFloat()) / 2f
+                val lastEntry = Entry(((periods.size - 1 + periods.size - 2).toFloat() / 2f), last)
                 averages.add(lastEntry)
             }
 
-            // Handle labels
-            for (i in 0 until periods.size-1 step 1){
-                // TODO: get day of period and convert to string
-                axisLabels.add(periods[i].name.substring(0,3).toUpperCase(Locale.getDefault()))
+            // Get the day from the period and add it as the label
+            for (i in 0 until periods.size - 1 step 1) {
+                val timestamp: Long? = getTimestampFromPeriod(periods[i])
+                if (timestamp == null) {
+                    axisLabels.add(((i / 2) + 1).toString()) // Fallback day number
+                } else {
+                    val day = TimeUtils.getDayFromTimestamp(timestamp)
+                    axisLabels.add(day.substring(0, 3).toUpperCase(Locale.getDefault()))
+                }
             }
 
             // Set axis info
-            val valueFormatter = object: ValueFormatter(){
+            val valueFormatter = object : ValueFormatter() {
                 override fun getAxisLabel(value: Float, axis: AxisBase?): String {
-                    //return axisLabels[value.toInt()]
                     return if (value.toInt() < axisLabels.size)
                         axisLabels[value.toInt()]
                     else ""
@@ -181,7 +181,7 @@ class WeatherChartDialog(context: Context): Dialog(context) {
             iconDataSet.setDrawIcons(true)
             iconDataSet.setDrawCircles(false)
             iconDataSet.setDrawValues(false)
-            iconDataSet.enableDashedLine(0f,1f,0f)
+            iconDataSet.enableDashedLine(0f, 1f, 0f)
             iconDataSet.color = ContextCompat.getColor(this.context, R.color.black)
 
             // Style the dataSet
@@ -191,7 +191,7 @@ class WeatherChartDialog(context: Context): Dialog(context) {
             weatherDataSet.cubicIntensity = .2f
             weatherDataSet.color = ContextCompat.getColor(this.context, R.color.colorWeatherChartLight)
 
-            val tempFormatter = object: ValueFormatter() {
+            val tempFormatter = object : ValueFormatter() {
                 private val format = DecimalFormat("###,##0")
                 override fun getPointLabel(entry: Entry?): String {
                     return format.format(entry?.y)
@@ -210,8 +210,8 @@ class WeatherChartDialog(context: Context): Dialog(context) {
         }
     }
 
-    fun handleWeatherChart(result: WeatherResult<ForecastResponse>){
-        when (result){
+    fun handleWeatherChart(result: WeatherResult<ForecastResponse>) {
+        when (result) {
             is WeatherResult.Loading -> this.showWeatherLoading()
             is WeatherResult.TodaysForecast -> {
                 this.setWeatherChart(result.data)
