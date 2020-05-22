@@ -15,7 +15,10 @@ import android.transition.TransitionInflater
 import android.util.Log
 import android.view.*
 import android.view.animation.AlphaAnimation
-import android.widget.*
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -34,24 +37,26 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.weather.WeatherResult
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.location.SingleShotLocationProvider
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
-import com.vwoom.timelapsegallery.weather.*
+import com.vwoom.timelapsegallery.weather.WeatherChartDialog
+import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
+import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
 // TODO if network disabled show feedback
-// TODO fix days of week
+
 // TODO show the number of projects due per day during the week
 // TODO: create gifs or mp4s from photo sets
-// TODO: remove all instances of non-null assertion !!
-// TODO: increase test coverage, viewmodels? livedata?
+// TODO: increase test coverage
+
+// TODO: optimize getting the device location for forecasts
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
@@ -143,11 +148,14 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val schedulesDisplayed = preferences.getBoolean(getString(R.string.key_schedule_display), true)
 
-        // TODO handle external files drive failure
         // Set up the adapter for the recycler view
-        val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        mGalleryAdapter = GalleryAdapter(this, externalFilesDir!!, schedulesDisplayed)
-
+        try {
+            val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
+            mGalleryAdapter = GalleryAdapter(this, externalFilesDir, schedulesDisplayed)
+        } catch (e: KotlinNullPointerException){
+            // TODO: set up analytics to track external files drive failure
+            Toast.makeText(requireContext(), "Error retrieving the files directory for the project.", Toast.LENGTH_LONG).show()
+        }
         // Set up the recycler view
         mGridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
         mGalleryRecyclerView = binding?.galleryRecyclerView
@@ -227,7 +235,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 if (mWeatherChartDialog == null) {
                     initializeWeatherDialogs()
                     getForecast()
-                } else if (mGalleryViewModel.weather.value !is WeatherResult.TodaysForecast){
+                } else if (mGalleryViewModel.weather.value !is WeatherResult.TodaysForecast) {
                     getForecast()
                 }
                 mWeatherChartDialog?.show()
@@ -245,11 +253,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mSearchDialog?.show()
         }
 
-        if (mGalleryViewModel.weatherChartDialogShowing){
+        if (mGalleryViewModel.weatherChartDialogShowing) {
             initializeWeatherDialogs()
             mWeatherChartDialog?.show()
         }
-        if (mGalleryViewModel.weatherDetailsDialogShowing){
+        if (mGalleryViewModel.weatherDetailsDialogShowing) {
             // Note: since weather details depends upon chart, weather details will always be initialized if the chart is showing
             mWeatherDetailsDialog?.show()
         }
@@ -305,7 +313,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         })
 
         // Observe forecast
-        mGalleryViewModel.weather.observe(viewLifecycleOwner, Observer{
+        mGalleryViewModel.weather.observe(viewLifecycleOwner, Observer {
             mWeatherChartDialog?.handleWeatherChart(it)
             mWeatherDetailsDialog?.handleWeatherResult(it)
         })
@@ -386,7 +394,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         updateSearchDialog()
     }
 
-    private fun initializeWeatherDialogs(){
+    private fun initializeWeatherDialogs() {
         initializeWeatherChartDialog()
         initializeWeatherDetailsDialog()
         if (mGalleryViewModel.weather.value != null) {
@@ -394,6 +402,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mWeatherDetailsDialog?.handleWeatherResult(mGalleryViewModel.weather.value!!)
         }
     }
+
     private fun initializeWeatherChartDialog() {
         mWeatherChartDialog = WeatherChartDialog(requireContext())
         mWeatherChartDialog?.setOnCancelListener {
@@ -410,7 +419,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     // TODO: debug weather dialog persisting after onpause when exit fab is clicked
-    private fun initializeWeatherDetailsDialog(){
+    private fun initializeWeatherDetailsDialog() {
         mWeatherDetailsDialog = WeatherDetailsDialog(requireContext())
         mWeatherDetailsDialog?.setOnCancelListener {
             mGalleryViewModel.weatherDetailsDialogShowing = false
@@ -421,7 +430,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     // TODO simplify updateWeatherData and getLastForecast
-    private fun updateWeatherData(){
+    private fun updateWeatherData() {
         mGalleryViewModel.weather.value = WeatherResult.Loading
         Log.d(TAG, "getting device location")
         if (gpsPermissionsGranted()) {
@@ -441,7 +450,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
-    private fun getForecast(){
+    private fun getForecast() {
         Log.d(TAG, "getting device location")
         if (gpsPermissionsGranted()) {
             Log.d(TAG, "permissions granted: requesting single shot location")
