@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.gallery
 
+import android.location.Location
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -55,17 +56,17 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     }
 
     // Retrieves today's forecast or a cached forecast if unable to query
-    fun getForecast(latitude: String, longitude: String) {
+    fun getForecast(location: Location?) {
         //Log.d(TAG, "getting forecast in view model")
         viewModelScope.launch {
-            weather.value = weatherRepository.getForecast(latitude, longitude)
+            weather.value = weatherRepository.getForecast(location)
         }
     }
 
     // Attempts to force update the forecast
-    fun updateForecast(latitude: String, longitude: String) {
+    fun updateForecast(location: Location) {
         viewModelScope.launch {
-            weather.value = weatherRepository.updateForecast(latitude, longitude)
+            weather.value = weatherRepository.updateForecast(location)
         }
     }
 

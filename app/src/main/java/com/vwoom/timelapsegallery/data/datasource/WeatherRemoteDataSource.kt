@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.data.datasource
 
+import android.location.Location
 import com.vwoom.timelapsegallery.weather.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -14,11 +15,13 @@ class WeatherRemoteDataSource {
 
     // Get the forecast from the national weather service api
     // Returns either (1) Weather Result: No Data or (2) Weather Result: Today's Forecast
-    suspend fun getForecast(latitude: String, longitude: String): WeatherResult<ForecastResponse> {
+    suspend fun getForecast(location: Location): WeatherResult<ForecastResponse> {
         // 1. Get the url to query the forecast for this devices location
         val forecastLocationResponse: ForecastLocationResponse?
         try {
-            forecastLocationResponse = weatherService.getForecastLocation(latitude, longitude)
+            forecastLocationResponse = weatherService.getForecastLocation(
+                    location.latitude.toString(),
+                    location.longitude.toString())
         } catch (e: Exception) {
             return WeatherResult.NoData(e, "Error retrieving forecast location")
         }

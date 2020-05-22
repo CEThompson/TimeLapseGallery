@@ -281,5 +281,8 @@
     <string name="cache_time">Cached: %1$s %2$s</string>
     <string name="forecast_error">Could not retrieve forecast from remote source</string>
     <string name="update_time">Today: %1$s %2$s</string>
+    <string name="no_location_error">Unable to sync: no location available</string>
+    <string name="permissions_required_for_forecast">Permissions required to get localized forecast.</string>
+    <string name="error_retrieving_files_dir">Error retrieving the files directory for the project.</string>
 
 </resources>

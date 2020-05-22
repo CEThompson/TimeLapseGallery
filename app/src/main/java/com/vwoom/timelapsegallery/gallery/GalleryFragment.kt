@@ -154,7 +154,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mGalleryAdapter = GalleryAdapter(this, externalFilesDir, schedulesDisplayed)
         } catch (e: KotlinNullPointerException){
             // TODO: set up analytics to track external files drive failure
-            Toast.makeText(requireContext(), "Error retrieving the files directory for the project.", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), getString(R.string.error_retrieving_files_dir), Toast.LENGTH_LONG).show()
         }
         // Set up the recycler view
         mGridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
@@ -234,9 +234,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             R.id.weather_option -> {
                 if (mWeatherChartDialog == null) {
                     initializeWeatherDialogs()
-                    getForecast()
+                    //getForecast()
+                    executeWithLocation { mGalleryViewModel.getForecast(mLocation) }
                 } else if (mGalleryViewModel.weather.value !is WeatherResult.TodaysForecast) {
-                    getForecast()
+                    //getForecast()
+                    executeWithLocation { mGalleryViewModel.getForecast(mLocation) }
                 }
                 mWeatherChartDialog?.show()
                 mGalleryViewModel.weatherChartDialogShowing = true
@@ -409,7 +411,16 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mGalleryViewModel.weatherChartDialogShowing = false
         }
         mWeatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
-            updateWeatherData()
+            //updateWeatherData()
+            mGalleryViewModel.weather.value = WeatherResult.Loading
+            executeWithLocation {
+                try {
+                    mGalleryViewModel.updateForecast(mLocation!!)
+                } catch (e: KotlinNullPointerException) {
+                    mGalleryViewModel.getForecast(null)
+                    Toast.makeText(requireContext(), getString(R.string.no_location_error), Toast.LENGTH_SHORT).show()
+                }
+            }
         }
         mWeatherChartDialog?.findViewById<TextView>(R.id.show_weather_details_tv)?.setOnClickListener {
             if (mWeatherDetailsDialog == null) initializeWeatherDetailsDialog()
@@ -429,42 +440,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
-    // TODO simplify updateWeatherData and getLastForecast
-    private fun updateWeatherData() {
-        mGalleryViewModel.weather.value = WeatherResult.Loading
-        Log.d(TAG, "getting device location")
+    private fun executeWithLocation(toExecute: () -> Unit){
         if (gpsPermissionsGranted()) {
-            Log.d(TAG, "permissions granted: requesting single shot location")
-
             SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
                 override fun onNewLocationAvailable(location: Location?) {
                     mLocation = location
-                    mGalleryViewModel.updateForecast(
-                            location?.latitude.toString(),
-                            location?.longitude.toString())
+                    toExecute.invoke()
                 }
             })
         } else {
-            Log.d(TAG, "permissions not granted")
-            requestPermissions(GPS_PERMISSIONS, GPS_REQUEST_CODE_PERMISSIONS)
-        }
-    }
-
-    private fun getForecast() {
-        Log.d(TAG, "getting device location")
-        if (gpsPermissionsGranted()) {
-            Log.d(TAG, "permissions granted: requesting single shot location")
-
-            SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
-                override fun onNewLocationAvailable(location: Location?) {
-                    mLocation = location
-                    mGalleryViewModel.getForecast(
-                            location?.latitude.toString(),
-                            location?.longitude.toString())
-                }
-            })
-        } else {
-            Log.d(TAG, "permissions not granted")
             requestPermissions(GPS_PERMISSIONS, GPS_REQUEST_CODE_PERMISSIONS)
         }
     }
@@ -611,9 +595,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == GPS_REQUEST_CODE_PERMISSIONS && gpsPermissionsGranted()) {
-            getForecast()
+            //getForecast()
+            executeWithLocation { mGalleryViewModel.getForecast(mLocation) }
         } else {
-            Toast.makeText(this.requireContext(), "Permissions are required to get localized weather data.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this.requireContext(), getString(R.string.permissions_required_for_forecast), Toast.LENGTH_SHORT).show()
             mGalleryViewModel.weather.value = WeatherResult.NoData()
         }
     }
