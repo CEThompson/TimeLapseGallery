@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.DialogWeatherRecyclerviewItemBinding
+import com.vwoom.timelapsegallery.weather.WeatherUtils.getTimestampFromPeriod
 import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherIcon
 
 
@@ -47,7 +48,10 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewH
             holder.binding.night.windSpeed.text = night.windSpeed
             holder.binding.night.description.text = night.shortForecast
             // Set the icon
-            holder.binding.night.icon.setImageDrawable(getWeatherIcon(holder.itemView.context, false, night.shortForecast))
+            holder.binding.night.icon.setImageDrawable(
+                    getWeatherIcon(holder.itemView.context,
+                            false, night.shortForecast,
+                            getTimestampFromPeriod(night)))
 
             // Show the layout
             holder.binding.night.detailItemLayout.visibility = View.VISIBLE
@@ -64,7 +68,8 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewH
             holder.binding.day.windSpeed.text = day.windSpeed
             holder.binding.day.description.text = day.shortForecast
             // Set the icon
-            holder.binding.day.icon.setImageDrawable(getWeatherIcon(holder.itemView.context, true, day.shortForecast))
+            holder.binding.day.icon.setImageDrawable(
+                    getWeatherIcon(holder.itemView.context, true, day.shortForecast, getTimestampFromPeriod(day)))
 
             // Show the layout
             holder.binding.day.detailItemLayout.visibility = View.VISIBLE

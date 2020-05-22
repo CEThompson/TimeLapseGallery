@@ -115,7 +115,11 @@ class WeatherChartDialog(context: Context) : Dialog(context) {
             for (i in periods.indices) {
                 weatherEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()))
                 // Handle icon per period
-                val drawable = getWeatherIcon(this.context, periods[i].isDaytime, periods[i].shortForecast)
+                val drawable = getWeatherIcon(
+                        this.context,
+                        periods[i].isDaytime,
+                        periods[i].shortForecast,
+                        getTimestampFromPeriod(periods[i]))
                 iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat() + 5f, drawable))
             }
 

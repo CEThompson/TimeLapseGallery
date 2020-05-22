@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.weather.MoonPhaseCalculator.getMoonPhaseFromTimestamp
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -12,7 +13,8 @@ object WeatherUtils {
 
     private val TAG = WeatherUtils::class.simpleName
 
-    fun getWeatherIcon(context: Context, isDay: Boolean, forecastDescription: String): Drawable? {
+    // Returns a weather icon from a forecast period description
+    fun getWeatherIcon(context: Context, isDay: Boolean, forecastDescription: String, timestamp: Long?): Drawable? {
         val description = forecastDescription.toLowerCase()
         val drawableInt: Int = when {
             // If cloudy or foggy
@@ -34,22 +36,25 @@ object WeatherUtils {
             else -> {
                 if (isDay) R.drawable.ic_wb_sunny_black_24dp
                 // TODO handle moon phases
+                // If night AND its clear show full moons, new moons, or intermediate state
                 else {
-                    // NEW MOON -> STAR
-                    //R.drawable.ic_star_black_24dp
-                    // WAXING -> Brightness 2
-                    R.drawable.ic_brightness_2_black_24dp
-                    // WANING -> Brightness 1
-                    //R.drawable.ic_brightness_1_black_24dp
-                    // FULL MOON -> Brightness 3
-                    //R.drawable.ic_brightness_3_black_24dp
+                    if (timestamp == null) R.drawable.ic_brightness_2_black_24dp
+                    else when (getMoonPhaseFromTimestamp(timestamp)){
+                        NEW_MOON -> R.drawable.ic_star_black_24dp
+                        FULL_MOON -> R.drawable.ic_brightness_1_black_24dp
+                        //WAXING -> R.drawable.ic_brightness_2_black_24dp
+                        //WANING -> R.drawable.ic_brightness_3_black_24dp
+                        else -> R.drawable.ic_brightness_2_black_24dp
+                    }
                 }
             }
         }
         return ContextCompat.getDrawable(context, drawableInt)
     }
 
-    fun getTimestampFromPeriod(period: ForecastResponse.Period): Long? {
+    // Returns a timestamp from a forecast response period start time string
+    fun getTimestampFromPeriod(period: ForecastResponse.Period?): Long? {
+        if (period == null) return null
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return try {
             val dateString = period.startTime.split("T")[0]
@@ -61,5 +66,5 @@ object WeatherUtils {
         }
     }
 
-
 }
+
