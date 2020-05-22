@@ -29,26 +29,31 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
                                             private val weatherRepository: WeatherRepository) : ViewModel() {
     // Live Data
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
-    val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
-    val weather = MutableLiveData<WeatherResult<ForecastResponse>>()
 
-    init {
-        weather.value = WeatherResult.Loading
-    }
+    // The displayed projects
+    var displayedProjectViews = MutableLiveData(emptyList<ProjectView>())
+    val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
+    val weather = MutableLiveData<WeatherResult<ForecastResponse>>(WeatherResult.Loading)
+    val search = MutableLiveData(false)
 
     // Inputted search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
     var searchName: String = ""
     var searchType: String = SEARCH_TYPE_NONE
 
-    // The resulting projects
-    var displayedProjectViews: List<ProjectView> = listOf()
-
-    // State of user interaction
+    // State of showing dialogs
     var searchDialogShowing = false
     var weatherChartDialogShowing = false
     var weatherDetailsDialogShowing = false
+
+    // For use when search launched from notification
     var userClickedToStopSearch = false
+
+    fun userIsSearching(): Boolean {
+        return searchTags.isNotEmpty()
+                || searchType != SEARCH_TYPE_NONE
+                || !searchName.isBlank()
+    }
 
     // Returns whether or not a tag was selected by the user
     fun tagSelected(tag: TagEntry): Boolean {

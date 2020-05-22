@@ -77,7 +77,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mSearchActiveFAB: FloatingActionButton? = null
 
     // Searching
-    private var mSearchDialog: Dialog? = null
+    private var mSearchDialog: SearchDialog? = null
     private var searchJob: Job? = null
 
     // Weather
@@ -167,8 +167,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // TODO: (update 1.2) re-evaluate transition after taking pictures of a project, filtered projects do not update immediately
-        if (mGalleryViewModel.displayedProjectViews.isNotEmpty())
-            mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjectViews)
+
+        /*if (mGalleryViewModel.displayedProjectViews.value?.isNotEmpty())
+            mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjectViews)*/
 
         mGalleryRecyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -196,7 +197,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mSearchActiveFAB = binding?.searchActiveIndicator
         mSearchActiveFAB?.setOnClickListener {
             mGalleryViewModel.userClickedToStopSearch = true
-            clearSearch()
+            //mGalleryViewModel.clearSearch()
+            mSearchDialog?.clearSearch()
         }
 
         setupViewModel()
@@ -207,8 +209,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // Hide or show search cancel fab depending upon whether or not the user is searching
-        if (!userIsNotSearching()) mSearchActiveFAB?.show()
-        else mSearchActiveFAB?.hide()
+        /*if (!userIsNotSearching()) mSearchActiveFAB?.show()
+        else mSearchActiveFAB?.hide()*/
 
         return binding?.root
     }
@@ -298,21 +300,28 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             // If the size of the current list is larger a project has been added
             val projectHasBeenAdded = (mPrevProjectsSize != null && mPrevProjectsSize!! < currentProjects.size)
             if (projectHasBeenAdded) {
-                mGalleryRecyclerView?.scrollToPosition(mGalleryViewModel.displayedProjectViews.size)
+                if (mGalleryViewModel.displayedProjectViews.value != null) {
+                    val size = mGalleryViewModel.displayedProjectViews.value!!.size
+                    mGalleryRecyclerView?.scrollToPosition(size)
+                }
             }
             // Keep track of number of projects
             mPrevProjectsSize = currentProjects.size
 
             // Update the displayed projects in the gallery
             mGalleryViewModel.viewModelScope.launch {
-                mGalleryViewModel.displayedProjectViews = mGalleryViewModel.filterProjects()
-                mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjectViews)
+                mGalleryViewModel.displayedProjectViews.value = mGalleryViewModel.filterProjects()
+                //mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjectViews.value)
             }
+        })
+
+        mGalleryViewModel.displayedProjectViews.observe(viewLifecycleOwner, Observer {
+            mGalleryAdapter?.setProjectData(it)
         })
 
         // Watch the tags to update the search dialog
         mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer {
-            updateSearchDialog()
+            mSearchDialog?.updateSearchDialog()
         })
 
         // Observe forecast
@@ -320,75 +329,22 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             mWeatherChartDialog?.handleWeatherChart(it)
             mWeatherDetailsDialog?.handleWeatherResult(it)
         })
+
+        mGalleryViewModel.search.observe(viewLifecycleOwner, Observer {
+            if (it){
+                mSearchActiveFAB?.show()
+            } else {
+                mSearchActiveFAB?.hide()
+            }
+        })
     }
 
     /**
      * Search Dialog methods
      */
     private fun initializeSearchDialog() {
-        mSearchDialog = Dialog(requireContext())
-        mSearchDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        mSearchDialog?.setContentView(R.layout.dialog_search)
+        mSearchDialog = SearchDialog(requireContext(), mGalleryViewModel)
         mSearchDialog?.setOnCancelListener { mGalleryViewModel.searchDialogShowing = false }
-
-        val searchEditText = mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)
-
-        val exitFab = mSearchDialog?.findViewById<FloatingActionButton>(R.id.search_dialog_exit_fab)
-        val okDismiss = mSearchDialog?.findViewById<TextView>(R.id.search_dialog_dismiss)
-        exitFab?.setOnClickListener { mSearchDialog?.cancel() }
-        okDismiss?.setOnClickListener { mSearchDialog?.cancel() }
-
-        val dueTodayCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_today_checkbox)
-        val dueTomorrowCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_tomorrow_checkbox)
-        val pendingCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_pending_checkbox)
-        val scheduledCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)
-        val unscheduledCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)
-
-        searchEditText?.setText(mGalleryViewModel.searchName)   // recover current search term
-
-        searchEditText?.addTextChangedListener {
-            val searchName = it.toString().trim()
-            mGalleryViewModel.searchName = searchName
-            updateSearchFilter()
-        }
-
-        // Handle search selection of scheduled / unscheduled projects
-        dueTodayCheckBox?.setOnClickListener {
-            val checked = (it as CheckBox).isChecked
-            if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_DUE_TODAY
-            else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-            updateSearchDialogCheckboxes()
-            updateSearchFilter()
-        }
-        dueTomorrowCheckBox?.setOnClickListener {
-            val checked = (it as CheckBox).isChecked
-            if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_DUE_TOMORROW
-            else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-            updateSearchDialogCheckboxes()
-            updateSearchFilter()
-        }
-        pendingCheckBox?.setOnClickListener {
-            val checked = (it as CheckBox).isChecked
-            if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_PENDING
-            else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-            updateSearchDialogCheckboxes()
-            updateSearchFilter()
-        }
-        scheduledCheckBox?.setOnClickListener {
-            val checked = (it as CheckBox).isChecked
-            if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_SCHEDULED
-            else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-            updateSearchDialogCheckboxes()
-            updateSearchFilter()
-        }
-        unscheduledCheckBox?.setOnClickListener {
-            val checked = (it as CheckBox).isChecked
-            if (checked) mGalleryViewModel.searchType = SEARCH_TYPE_UNSCHEDULED
-            else mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-            updateSearchDialogCheckboxes()
-            updateSearchFilter()
-        }
-        updateSearchDialog()
     }
 
     private fun initializeWeatherChartDialog() {
@@ -441,99 +397,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         } else {
             requestPermissions(GPS_PERMISSIONS, GPS_REQUEST_CODE_PERMISSIONS)
         }
-    }
-
-    private fun updateSearchFilter() {
-        searchJob?.cancel()
-        searchJob = mGalleryViewModel.viewModelScope.launch {
-            mGalleryViewModel.displayedProjectViews = mGalleryViewModel.filterProjects()
-            mGalleryAdapter?.setProjectData(mGalleryViewModel.displayedProjectViews)
-            // show search fab if actively searching
-            if (userIsNotSearching())
-                mSearchActiveFAB?.hide()
-            else
-                mSearchActiveFAB?.show()
-        }
-    }
-
-    private fun userIsNotSearching(): Boolean {
-        return mGalleryViewModel.searchTags.isEmpty()
-                && mGalleryViewModel.searchType == SEARCH_TYPE_NONE
-                && mGalleryViewModel.searchName.isBlank()
-    }
-
-    // Updates the dialog with all tags in the database for filtration
-    // And updates the state of the checkboxes in the dialog
-    private fun updateSearchDialog() {
-        if (mSearchDialog == null) return
-
-        // 1. Update the name edit text
-        mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)?.setText(mGalleryViewModel.searchName)
-
-        // 2. Update tag state
-        updateSearchDialogTags()
-
-        // 3. Update the the checkboxes
-        updateSearchDialogCheckboxes()
-    }
-
-    // This sets the tags
-    private fun updateSearchDialogTags() {
-        var tags: List<TagEntry> = listOf()
-        if (mGalleryViewModel.tags.value != null) {
-            tags = mGalleryViewModel.tags.value!!.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
-        }
-        // Clear the tag layout
-        val tagLayout = mSearchDialog?.findViewById<FlexboxLayout>(R.id.dialog_search_tags_layout)
-        val emptyListIndicator = mSearchDialog?.findViewById<TextView>(R.id.empty_tags_label)
-        tagLayout?.removeAllViews()
-        // Show no tag indicator
-        if (tags.isEmpty()) {
-            emptyListIndicator?.visibility = View.VISIBLE
-            tagLayout?.visibility = View.GONE
-        } else {
-            tagLayout?.visibility = View.VISIBLE
-            emptyListIndicator?.visibility = View.GONE
-        }
-        // Create the tag views
-        for (tag in tags) {
-            val tagCheckBox = CheckBox(requireContext())
-            tagCheckBox.text = getString(R.string.hashtag, tag.text)
-            tagCheckBox.setTypeface(null, Typeface.ITALIC)
-            tagCheckBox.alpha = .8f
-            tagCheckBox.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
-            tagCheckBox.isChecked = mGalleryViewModel.tagSelected(tag)
-            tagCheckBox.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) mGalleryViewModel.searchTags.add(tag)
-                else mGalleryViewModel.searchTags.remove(tag)
-                updateSearchFilter()
-            }
-            tagLayout?.addView(tagCheckBox)
-        }
-    }
-
-    // This sets the checkboxes
-    private fun updateSearchDialogCheckboxes() {
-        // Update the state of search by schedule layout
-        val dueTodayCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_today_checkbox)
-        val dueTomorrowCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_tomorrow_checkbox)
-        val pendingCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_pending_checkbox)
-        val scheduledCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_scheduled_checkbox)
-        val unscheduledCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)
-        dueTodayCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_DUE_TODAY
-        dueTomorrowCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_DUE_TOMORROW
-        pendingCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_PENDING
-        scheduledCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_SCHEDULED
-        unscheduledCheckBox?.isChecked = mGalleryViewModel.searchType == SEARCH_TYPE_UNSCHEDULED
-    }
-
-    // Resets the search parameters and updates the UI
-    private fun clearSearch() {
-        mGalleryViewModel.searchName = ""
-        mGalleryViewModel.searchTags.clear()
-        mGalleryViewModel.searchType = SEARCH_TYPE_NONE
-        updateSearchFilter()
-        updateSearchDialog()
     }
 
     /**
