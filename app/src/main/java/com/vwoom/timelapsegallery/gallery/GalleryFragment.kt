@@ -233,8 +233,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
             R.id.weather_option -> {
                 if (mWeatherChartDialog == null) {
-                    initializeWeatherDialogs()
-                    //getForecast()
+                    //initializeWeatherDialogs()
+                    initializeWeatherChartDialog()
                     executeWithLocation { mGalleryViewModel.getForecast(mLocation) }
                 } else if (mGalleryViewModel.weather.value !is WeatherResult.TodaysForecast) {
                     //getForecast()
@@ -256,11 +256,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         if (mGalleryViewModel.weatherChartDialogShowing) {
-            initializeWeatherDialogs()
+            initializeWeatherChartDialog()
             mWeatherChartDialog?.show()
         }
         if (mGalleryViewModel.weatherDetailsDialogShowing) {
-            // Note: since weather details depends upon chart, weather details will always be initialized if the chart is showing
+            initializeWeatherDetailsDialog()
             mWeatherDetailsDialog?.show()
         }
     }
@@ -269,6 +269,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         super.onPause()
         mSearchDialog?.dismiss()
         mWeatherChartDialog?.dismiss()
+        mWeatherDetailsDialog?.dismiss()
     }
 
     override fun onStop() {
@@ -333,15 +334,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         val searchEditText = mSearchDialog?.findViewById<EditText>(R.id.search_edit_text)
 
         val exitFab = mSearchDialog?.findViewById<FloatingActionButton>(R.id.search_dialog_exit_fab)
-        exitFab?.setOnClickListener {
-            mGalleryViewModel.searchDialogShowing = false
-            mSearchDialog?.dismiss()
-        }
         val okDismiss = mSearchDialog?.findViewById<TextView>(R.id.search_dialog_dismiss)
-        okDismiss?.setOnClickListener {
-            mGalleryViewModel.searchDialogShowing = false
-            mSearchDialog?.dismiss()
-        }
+        exitFab?.setOnClickListener { mSearchDialog?.cancel() }
+        okDismiss?.setOnClickListener { mSearchDialog?.cancel() }
 
         val dueTodayCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_today_checkbox)
         val dueTomorrowCheckBox = mSearchDialog?.findViewById<CheckBox>(R.id.search_due_tomorrow_checkbox)
@@ -396,22 +391,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         updateSearchDialog()
     }
 
-    private fun initializeWeatherDialogs() {
-        initializeWeatherChartDialog()
-        initializeWeatherDetailsDialog()
-        if (mGalleryViewModel.weather.value != null) {
-            mWeatherChartDialog?.handleWeatherChart(mGalleryViewModel.weather.value!!)
-            mWeatherDetailsDialog?.handleWeatherResult(mGalleryViewModel.weather.value!!)
-        }
-    }
-
     private fun initializeWeatherChartDialog() {
         mWeatherChartDialog = WeatherChartDialog(requireContext())
         mWeatherChartDialog?.setOnCancelListener {
             mGalleryViewModel.weatherChartDialogShowing = false
         }
         mWeatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
-            //updateWeatherData()
             mGalleryViewModel.weather.value = WeatherResult.Loading
             executeWithLocation {
                 try {
@@ -423,13 +408,16 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
         }
         mWeatherChartDialog?.findViewById<TextView>(R.id.show_weather_details_tv)?.setOnClickListener {
+            mWeatherChartDialog?.cancel()
             if (mWeatherDetailsDialog == null) initializeWeatherDetailsDialog()
             mGalleryViewModel.weatherDetailsDialogShowing = true
             mWeatherDetailsDialog?.show()
         }
+
+        if (mGalleryViewModel.weather.value != null)
+            mWeatherChartDialog?.handleWeatherChart(mGalleryViewModel.weather.value!!)
     }
 
-    // TODO: debug weather dialog persisting after onpause when exit fab is clicked
     private fun initializeWeatherDetailsDialog() {
         mWeatherDetailsDialog = WeatherDetailsDialog(requireContext())
         mWeatherDetailsDialog?.setOnCancelListener {
@@ -438,6 +426,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mWeatherDetailsDialog?.findViewById<FloatingActionButton>(R.id.weather_details_dialog_exit_fab)?.setOnClickListener {
             mWeatherDetailsDialog?.cancel()
         }
+        if (mGalleryViewModel.weather.value != null)
+            mWeatherDetailsDialog?.handleWeatherResult(mGalleryViewModel.weather.value!!)
     }
 
     private fun executeWithLocation(toExecute: () -> Unit){
