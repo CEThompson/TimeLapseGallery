@@ -409,6 +409,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
+    // TODO: debug weather dialog persisting after onpause when exit fab is clicked
     private fun initializeWeatherDetailsDialog(){
         mWeatherDetailsDialog = WeatherDetailsDialog(requireContext())
         mWeatherDetailsDialog?.setOnCancelListener {
