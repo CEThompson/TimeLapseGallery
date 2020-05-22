@@ -7,6 +7,7 @@ import android.view.Window
 import android.widget.ProgressBar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 
@@ -19,7 +20,10 @@ class WeatherDetailsDialog(context: Context, galleryViewModel: GalleryViewModel)
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.dialog_weather_details)
         this.setOnCancelListener { galleryViewModel.weatherDetailsDialogShowing = false }
-
+        this.findViewById<FloatingActionButton>(R.id.weather_details_dialog_exit_fab).setOnClickListener {
+            this.cancel()
+        }
+        
         mWeatherRecyclerView = this.findViewById(R.id.weather_recycler_view)
         mWeatherAdapter = WeatherAdapter()
         val weatherLayoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
