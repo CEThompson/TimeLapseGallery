@@ -15,17 +15,20 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.weather.WeatherUtils.getTimestampFromPeriod
 import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherIcon
 import java.text.DecimalFormat
 import java.util.*
 
-class WeatherChartDialog(context: Context) : Dialog(context) {
+class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) : Dialog(context) {
 
     init {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.dialog_weather_chart)
+
+        this.setOnCancelListener { galleryViewModel.weatherChartDialogShowing = false }
 
         // Constrain the size of the chart to 80% of the smallest dimension
         val dm = context.resources.displayMetrics
@@ -34,6 +37,9 @@ class WeatherChartDialog(context: Context) : Dialog(context) {
         val minSize = (width.coerceAtMost(height) * 0.8).toInt()
         this.findViewById<LineChart>(R.id.weather_chart)?.layoutParams?.height = minSize
         this.findViewById<LineChart>(R.id.weather_chart)?.layoutParams?.width = minSize
+
+        // Initialize the data
+        if (galleryViewModel.weather.value != null) handleWeatherChart(galleryViewModel.weather.value!!)
     }
 
     private fun showCachedForecast(result: WeatherResult.CachedForecast<ForecastResponse>) {

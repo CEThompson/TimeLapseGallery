@@ -24,6 +24,8 @@ class SearchDialog(context: Context, private val galleryViewModel: GalleryViewMo
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.dialog_search)
 
+        this.setOnCancelListener { galleryViewModel.searchDialogShowing = false }
+
         val searchEditText = this.findViewById<EditText>(R.id.search_edit_text)
         val exitFab = this.findViewById<FloatingActionButton>(R.id.search_dialog_exit_fab)
         val okDismiss = this.findViewById<TextView>(R.id.search_dialog_dismiss)

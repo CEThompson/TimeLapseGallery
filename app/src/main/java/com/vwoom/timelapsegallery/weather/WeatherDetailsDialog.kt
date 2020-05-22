@@ -8,8 +8,9 @@ import android.widget.ProgressBar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 
-class WeatherDetailsDialog(context: Context): Dialog(context) {
+class WeatherDetailsDialog(context: Context, galleryViewModel: GalleryViewModel): Dialog(context) {
 
     private val mWeatherRecyclerView: RecyclerView
     private val mWeatherAdapter: WeatherAdapter
@@ -17,6 +18,8 @@ class WeatherDetailsDialog(context: Context): Dialog(context) {
     init {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.dialog_weather_details)
+        this.setOnCancelListener { galleryViewModel.weatherDetailsDialogShowing = false }
+
         mWeatherRecyclerView = this.findViewById(R.id.weather_recycler_view)
         mWeatherAdapter = WeatherAdapter()
         val weatherLayoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
@@ -33,6 +36,8 @@ class WeatherDetailsDialog(context: Context): Dialog(context) {
         val minSize = (width.coerceAtMost(height) * 0.7).toInt()
         this.findViewById<RecyclerView>(R.id.weather_recycler_view)?.layoutParams?.width = minSize
 
+        // Set the data
+        if (galleryViewModel.weather.value != null) handleWeatherResult(galleryViewModel.weather.value!!)
     }
 
     private fun showWeatherLoading(){
