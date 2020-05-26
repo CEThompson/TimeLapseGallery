@@ -128,6 +128,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         toolbar = binding?.galleryFragmentToolbar
         toolbar?.title = getString(R.string.app_name)
         // TODO: refactor so that toolbar does not violate inversion of control
+        // TODO: convert to navigation drawer
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
 
