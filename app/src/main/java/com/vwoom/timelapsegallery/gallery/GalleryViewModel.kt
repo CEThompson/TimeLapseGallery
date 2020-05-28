@@ -49,6 +49,12 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
 
     private var searchJob: Job = Job()
 
+    // TODO: handle all jobs and make sure to cancel on clear in all view models
+    override fun onCleared() {
+        super.onCleared()
+        searchJob.cancel()
+    }
+
     // TODO
     // Inputted search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
