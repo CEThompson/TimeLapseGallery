@@ -16,6 +16,7 @@ import java.io.IOException
 class TimeLapseDatabaseTest {
 
     // DAOs
+    // TODO write comprehensive tests for each dao
     private lateinit var weatherDao: WeatherDao
     private lateinit var projectDao: ProjectDao
     private lateinit var projectTagDao: ProjectTagDao
@@ -28,7 +29,7 @@ class TimeLapseDatabaseTest {
     private lateinit var db: TimeLapseDatabase
 
     @Before
-    fun createDb(){
+    fun createDb() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         db = Room.inMemoryDatabaseBuilder(context, TimeLapseDatabase::class.java)
                 .allowMainThreadQueries()
@@ -44,14 +45,13 @@ class TimeLapseDatabaseTest {
 
     @After
     @Throws(IOException::class)
-    fun closeDb(){
+    fun closeDb() {
         db.close()
     }
 
-    // TODO write comprehensive tests for each
     @Test
     @Throws(Exception::class)
-    fun insertWeather(){
+    fun insertWeather() {
         // Should be null without an entry
         var res = runBlocking { weatherDao.getWeather() }
         assert(res == null)
