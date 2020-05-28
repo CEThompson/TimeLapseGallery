@@ -14,6 +14,7 @@ import com.vwoom.timelapsegallery.weather.WeatherResult
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.weather.ForecastResponse
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -31,11 +32,24 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
 
     // The displayed projects
-    var displayedProjectViews = MutableLiveData(emptyList<ProjectView>())
-    val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
-    val weather = MutableLiveData<WeatherResult<ForecastResponse>>(WeatherResult.Loading)
-    val search = MutableLiveData(false)
+    private val _displayedProjectViews = MutableLiveData(emptyList<ProjectView>())
+    val displayedProjectViews: LiveData<List<ProjectView>>
+        get() = _displayedProjectViews
 
+    val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
+
+
+    private val _weather = MutableLiveData<WeatherResult<ForecastResponse>>(WeatherResult.Loading)
+    val weather: LiveData<WeatherResult<ForecastResponse>>
+        get() = _weather
+
+    private val _search = MutableLiveData(false)
+    val search: LiveData<Boolean>
+        get() = _search
+
+    private var searchJob: Job = Job()
+
+    // TODO
     // Inputted search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
     var searchName: String = ""
@@ -49,7 +63,7 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     // For use when search launched from notification
     var userClickedToStopSearch = false
 
-    fun userIsSearching(): Boolean {
+    private fun userIsSearching(): Boolean {
         return searchTags.isNotEmpty()
                 || searchType != SEARCH_TYPE_NONE
                 || !searchName.isBlank()
@@ -63,75 +77,88 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     // Retrieves today's forecast or a cached forecast if unable to query
     fun getForecast(location: Location?) {
         //Log.d(TAG, "getting forecast in view model")
+        _weather.value = WeatherResult.Loading
         viewModelScope.launch {
-            weather.value = weatherRepository.getForecast(location)
+            _weather.value = weatherRepository.getForecast(location)
         }
     }
 
     // Attempts to force update the forecast
     fun updateForecast(location: Location) {
+        _weather.value = WeatherResult.Loading
         viewModelScope.launch {
-            weather.value = weatherRepository.updateForecast(location)
+            _weather.value = weatherRepository.updateForecast(location)
         }
     }
 
+    fun forecastDenied(){
+        _weather.value = WeatherResult.NoData()
+    }
+
     // Filters the projects by the inputted search parameters
-    suspend fun filterProjects(): List<ProjectView> {
-        if (projects.value == null) return listOf()
-        var resultProjects = projects.value!!
+    fun filterProjects() {
+        searchJob.cancel()
+        searchJob = viewModelScope.launch {
+            if (projects.value == null) _displayedProjectViews.value = listOf()
+            var resultProjects = projects.value!!
 
-        if (searchTags.isNotEmpty()) {
-            resultProjects = resultProjects.filter {
-                val projectTags: List<ProjectTagEntry> = tagRepository.getProjectTags(it.project_id)
-                val tagEntriesForProject: List<TagEntry> = tagRepository.getTagsFromProjectTags(projectTags)
+            if (searchTags.isNotEmpty()) {
+                resultProjects = resultProjects.filter {
+                    val projectTags: List<ProjectTagEntry> = tagRepository.getProjectTags(it.project_id)
+                    val tagEntriesForProject: List<TagEntry> = tagRepository.getTagsFromProjectTags(projectTags)
 
-                // Include projects with tags included in the search filter
-                for (tag in searchTags)
-                    if (tagEntriesForProject.contains(tag)) return@filter true
-                return@filter false
+                    // Include projects with tags included in the search filter
+                    for (tag in searchTags)
+                        if (tagEntriesForProject.contains(tag)) return@filter true
+                    return@filter false
+                }
             }
+
+            if (searchName.isNotEmpty()) {
+                resultProjects = resultProjects.filter {
+                    if (it.project_name == null) return@filter false
+                    if (it.project_name.toLowerCase(Locale.getDefault()).contains(searchName.toLowerCase(Locale.getDefault()))) return@filter true
+                    return@filter false
+                }
+            }
+
+            when (searchType) {
+                SEARCH_TYPE_SCHEDULED -> {
+                    resultProjects = resultProjects.filter {
+                        return@filter it.interval_days > 0
+                    }
+                }
+                SEARCH_TYPE_UNSCHEDULED -> {
+                    resultProjects = resultProjects.filter {
+                        return@filter it.interval_days == 0
+                    }
+                }
+                SEARCH_TYPE_DUE_TODAY -> {
+                    resultProjects = resultProjects.filter {
+                        if (it.interval_days == 0) return@filter false
+                        return@filter daysUntilDue(it) <= 0
+                    }
+                }
+                SEARCH_TYPE_DUE_TOMORROW -> {
+                    resultProjects = resultProjects.filter {
+                        if (it.interval_days == 0) return@filter false
+                        return@filter daysUntilDue(it) == 1.toLong()
+                    }
+                }
+                SEARCH_TYPE_PENDING -> {
+                    resultProjects = resultProjects.filter {
+                        if (it.interval_days == 0) return@filter false
+                        return@filter daysUntilDue(it) > 0
+                    }
+                    resultProjects = resultProjects.sortedBy { daysUntilDue(it) } // show projects due earlier first
+                }
+            }
+            _displayedProjectViews.value = resultProjects
         }
+    }
 
-        if (searchName.isNotEmpty()) {
-            resultProjects = resultProjects.filter {
-                if (it.project_name == null) return@filter false
-                if (it.project_name.toLowerCase(Locale.getDefault()).contains(searchName.toLowerCase(Locale.getDefault()))) return@filter true
-                return@filter false
-            }
-        }
-
-        when (searchType) {
-            SEARCH_TYPE_SCHEDULED -> {
-                resultProjects = resultProjects.filter {
-                    return@filter it.interval_days > 0
-                }
-            }
-            SEARCH_TYPE_UNSCHEDULED -> {
-                resultProjects = resultProjects.filter {
-                    return@filter it.interval_days == 0
-                }
-            }
-            SEARCH_TYPE_DUE_TODAY -> {
-                resultProjects = resultProjects.filter {
-                    if (it.interval_days == 0) return@filter false
-                    return@filter daysUntilDue(it) <= 0
-                }
-            }
-            SEARCH_TYPE_DUE_TOMORROW -> {
-                resultProjects = resultProjects.filter {
-                    if (it.interval_days == 0) return@filter false
-                    return@filter daysUntilDue(it) == 1.toLong()
-                }
-            }
-            SEARCH_TYPE_PENDING -> {
-                resultProjects = resultProjects.filter {
-                    if (it.interval_days == 0) return@filter false
-                    return@filter daysUntilDue(it) > 0
-                }
-                resultProjects = resultProjects.sortedBy { daysUntilDue(it) } // show projects due earlier first
-            }
-        }
-        return resultProjects
+    fun setSearch() {
+        _search.value = userIsSearching()
     }
 
     companion object {

@@ -158,12 +158,8 @@ class SearchDialog(context: Context, private val galleryViewModel: GalleryViewMo
     }
 
     private fun updateSearchFilter() {
-        galleryViewModel.viewModelScope.launch {
-            galleryViewModel.displayedProjectViews.value = galleryViewModel.filterProjects()
-
-            // show search fab if actively searching
-            galleryViewModel.search.value = galleryViewModel.userIsSearching()
-        }
+        galleryViewModel.filterProjects()
+        galleryViewModel.setSearch()
     }
 
 }
