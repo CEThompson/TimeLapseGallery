@@ -287,9 +287,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
             // 2. Set the displayed projects by the current filter
             // Note: default filter is none and will display currentProjects
-            mGalleryViewModel.viewModelScope.launch {
-                mGalleryViewModel.displayedProjectViews.value = mGalleryViewModel.filterProjects()
-            }
+            mGalleryViewModel.filterProjects()
+            /*mGalleryViewModel.viewModelScope.launch {
+                mGalleryViewModel._displayedProjectViews.value = mGalleryViewModel.filterProjects()
+            }*/
         })
 
         // Observe the projects to be displayed after filtration
@@ -324,7 +325,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mWeatherChartDialog = WeatherChartDialog(requireContext(), mGalleryViewModel)
         // Set click listener to get device location and forecast, otherwise get local cache if available
         mWeatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
-            mGalleryViewModel.weather.value = WeatherResult.Loading
+            //mGalleryViewModel.weather.value = WeatherResult.Loading
             getLocationAndExecute {
                 try {
                     mGalleryViewModel.updateForecast(mLocation!!)
@@ -415,7 +416,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             getLocationAndExecute { mGalleryViewModel.getForecast(mLocation) }
         } else {
             Toast.makeText(this.requireContext(), getString(R.string.permissions_required_for_forecast), Toast.LENGTH_SHORT).show()
-            mGalleryViewModel.weather.value = WeatherResult.NoData()
+            mGalleryViewModel.forecastDenied()
         }
     }
 
