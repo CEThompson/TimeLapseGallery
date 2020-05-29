@@ -16,7 +16,7 @@ class WeatherLocalDataSource(private val weatherDao: WeatherDao) {
 
         return if (weatherEntry == null) WeatherResult.NoData()
         else {
-            val localResponse = Gson().fromJson(weatherEntry.forecast, ForecastResponse::class.java)
+            val localResponse = Gson().fromJson(weatherEntry.forecastJsonString, ForecastResponse::class.java)
             if (DateUtils.isToday(weatherEntry.timestamp)) {
                 WeatherResult.TodaysForecast(localResponse, weatherEntry.timestamp)
             } else {
@@ -30,7 +30,7 @@ class WeatherLocalDataSource(private val weatherDao: WeatherDao) {
 
         return if (weatherEntry == null) WeatherResult.NoData()
         else {
-            val localResponse = Gson().fromJson(weatherEntry.forecast, ForecastResponse::class.java)
+            val localResponse = Gson().fromJson(weatherEntry.forecastJsonString, ForecastResponse::class.java)
             WeatherResult.CachedForecast(localResponse, weatherEntry.timestamp)
         }
     }

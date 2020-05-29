@@ -153,7 +153,7 @@ abstract class TimeLapseDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS weather " +
                         "(id INTEGER NOT NULL, " +
-                        "forecast TEXT NOT NULL," +
+                        "forecastJsonString TEXT NOT NULL," +
                         "timestamp INTEGER NOT NULL, " +
                         "PRIMARY KEY(id)" +
                         ")")
