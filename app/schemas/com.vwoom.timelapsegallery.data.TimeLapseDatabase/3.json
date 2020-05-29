@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "cbb599547aba9c923d9ae2530ebfd11b",
+    "identityHash": "fa2ba4816a7bfe14415d18040dafdacb",
     "entities": [
       {
         "tableName": "project",
@@ -287,7 +287,7 @@
       },
       {
         "tableName": "weather",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `forecast` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `forecastJsonString` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -296,8 +296,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "forecast",
-            "columnName": "forecast",
+            "fieldPath": "forecastJsonString",
+            "columnName": "forecastJsonString",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -326,7 +326,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cbb599547aba9c923d9ae2530ebfd11b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fa2ba4816a7bfe14415d18040dafdacb')"
     ]
   }
 }

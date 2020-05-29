@@ -40,12 +40,10 @@ import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.launch
 
-// TODO if network disabled show feedback, improve No Data layout for weather forecast
-
+// TODO if network / data disabled show feedback on attempt to get weather
 // TODO show the number of projects due per day during the week
 // TODO: create gifs or mp4s from photo sets
 // TODO: increase test coverage
-
 // TODO: optimize getting the device location for forecasts
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
