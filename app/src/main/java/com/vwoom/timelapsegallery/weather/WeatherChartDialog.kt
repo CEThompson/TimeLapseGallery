@@ -7,6 +7,7 @@ import android.view.Window
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.AxisBase
@@ -14,6 +15,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 import com.vwoom.timelapsegallery.utils.TimeUtils
@@ -22,22 +24,23 @@ import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherIcon
 import java.text.DecimalFormat
 import java.util.*
 
-// TODO:
 class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) : Dialog(context) {
 
     init {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.dialog_weather_chart)
 
+        // Set cancellation listeners
         this.setOnCancelListener { galleryViewModel.weatherChartDialogShowing = false }
+        this.findViewById<FloatingActionButton>(R.id.weather_chart_dialog_exit_fab).setOnClickListener { this.cancel() }
 
-        // Constrain the size of the chart to 80% of the smallest dimension
+        // Constrain the size of the chart to 80% of the smallest screen dimension
         val dm = context.resources.displayMetrics
         val width = dm.widthPixels
         val height = dm.heightPixels
         val minSize = (width.coerceAtMost(height) * 0.8).toInt()
-        this.findViewById<LineChart>(R.id.weather_chart)?.layoutParams?.height = minSize
-        this.findViewById<LineChart>(R.id.weather_chart)?.layoutParams?.width = minSize
+        //this.findViewById<ConstraintLayout>(R.id.weather_chart_constraint_layout)?.layoutParams?.height = minSize
+        this.findViewById<ConstraintLayout>(R.id.weather_chart_constraint_layout)?.layoutParams?.width = minSize
 
         // Initialize the data
         if (galleryViewModel.weather.value != null) handleWeatherChart(galleryViewModel.weather.value!!)
@@ -91,6 +94,7 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
     private fun showWeatherLoading() {
         // Show the loading indicator
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
+        this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.INVISIBLE
         this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.INVISIBLE
     }
 
