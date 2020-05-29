@@ -22,6 +22,7 @@ import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherIcon
 import java.text.DecimalFormat
 import java.util.*
 
+// TODO:
 class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) : Dialog(context) {
 
     init {

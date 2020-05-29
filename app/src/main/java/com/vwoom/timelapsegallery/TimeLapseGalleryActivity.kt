@@ -7,6 +7,7 @@ import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 
+// TODO: implement activity drawer and navigation overrides here
 class TimeLapseGalleryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

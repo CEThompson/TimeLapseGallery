@@ -25,6 +25,9 @@ const val SEARCH_TYPE_PENDING = "pending"
 const val SEARCH_TYPE_SCHEDULED = "scheduled"
 const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 
+// TODO: encapsulate view models
+// TODO: debug search cancel fab functionality breaking
+// TODO: debug search launch from notification, does not show search active fab
 class GalleryViewModel internal constructor(projectRepository: ProjectRepository,
                                             private val tagRepository: TagRepository,
                                             private val weatherRepository: WeatherRepository) : ViewModel() {
