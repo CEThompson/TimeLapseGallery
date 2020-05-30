@@ -31,15 +31,15 @@ const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 class GalleryViewModel internal constructor(projectRepository: ProjectRepository,
                                             private val tagRepository: TagRepository,
                                             private val weatherRepository: WeatherRepository) : ViewModel() {
-    // Live Data
+    // For observing all projects
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
 
-    // The displayed projects
+    // For the displayed projects in search filtration
     private val _displayedProjectViews = MutableLiveData(emptyList<ProjectView>())
     val displayedProjectViews: LiveData<List<ProjectView>>
         get() = _displayedProjectViews
 
-    // Tags for projects
+    // Tags for all projects to populate the search dialog
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
 
     // Weather forecast
@@ -47,17 +47,10 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     val weather: LiveData<WeatherResult<ForecastResponse>>
         get() = _weather
 
-    // Search state
+    // Search state: weather a search is active or not
     private val _search = MutableLiveData(false)
     val search: LiveData<Boolean>
         get() = _search
-
-    private var searchJob: Job = Job()
-
-    override fun onCleared() {
-        super.onCleared()
-        searchJob.cancel()
-    }
 
     // Inputted search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
@@ -70,7 +63,15 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     var weatherDetailsDialogShowing = false
 
     // For use when search launched from notification
+    // To prevent search activating when returning to the gallery, after the user decided to stop the search
     var userClickedToStopSearch = false
+
+    private var searchJob: Job = Job()
+
+    override fun onCleared() {
+        super.onCleared()
+        searchJob.cancel()
+    }
 
     private fun userIsSearching(): Boolean {
         return searchTags.isNotEmpty()
