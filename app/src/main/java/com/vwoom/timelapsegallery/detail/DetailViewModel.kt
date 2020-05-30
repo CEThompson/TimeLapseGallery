@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
+// TODO implement on cleared for any view model jobs
 class DetailViewModel(private val projectRepository: ProjectRepository,
                       private val tagRepository: TagRepository,
                       private val projectId: Long) : ViewModel() {

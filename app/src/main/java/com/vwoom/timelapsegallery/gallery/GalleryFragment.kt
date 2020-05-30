@@ -183,7 +183,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mSearchCancelFAB = binding?.searchActiveIndicator
         mSearchCancelFAB?.setOnClickListener {
             mGalleryViewModel.userClickedToStopSearch = true
-            mSearchDialog?.clearSearch()
+            mGalleryViewModel.clearSearch()
+            mSearchDialog?.updateSearchDialog()
         }
 
         setupViewModel()
@@ -191,6 +192,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Launch with search filter if set from the notification
         if (args.searchLaunchDue && !mGalleryViewModel.userClickedToStopSearch) {
             mGalleryViewModel.searchType = SEARCH_TYPE_DUE_TODAY
+            mGalleryViewModel.setSearch()
         }
 
         return binding?.root
@@ -263,6 +265,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mGalleryAdapter = null
         toolbar = null
         binding = null
+        mSearchDialog = null
+        mWeatherDetailsDialog = null
+        mWeatherChartDialog = null
     }
 
     /**

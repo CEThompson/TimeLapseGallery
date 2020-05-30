@@ -148,15 +148,6 @@ class SearchDialog(context: Context, private val galleryViewModel: GalleryViewMo
         unscheduledCheckBox?.isChecked = galleryViewModel.searchType == SEARCH_TYPE_UNSCHEDULED
     }
 
-    // Resets the search parameters and updates the UI
-    fun clearSearch() {
-        galleryViewModel.searchName = ""
-        galleryViewModel.searchTags.clear()
-        galleryViewModel.searchType = SEARCH_TYPE_NONE
-        updateSearchFilter()
-        updateSearchDialog()
-    }
-
     private fun updateSearchFilter() {
         galleryViewModel.filterProjects()
         galleryViewModel.setSearch()

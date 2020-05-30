@@ -39,26 +39,26 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
     val displayedProjectViews: LiveData<List<ProjectView>>
         get() = _displayedProjectViews
 
+    // Tags for projects
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
 
-
+    // Weather forecast
     private val _weather = MutableLiveData<WeatherResult<ForecastResponse>>(WeatherResult.Loading)
     val weather: LiveData<WeatherResult<ForecastResponse>>
         get() = _weather
 
+    // Search state
     private val _search = MutableLiveData(false)
     val search: LiveData<Boolean>
         get() = _search
 
     private var searchJob: Job = Job()
 
-    // TODO: handle all jobs and make sure to cancel on clear in all view models
     override fun onCleared() {
         super.onCleared()
         searchJob.cancel()
     }
 
-    // TODO
     // Inputted search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
     var searchName: String = ""
@@ -168,6 +168,14 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
 
     fun setSearch() {
         _search.value = userIsSearching()
+    }
+
+    fun clearSearch() {
+        searchName = ""
+        searchTags.clear()
+        searchType = SEARCH_TYPE_NONE
+        filterProjects()
+        setSearch()
     }
 
     companion object {
