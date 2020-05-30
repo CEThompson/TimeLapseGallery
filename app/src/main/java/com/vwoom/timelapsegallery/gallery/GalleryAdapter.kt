@@ -9,7 +9,6 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
@@ -25,7 +24,7 @@ class GalleryAdapter(
         private val mClickHandler: GalleryAdapterOnClickHandler,
         val externalFilesDir: File,
         private val scheduleDisplaysEnabled: Boolean) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
-    private var mProjectViewData: List<ProjectView>? = null
+    private var mProjectViewData: List<ProjectView> = listOf()
     private var mProjectsToCoverPhotos: HashMap<ProjectView, File> = hashMapOf()
     private var mCoverPhotosToRatios: HashMap<File, String> = hashMapOf()
     private val constraintSet: ConstraintSet = ConstraintSet()
@@ -38,7 +37,7 @@ class GalleryAdapter(
         : RecyclerView.ViewHolder(binding.root), OnClickListener {
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
-            val clickedProject = mProjectViewData!![adapterPosition]
+            val clickedProject = mProjectViewData[adapterPosition]
             mClickHandler.onClick(
                     clickedProject,
                     binding,
@@ -61,7 +60,7 @@ class GalleryAdapter(
 
     override fun onBindViewHolder(holder: GalleryAdapterViewHolder, position: Int) {
         // Get project information
-        val project: ProjectView? = mProjectViewData?.get(position)
+        val project: ProjectView? = mProjectViewData[position]
         val photoFile: File? = mProjectsToCoverPhotos[project]
         // Set the constraint ratio
         var ratio: String? = mCoverPhotosToRatios[photoFile]
@@ -111,7 +110,7 @@ class GalleryAdapter(
     }
 
     override fun getItemCount(): Int {
-        return if (mProjectViewData == null) 0 else mProjectViewData!!.size
+        return mProjectViewData.size
     }
 
     // TODO: (update 1.2) consider calculating this information somewhere else to speed up the gallery (perhaps a diff util?)
