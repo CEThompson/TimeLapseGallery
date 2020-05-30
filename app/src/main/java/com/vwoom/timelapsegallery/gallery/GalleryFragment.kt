@@ -7,7 +7,6 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
-import android.os.SystemClock
 import android.transition.Transition
 import android.transition.TransitionInflater
 import android.view.*
@@ -19,7 +18,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -38,13 +36,11 @@ import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.weather.WeatherChartDialog
 import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
 import com.vwoom.timelapsegallery.weather.WeatherResult
-import kotlinx.coroutines.launch
 
 // TODO if network / data disabled show feedback on attempt to get weather
-// TODO show the number of projects due per day during the week
 // TODO: create gifs or mp4s from photo sets
 // TODO: increase test coverage
-// TODO: optimize getting the device location for forecasts
+// TODO: optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
@@ -74,9 +70,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     // For scrolling to the end when adding a new project
     private var mPrevProjectsSize: Int? = null
-
-    // For preventing double click crash
-    private var mLastClickTime: Long? = null
 
     private var mNumberOfColumns = 3
 
@@ -143,7 +136,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         try {
             val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
             mGalleryAdapter = GalleryAdapter(this, externalFilesDir, schedulesDisplayed)
-        } catch (e: KotlinNullPointerException){
+        } catch (e: KotlinNullPointerException) {
             // TODO: set up analytics to track external files drive failure
             Toast.makeText(requireContext(), getString(R.string.error_retrieving_files_dir), Toast.LENGTH_LONG).show()
         }
@@ -235,6 +228,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onResume() {
         super.onResume()
+        // Re-enable the recycler view
+        mGalleryRecyclerView?.isEnabled = true
+
+        // Restore any dialogs
         if (mGalleryViewModel.searchDialogShowing) {
             mSearchDialog = SearchDialog(requireContext(), mGalleryViewModel)
             mSearchDialog?.show()
@@ -288,12 +285,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
             mPrevProjectsSize = currentProjects.size // Keep track of number of projects for comparison to previous
 
-            // 2. Set the displayed projects by the current filter
+            // 2. Update the displayed projects by the current filter
             // Note: default filter is none and will display currentProjects
             mGalleryViewModel.filterProjects()
-            /*mGalleryViewModel.viewModelScope.launch {
-                mGalleryViewModel._displayedProjectViews.value = mGalleryViewModel.filterProjects()
-            }*/
         })
 
         // Observe the projects to be displayed after filtration
@@ -328,7 +322,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mWeatherChartDialog = WeatherChartDialog(requireContext(), mGalleryViewModel)
         // Set click listener to get device location and forecast, otherwise get local cache if available
         mWeatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
-            //mGalleryViewModel.weather.value = WeatherResult.Loading
             getLocationAndExecute {
                 try {
                     mGalleryViewModel.updateForecast(mLocation!!)
@@ -350,7 +343,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     // Gets the device location and executes a function passed as a parameter
-    private fun getLocationAndExecute(toExecute: () -> Unit){
+    private fun getLocationAndExecute(toExecute: () -> Unit) {
         if (gpsPermissionsGranted()) {
             SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
                 override fun onNewLocationAvailable(location: Location?) {
@@ -365,10 +358,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     // Navigates to the clicked project
     override fun onClick(clickedProjectView: ProjectView, binding: GalleryRecyclerviewItemBinding, position: Int) {
-        // TODO: refactor to click enabling / disabling, theres a way to do this rather than tracking click time
-        // Prevents multiple clicks
-        if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 250) return
-        mLastClickTime = SystemClock.elapsedRealtime()
+        // Only execute if recycler view is enabled
+        if (mGalleryRecyclerView?.isEnabled == false) return
+        // Disable the recycler view to prevent double clicks
+        else mGalleryRecyclerView?.isEnabled = false
 
         // Restore the exit transition if it has been nullified by navigating to the add project fab
         if (exitTransition == null)
@@ -398,6 +391,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         val recyclerState: Parcelable? = savedInstanceState?.getParcelable(BUNDLE_RECYCLER_LAYOUT)
         mGalleryRecyclerView?.layoutManager?.onRestoreInstanceState(recyclerState)
     }
+
     // Save the scroll state of the recycler view
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
