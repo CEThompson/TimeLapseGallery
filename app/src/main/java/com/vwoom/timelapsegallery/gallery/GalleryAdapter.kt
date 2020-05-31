@@ -28,8 +28,6 @@ class GalleryAdapter(
         private val scheduleDisplaysEnabled: Boolean)
     : ListAdapter<ProjectView, GalleryAdapterViewHolder>(ProjectViewDiffCallback())
 {
-    private var mProjectsToCoverPhotos: HashMap<ProjectView, File> = hashMapOf()
-    private var mCoverPhotosToRatios: HashMap<File, String> = hashMapOf()
     private val constraintSet: ConstraintSet = ConstraintSet()
 
     interface GalleryAdapterOnClickHandler {
@@ -63,27 +61,34 @@ class GalleryAdapter(
 
     override fun onBindViewHolder(holder: GalleryAdapterViewHolder, position: Int) {
         // Get project information
-        val project: ProjectView? = getItem(position)
+        val project: ProjectView = getItem(position)
 
-        val photoFile: File? = mProjectsToCoverPhotos[project]
-        // Set the constraint ratio
-        var ratio: String? = mCoverPhotosToRatios[photoFile]
-        if (ratio == null) ratio = holder.itemView.context.getString(R.string.default_aspect_ratio)
+        // Get the photo for the project
+        val photoUrl = ProjectUtils.getProjectPhotoUrl(
+                externalFilesDir,
+                getProjectEntryFromProjectView(project),
+                project.cover_photo_timestamp)
+
+        // Initialize a constraint ratio
+        var ratio: String = holder.itemView.context.getString(R.string.default_aspect_ratio)
+        // Get the aspect ratio from the photo if available
+        if (photoUrl != null) ratio = PhotoUtils.getAspectRatioFromImagePath(photoUrl)
 
         constraintSet.clone(holder.binding.projectRecyclerviewConstraintLayout)
         constraintSet.setDimensionRatio(holder.binding.projectImage.id, ratio)
         constraintSet.applyTo(holder.binding.projectRecyclerviewConstraintLayout)
 
         // Handle Check Display
-        val photoTakenToday = if (project == null || photoFile == null) false else DateUtils.isToday(project.cover_photo_timestamp)
+        val photoTakenToday = DateUtils.isToday(project.cover_photo_timestamp)
         if (photoTakenToday) {
             holder.binding.scheduleIndicatorCheck.visibility = VISIBLE
         } else {
             holder.binding.scheduleIndicatorCheck.visibility = INVISIBLE
         }
 
-        val projectIsScheduled = if (project == null) false else (project.interval_days != 0)
-        if (projectIsScheduled && scheduleDisplaysEnabled && project != null) {
+        // Handle the schedule layout
+        val projectIsScheduled = (project.interval_days != 0)
+        if (projectIsScheduled && scheduleDisplaysEnabled) {
             setScheduleInformation(project, holder, project.interval_days, photoTakenToday)
             holder.binding.galleryScheduleLayout.scheduleLayout.visibility = VISIBLE
         } else {
@@ -91,7 +96,7 @@ class GalleryAdapter(
         }
 
         // Set transition targets
-        val imageTransitionName = project?.project_id?.toString() ?: "projectLoadError"
+        val imageTransitionName = project.project_id.toString()
         holder.binding.projectImage.transitionName = imageTransitionName
         holder.binding.projectCardView.transitionName = "${imageTransitionName}card"
         holder.binding.galleryBottomGradient.transitionName = "${imageTransitionName}bottomGradient"
@@ -99,7 +104,8 @@ class GalleryAdapter(
         holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.transitionName = "${imageTransitionName}due"
         holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.transitionName = "${imageTransitionName}interval"
 
-        if (photoFile == null) {
+        // Load the image or an error image
+        if (photoUrl == null) {
             Glide.with(holder.itemView.context)
                     .load(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
                     .centerInside()
@@ -107,26 +113,9 @@ class GalleryAdapter(
         } else {
             // Load the image
             Glide.with(holder.itemView.context)
-                    .load(photoFile)
+                    .load(File(photoUrl))
                     .error(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
                     .into(holder.binding.projectImage)
-        }
-    }
-
-    // TODO: (update 1.2) consider calculating this information somewhere else to speed up the gallery (perhaps a diff util?)
-    fun setProjectData(projectViewData: List<ProjectView>) {
-        mProjectsToCoverPhotos.clear()
-        for (project in projectViewData) {
-            val photoUrl = ProjectUtils.getProjectPhotoUrl(
-                    externalFilesDir,
-                    getProjectEntryFromProjectView(project),
-                    project.cover_photo_timestamp)
-            if (photoUrl != null) {
-                val ratio = PhotoUtils.getAspectRatioFromImagePath(photoUrl)
-                val file = File(photoUrl)
-                mCoverPhotosToRatios.apply { put(file, ratio) }
-                mProjectsToCoverPhotos.apply { put(project, file) }
-            }
         }
     }
 

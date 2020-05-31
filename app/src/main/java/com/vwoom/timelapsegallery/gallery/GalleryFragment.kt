@@ -292,8 +292,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Observe the projects to be displayed after filtration
         mGalleryViewModel.displayedProjectViews.observe(viewLifecycleOwner, Observer {
-            // TODO reconsider setProjectData
-            mGalleryAdapter?.setProjectData(it)
             mGalleryAdapter?.submitList(it)
         })
 
