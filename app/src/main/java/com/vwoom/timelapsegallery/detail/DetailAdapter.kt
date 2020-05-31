@@ -3,10 +3,13 @@ package com.vwoom.timelapsegallery.detail
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
+import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.DetailRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.detail.DetailAdapter.DetailAdapterViewHolder
@@ -14,8 +17,9 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import java.io.File
 
-class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val externalFilesDir: File) : RecyclerView.Adapter<DetailAdapterViewHolder>() {
-    private var mPhotos: List<PhotoEntry> = emptyList()
+class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val externalFilesDir: File)
+    : ListAdapter<PhotoEntry, DetailAdapterViewHolder>(PhotoDiffCallback()) {
+
     private lateinit var mProjectView: ProjectView
     private lateinit var mCurrentPhoto: PhotoEntry
 
@@ -26,8 +30,9 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
     inner class DetailAdapterViewHolder(var binding: DetailRecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
-            val clickedPhoto = mPhotos[adapterPosition]
-            mCurrentPhoto = clickedPhoto
+            val clickedPhoto = getItem(adapterPosition)
+            //mCurrentPhoto = clickedPhoto
+            setCurrentPhoto(clickedPhoto)
             mClickHandler.onClick(clickedPhoto)
         }
 
@@ -46,7 +51,8 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
     override fun onBindViewHolder(holder: DetailAdapterViewHolder, position: Int) {
         val binding = holder.binding
         val context = holder.itemView.context
-        val currentPhoto: PhotoEntry = mPhotos[position]
+        val currentPhoto: PhotoEntry = getItem(position)
+
         val photoPath: String? = ProjectUtils.getProjectPhotoUrl(
                 externalFilesDir,
                 getProjectEntryFromProjectView(mProjectView),
@@ -69,25 +75,40 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
                     .into(binding.detailThumbnail)
         }
 
-        if (mPhotos[position] === mCurrentPhoto) {
+        if (currentPhoto == mCurrentPhoto) {
             binding.selectionIndicator.visibility = View.VISIBLE
         } else {
             binding.selectionIndicator.visibility = View.INVISIBLE
         }
     }
 
-    override fun getItemCount(): Int {
-        return mPhotos.size
-    }
-
-    fun setPhotoData(photoData: List<PhotoEntry>, projectView: ProjectView) {
-        mPhotos = photoData
+    fun setProject(projectView: ProjectView) {
         mProjectView = projectView
-        notifyDataSetChanged()
     }
 
     fun setCurrentPhoto(photo: PhotoEntry) {
-        mCurrentPhoto = photo
-        notifyDataSetChanged()
+        if (!this::mCurrentPhoto.isInitialized) {
+            mCurrentPhoto = photo
+            return
+        } else {
+            val previous = mCurrentPhoto
+            mCurrentPhoto = photo
+            val prevPos = this.currentList.indexOf(previous)
+            val currentPos = this.currentList.indexOf(photo)
+            this.notifyItemChanged(prevPos)
+            this.notifyItemChanged(currentPos)
+        }
+        /*mCurrentPhoto = photo
+        notifyDataSetChanged()*/
+    }
+}
+
+class PhotoDiffCallback: DiffUtil.ItemCallback<PhotoEntry>() {
+    override fun areContentsTheSame(oldItem: PhotoEntry, newItem: PhotoEntry): Boolean {
+        return oldItem.id == newItem.id
+    }
+
+    override fun areItemsTheSame(oldItem: PhotoEntry, newItem: PhotoEntry): Boolean {
+        return oldItem == newItem
     }
 }

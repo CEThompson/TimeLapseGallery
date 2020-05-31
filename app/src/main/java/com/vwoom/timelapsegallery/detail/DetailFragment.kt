@@ -377,7 +377,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Updates the ui to a particular photo entry
     private fun loadUi(photoEntry: PhotoEntry) {
         // Notify the adapter: this updates the detail recycler view red highlight indicator
-        mDetailAdapter?.setCurrentPhoto(photoEntry)
+        //if (!mPlaying)
+            mDetailAdapter?.setCurrentPhoto(photoEntry)
 
         // Get the image path, handle orientation indicator and load the image
         val imagePath: String? = ProjectUtils.getProjectPhotoUrl(
@@ -392,7 +393,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Update position of progress view and thumbnail
         val position = mPhotos.indexOf(photoEntry)
         val photoNumber = position + 1
-        binding?.detailsRecyclerview?.scrollToPosition(position)
+        if (!mPlaying)
+            binding?.detailsRecyclerview?.scrollToPosition(position)
         binding?.imageLoadingProgress?.progress = position
 
         // If playing do not update the individual photo info (skip the rest)
@@ -749,8 +751,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Observe the project for name and schedule changes
         detailViewModel.projectView.observe(viewLifecycleOwner, Observer { projectView: ProjectView? ->
             if (projectView==null) return@Observer
-
             mCurrentProjectView = projectView
+            mDetailAdapter?.setProject(mCurrentProjectView)
             // This updates the project information card, project info dialog,
             // schedule layout over the image and the schedule dialog
 
@@ -834,7 +836,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
             // Update the recycler view
             mPhotos = photoEntries
-            mDetailAdapter?.setPhotoData(mPhotos, mCurrentProjectView)
+            mDetailAdapter?.submitList(photoEntries)
+
             // Bind cover photo to the end of the list always
             val lastPhotoEntry = photoEntries.last()
             detailViewModel.setLastPhotoByEntry(mExternalFilesDir, mCurrentProjectView, lastPhotoEntry)
