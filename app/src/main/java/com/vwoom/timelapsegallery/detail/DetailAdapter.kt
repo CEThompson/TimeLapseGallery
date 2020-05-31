@@ -17,10 +17,12 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import java.io.File
 
-class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val externalFilesDir: File)
+class DetailAdapter(
+        private val mClickHandler: DetailAdapterOnClickHandler,
+        val externalFilesDir: File,
+        var projectView: ProjectView)
     : ListAdapter<PhotoEntry, DetailAdapterViewHolder>(PhotoDiffCallback()) {
 
-    private lateinit var mProjectView: ProjectView
     private lateinit var mCurrentPhoto: PhotoEntry
 
     interface DetailAdapterOnClickHandler {
@@ -55,7 +57,7 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
 
         val photoPath: String? = ProjectUtils.getProjectPhotoUrl(
                 externalFilesDir,
-                getProjectEntryFromProjectView(mProjectView),
+                getProjectEntryFromProjectView(projectView),
                 currentPhoto.timestamp)
 
         // Otherwise continue on to load the correct image
@@ -83,7 +85,7 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
     }
 
     fun setProject(projectView: ProjectView) {
-        mProjectView = projectView
+        this.projectView = projectView
     }
 
     fun setCurrentPhoto(photo: PhotoEntry) {
@@ -98,8 +100,6 @@ class DetailAdapter(private val mClickHandler: DetailAdapterOnClickHandler, val 
             this.notifyItemChanged(prevPos)
             this.notifyItemChanged(currentPos)
         }
-        /*mCurrentPhoto = photo
-        notifyDataSetChanged()*/
     }
 }
 

@@ -183,7 +183,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Set up adapter and recycler view
-        mDetailAdapter = DetailAdapter(this, mExternalFilesDir)
+        mDetailAdapter = DetailAdapter(this, mExternalFilesDir, args.clickedProjectView)
         val linearLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding?.detailsRecyclerview?.layoutManager = linearLayoutManager
         binding?.detailsRecyclerview?.adapter = mDetailAdapter
