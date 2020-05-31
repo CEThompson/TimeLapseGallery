@@ -7,6 +7,8 @@ import android.view.View.*
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
@@ -23,8 +25,9 @@ import java.util.*
 class GalleryAdapter(
         private val mClickHandler: GalleryAdapterOnClickHandler,
         val externalFilesDir: File,
-        private val scheduleDisplaysEnabled: Boolean) : RecyclerView.Adapter<GalleryAdapterViewHolder>() {
-    private var mProjectViewData: List<ProjectView> = listOf()
+        private val scheduleDisplaysEnabled: Boolean)
+    : ListAdapter<ProjectView, GalleryAdapterViewHolder>(ProjectViewDiffCallback())
+{
     private var mProjectsToCoverPhotos: HashMap<ProjectView, File> = hashMapOf()
     private var mCoverPhotosToRatios: HashMap<File, String> = hashMapOf()
     private val constraintSet: ConstraintSet = ConstraintSet()
@@ -37,7 +40,7 @@ class GalleryAdapter(
         : RecyclerView.ViewHolder(binding.root), OnClickListener {
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
-            val clickedProject = mProjectViewData[adapterPosition]
+            val clickedProject = getItem(adapterPosition)
             mClickHandler.onClick(
                     clickedProject,
                     binding,
@@ -60,7 +63,8 @@ class GalleryAdapter(
 
     override fun onBindViewHolder(holder: GalleryAdapterViewHolder, position: Int) {
         // Get project information
-        val project: ProjectView? = mProjectViewData[position]
+        val project: ProjectView? = getItem(position)
+
         val photoFile: File? = mProjectsToCoverPhotos[project]
         // Set the constraint ratio
         var ratio: String? = mCoverPhotosToRatios[photoFile]
@@ -109,13 +113,8 @@ class GalleryAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return mProjectViewData.size
-    }
-
     // TODO: (update 1.2) consider calculating this information somewhere else to speed up the gallery (perhaps a diff util?)
     fun setProjectData(projectViewData: List<ProjectView>) {
-        mProjectViewData = projectViewData
         mProjectsToCoverPhotos.clear()
         for (project in projectViewData) {
             val photoUrl = ProjectUtils.getProjectPhotoUrl(
@@ -129,7 +128,6 @@ class GalleryAdapter(
                 mProjectsToCoverPhotos.apply { put(project, file) }
             }
         }
-        notifyDataSetChanged()
     }
 
     // Updates the UI for the schedule layout
@@ -180,5 +178,15 @@ class GalleryAdapter(
             holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv
                     .setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_schedule_indicator_pending_24dp, 0, 0, 0)
         }
+    }
+}
+
+class ProjectViewDiffCallback: DiffUtil.ItemCallback<ProjectView>() {
+    override fun areContentsTheSame(oldItem: ProjectView, newItem: ProjectView): Boolean {
+        return oldItem.project_id == newItem.project_id
+    }
+
+    override fun areItemsTheSame(oldItem: ProjectView, newItem: ProjectView): Boolean {
+        return oldItem == newItem
     }
 }

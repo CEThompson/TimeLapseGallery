@@ -292,7 +292,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Observe the projects to be displayed after filtration
         mGalleryViewModel.displayedProjectViews.observe(viewLifecycleOwner, Observer {
+            // TODO reconsider setProjectData
             mGalleryAdapter?.setProjectData(it)
+            mGalleryAdapter?.submitList(it)
         })
 
         // Observe the search state
@@ -304,7 +306,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Observe the weather response saved in the database
         // This may be WeatherResponse.NoData, WeatherResponse.Loading, WeatherResponse.Cached, WeatherResponse.TodaysForecast
         mGalleryViewModel.weather.observe(viewLifecycleOwner, Observer {
-            // Display the data from the reponse in the dialogs
+            // Display the data from the response in the dialogs
             mWeatherChartDialog?.handleWeatherChart(it)
             mWeatherDetailsDialog?.handleWeatherResult(it)
         })
