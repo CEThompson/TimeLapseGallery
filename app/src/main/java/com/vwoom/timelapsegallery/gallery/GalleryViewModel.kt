@@ -10,10 +10,10 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.repository.WeatherRepository
-import com.vwoom.timelapsegallery.weather.WeatherResult
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.weather.ForecastResponse
+import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
@@ -26,8 +26,6 @@ const val SEARCH_TYPE_SCHEDULED = "scheduled"
 const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 
 // TODO: encapsulate view models
-// TODO: debug search cancel fab functionality breaking
-// TODO: debug search launch from notification, does not show search active fab
 class GalleryViewModel internal constructor(projectRepository: ProjectRepository,
                                             private val tagRepository: TagRepository,
                                             private val weatherRepository: WeatherRepository) : ViewModel() {
@@ -86,7 +84,6 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
 
     // Retrieves today's forecast or a cached forecast if unable to query
     fun getForecast(location: Location?) {
-        //Log.d(TAG, "getting forecast in view model")
         _weather.value = WeatherResult.Loading
         viewModelScope.launch {
             _weather.value = weatherRepository.getForecast(location)
@@ -101,7 +98,7 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
         }
     }
 
-    fun forecastDenied(){
+    fun forecastDenied() {
         _weather.value = WeatherResult.NoData()
     }
 
@@ -179,7 +176,4 @@ class GalleryViewModel internal constructor(projectRepository: ProjectRepository
         setSearch()
     }
 
-    companion object {
-        private val TAG = GalleryViewModel::class.java.simpleName
-    }
 }

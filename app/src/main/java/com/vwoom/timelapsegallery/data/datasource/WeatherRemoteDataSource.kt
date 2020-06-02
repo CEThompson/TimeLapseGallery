@@ -5,6 +5,9 @@ import com.vwoom.timelapsegallery.weather.ForecastLocationResponse
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherApi.weatherService
 import com.vwoom.timelapsegallery.weather.WeatherResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 
 class WeatherRemoteDataSource {
     // Get the forecast from the national weather service api
@@ -13,9 +16,9 @@ class WeatherRemoteDataSource {
         // 1. Get the url to query the forecast for this devices location
         val forecastLocationResponse: ForecastLocationResponse?
         try {
-            forecastLocationResponse = weatherService.getForecastLocation(
-                    location.latitude.toString(),
-                    location.longitude.toString())
+            val forecastLocationDeferred = weatherService
+                    .getForecastLocation(location.latitude.toString(), location.longitude.toString())
+            forecastLocationResponse = forecastLocationDeferred.await()
         } catch (e: Exception) {
             return WeatherResult.NoData(e, "Error retrieving forecast location")
         }
@@ -25,7 +28,9 @@ class WeatherRemoteDataSource {
         // 2. Call the url to get the forecast for the location and return the result
         val url = forecastLocationResponse.properties.forecast
         return try {
-            val forecastResponse = weatherService.getForecast(url)
+            val getForecastDeferred = weatherService.getForecast(url)
+            val forecastResponse = getForecastDeferred.await()
+
             // If we have a response return a weather result with the forecast packaged as data and the timestamp
             if (forecastResponse != null)
                 WeatherResult.TodaysForecast(forecastResponse, System.currentTimeMillis())
