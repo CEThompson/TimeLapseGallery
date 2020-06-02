@@ -17,12 +17,10 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
         return if (remoteResponse is WeatherResult.TodaysForecast) {
             weatherLocalDataSource.cacheForecast(remoteResponse.data)
             WeatherResult.TodaysForecast(remoteResponse.data, remoteResponse.timestamp)
-            //WeatherResult.UpdateForecast.Success(remoteResponse.data, remoteResponse.timestamp)
         }
         else {
             val noDataResponse = remoteResponse as WeatherResult.NoData
             val cache = weatherLocalDataSource.getCache()
-            //WeatherResult.UpdateForecast.Failure(noDataResponse.exception, message)
             if (cache is WeatherResult.CachedForecast)
                 WeatherResult.CachedForecast(cache.data, cache.timestamp, remoteResponse.exception, remoteResponse.message)
             else
