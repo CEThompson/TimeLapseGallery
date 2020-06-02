@@ -64,6 +64,7 @@ import kotlin.properties.Delegates
 
 // TODO: (update 1.2) use NDK to implement converting photo sets to .gif and .mp4/.mov etc
 // TODO: (update 1.2) implement pinch zoom on fullscreen image
+// TODO: add rewind button
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private val args: DetailFragmentArgs by navArgs()
