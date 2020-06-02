@@ -1,9 +1,9 @@
 package com.vwoom.timelapsegallery.weather
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
 
 data class ForecastLocationResponse(
-    @SerializedName("@context")
+    @Json(name="@context")
     val context: List<Any>,
     val geometry: Geometry,
     val id: String,
@@ -17,9 +17,9 @@ data class ForecastLocationResponse(
     )
 
     data class Properties(
-            @SerializedName("@id")
+            @Json(name="@id")
             val id: String,
-            @SerializedName("@type")
+            @Json(name="@type")
             val type: String,
             val county: String,
             val cwa: String,

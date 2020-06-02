@@ -1,17 +1,19 @@
 package com.vwoom.timelapsegallery.weather
 
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.vwoom.timelapsegallery.weather.WeatherApi.moshi
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Url
 
 const val weatherServiceBaseUrl = "https://api.weather.gov/"
 
-// Set up retrofit instance for data source
 private val retrofit = Retrofit.Builder()
         .baseUrl(weatherServiceBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
 
 interface WeatherService {
@@ -26,5 +28,9 @@ interface WeatherService {
 object WeatherApi {
     val weatherService: WeatherService by lazy {
         retrofit.create(WeatherService::class.java)
+    }
+    val moshi: Moshi by lazy {
+        Moshi.Builder()
+                .add(KotlinJsonAdapterFactory()).build()
     }
 }
