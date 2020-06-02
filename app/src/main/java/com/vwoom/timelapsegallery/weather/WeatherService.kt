@@ -21,11 +21,11 @@ private val retrofit = Retrofit.Builder()
 
 interface WeatherService {
     @GET("points/{latitude},{longitude}")
-    suspend fun getForecastLocation(@Path("latitude") latitude: String,
-                                    @Path("longitude") longitude: String): Deferred<ForecastLocationResponse?>
+    suspend fun getForecastLocationAsync(@Path("latitude") latitude: String,
+                                         @Path("longitude") longitude: String): Deferred<ForecastLocationResponse?>
 
     @GET
-    suspend fun getForecast(@Url stringUrl: String): Deferred<ForecastResponse?>
+    suspend fun getForecastAsync(@Url stringUrl: String): Deferred<ForecastResponse?>
 
 }
 
