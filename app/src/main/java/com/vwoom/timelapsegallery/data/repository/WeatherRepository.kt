@@ -12,6 +12,7 @@ class WeatherRepository(private val weatherLocalDataSource: WeatherLocalDataSour
 
     // This function calls the national weather service API to attempt to update the forecast stored in the database
     // Returns either (1) Weather Result: Update Success or (2) Weather Result: Update Failure
+    // TODO convert updateForecast to a non-returning function and drive the forecast from livedata in the view model as in lesson 9 of udacity course
     suspend fun updateForecast(location: Location): WeatherResult<ForecastResponse> {
         val remoteResponse = weatherRemoteDataSource.getForecast(location)
         return if (remoteResponse is WeatherResult.TodaysForecast) {
