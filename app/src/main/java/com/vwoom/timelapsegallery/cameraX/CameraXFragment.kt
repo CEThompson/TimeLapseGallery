@@ -167,7 +167,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         cameraProviderFuture.addListener(Runnable {
             val cameraProvider = cameraProviderFuture.get()
             val camera = cameraProvider.bindToLifecycle(this, cameraSelector, imageCapture, preview)
-            preview?.setSurfaceProvider(previewView?.createSurfaceProvider(camera.cameraInfo))
+            preview?.setSurfaceProvider(previewView?.createSurfaceProvider())
             setUpTapToFocus(display, cameraSelector, camera)
         }, ContextCompat.getMainExecutor(requireContext()))
     }
