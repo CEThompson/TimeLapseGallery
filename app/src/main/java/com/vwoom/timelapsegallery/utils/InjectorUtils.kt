@@ -13,6 +13,7 @@ import com.vwoom.timelapsegallery.detail.DetailViewModelFactory
 //import com.vwoom.timelapsegallery.gallery.GalleryViewModelFactory
 import com.vwoom.timelapsegallery.settings.SettingsViewModelFactory
 
+// TODO completely remove usage of injector utils
 object InjectorUtils {
 
     fun getProjectRepository(context: Context): ProjectRepository {
