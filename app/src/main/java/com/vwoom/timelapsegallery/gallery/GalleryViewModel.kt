@@ -86,7 +86,6 @@ class GalleryViewModel
 
     // Retrieves today's forecast or a cached forecast if unable to query
     fun getForecast(location: Location?) {
-        _weather.value = WeatherResult.Loading
         viewModelScope.launch {
             _weather.value = weatherRepository.getForecast(location)
         }
@@ -94,10 +93,13 @@ class GalleryViewModel
 
     // Attempts to force update the forecast
     fun updateForecast(location: Location) {
-        _weather.value = WeatherResult.Loading
         viewModelScope.launch {
             _weather.value = weatherRepository.updateForecast(location)
         }
+    }
+
+    fun setLoading(){
+        _weather.value = WeatherResult.Loading
     }
 
     fun forecastDenied() {

@@ -101,9 +101,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AndroidSupportInjection.inject(this)
-        //mGalleryViewModel = ViewModelProvider(this, viewModelFactory)[GalleryViewModel::class.java]
 
+        // Inject dependencies for fragment
+        AndroidSupportInjection.inject(this)
 
         galleryReenterTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
         galleryReenterTransition.addListener(reenterListener)
@@ -327,6 +327,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         mWeatherChartDialog = WeatherChartDialog(requireContext(), mGalleryViewModel)
         // Set click listener to get device location and forecast, otherwise get local cache if available
         mWeatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
+            mGalleryViewModel.setLoading()
             getLocationAndExecute {
                 try {
                     mGalleryViewModel.updateForecast(mLocation!!)
