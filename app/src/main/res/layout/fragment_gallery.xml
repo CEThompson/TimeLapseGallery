@@ -31,7 +31,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/projects_recycler_view_content_description"
-            android:paddingTop="?attr/actionBarSize"/>
+            android:paddingTop="?attr/actionBarSize"
+            app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+            app:spanCount="3"
+            tools:listitem="@layout/gallery_recyclerview_item"
+            />
 
         <!-- FAB to create a new project -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
