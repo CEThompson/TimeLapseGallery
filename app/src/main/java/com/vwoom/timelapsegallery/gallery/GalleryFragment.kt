@@ -18,7 +18,6 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
@@ -33,23 +32,25 @@ import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.location.SingleShotLocationProvider
-import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.weather.WeatherChartDialog
 import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
 import com.vwoom.timelapsegallery.weather.WeatherResult
+import dagger.android.AndroidInjection
+import dagger.android.support.AndroidSupportInjection
 import java.lang.Exception
+import javax.inject.Inject
 
 // TODO: create gifs or mp4s from photo sets
 // TODO: increase test coverage
 // TODO: optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
-    private val args: GalleryFragmentArgs by navArgs()
 
-    private val mGalleryViewModel: GalleryViewModel by viewModels {
-        InjectorUtils.provideGalleryViewModelFactory(requireActivity())
-    }
+    private val args: GalleryFragmentArgs by navArgs()
+    
+    @Inject
+    lateinit var mGalleryViewModel: GalleryViewModel
 
     // Recyclerview
     private var mGalleryRecyclerView: RecyclerView? = null
@@ -98,11 +99,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
     }
 
-    /**
-     * Lifecycle
-     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AndroidSupportInjection.inject(this)
+        //mGalleryViewModel = ViewModelProvider(this, viewModelFactory)[GalleryViewModel::class.java]
+
+
         galleryReenterTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
         galleryReenterTransition.addListener(reenterListener)
         galleryExitTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
@@ -117,6 +119,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // Set up options menu
+        // TODO refactor toolbar so that it does not violate inversion of control
         setHasOptionsMenu(true)
         toolbar = binding?.galleryFragmentToolbar
         toolbar?.title = getString(R.string.app_name)
@@ -277,6 +280,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Note: this does not bind directly to displayed projects
         mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer { currentProjects ->
             // 1. Detect if we have added a project and scroll to the end
+
             val projectHasBeenAdded = (mPrevProjectsSize != null && mPrevProjectsSize!! < currentProjects.size)
             if (projectHasBeenAdded) {
                 if (mGalleryViewModel.displayedProjectViews.value != null) {

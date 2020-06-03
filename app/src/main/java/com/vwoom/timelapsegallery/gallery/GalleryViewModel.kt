@@ -17,6 +17,7 @@ import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
 const val SEARCH_TYPE_NONE = "none"
 const val SEARCH_TYPE_DUE_TODAY = "due_today"
@@ -26,9 +27,10 @@ const val SEARCH_TYPE_SCHEDULED = "scheduled"
 const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 
 // TODO: encapsulate view models
-class GalleryViewModel internal constructor(projectRepository: ProjectRepository,
-                                            private val tagRepository: TagRepository,
-                                            private val weatherRepository: WeatherRepository) : ViewModel() {
+class GalleryViewModel
+@Inject constructor (projectRepository: ProjectRepository,
+                     private val tagRepository: TagRepository,
+                     private val weatherRepository: WeatherRepository) : ViewModel() {
     // For observing all projects
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
 

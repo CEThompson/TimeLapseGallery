@@ -176,6 +176,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
         mPlaybackInterval = playbackIntervalSharedPref?.toLong() ?: 50
 
+        // TODO refactor toolbar so that it does not violate inversion of control
         // Set up toolbar
         setHasOptionsMenu(true)
         toolbar = binding?.detailsFragmentToolbar

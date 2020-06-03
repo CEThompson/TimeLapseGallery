@@ -6,6 +6,8 @@ import com.vwoom.timelapsegallery.weather.ForecastLocationResponse
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherApi.weatherService
 import com.vwoom.timelapsegallery.weather.WeatherResult
+import com.vwoom.timelapsegallery.weather.WeatherService
+import javax.inject.Inject
 
 class WeatherRemoteDataSource {
     // Get the forecast from the national weather service api

@@ -219,7 +219,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     override fun onResume() {
         super.onResume()
-        (activity as TimeLapseGalleryActivity).supportActionBar?.hide()
+        // TODO handle action bar: (activity as TimeLapseGalleryActivity).supportActionBar?.hide()
     }
 
     private fun initializeCamera() = lifecycleScope.launchIdling {
@@ -303,7 +303,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         } catch (exc: Throwable) {
             Log.e(TAG, "Error closing camera", exc)
         }
-        (activity as TimeLapseGalleryActivity).supportActionBar?.show()
+        // TODO handle action bar: (activity as TimeLapseGalleryActivity).supportActionBar?.show()
     }
 
     override fun onDestroy() {

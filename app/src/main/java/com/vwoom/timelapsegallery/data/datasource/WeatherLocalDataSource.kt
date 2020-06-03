@@ -8,8 +8,10 @@ import com.vwoom.timelapsegallery.weather.WeatherApi.moshi
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class WeatherLocalDataSource(private val weatherDao: WeatherDao) {
+class WeatherLocalDataSource
+@Inject constructor (private val weatherDao: WeatherDao) {
 
     // Gets the forecast from the database
     // Returns either (1) No Data (2) Todays Forecast or (3) A Cached Forecast

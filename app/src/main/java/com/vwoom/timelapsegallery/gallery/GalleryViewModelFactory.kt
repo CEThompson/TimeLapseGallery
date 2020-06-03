@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModelProvider.NewInstanceFactory
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.repository.WeatherRepository
+import javax.inject.Inject
 
-class GalleryViewModelFactory(private val projectRepository: ProjectRepository,
-                              private val tagRepository: TagRepository,
-                                private val weatherRepository: WeatherRepository) : NewInstanceFactory() {
+
+class GalleryViewModelFactory
+@Inject constructor (private val projectRepository: ProjectRepository,
+                     private val tagRepository: TagRepository,
+                     private val weatherRepository: WeatherRepository) : NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
         return GalleryViewModel(
