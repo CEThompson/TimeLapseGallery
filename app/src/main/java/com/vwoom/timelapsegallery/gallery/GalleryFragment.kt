@@ -1,9 +1,11 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
@@ -36,8 +38,8 @@ import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.weather.WeatherChartDialog
 import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
 import com.vwoom.timelapsegallery.weather.WeatherResult
+import java.lang.Exception
 
-// TODO if network / data disabled show feedback on attempt to get weather
 // TODO: create gifs or mp4s from photo sets
 // TODO: increase test coverage
 // TODO: optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
@@ -270,7 +272,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     /**
      * UI binding
      */
-    // TODO: (update 1.2) re-evaluate transition after taking pictures of a project, filtered projects do not update immediately
     private fun setupViewModel() {
         // Observe the entire list projects in the database
         // Note: this does not bind directly to displayed projects
@@ -344,14 +345,34 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
     // Gets the device location and executes a function passed as a parameter
     private fun getLocationAndExecute(toExecute: () -> Unit) {
+        val lm: LocationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        // Determine if network or gps are enabled
+        val gpsEnabled = try { lm.isProviderEnabled(LocationManager.GPS_PROVIDER) }
+            catch (e: Exception) { false }
+        val networkEnabled = try { lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) }
+            catch (e: Exception) { false }
+
         if (gpsPermissionsGranted()) {
-            SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
-                override fun onNewLocationAvailable(location: Location?) {
-                    mLocation = location
-                    toExecute.invoke()
-                }
-            })
-        } else {
+            // If gps permissions have been granted:
+            // If neither network or gps available, inform the user to activate location services
+            if (!gpsEnabled && !networkEnabled) {
+                mGalleryViewModel.getForecast(null)
+                Toast.makeText(requireContext(), getString(R.string.enable_location_resources), Toast.LENGTH_LONG).show()
+            }
+            // Otherwise request a single shot location
+            // and invoke the passed in function (forecast get or update) on success
+            else {
+                SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
+                    override fun onNewLocationAvailable(location: Location?) {
+                        mLocation = location
+                        toExecute.invoke()
+                    }
+                })
+            }
+        }
+        // If gps permissions have not been granted request the permissions
+        else {
             requestPermissions(GPS_PERMISSIONS, GPS_REQUEST_CODE_PERMISSIONS)
         }
     }

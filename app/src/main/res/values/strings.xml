@@ -284,5 +284,6 @@
     <string name="no_location_error">Unable to sync: no location available</string>
     <string name="permissions_required_for_forecast">Permissions required to get localized forecast.</string>
     <string name="error_retrieving_files_dir">Error retrieving the files directory for the project.</string>
+    <string name="enable_location_resources">Cannot access gps or network: please enable location services.</string>
 
 </resources>
