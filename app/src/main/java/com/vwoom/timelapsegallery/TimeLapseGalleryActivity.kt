@@ -8,7 +8,7 @@ import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 
 // TODO: consider implementing RTL support
-// TODO: implement
+// TODO: implement left handed and right handed modes
 
 // TODO: implement activity drawer and navigation overrides here
 class TimeLapseGalleryActivity : AppCompatActivity() {
