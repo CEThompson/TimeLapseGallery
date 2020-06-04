@@ -14,6 +14,9 @@ import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 // TODO: consider any content descriptions that need dynamic content descriptions with live regions
 
 // TODO: implement activity drawer and navigation overrides here
+
+// TODO: consider implement search tag filters as chips instead of checkboxes
+
 class TimeLapseGalleryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
