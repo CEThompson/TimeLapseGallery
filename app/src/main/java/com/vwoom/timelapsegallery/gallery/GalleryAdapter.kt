@@ -176,6 +176,6 @@ class ProjectViewDiffCallback: DiffUtil.ItemCallback<ProjectView>() {
     }
 
     override fun areItemsTheSame(oldItem: ProjectView, newItem: ProjectView): Boolean {
-        return oldItem == newItem
+        return oldItem === newItem
     }
 }
