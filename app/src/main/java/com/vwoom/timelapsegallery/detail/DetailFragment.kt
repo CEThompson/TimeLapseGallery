@@ -576,7 +576,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // Handle UI
         fadeOutPhotoInformation()
         setFabStatePlaying(true)
-        
+
         // Rewind from the end if currently at the beginning
         if (mCurrentPlayPosition == 0) {
             mCurrentPlayPosition = mPhotos.size - 1

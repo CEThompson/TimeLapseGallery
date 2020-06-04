@@ -26,6 +26,22 @@
                 app:layout_constraintTop_toTopOf="parent"
                 />
 
+            <!-- FAB to play a video backwards -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/play_backwards_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin"
+                android:contentDescription="@string/play_as_video_fab_content_description"
+                android:transitionName="details_play_fab"
+                android:src="@drawable/ic_baseline_fast_rewind_white_24"
+                app:borderWidth="0dp"
+                app:backgroundTint="@color/colorSubtleAccent"
+                app:fabSize="mini"
+                app:layout_constraintEnd_toStartOf="@id/details_card_container"
+                app:layout_constraintBottom_toBottomOf="@id/details_card_container"
+                />
+
             <!-- tag management fab -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/project_tag_fab"
