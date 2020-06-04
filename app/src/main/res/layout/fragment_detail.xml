@@ -243,6 +243,22 @@
                 android:theme="@style/AppToolbar" />
         </com.google.android.material.appbar.AppBarLayout>
 
+        <!-- FAB to play a video backwards -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/play_backwards_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="@dimen/fab_detail_rewind_bottom"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:contentDescription="@string/play_as_video_fab_content_description"
+            android:transitionName="details_play_fab"
+            android:src="@drawable/ic_baseline_fast_rewind_white_24"
+            app:borderWidth="0dp"
+            app:backgroundTint="@color/colorSubtleAccent"
+            app:fabSize="mini"
+            />
+
         <!-- FAB to play a video from the images -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/play_as_video_fab"

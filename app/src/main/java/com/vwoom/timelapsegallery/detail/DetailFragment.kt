@@ -25,7 +25,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
@@ -215,6 +214,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             }
         }
         binding?.playAsVideoFab?.setOnClickListener { playSetOfImages() }
+        binding?.playBackwardsFab?.setOnClickListener { rewindSetOfImages() }
         binding?.projectScheduleFab?.setOnClickListener {
             if (mScheduleDialog == null) initializeScheduleDialog()
             mScheduleDialog?.show()
@@ -539,7 +539,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto)
         // Handle UI
         fadeOutPhotoInformation()
-        setFabStatePlaying()
+        setFabStatePlaying(backward = false)
         // Override the play position to beginning if currently already at the end
         if (mCurrentPlayPosition == mPhotos.size - 1) {
             mCurrentPlayPosition = 0
@@ -548,17 +548,56 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // Schedule the recursive sequence
         binding?.imageLoadingProgress?.progress = mCurrentPlayPosition
-        scheduleLoadPhoto(mCurrentPlayPosition) // Recursively loads the rest of set from beginning
+        scheduleNextPhoto(mCurrentPlayPosition) // Recursively loads the rest of set from beginning
 
         // Track play button interaction
         mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_play_time_lapse), null)
     }
 
+    // Loads the set of images backwards
+    private fun rewindSetOfImages() {
+        // If already playing then stop
+        if (mPlaying) {
+            stopPlaying()
+            mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
+            return
+        }
+        // If not enough photos give user feedback
+        if (mPhotos.size <= 1) {
+            Snackbar.make(binding!!.detailsCoordinatorLayout, R.string.add_more_photos,
+                    Snackbar.LENGTH_LONG)
+                    .show()
+            return
+        }
+
+        // Handle play state
+        mPlaying = true
+        mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto)
+        // Handle UI
+        fadeOutPhotoInformation()
+        setFabStatePlaying(true)
+        
+        // Rewind from the end if currently at the beginning
+        if (mCurrentPlayPosition == 0) {
+            mCurrentPlayPosition = mPhotos.size - 1
+            detailViewModel.setPhoto(mPhotos[mPhotos.size - 1])
+        }
+
+        // Schedule the recursive sequence
+        binding?.imageLoadingProgress?.progress = mCurrentPlayPosition
+        scheduleRewindPhoto(mCurrentPlayPosition) // Recursively loads the rest of set from beginning
+    }
+
+
     // Sets the two play buttons to red with a stop icon
-    private fun setFabStatePlaying() {
+    private fun setFabStatePlaying(backward: Boolean) {
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorRedAccent))
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorRedAccent)
         binding?.playAsVideoFab?.setImageResource(R.drawable.ic_stop_white_24dp)
+
+        if (backward)
+            binding?.playBackwardsFab?.backgroundTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
     }
 
     // Sets the two play buttons to green with a play icon
@@ -566,6 +605,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.playAsVideoFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorGreen))
         binding?.playAsVideoFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
         binding?.playAsVideoFab?.setImageResource(R.drawable.ic_play_arrow_white_24dp)
+
+        binding?.playBackwardsFab?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorSubtleAccent))
+
     }
 
     // Resets the UI & handles state after playing
@@ -579,7 +621,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     }
 
     // Sets a coroutine to load the next photo every 50 ms, or whatever has been chosen from the shared preferences
-    private fun scheduleLoadPhoto(position: Int) {
+    private fun scheduleNextPhoto(position: Int) {
         Log.d("DetailsFragment", "schedule loading position $position")
         if (position < 0 || position >= mPhotos.size) {
             stopPlaying()
@@ -592,11 +634,34 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             if (mImageIsLoaded) {
                 detailViewModel.nextPhoto()
                 binding?.imageLoadingProgress?.progress = position + 1
-                scheduleLoadPhoto(position + 1)
+                scheduleNextPhoto(position + 1)
             }
             // Otherwise check again after the interval
             else {
-                scheduleLoadPhoto(position)
+                scheduleNextPhoto(position)
+            }
+        }
+    }
+
+    // Sets a coroutine to load the previous photo every 50 ms, or whatever has been chosen from the shared preferences
+    private fun scheduleRewindPhoto(position: Int) {
+        Log.d("DetailsFragment", "schedule loading position $position")
+        if (position < 0 || position >= mPhotos.size) {
+            stopPlaying()
+            return
+        }
+        mCurrentPlayPosition = position
+        playJob = detailViewModel.viewModelScope.launch {
+            delay(mPlaybackInterval)
+            // If image is loaded load the next photo
+            if (mImageIsLoaded) {
+                detailViewModel.previousPhoto()
+                binding?.imageLoadingProgress?.progress = position - 1
+                scheduleRewindPhoto(position - 1)
+            }
+            // Otherwise check again after the interval
+            else {
+                scheduleRewindPhoto(position)
             }
         }
     }

@@ -32,6 +32,7 @@
 
     <dimen name="fab_detail_margin_bottom">52dp</dimen>
     <dimen name="fab_detail_plus_add_margin_bottom">120dp</dimen>
+    <dimen name="fab_detail_rewind_bottom">188dp</dimen>
 
     <dimen name="fab_size">52dp</dimen>
 
