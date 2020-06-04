@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.detail
 
+/*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
@@ -14,4 +15,4 @@ class DetailViewModelFactory(private val projectRepository: ProjectRepository,
                 projectRepository,
                 tagRepository, projectId) as T
     }
-}
+}*/

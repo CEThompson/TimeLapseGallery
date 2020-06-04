@@ -15,7 +15,8 @@ import javax.inject.Singleton
             AndroidInjectionModule::class,
             AndroidSupportInjectionModule::class,
             DataModule::class,
-            GalleryModule::class
+            GalleryModule::class,
+            DetailModule::class
         ]
 )
 interface AppComponent {

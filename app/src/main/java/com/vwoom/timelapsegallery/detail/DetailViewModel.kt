@@ -17,16 +17,21 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectV
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
+import javax.inject.Inject
+import kotlin.properties.Delegates
 
 // TODO implement on cleared for any view model jobs
-class DetailViewModel(private val projectRepository: ProjectRepository,
-                      private val tagRepository: TagRepository,
-                      private val projectId: Long) : ViewModel() {
+class DetailViewModel @Inject constructor(
+        private val projectRepository: ProjectRepository,
+        private val tagRepository: TagRepository) : ViewModel() {
+
+    private var projectId by Delegates.notNull<Long>()
+
     // Live data
-    val projectView: LiveData<ProjectView?> = projectRepository.getProjectViewLiveData(projectId)
-    val photos: LiveData<List<PhotoEntry>> = projectRepository.getProjectPhotosLiveData(projectId)
-    val projectTags: LiveData<List<ProjectTagEntry>> = tagRepository.getProjectTagsLiveData(projectId)
-    val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
+    lateinit var projectView: LiveData<ProjectView?>
+    lateinit var photos: LiveData<List<PhotoEntry>>
+    lateinit var projectTags: LiveData<List<ProjectTagEntry>>
+    lateinit var tags: LiveData<List<TagEntry>>
 
     // Dialog state
     var scheduleDialogShowing: Boolean = false
@@ -38,6 +43,15 @@ class DetailViewModel(private val projectRepository: ProjectRepository,
     var lastPhoto: Photo? = null    // used to pass to the camera fragment
     var photoIndex: Int = 0
     var maxIndex: Int = 0
+
+    fun injectProjectId(id: Long){
+        projectId = id
+        projectView = projectRepository.getProjectViewLiveData(projectId)
+        photos = projectRepository.getProjectPhotosLiveData(projectId)
+        projectTags = tagRepository.getProjectTagsLiveData(projectId)
+        tags = tagRepository.getTagsLiveData()
+
+    }
 
     fun setSchedule(externalFilesDir: File, projectView: ProjectView, intervalInDays: Int) {
         viewModelScope.launch {

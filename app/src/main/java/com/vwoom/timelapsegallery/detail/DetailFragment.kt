@@ -55,11 +55,13 @@ import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
+import javax.inject.Inject
 import kotlin.properties.Delegates
 
 // TODO: (update 1.2) use NDK to implement converting photo sets to .gif and .mp4/.mov etc
@@ -68,9 +70,10 @@ import kotlin.properties.Delegates
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private val args: DetailFragmentArgs by navArgs()
-    private val detailViewModel: DetailViewModel by viewModels {
-        InjectorUtils.provideDetailsViewModelFactory(requireActivity(), args.clickedProjectView)
-    }
+
+    @Inject
+    lateinit var detailViewModel: DetailViewModel
+
     private lateinit var mExternalFilesDir: File
     private var binding: FragmentDetailBinding? = null
     private var toolbar: Toolbar? = null
@@ -126,6 +129,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Inject viewmodel and its passed argument
+        AndroidSupportInjection.inject(this)
+        detailViewModel.injectProjectId(args.clickedProjectView.project_id)
+
         mCurrentProjectView = args.clickedProjectView
         mPlaybackInterval = getString(R.string.playback_interval_default).toLong()
 
