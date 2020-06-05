@@ -1,6 +1,6 @@
 <resources>
     <!-- Project strings -->
-    <string name="app_name">Time Lapse Gallery</string>
+    <string name="app_name">TLG</string>
     <string name="project_details">Project Details</string>
 
     <!-- Option actions -->
