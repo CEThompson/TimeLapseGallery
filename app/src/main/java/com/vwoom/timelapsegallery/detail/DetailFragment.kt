@@ -137,7 +137,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         try {
             mExternalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
         } catch (exc: KotlinNullPointerException) {
-            // TODO (update 1.2): Investigate potential failurs with external files.
+            // TODO (update 1.2): Investigate potential failures with external files.
             Log.e(TAG, "Couldn't get external files directory.")
             Toast.makeText(requireContext(), "Fatal Error: Could not load external files!", Toast.LENGTH_LONG).show()
         }
@@ -287,10 +287,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     startActivity(Intent.createChooser(shareIntent, "Share Image"))
                 }
 
+                // TODO: determine conditions for gif creation
                 Log.d("TLG.GIF:", "Calling make gif")
                 detailViewModel.viewModelScope.launch {
                     withContext(Dispatchers.IO) {
-                        FfmpegUtils.makeGif(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
+                        ProjectUtils.makeGif(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
                     }
                 }
 
@@ -311,6 +312,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+
 
     /**
      * Lifecycle

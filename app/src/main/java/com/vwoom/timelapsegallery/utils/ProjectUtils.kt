@@ -1,5 +1,8 @@
 package com.vwoom.timelapsegallery.utils
 
+import android.util.Log
+import com.arthenica.mobileffmpeg.Config
+import com.arthenica.mobileffmpeg.FFmpeg
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
@@ -115,5 +118,31 @@ object ProjectUtils {
         val daysUntilDue = projectView.interval_days - daysSinceLastPhoto
         return daysUntilDue == 1.toLong()
     }
+
+    // Creates a .gif from the set of photos for a project
+    fun makeGif(externalFilesDir: File, project: ProjectEntry){
+        // Write the list of paths for the files to a text file for use by ffmpeb
+        Log.d("TLG.GIF:", "Creating list of text files")
+        val listTextFile = FileUtils.createTempListPhotoFiles(externalFilesDir, project)
+
+        // Get the meta directory for the project
+        val projectMetaDir = getMetaDirectoryForProject(externalFilesDir, project.id)
+
+        // Define the output path for the gif
+        val outputGif = "${projectMetaDir.absolutePath}/out.gif"
+        Log.d("TLG.GIF:", "Output gif path is: $outputGif")
+
+        // Create the command for ffmpeg
+        val ffmpegCommand = "-r 7 -y -f concat -safe 0 -i $listTextFile -vf scale=400:-1 $outputGif"
+        Log.d("TLG.GIF:", "Executing ffmpeg command: $ffmpegCommand")
+
+        // Execute the command
+        val rc = FFmpeg.execute(ffmpegCommand)
+        Log.d("TLG.GIF:", "Executed, rc is: $rc")
+
+        val lastCommandOutput = Config.getLastCommandOutput()
+        Log.d("TLG.GIF:", "Last command output: $lastCommandOutput")
+    }
+
 }
 
