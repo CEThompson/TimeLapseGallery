@@ -10,11 +10,8 @@ import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 // TODO: consider implementing RTL support
 // TODO: implement left handed and right handed modes for detail fragment
 // TODO: implement content grouping where appropriate for accessibility
-
 // TODO: consider any content descriptions that need dynamic content descriptions with live regions
-
 // TODO: implement activity drawer and navigation overrides here
-
 // TODO: consider implement search tag filters as chips instead of checkboxes
 
 class TimeLapseGalleryActivity : AppCompatActivity() {
