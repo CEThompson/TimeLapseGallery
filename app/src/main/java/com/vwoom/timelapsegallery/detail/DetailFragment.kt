@@ -55,9 +55,7 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectV
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -288,6 +286,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     }
                     startActivity(Intent.createChooser(shareIntent, "Share Image"))
                 }
+
+                Log.d("TLG.GIF:", "Calling make gif")
+                detailViewModel.viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        FfmpegUtils.makeGif(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
+                    }
+                }
+
                 true
             }
             R.id.delete_photo -> {

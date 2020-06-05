@@ -181,4 +181,7 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
+    /* ffmpeg */
+    // Note: LTS version required to support API level 16+ rather than API level 24+
+    implementation 'com.arthenica:mobile-ffmpeg-full:4.3.1.LTS'
 }

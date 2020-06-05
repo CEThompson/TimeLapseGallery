@@ -24,7 +24,7 @@ object ProjectUtils {
 
     // Creates a list of photo entries in a project folder sorted by timestamp
     fun getPhotoEntriesInProjectDirectory(externalFilesDir: File,
-                                          projectEntry: ProjectEntry): List<PhotoEntry>? {
+                                          projectEntry: ProjectEntry): List<PhotoEntry> {
         val photos: MutableList<PhotoEntry> = ArrayList()
         val projectFolder = getProjectFolder(externalFilesDir, projectEntry)
         val files = projectFolder.listFiles()
@@ -43,7 +43,7 @@ object ProjectUtils {
                 val photoEntry = PhotoEntry(projectEntry.id, timestamp)
                 photos.add(photoEntry)
             }
-        } else return null
+        }
         // Sort the photo entries by timestamp
         photos.sortBy { it.timestamp }
         return photos

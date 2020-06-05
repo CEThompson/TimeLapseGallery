@@ -6,7 +6,6 @@ import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getMetaDirectoryForProject
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectFolder
-import com.vwoom.timelapsegallery.weather.ForecastResponse
 import java.io.*
 
 const val RESERVED_CHARACTERS = "|\\?*<\":>+[]/'"
@@ -17,10 +16,13 @@ object FileUtils {
     // Directory definitions
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
     const val META_FILE_SUBDIRECTORY = "Meta"
+    const val GIF_FILE_SUBDIRECTORY = "gif"
 
     // Text files for metadata
     const val SCHEDULE_TEXT_FILE = "schedule.txt"
     const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
+
+    const val LIST_PHOTOS_TEXT_FILE = "photos_list.txt"
 
     // Creates an image file for a project in the projects folder by project view
     private fun createImageFileForProject(storageDirectory: File, projectEntry: ProjectEntry, timestamp: Long): File {
@@ -150,6 +152,48 @@ object FileUtils {
         } catch (exception: IOException) {
             Log.e(TAG, "error writing schedule to text file: ${exception.message}")
         }
+    }
+
+    fun createTempListPhotoFiles(
+            externalFilesDir: File,
+            project: ProjectEntry): File? {
+
+        // First clean the temp files
+        Log.d("TLG.GIF:", "Clearing temp directory")
+        deleteTempFiles(externalFilesDir)
+
+        Log.d("TLG.GIF:", "Getting list of photos to convert")
+        val photosToConvert = ProjectUtils.getPhotoEntriesInProjectDirectory(externalFilesDir, project)
+
+        val tempFolder = File(externalFilesDir, TEMP_FILE_SUBDIRECTORY)
+        tempFolder.mkdir()
+        val listFiles = File(tempFolder, LIST_PHOTOS_TEXT_FILE)
+
+        Log.d("TLG.GIF:", "Writing list of photos to convert")
+        try {
+            val output = FileOutputStream(listFiles)
+            val outputStreamWriter = OutputStreamWriter(output)
+
+            // create a text file list of the photo urls in the format
+            // file '/path/to/file1'
+            // file '/path/to/file2'
+            // etc.
+            for (photo in photosToConvert) {
+                val photoUrlString = ProjectUtils.getProjectPhotoUrl(externalFilesDir, project, photo.timestamp)
+                val fileDefString = "file '$photoUrlString'\n"
+                Log.d("TLG.GIF:", "Writing: $fileDefString")
+                outputStreamWriter.write(fileDefString)
+            }
+
+            outputStreamWriter.flush()
+            output.fd.sync()
+            outputStreamWriter.close()
+
+        } catch (exception: IOException) {
+            Log.d("TLG.GIF:", "Caught exception trying to write list of files: ${exception.message}")
+            return null
+        }
+        return listFiles
     }
 
 }
