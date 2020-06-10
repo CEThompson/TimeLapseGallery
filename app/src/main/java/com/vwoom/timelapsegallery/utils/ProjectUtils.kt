@@ -133,7 +133,7 @@ object ProjectUtils {
         Log.d("TLG.GIF:", "Output gif path is: $outputGif")
 
         // Create the command for ffmpeg
-        val ffmpegCommand = "-r 7 -y -f concat -safe 0 -i $listTextFile -vf scale=400:-1 $outputGif"
+        val ffmpegCommand = "-r 14 -y -f concat -safe 0 -i $listTextFile -vf scale=400:-1 $outputGif"
         Log.d("TLG.GIF:", "Executing ffmpeg command: $ffmpegCommand")
 
         // Execute the command
