@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
@@ -103,6 +104,19 @@ class GalleryAdapter(
         holder.binding.galleryScheduleLayout.galleryGradientTopDown.transitionName = "${imageTransitionName}topGradient"
         holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.transitionName = "${imageTransitionName}due"
         holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.transitionName = "${imageTransitionName}interval"
+
+        // TODO try loading gif
+        val projectMetaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesDir, project.project_id)
+        // Define the output path for the gif
+        val outputGif = "${projectMetaDir.absolutePath}/out.gif"
+        val gifFile = File(outputGif)
+        if (gifFile.exists()) {
+            Glide.with(holder.itemView.context)
+                    .asGif()
+                    .load(gifFile)
+                    .into(holder.binding.projectImage)
+            return
+        }
 
         // Load the image or an error image
         if (photoUrl == null) {
