@@ -63,7 +63,6 @@ import kotlin.properties.Delegates
 
 // TODO: (update 1.2) use NDK to implement converting photo sets to .gif and .mp4/.mov etc
 // TODO: (update 1.2) implement pinch zoom on fullscreen image
-// TODO: add rewind button
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private val args: DetailFragmentArgs by navArgs()
@@ -287,7 +286,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     startActivity(Intent.createChooser(shareIntent, "Share Image"))
                 }
 
-                // TODO: determine conditions for gif creation
+                // TODO: determine conditions for gif creation. Create only after 5 samples?
                 Log.d("TLG.GIF:", "Calling make gif")
                 detailViewModel.viewModelScope.launch {
                     withContext(Dispatchers.IO) {
