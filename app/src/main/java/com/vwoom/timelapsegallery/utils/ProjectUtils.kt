@@ -128,9 +128,13 @@ object ProjectUtils {
         // Get the meta directory for the project
         val projectMetaDir = getMetaDirectoryForProject(externalFilesDir, project.id)
 
+        // TODO: centralize location of all output gifs and name them by project ID
         // Define the output path for the gif
         val outputGif = "${projectMetaDir.absolutePath}/out.gif"
         Log.d("TLG.GIF:", "Output gif path is: $outputGif")
+
+        // TODO: create control for framerate
+        // TODO: create control for scale
 
         // Create the command for ffmpeg
         val ffmpegCommand = "-r 14 -y -f concat -safe 0 -i $listTextFile -vf scale=400:-1 $outputGif"
@@ -142,6 +146,13 @@ object ProjectUtils {
 
         val lastCommandOutput = Config.getLastCommandOutput()
         Log.d("TLG.GIF:", "Last command output: $lastCommandOutput")
+    }
+
+    fun getGifForProject(externalFilesDir: File, project: ProjectEntry): File? {
+        val projectMetaDir = getMetaDirectoryForProject(externalFilesDir, project.id)
+        val gifFile = File("${projectMetaDir.absolutePath}/out.gif")
+        return if (gifFile.exists()) gifFile
+        else null
     }
 
 }

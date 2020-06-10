@@ -267,10 +267,43 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.share -> {
+            R.id.convert_to_gif -> {
+                Log.d("TLG.GIF:", "Calling make gif")
+                val convertJob = detailViewModel.viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        ProjectUtils.makeGif(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
+                    }
+                }
+                convertJob.invokeOnCompletion {
+                    Toast.makeText(requireContext(), "Conversion complete", Toast.LENGTH_SHORT).show()
+                }
+                true
+            }
+            R.id.share_project -> {
+                val gifFile = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
+                if (gifFile != null) {
+                    val shareIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        type = "image/gif"
+                        val photoURI: Uri = FileProvider.getUriForFile(requireContext(),
+                                requireContext().applicationContext.packageName.toString() + ".fileprovider",
+                                gifFile)
+                        putExtra(Intent.EXTRA_STREAM, photoURI)
+                    }
+                    startActivity(Intent.createChooser(shareIntent, "Share Image"))
+                }
+                // Gif has not yet been created
+                else {
+                    Toast.makeText(requireContext(), "No GIF available for project", Toast.LENGTH_LONG).show()
+                    // TODO: Open create gif/video dialog
+                }
+                true
+            }
+            R.id.share_photo -> {
                 val photoUrl = ProjectUtils.getProjectPhotoUrl(mExternalFilesDir,
                         getProjectEntryFromProjectView(mCurrentProjectView),
                         mCurrentPhoto.timestamp)
+
                 if (photoUrl != null)
                 {
                     val shareIntent: Intent = Intent().apply {
@@ -285,15 +318,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     }
                     startActivity(Intent.createChooser(shareIntent, "Share Image"))
                 }
-
-                // TODO: determine conditions for gif creation. Create only after 5 samples?
-                Log.d("TLG.GIF:", "Calling make gif")
-                detailViewModel.viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
-                        ProjectUtils.makeGif(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
-                    }
-                }
-
                 true
             }
             R.id.delete_photo -> {

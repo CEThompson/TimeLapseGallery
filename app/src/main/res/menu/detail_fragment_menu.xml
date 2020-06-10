@@ -2,10 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/share"
-        android:title="@string/share"
+    <item android:id="@+id/convert_to_gif"
+        android:title="@string/convert_to_gif"
+        android:icon="@drawable/ic_baseline_video_call_24"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/share_project"
+        android:title="@string/share_project"
         android:icon="@drawable/ic_share_white_24dp"
         app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/share_photo"
+        android:title="@string/share_photo"
+        app:showAsAction="never"/>
 
     <item android:id="@+id/delete_photo"
         android:title="@string/delete_photo"

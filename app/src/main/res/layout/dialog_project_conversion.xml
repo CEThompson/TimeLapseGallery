@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TODO: consider finishing this dialog to handle gif/video conversion -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/dialog_conversion_exit_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:layout_margin="@dimen/medium"
+        android:src="@drawable/ic_clear_white_24dp"
+        app:backgroundTint="@color/colorSubtleRedAccent"
+        app:fabSize="mini"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/dialog_conversion_gif_preview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/large"
+        android:src="@color/darkImagePlaceHolder"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_conversion_exit_fab"
+        app:layout_constraintBottom_toTopOf="@id/dialog_project_conversion_convert_FAB"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/dialog_conversion_share_FAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/medium"
+        android:src="@drawable/ic_share_white_24dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/dialog_project_conversion_convert_FAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/medium"
+        app:backgroundTint="@color/colorGreen"
+        android:src="@drawable/ic_baseline_video_call_24"
+        app:layout_constraintRight_toLeftOf="@id/dialog_conversion_share_FAB"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/dialog_project_conversion_remove_FAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/medium"
+        app:backgroundTint="@color/colorRedAccent"
+        android:src="@drawable/ic_baseline_videocam_off_24"
+        app:layout_constraintRight_toLeftOf="@id/dialog_project_conversion_convert_FAB"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
