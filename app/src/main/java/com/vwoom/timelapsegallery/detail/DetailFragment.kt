@@ -94,13 +94,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Dialogs
     private var mTagDialog: Dialog? = null
     private var mInfoDialog: InfoDialog? = null
-    private var mScheduleDialog: Dialog? = null
+    private var mScheduleDialog: ScheduleDialog? = null
     private var mConvertDialog: ConversionDialog? = null
-
-    // For schedule selection
-    private var mNoneSelector: CardView? = null
-    private val mDaySelectionViews: ArrayList<CardView> = arrayListOf()
-    private val mWeekSelectionViews: ArrayList<CardView> = arrayListOf()
 
     // For playing time lapse
     private var mPlaying = false
@@ -221,7 +216,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.playAsVideoFab?.setOnClickListener { playSetOfImages() }
         binding?.playBackwardsFab?.setOnClickListener { rewindSetOfImages() }
         binding?.projectScheduleFab?.setOnClickListener {
-            if (mScheduleDialog == null) initializeScheduleDialog()
+            if (mScheduleDialog == null) {
+                mScheduleDialog = ScheduleDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
+            }
             mScheduleDialog?.show()
             detailViewModel.scheduleDialogShowing = true
         }
@@ -368,7 +365,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mInfoDialog?.show()
         }
         if (detailViewModel.scheduleDialogShowing) {
-            if (mScheduleDialog == null) initializeScheduleDialog()
+            if (mScheduleDialog == null) {
+                mScheduleDialog = ScheduleDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
+            }
             mScheduleDialog?.show()
         }
         if (detailViewModel.tagDialogShowing) {
@@ -757,89 +756,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         setProjectTagDialog()
     }
 
-    private fun initializeScheduleDialog() {
-        if (mScheduleDialog != null) return
-
-        mScheduleDialog = Dialog(requireContext())
-        mScheduleDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        mScheduleDialog?.setContentView(R.layout.dialog_schedule)
-        mScheduleDialog?.setOnCancelListener { detailViewModel.scheduleDialogShowing = false }
-
-        // Set up selector for no schedule
-        val noneLayout = mScheduleDialog?.findViewById<FrameLayout>(R.id.dialog_schedule_none_layout)
-        noneLayout?.removeAllViews()
-        mNoneSelector = layoutInflater.inflate(R.layout.dialog_schedule_selector, noneLayout, false) as CardView
-        val noneTv = mNoneSelector?.findViewById<TextView>(R.id.selector_child_tv)
-        noneTv?.text = getString(R.string.unscheduled)
-        mNoneSelector?.contentDescription = getString(R.string.content_description_schedule_selector_none)
-        noneLayout?.addView(mNoneSelector)
-        mNoneSelector?.setOnClickListener {
-            detailViewModel.setSchedule(mExternalFilesDir, mCurrentProjectView, 0)
-            mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_schedule), null)
-        }
-
-        // Set up days selection
-        val daysLayout = mScheduleDialog?.findViewById<FlexboxLayout>(R.id.dialog_schedule_days_selection_layout)
-        daysLayout?.removeAllViews()
-        for (dayInterval in 1..6) {
-            // a selection layout for each interval
-            //val textView = TextView(requireContext())
-            val selectionLayout: CardView = layoutInflater.inflate(R.layout.dialog_schedule_selector, daysLayout, false) as CardView
-            val textView = selectionLayout.findViewById<TextView>(R.id.selector_child_tv)
-            textView.text = dayInterval.toString()
-            selectionLayout.setOnClickListener {
-                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProjectView, dayInterval)
-                mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_days), null)
-            }
-            daysLayout?.addView(selectionLayout)
-            selectionLayout.contentDescription = getString(R.string.content_description_schedule_selector_days, dayInterval)
-            mDaySelectionViews.add(selectionLayout)
-        }
-
-        // Set up weeks selection
-        val weeksLayout = mScheduleDialog?.findViewById<FlexboxLayout>(R.id.dialog_schedule_weeks_selection_layout)
-        weeksLayout?.removeAllViews()
-        for (weekInterval in 1..4) {
-            val selectionLayout: CardView = layoutInflater.inflate(R.layout.dialog_schedule_selector, daysLayout, false) as CardView
-            val textView = selectionLayout.findViewById<TextView>(R.id.selector_child_tv)
-            textView.text = weekInterval.toString()
-            selectionLayout.setOnClickListener {
-                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProjectView, weekInterval * 7)
-                mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_weeks), null)
-            }
-            weeksLayout?.addView(selectionLayout)
-            selectionLayout.contentDescription = getString(R.string.content_description_schedule_selector_weeks, weekInterval)
-            mWeekSelectionViews.add(selectionLayout)
-        }
-
-        // Set up custom input
-        mScheduleDialog?.findViewById<EditText>(R.id.custom_schedule_input)?.addTextChangedListener {
-            val interval = it.toString()
-            if (interval.isNotEmpty()) {
-                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProjectView, interval.toInt())
-                mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_custom), null)
-            } else {
-                detailViewModel.setSchedule(mExternalFilesDir, mCurrentProjectView, 0)
-                mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_schedule), null)
-            }
-        }
-
-        // Set up dismissing the dialog
-        val okTextView = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_dismiss)
-        okTextView?.setOnClickListener {
-            mScheduleDialog?.dismiss()
-            detailViewModel.scheduleDialogShowing = false
-        }
-        val exitFab = mScheduleDialog?.findViewById<FloatingActionButton>(R.id.schedule_dialog_exit_fab)
-        exitFab?.setOnClickListener {
-            mScheduleDialog?.dismiss()
-            detailViewModel.scheduleDialogShowing = false
-        }
-
-        // Update UI to current schedule
-        setScheduleInformation()
-    }
-
     /**
      * UI binding
      */
@@ -922,8 +838,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             // Also update the fields in the info dialog
             mInfoDialog?.setInfoDialog(projectView)
             // And update the fields in the schedule dialog
-            setScheduleInformation()
-
+            mScheduleDialog?.setScheduleInformation(projectView)
         })
 
         // Observe the list of photos
@@ -1089,46 +1004,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 availableTagsLayout?.addView(textView)
             }
         }
-    }
-
-    // Updates UI of schedule dialog to current schedule
-    private fun setScheduleInformation() {
-        if (mScheduleDialog == null) return
-        val colorSelected = R.color.colorPrimary
-        val colorDefault = R.color.colorSubtleAccent
-        val defaultElevation = 2f
-        val selectedElevation = 6f
-
-        val currentInterval = mCurrentProjectView.interval_days
-        if (currentInterval == 0) {
-            mNoneSelector?.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
-            mNoneSelector?.elevation = selectedElevation
-        } else {
-            mNoneSelector?.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorDefault))
-            mNoneSelector?.elevation = defaultElevation
-        }
-        for (selector in mDaySelectionViews) {
-            selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorDefault))
-            selector.elevation = defaultElevation
-            val selectorTv = selector.findViewById<TextView>(R.id.selector_child_tv)
-            if (selectorTv.text == currentInterval.toString()) {
-                selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
-                selector.elevation = selectedElevation
-            }
-        }
-        for (selector in mWeekSelectionViews) {
-            selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorDefault))
-            selector.elevation = defaultElevation
-            val selectorTv = selector.findViewById<TextView>(R.id.selector_child_tv)
-            val currentWeekIntervalToDays = selectorTv.text.toString().toInt() * 7
-            if (currentWeekIntervalToDays == currentInterval) {
-                selector.setCardBackgroundColor(ContextCompat.getColor(requireContext(), colorSelected))
-                selector.elevation = selectedElevation
-            }
-        }
-        val scheduleOutput = mScheduleDialog?.findViewById<TextView>(R.id.dialog_schedule_result)
-        if (mCurrentProjectView.interval_days == 0) scheduleOutput?.text = getString(R.string.none)
-        else scheduleOutput?.text = getString(R.string.every_x_days, mCurrentProjectView.interval_days.toString())
     }
 
     /**
