@@ -37,6 +37,7 @@ class DetailViewModel @Inject constructor(
     var scheduleDialogShowing: Boolean = false
     var infoDialogShowing: Boolean = false
     var tagDialogShowing: Boolean = false
+    var convertDialogShowing: Boolean = false
 
     // Photo state and positioning
     val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)

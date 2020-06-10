@@ -105,12 +105,10 @@ class GalleryAdapter(
         holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.transitionName = "${imageTransitionName}due"
         holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.transitionName = "${imageTransitionName}interval"
 
-        // TODO try loading gif
-        val projectMetaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesDir, project.project_id)
-        // Define the output path for the gif
-        val outputGif = "${projectMetaDir.absolutePath}/out.gif"
-        val gifFile = File(outputGif)
-        if (gifFile.exists()) {
+        // Load the gif for the project if created
+        val gifFile = ProjectUtils.getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
+        if (gifFile!=null) {
+            // TODO: figure out why gif is stuck on first frame after return
             Glide.with(holder.itemView.context)
                     .asGif()
                     .load(gifFile)
@@ -118,7 +116,7 @@ class GalleryAdapter(
             return
         }
 
-        // Load the image or an error image
+        // Otherwise load the image or an error image
         if (photoUrl == null) {
             Glide.with(holder.itemView.context)
                     .load(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)

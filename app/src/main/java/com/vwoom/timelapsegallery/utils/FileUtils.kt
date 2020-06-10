@@ -16,6 +16,7 @@ object FileUtils {
     // Directory definitions
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
     const val META_FILE_SUBDIRECTORY = "Meta"
+    const val GIF_FILE_SUBDIRECTORY = "Gif"
 
     // Text files for metadata
     const val SCHEDULE_TEXT_FILE = "schedule.txt"

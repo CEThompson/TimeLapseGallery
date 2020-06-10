@@ -21,6 +21,7 @@ import android.view.animation.Animation
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
@@ -33,6 +34,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.room.util.FileUtil
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -61,6 +63,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
+// TODO: debug dialogs failing to persist, perhaps something to do with dagger injection
 // TODO: (update 1.2) use NDK to implement converting photo sets to .gif and .mp4/.mov etc
 // TODO: (update 1.2) implement pinch zoom on fullscreen image
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
@@ -88,6 +91,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mTagDialog: Dialog? = null
     private var mInfoDialog: Dialog? = null
     private var mScheduleDialog: Dialog? = null
+    private var mConvertDialog: Dialog? = null
 
     // For schedule selection
     private var mNoneSelector: CardView? = null
@@ -268,15 +272,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.convert_to_gif -> {
-                Log.d("TLG.GIF:", "Calling make gif")
-                val convertJob = detailViewModel.viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
-                        ProjectUtils.makeGif(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
-                    }
-                }
-                convertJob.invokeOnCompletion {
-                    Toast.makeText(requireContext(), "Conversion complete", Toast.LENGTH_SHORT).show()
-                }
+                if (mConvertDialog == null) initializeConvertDialog()
+                mConvertDialog?.show()
+                detailViewModel.convertDialogShowing = true
                 true
             }
             R.id.share_project -> {
@@ -363,6 +361,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             if (mTagDialog == null) initializeTagDialog()
             mTagDialog?.show()
         }
+        if (detailViewModel.convertDialogShowing) {
+            if (mConvertDialog == null) initializeConvertDialog()
+            mConvertDialog?.show()
+        }
     }
 
     override fun onPause() {
@@ -375,6 +377,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mInfoDialog?.dismiss()
         mTagDialog?.dismiss()
         mScheduleDialog?.dismiss()
+        mConvertDialog?.dismiss()
     }
 
     override fun onStop() {
@@ -388,6 +391,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         mTagDialog = null
         mScheduleDialog = null
         mInfoDialog = null
+        mConvertDialog = null
         mDetailAdapter = null
         toolbar = null
     }
@@ -729,6 +733,73 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         setInfoDialog()
         setInfoTags()
+    }
+
+    private fun initializeConvertDialog() {
+        mConvertDialog = Dialog(requireContext())
+        mConvertDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        mConvertDialog?.setContentView(R.layout.dialog_project_conversion)
+        mConvertDialog?.setOnCancelListener{ detailViewModel.convertDialogShowing = false }
+
+        // Constrain dialog size
+        val dm = requireContext().resources.displayMetrics
+        val width = dm.widthPixels
+        val height = dm.heightPixels
+        val newWidth = (width * 0.7).toInt()
+        val newHeight = (height * 0.7).toInt()
+        mConvertDialog?.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout)?.layoutParams?.width = newWidth
+        mConvertDialog?.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout)?.layoutParams?.height = newHeight
+
+
+        // Initialize the gif preview
+        val gifFile = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
+        val gifPreview = mConvertDialog?.findViewById<ImageView>(R.id.dialog_conversion_gif_preview)
+        if (gifPreview!=null && gifFile!=null)
+            Glide.with(this)
+                    .load(gifFile)
+                    .fitCenter()
+                    .into(gifPreview)
+
+        // Convert the project photos to gif on click
+        val convertFab = mConvertDialog?.findViewById<FloatingActionButton>(R.id.dialog_project_conversion_convert_FAB)
+        convertFab?.setOnClickListener {
+            mConvertDialog?.findViewById<ProgressBar>(R.id.conversion_progress)?.visibility = VISIBLE
+            // Launch the conversion on IO thread
+            val convertJob = detailViewModel.viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    ProjectUtils.makeGif(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
+                }
+            }
+            // On completion update the preview
+            convertJob.invokeOnCompletion {
+                val updatedGif = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
+                mConvertDialog?.findViewById<ProgressBar>(R.id.conversion_progress)?.visibility = INVISIBLE
+                if (gifPreview!=null && updatedGif!=null)
+                    Glide.with(this)
+                            .load(updatedGif)
+                            .fitCenter()
+                            .into(gifPreview)
+            }
+        }
+
+        // Delete the gif for the project
+        val delFab = mConvertDialog?.findViewById<FloatingActionButton>(R.id.dialog_project_conversion_remove_FAB)
+        delFab?.setOnClickListener {
+            val curGif = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
+            if (curGif!=null) FileUtils.deleteRecursive(curGif)
+            if (gifPreview != null) {
+                Glide.with(this)
+                        .load(R.color.imagePlaceholder)
+                        .fitCenter()
+                        .into(gifPreview)
+            }
+        }
+
+        val exitFab = mConvertDialog?.findViewById<FloatingActionButton>(R.id.dialog_conversion_exit_fab)
+        exitFab?.setOnClickListener {
+            mConvertDialog?.dismiss()
+            detailViewModel.convertDialogShowing = false
+        }
     }
 
     private fun initializeTagDialog() {

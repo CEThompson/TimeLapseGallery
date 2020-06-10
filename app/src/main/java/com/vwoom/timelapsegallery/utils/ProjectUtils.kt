@@ -25,6 +25,12 @@ object ProjectUtils {
         return projectSubfolder
     }
 
+    private fun getGifDirectory(externalFilesDir: File): File {
+        val gifDir = File(externalFilesDir, FileUtils.GIF_FILE_SUBDIRECTORY)
+        gifDir.mkdir()
+        return gifDir
+    }
+
     // Creates a list of photo entries in a project folder sorted by timestamp
     fun getPhotoEntriesInProjectDirectory(externalFilesDir: File,
                                           projectEntry: ProjectEntry): List<PhotoEntry> {
@@ -126,11 +132,11 @@ object ProjectUtils {
         val listTextFile = FileUtils.createTempListPhotoFiles(externalFilesDir, project)
 
         // Get the meta directory for the project
-        val projectMetaDir = getMetaDirectoryForProject(externalFilesDir, project.id)
+        val projectGifDir = getGifDirectory(externalFilesDir)
 
         // TODO: centralize location of all output gifs and name them by project ID
         // Define the output path for the gif
-        val outputGif = "${projectMetaDir.absolutePath}/out.gif"
+        val outputGif = "${projectGifDir.absolutePath}/${project.id}.gif"
         Log.d("TLG.GIF:", "Output gif path is: $outputGif")
 
         // TODO: create control for framerate
@@ -149,11 +155,10 @@ object ProjectUtils {
     }
 
     fun getGifForProject(externalFilesDir: File, project: ProjectEntry): File? {
-        val projectMetaDir = getMetaDirectoryForProject(externalFilesDir, project.id)
-        val gifFile = File("${projectMetaDir.absolutePath}/out.gif")
+        val projectGifDir = getGifDirectory(externalFilesDir)
+        val gifFile = File("${projectGifDir.absolutePath}/${project.id}.gif")
         return if (gifFile.exists()) gifFile
         else null
     }
-
 }
 
