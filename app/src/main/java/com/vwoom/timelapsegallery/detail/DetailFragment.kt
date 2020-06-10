@@ -52,6 +52,9 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentDetailBinding
 import com.vwoom.timelapsegallery.detail.dialog.ConversionDialog
+import com.vwoom.timelapsegallery.detail.dialog.InfoDialog
+import com.vwoom.timelapsegallery.detail.dialog.ScheduleDialog
+import com.vwoom.timelapsegallery.detail.dialog.TagDialog
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
@@ -90,9 +93,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     // Dialogs
     private var mTagDialog: Dialog? = null
-    private var mInfoDialog: Dialog? = null
+    private var mInfoDialog: InfoDialog? = null
     private var mScheduleDialog: Dialog? = null
-    private var mConvertDialog: Dialog? = null
+    private var mConvertDialog: ConversionDialog? = null
 
     // For schedule selection
     private var mNoneSelector: CardView? = null
@@ -131,7 +134,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Inject viewmodel and its passed argument
+        // Inject view model and its passed argument
         AndroidSupportInjection.inject(this)
         detailViewModel.injectProjectId(args.clickedProjectView.project_id)
 
@@ -228,7 +231,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             detailViewModel.tagDialogShowing = true
         }
         binding?.projectInformationLayout?.projectInformationCardview?.setOnClickListener {
-            if (mInfoDialog == null) initializeInfoDialog()
+            if (mInfoDialog == null) {
+                mInfoDialog = InfoDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
+                mInfoDialog?.setInfoDialog(mCurrentProjectView)
+                mInfoDialog?.setInfoTags(getTagsText(mProjectTags))
+            }
             mInfoDialog?.show()
             detailViewModel.infoDialogShowing = true
         }
@@ -353,7 +360,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         super.onResume()
         // Restore any showing dialogs
         if (detailViewModel.infoDialogShowing) {
-            if (mInfoDialog == null) initializeInfoDialog()
+            if (mInfoDialog == null) {
+                mInfoDialog = InfoDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
+                mInfoDialog?.setInfoDialog(mCurrentProjectView)
+                mInfoDialog?.setInfoTags(getTagsText(mProjectTags))
+            }
             mInfoDialog?.show()
         }
         if (detailViewModel.scheduleDialogShowing) {
@@ -710,103 +721,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     /**
      * Dialog Initialization Methods
      */
-    private fun initializeInfoDialog() {
-        mInfoDialog = Dialog(requireContext())
-        mInfoDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        mInfoDialog?.setContentView(R.layout.dialog_project_information)
-        mInfoDialog?.setOnCancelListener { detailViewModel.infoDialogShowing = false }
-        // Get Views
-        val editNameButton = mInfoDialog?.findViewById<FloatingActionButton>(R.id.edit_project_name_button)
-        // Set fab colors
-        editNameButton?.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
-        editNameButton?.setOnClickListener { verifyEditName() }
-        val tagsTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
-        tagsTextView?.setOnClickListener {
-            if (mTagDialog == null) initializeTagDialog()
-            mTagDialog?.show()
-            detailViewModel.tagDialogShowing = true
-        }
-        val infoOkTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_info_dismiss)
-        infoOkTextView?.setOnClickListener {
-            mInfoDialog?.dismiss()
-            detailViewModel.infoDialogShowing = false
-        }
-        val exitFab = mInfoDialog?.findViewById<FloatingActionButton>(R.id.project_info_exit_fab)
-        exitFab?.setOnClickListener {
-            mInfoDialog?.dismiss()
-            detailViewModel.infoDialogShowing = false
-        }
-        setInfoDialog()
-        setInfoTags()
-    }
-
-    /*private fun initializeConvertDialog() {
-        mConvertDialog = Dialog(requireContext())
-        mConvertDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        mConvertDialog?.setContentView(R.layout.dialog_project_conversion)
-        mConvertDialog?.setOnCancelListener{ detailViewModel.convertDialogShowing = false }
-
-        // Constrain dialog size
-        val dm = requireContext().resources.displayMetrics
-        val width = dm.widthPixels
-        val height = dm.heightPixels
-        val newWidth = (width * 0.7).toInt()
-        val newHeight = (height * 0.7).toInt()
-        mConvertDialog?.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout)?.layoutParams?.width = newWidth
-        mConvertDialog?.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout)?.layoutParams?.height = newHeight
-
-
-        // Initialize the gif preview
-        val gifFile = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
-        val gifPreview = mConvertDialog?.findViewById<ImageView>(R.id.dialog_conversion_gif_preview)
-        if (gifPreview!=null && gifFile!=null)
-            Glide.with(this)
-                    .load(gifFile)
-                    .fitCenter()
-                    .into(gifPreview)
-
-        // Convert the project photos to gif on click
-        val convertFab = mConvertDialog?.findViewById<FloatingActionButton>(R.id.dialog_project_conversion_convert_FAB)
-        convertFab?.setOnClickListener {
-            mConvertDialog?.findViewById<ProgressBar>(R.id.conversion_progress)?.visibility = VISIBLE
-            // Launch the conversion on IO thread
-            val convertJob = detailViewModel.viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    ProjectUtils.makeGif(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
-                }
-            }
-            // On completion update the preview
-            convertJob.invokeOnCompletion {
-                val updatedGif = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
-                mConvertDialog?.findViewById<ProgressBar>(R.id.conversion_progress)?.visibility = INVISIBLE
-                if (gifPreview!=null && updatedGif!=null)
-                    Glide.with(this)
-                            .load(updatedGif)
-                            .fitCenter()
-                            .into(gifPreview)
-            }
-        }
-
-        // Delete the gif for the project
-        val delFab = mConvertDialog?.findViewById<FloatingActionButton>(R.id.dialog_project_conversion_remove_FAB)
-        delFab?.setOnClickListener {
-            val curGif = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
-            if (curGif!=null) FileUtils.deleteRecursive(curGif)
-            if (gifPreview != null) {
-                Glide.with(this)
-                        .load(R.color.imagePlaceholder)
-                        .fitCenter()
-                        .into(gifPreview)
-            }
-        }
-
-        val exitFab = mConvertDialog?.findViewById<FloatingActionButton>(R.id.dialog_conversion_exit_fab)
-        exitFab?.setOnClickListener {
-            mConvertDialog?.dismiss()
-            detailViewModel.convertDialogShowing = false
-        }
-    }*/
-
     private fun initializeTagDialog() {
         mTagDialog = Dialog(requireContext())
         mTagDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -1006,7 +920,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 binding?.detailScheduleLayout?.scheduleLayout?.visibility = VISIBLE
             }
             // Also update the fields in the info dialog
-            setInfoDialog()
+            mInfoDialog?.setInfoDialog(projectView)
             // And update the fields in the schedule dialog
             setScheduleInformation()
 
@@ -1099,8 +1013,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 // 2. Set the tags for the project tag dialog
                 setProjectTagDialog()
 
-                // 3. Set the tags in the info dialog and get the string representing the tags
-                val tagsText = setInfoTags()
+                // 3. Get the string representing the tags and set the info dialog
+                val tagsText = getTagsText(mProjectTags)
+                mInfoDialog?.setInfoTags(tagsText)
+
                 // 4. Use the string to set the tags in the project info card view unless there are none
                 if (mProjectTags.isEmpty()) {
                     binding?.projectInformationLayout?.detailsProjectTagsTextview?.visibility = GONE
@@ -1123,37 +1039,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         })
     }
 
-    // This updates the tags in the project info dialog
-    // This is distinct from set info dialog so that tags may be updated separately
-    private fun setInfoTags(): String {
+    // Gets the text from a list of tags handling empty case
+    private fun getTagsText(tags: List<TagEntry>): String {
         var tagsText = ""
-        for (tag in mProjectTags) {
+        for (tag in tags) {
             // Concatenate a string for non-interactive output
             tagsText = tagsText.plus("#${tag.text}  ")
         }
-        val tagsTextView = mInfoDialog?.findViewById<TextView>(R.id.dialog_information_tags)
-        if (tagsText.isEmpty()) tagsTextView?.text = getString(R.string.none)
-        else tagsTextView?.text = tagsText
-        return tagsText
-    }
-
-    // This updates the rest of the info in the project info dialog
-    // Name, id, schedule, etc.
-    private fun setInfoDialog() {
-        if (mInfoDialog == null) return
-        // Set info dialog fields
-        val projectInfoDialogId = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_id_field)
-        projectInfoDialogId?.text = mCurrentProjectView.project_id.toString()
-        val projectInfoNameTv = mInfoDialog?.findViewById<TextView>(R.id.dialog_project_info_name)
-        if (mCurrentProjectView.project_name == null || mCurrentProjectView.project_name!!.isEmpty()) {
-            projectInfoNameTv?.text = getString(R.string.unnamed)
-        } else projectInfoNameTv?.text = mCurrentProjectView.project_name
-        if (mCurrentProjectView.interval_days == 0) {
-            mInfoDialog?.findViewById<TextView>(R.id.info_dialog_schedule_description)?.text = getString(R.string.none)
-        } else {
-            mInfoDialog?.findViewById<TextView>(R.id.info_dialog_schedule_description)?.text =
-                    getString(R.string.every_x_days, mCurrentProjectView.interval_days.toString())
-        }
+        return if (tagsText.isEmpty()) requireContext().getString(R.string.none)
+        else tagsText
     }
 
     // This sets the tags in the project info dialog
@@ -1319,22 +1213,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_project), null)
 
                     findNavController().popBackStack()
-                }
-                .setNegativeButton(android.R.string.no, null).show()
-    }
-
-    // Verifies the user wishes to rename the project
-    // This will rename the folder the images are written to.
-    private fun verifyEditName() {
-        val input = EditText(requireContext())
-        input.inputType = InputType.TYPE_CLASS_TEXT
-        input.contentDescription = getString(R.string.content_description_edit_text_project_name)
-        AlertDialog.Builder(requireContext())
-                .setTitle(getString(R.string.edit_name))
-                .setView(input)
-                .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    val nameText = input.text.toString().trim()
-                    detailViewModel.updateProjectName(mExternalFilesDir, nameText, mCurrentProjectView)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
