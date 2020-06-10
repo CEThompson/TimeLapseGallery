@@ -51,6 +51,7 @@ import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentDetailBinding
+import com.vwoom.timelapsegallery.detail.dialog.ConversionDialog
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.*
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
@@ -272,7 +273,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.convert_to_gif -> {
-                if (mConvertDialog == null) initializeConvertDialog()
+                if (mConvertDialog == null) {
+                    mConvertDialog = ConversionDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
+                }
                 mConvertDialog?.show()
                 detailViewModel.convertDialogShowing = true
                 true
@@ -362,7 +365,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mTagDialog?.show()
         }
         if (detailViewModel.convertDialogShowing) {
-            if (mConvertDialog == null) initializeConvertDialog()
+            if (mConvertDialog == null) {
+                mConvertDialog = ConversionDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
+            }
             mConvertDialog?.show()
         }
     }
@@ -735,7 +740,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         setInfoTags()
     }
 
-    private fun initializeConvertDialog() {
+    /*private fun initializeConvertDialog() {
         mConvertDialog = Dialog(requireContext())
         mConvertDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         mConvertDialog?.setContentView(R.layout.dialog_project_conversion)
@@ -800,7 +805,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mConvertDialog?.dismiss()
             detailViewModel.convertDialogShowing = false
         }
-    }
+    }*/
 
     private fun initializeTagDialog() {
         mTagDialog = Dialog(requireContext())
