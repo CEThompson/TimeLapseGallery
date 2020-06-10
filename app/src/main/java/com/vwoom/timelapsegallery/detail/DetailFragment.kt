@@ -92,7 +92,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private var mDetailAdapter: DetailAdapter? = null
 
     // Dialogs
-    private var mTagDialog: Dialog? = null
+    private var mTagDialog: TagDialog? = null
     private var mInfoDialog: InfoDialog? = null
     private var mScheduleDialog: ScheduleDialog? = null
     private var mConvertDialog: ConversionDialog? = null
@@ -223,7 +223,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             detailViewModel.scheduleDialogShowing = true
         }
         binding?.projectTagFab?.setOnClickListener {
-            if (mTagDialog == null) initializeTagDialog()
+            if (mTagDialog == null) {
+                mTagDialog = TagDialog(requireContext(), detailViewModel, mCurrentProjectView)
+                mTagDialog?.setProjectTagDialog(mAllTags, mProjectTags)
+            }
             mTagDialog?.show()
             detailViewModel.tagDialogShowing = true
         }
@@ -341,8 +344,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-
-
     /**
      * Lifecycle
      */
@@ -371,7 +372,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mScheduleDialog?.show()
         }
         if (detailViewModel.tagDialogShowing) {
-            if (mTagDialog == null) initializeTagDialog()
+            if (mTagDialog == null) {
+                mTagDialog = TagDialog(requireContext(), detailViewModel, mCurrentProjectView)
+                mTagDialog?.setProjectTagDialog(mAllTags, mProjectTags)
+            }
             mTagDialog?.show()
         }
         if (detailViewModel.convertDialogShowing) {
@@ -717,44 +721,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
     }
 
-    /**
-     * Dialog Initialization Methods
-     */
-    private fun initializeTagDialog() {
-        mTagDialog = Dialog(requireContext())
-        mTagDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        mTagDialog?.setContentView(R.layout.dialog_project_tag)
-        mTagDialog?.setOnCancelListener { detailViewModel.tagDialogShowing = false }
-        // set add tag fab
-        val editText = mTagDialog?.findViewById<EditText>(R.id.add_tag_dialog_edit_text)
-        val addTagFab = mTagDialog?.findViewById<FloatingActionButton>(R.id.add_tag_fab)
-        addTagFab?.setOnClickListener {
-            val tagText = editText?.text.toString().trim()
-            when {
-                tagText.isEmpty() -> {
-                    return@setOnClickListener
-                }
-                tagText.contains(' ') -> showTagValidationAlertDialog(getString(R.string.invalid_tag_one_word))
-                tagText.length > 14 -> showTagValidationAlertDialog(getString(R.string.invalid_tag_length))
-                else -> {
-                    detailViewModel.addTag(tagText, mCurrentProjectView)
-                    mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_tag), null)
-                    editText?.text?.clear()
-                }
-            }
-        }
-        val dismissView = mTagDialog?.findViewById<TextView>(R.id.dialog_project_tag_dismiss)
-        dismissView?.setOnClickListener {
-            mTagDialog?.dismiss()
-            detailViewModel.tagDialogShowing = false
-        }
-        val exitFab = mTagDialog?.findViewById<FloatingActionButton>(R.id.project_tag_exit_fab)
-        exitFab?.setOnClickListener {
-            mTagDialog?.dismiss()
-            detailViewModel.tagDialogShowing = false
-        }
-        setProjectTagDialog()
-    }
 
     /**
      * UI binding
@@ -926,7 +892,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         .sortedBy { it.text.toLowerCase(Locale.getDefault()) }
 
                 // 2. Set the tags for the project tag dialog
-                setProjectTagDialog()
+                mTagDialog?.setProjectTagDialog(mAllTags, mProjectTags)
 
                 // 3. Get the string representing the tags and set the info dialog
                 val tagsText = getTagsText(mProjectTags)
@@ -950,7 +916,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         // So that the user may simply click on a tag to add them to a project
         detailViewModel.tags.observe(viewLifecycleOwner, Observer { tagEntries: List<TagEntry> ->
             mAllTags = tagEntries.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
-            setProjectTagDialog()
+            mTagDialog?.setProjectTagDialog(mAllTags, mProjectTags)
         })
     }
 
@@ -963,47 +929,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         return if (tagsText.isEmpty()) requireContext().getString(R.string.none)
         else tagsText
-    }
-
-    // This sets the tags in the project info dialog
-    // This creates text views for all tags in the database, but if the tags
-    // belong to the project then they are styled appropriately for user feedback
-    private fun setProjectTagDialog() {
-        if (mTagDialog == null) return
-        val availableTagsLayout = mTagDialog?.findViewById<FlexboxLayout>(R.id.project_tag_dialog_available_tags_layout)
-        availableTagsLayout?.removeAllViews()
-        // Set up the available tags in the project information dialog
-        val instructionTv = mTagDialog?.findViewById<TextView>(R.id.tag_deletion_instructions)
-        if (mAllTags.isEmpty()) {
-            instructionTv?.text = getString(R.string.tag_start_instruction)
-        } else {
-            instructionTv?.text = getString(R.string.tag_deletion_instruction)
-            // Add the tags to the layout
-            for (tagEntry in mAllTags) {
-                // Inflate the tag and set its text
-                val textView: TextView = layoutInflater.inflate(R.layout.tag_text_view, availableTagsLayout, false) as TextView
-                textView.text = getString(R.string.hashtag, tagEntry.text)
-
-                // Style depending upon whether or not this particular project is tagged
-                val tagInProject: Boolean = mProjectTags.contains(tagEntry)
-                if (tagInProject) {
-                    textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorTag))
-                    textView.setOnClickListener { detailViewModel.deleteTagFromProject(tagEntry, mCurrentProjectView) }
-                } else {
-                    textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-                    textView.setOnClickListener { detailViewModel.addTag(tagEntry.text, mCurrentProjectView) }
-                }
-
-                // Set tag deletion
-                textView.setOnLongClickListener {
-                    verifyTagDeletion(tagEntry)
-                    true
-                }
-
-                // Add the view to the flex box layout
-                availableTagsLayout?.addView(textView)
-            }
-        }
     }
 
     /**
@@ -1027,20 +952,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     detailViewModel.deleteCurrentPhoto(mExternalFilesDir)
                     mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_photo), null)
-                }
-                .setNegativeButton(android.R.string.no, null).show()
-    }
-
-    // Ensures the user wishes to delete the selected tag
-    private fun verifyTagDeletion(tagEntry: TagEntry) {
-        AlertDialog.Builder(requireContext())
-                .setTitle(getString(R.string.delete_tag, tagEntry.text))
-                .setMessage(getString(R.string.verify_delete_tag, tagEntry.text))
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    // If this photo is the last photo then set the new thumbnail to its previous
-                    detailViewModel.deleteTagFromDatabase(tagEntry)
-                    mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_tag), null)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
@@ -1090,16 +1001,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                     findNavController().popBackStack()
                 }
                 .setNegativeButton(android.R.string.no, null).show()
-    }
-
-    // Gives user feedback on tags
-    private fun showTagValidationAlertDialog(message: String) {
-        AlertDialog.Builder(requireContext())
-                .setTitle(getString(R.string.invalid_tag))
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setMessage(message)
-                .setPositiveButton(android.R.string.ok) { _, _: Int ->
-                }.show()
     }
 
     companion object {
