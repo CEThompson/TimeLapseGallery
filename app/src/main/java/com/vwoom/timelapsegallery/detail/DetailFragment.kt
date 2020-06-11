@@ -215,30 +215,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         }
         binding?.playAsVideoFab?.setOnClickListener { playSetOfImages() }
         binding?.playBackwardsFab?.setOnClickListener { rewindSetOfImages() }
-        binding?.projectScheduleFab?.setOnClickListener {
-            if (mScheduleDialog == null) {
-                mScheduleDialog = ScheduleDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
-            }
-            mScheduleDialog?.show()
-            detailViewModel.scheduleDialogShowing = true
-        }
-        binding?.projectTagFab?.setOnClickListener {
-            if (mTagDialog == null) {
-                mTagDialog = TagDialog(requireContext(), detailViewModel, mCurrentProjectView)
-                mTagDialog?.setProjectTagDialog(mAllTags, mProjectTags)
-            }
-            mTagDialog?.show()
-            detailViewModel.tagDialogShowing = true
-        }
-        binding?.projectInformationLayout?.projectInformationCardview?.setOnClickListener {
-            if (mInfoDialog == null) {
-                mInfoDialog = InfoDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
-                mInfoDialog?.setInfoDialog(mCurrentProjectView)
-                mInfoDialog?.setInfoTags(getTagsText(mProjectTags))
-            }
-            mInfoDialog?.show()
-            detailViewModel.infoDialogShowing = true
-        }
+
+        // Only construct dialogs if they are clicked
+        binding?.projectScheduleFab?.setOnClickListener { lazyShowScheduleDialog() }
+        binding?.projectTagFab?.setOnClickListener { lazyShowProjectTagDialog() }
+        binding?.projectInformationLayout?.projectInformationCardview?.setOnClickListener { lazyShowInfoDialog() }
+
         binding?.fullscreenFab?.setOnClickListener {
             exitTransition = TransitionInflater.from(context).inflateTransition(R.transition.details_to_fullscreen_transition)
             val action = DetailFragmentDirections.actionDetailsFragmentToFullscreenFragment(detailViewModel.photoIndex, photoUrls)
@@ -272,6 +254,42 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         return binding?.root
     }
 
+    private fun lazyShowInfoDialog() {
+        if (mInfoDialog == null) {
+            mInfoDialog = InfoDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
+            mInfoDialog?.setInfoDialog(mCurrentProjectView)
+            mInfoDialog?.setInfoTags(getTagsText(mProjectTags))
+        }
+        mInfoDialog?.show()
+        detailViewModel.infoDialogShowing = true
+    }
+
+    private fun lazyShowProjectTagDialog() {
+        if (mTagDialog == null) {
+            mTagDialog = TagDialog(requireContext(), detailViewModel, mCurrentProjectView)
+            mTagDialog?.setProjectTagDialog(mAllTags, mProjectTags)
+        }
+        mTagDialog?.show()
+        detailViewModel.tagDialogShowing = true
+    }
+
+    private fun lazyShowScheduleDialog() {
+        if (mScheduleDialog == null) {
+            mScheduleDialog = ScheduleDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
+        }
+        mScheduleDialog?.show()
+        detailViewModel.scheduleDialogShowing = true
+    }
+
+    private fun lazyShowConvertDialog() {
+        if (mConvertDialog == null) {
+            mConvertDialog = ConversionDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
+        }
+        mConvertDialog?.show()
+        detailViewModel.convertDialogShowing = true
+    }
+
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.detail_fragment_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -280,11 +298,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.convert_to_gif -> {
-                if (mConvertDialog == null) {
-                    mConvertDialog = ConversionDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
-                }
-                mConvertDialog?.show()
-                detailViewModel.convertDialogShowing = true
+                lazyShowConvertDialog()
                 true
             }
             R.id.share_project -> {
@@ -357,33 +371,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onResume() {
         super.onResume()
         // Restore any showing dialogs
-        if (detailViewModel.infoDialogShowing) {
-            if (mInfoDialog == null) {
-                mInfoDialog = InfoDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
-                mInfoDialog?.setInfoDialog(mCurrentProjectView)
-                mInfoDialog?.setInfoTags(getTagsText(mProjectTags))
-            }
-            mInfoDialog?.show()
-        }
-        if (detailViewModel.scheduleDialogShowing) {
-            if (mScheduleDialog == null) {
-                mScheduleDialog = ScheduleDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
-            }
-            mScheduleDialog?.show()
-        }
-        if (detailViewModel.tagDialogShowing) {
-            if (mTagDialog == null) {
-                mTagDialog = TagDialog(requireContext(), detailViewModel, mCurrentProjectView)
-                mTagDialog?.setProjectTagDialog(mAllTags, mProjectTags)
-            }
-            mTagDialog?.show()
-        }
-        if (detailViewModel.convertDialogShowing) {
-            if (mConvertDialog == null) {
-                mConvertDialog = ConversionDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
-            }
-            mConvertDialog?.show()
-        }
+        if (detailViewModel.infoDialogShowing) { lazyShowInfoDialog() }
+        if (detailViewModel.scheduleDialogShowing) { lazyShowScheduleDialog() }
+        if (detailViewModel.tagDialogShowing) { lazyShowProjectTagDialog() }
+        if (detailViewModel.convertDialogShowing) { lazyShowConvertDialog() }
     }
 
     override fun onPause() {
