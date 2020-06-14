@@ -54,6 +54,9 @@ class ConversionDialog(context: Context, detailViewModel: DetailViewModel, exter
             // Launch the conversion on IO thread
             val convertJob = detailViewModel.viewModelScope.launch {
                 withContext(Dispatchers.IO) {
+                    // First delete the old GIF
+                    deleteGif(externalFilesDir, project)
+                    // Then write the new one
                     ProjectUtils.makeGif(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
                 }
             }
@@ -72,14 +75,12 @@ class ConversionDialog(context: Context, detailViewModel: DetailViewModel, exter
         // Delete the gif for the project
         val delFab = this.findViewById<FloatingActionButton>(R.id.dialog_project_conversion_remove_FAB)
         delFab.setOnClickListener {
-            val curGif = ProjectUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
-            if (curGif != null) FileUtils.deleteRecursive(curGif)
-            if (gifPreview != null) {
+            deleteGif(externalFilesDir, project)
+            if (gifPreview != null)
                 Glide.with(context)
                         .load(R.color.imagePlaceholder)
                         .fitCenter()
                         .into(gifPreview)
-            }
         }
 
         val exitFab = this.findViewById<FloatingActionButton>(R.id.dialog_conversion_exit_fab)
@@ -88,6 +89,11 @@ class ConversionDialog(context: Context, detailViewModel: DetailViewModel, exter
             detailViewModel.convertDialogShowing = false
         }
 
+    }
+
+    private fun deleteGif(externalFilesDir: File, project: ProjectView) {
+        val curGif = ProjectUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
+        if (curGif != null) FileUtils.deleteRecursive(curGif)
     }
 
 
