@@ -35,9 +35,10 @@ object ImportUtils {
             val url = child.absolutePath
             val projectFilename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
 
-            // Skip Temporary Images
+            // Skip Temporary Images, Meta Directory, and GIF directory
             if (projectFilename == FileUtils.TEMP_FILE_SUBDIRECTORY
-                    || projectFilename == FileUtils.META_FILE_SUBDIRECTORY) continue
+                    || projectFilename == FileUtils.META_FILE_SUBDIRECTORY
+                    || projectFilename == FileUtils.GIF_FILE_SUBDIRECTORY) continue
 
             // Determine ID of project
             val idString: String =
