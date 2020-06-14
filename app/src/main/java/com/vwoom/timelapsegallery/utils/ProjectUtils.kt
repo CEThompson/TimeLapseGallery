@@ -21,13 +21,13 @@ object ProjectUtils {
     fun getMetaDirectoryForProject(externalFilesDir: File, projectId: Long): File {
         val metaDir = File(externalFilesDir, FileUtils.META_FILE_SUBDIRECTORY)
         val projectSubfolder = File(metaDir, projectId.toString())
-        projectSubfolder.mkdirs()
+        if (!projectSubfolder.exists()) projectSubfolder.mkdirs()
         return projectSubfolder
     }
 
     private fun getGifDirectory(externalFilesDir: File): File {
         val gifDir = File(externalFilesDir, FileUtils.GIF_FILE_SUBDIRECTORY)
-        gifDir.mkdir()
+        if (!gifDir.exists()) gifDir.mkdir()
         return gifDir
     }
 
