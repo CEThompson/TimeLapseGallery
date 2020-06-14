@@ -23,6 +23,7 @@ import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 import java.util.*
 
+// TODO: implement callback to stop gif after one cycle
 class GalleryAdapter(
         private val mClickHandler: GalleryAdapterOnClickHandler,
         val externalFilesDir: File,
