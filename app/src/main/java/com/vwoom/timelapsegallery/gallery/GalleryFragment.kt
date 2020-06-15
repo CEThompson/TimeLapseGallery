@@ -36,9 +36,7 @@ import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.weather.WeatherChartDialog
 import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
 import com.vwoom.timelapsegallery.weather.WeatherResult
-import dagger.android.AndroidInjection
 import dagger.android.support.AndroidSupportInjection
-import java.lang.Exception
 import javax.inject.Inject
 
 // TODO: create gifs or mp4s from photo sets
@@ -48,7 +46,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
 
     private val args: GalleryFragmentArgs by navArgs()
-    
+
     @Inject
     lateinit var mGalleryViewModel: GalleryViewModel
 
@@ -353,10 +351,16 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         val lm: LocationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         // Determine if network or gps are enabled
-        val gpsEnabled = try { lm.isProviderEnabled(LocationManager.GPS_PROVIDER) }
-            catch (e: Exception) { false }
-        val networkEnabled = try { lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) }
-            catch (e: Exception) { false }
+        val gpsEnabled = try {
+            lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        } catch (e: Exception) {
+            false
+        }
+        val networkEnabled = try {
+            lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        } catch (e: Exception) {
+            false
+        }
 
         if (gpsPermissionsGranted()) {
             // If gps permissions have been granted:
