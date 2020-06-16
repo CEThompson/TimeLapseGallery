@@ -128,7 +128,7 @@ object ProjectUtils {
     // Creates a .gif from the set of photos for a project
     fun makeGif(externalFilesDir: File, project: ProjectEntry){
         // Write the list of paths for the files to a text file for use by ffmpeb
-        Log.d("TLG.GIF:", "Creating list of text files")
+        //Log.d("TLG.GIF:", "Creating list of text files")
         val listTextFile = FileUtils.createTempListPhotoFiles(externalFilesDir, project)
 
         // Get the meta directory for the project
@@ -137,21 +137,21 @@ object ProjectUtils {
         // TODO: centralize location of all output gifs and name them by project ID
         // Define the output path for the gif
         val outputGif = "${projectGifDir.absolutePath}/${project.id}.gif"
-        Log.d("TLG.GIF:", "Output gif path is: $outputGif")
+        //Log.d("TLG.GIF:", "Output gif path is: $outputGif")
 
         // TODO: create control for framerate
         // TODO: create control for scale
 
         // Create the command for ffmpeg
         val ffmpegCommand = "-r 14 -y -f concat -safe 0 -i $listTextFile -vf scale=400:-1 $outputGif"
-        Log.d("TLG.GIF:", "Executing ffmpeg command: $ffmpegCommand")
+        //Log.d("TLG.GIF:", "Executing ffmpeg command: $ffmpegCommand")
 
         // Execute the command
         val rc = FFmpeg.execute(ffmpegCommand)
-        Log.d("TLG.GIF:", "Executed, rc is: $rc")
+        //Log.d("TLG.GIF:", "Executed, rc is: $rc")
 
         val lastCommandOutput = Config.getLastCommandOutput()
-        Log.d("TLG.GIF:", "Last command output: $lastCommandOutput")
+        //Log.d("TLG.GIF:", "Last command output: $lastCommandOutput")
     }
 
     fun getGifForProject(externalFilesDir: File, project: ProjectEntry): File? {

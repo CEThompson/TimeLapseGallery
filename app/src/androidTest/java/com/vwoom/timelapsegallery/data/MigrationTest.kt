@@ -125,7 +125,7 @@ class MigrationTest {
 
         // Check for entry match
         weather = runBlocking { resultDb.weatherDao().getWeather() }
-        assert(weather?.forecast == forecastString)
+        assert(weather?.forecastJsonString == forecastString)
         assert(weather?.timestamp == testTime)
 
         // Check deletion

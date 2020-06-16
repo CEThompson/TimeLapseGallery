@@ -198,23 +198,6 @@ class ProjectUtilsTest {
         assertTrue(isProjectDueTomorrow)
     }
 
-    /*// TODO: finish this test
-    @Test
-    fun makeGif_convertsProjectToGif(){
-        // Given - a project with a set of images
-        val project = ProjectEntry(1, null)
-
-        // TODO: add photos to project
-
-        // When - we call the function makeGif
-        makeGif(externalFilesTestDir, project)
-
-        // Then
-        val gif = getGifForProject(externalFilesTestDir, project)
-
-        assert (gif!= null)
-    }*/
-    
     // Makes sure a project with a gif does return a gif for the project
     @Test
     fun getGifForProject_GifExists(){
@@ -222,7 +205,7 @@ class ProjectUtilsTest {
         val project = ProjectEntry(1000, null)
         val gifDir = File(externalFilesTestDir, FileUtils.GIF_FILE_SUBDIRECTORY)
         if (!gifDir.exists()) gifDir.mkdir()
-        val makeGif = File(gifDir, "${project.id.toString()}.gif")
+        val makeGif = File(gifDir, "${project.id}.gif")
         makeGif.mkdir()
 
         // When we get the gif for the project

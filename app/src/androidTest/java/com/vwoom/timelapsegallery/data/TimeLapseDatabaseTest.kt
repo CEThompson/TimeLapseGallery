@@ -57,7 +57,7 @@ class TimeLapseDatabaseTest {
         assert(res == null)
 
         // Should not be null if an entry is added
-        val entry = WeatherEntry(forecast = "fake_json_string", timestamp = System.currentTimeMillis())
+        val entry = WeatherEntry(forecastJsonString = "fake_json_string", timestamp = System.currentTimeMillis())
         runBlocking { weatherDao.insertWeather(entry) }
         res = runBlocking { weatherDao.getWeather() }
         assert(res != null)
