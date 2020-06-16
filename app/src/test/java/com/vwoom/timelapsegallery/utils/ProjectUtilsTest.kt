@@ -214,22 +214,26 @@ class ProjectUtilsTest {
 
         assert (gif!= null)
     }*/
-
-    /*// TODO: finish this test
+    
+    // Makes sure a project with a gif does return a gif for the project
     @Test
     fun getGifForProject_GifExists(){
         // Given a gif and a project
         val project = ProjectEntry(1000, null)
+        val gifDir = File(externalFilesTestDir, FileUtils.GIF_FILE_SUBDIRECTORY)
+        if (!gifDir.exists()) gifDir.mkdir()
+        val makeGif = File(gifDir, "${project.id.toString()}.gif")
+        makeGif.mkdir()
 
         // When we get the gif for the project
         val gif = getGifForProject(externalFilesTestDir, project)
 
         // It exists
+        assert (gif != null)
         if (gif != null) assert(gif.exists())
-        else assert (false)
-    }*/
+    }
 
-    // TODO: finish this test
+    // Makes sure a project with no gif does not return a gif for the project
     @Test
     fun getGifForProject_No_Gif(){
         // Given a gif and a project
