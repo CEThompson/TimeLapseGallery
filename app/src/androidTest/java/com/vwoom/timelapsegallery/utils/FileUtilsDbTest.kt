@@ -20,6 +20,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 
+// TODO: look into errors running these database tests. What is the right way to test databases?
 @RunWith(AndroidJUnit4ClassRunner::class)
 class FilesUtilsDbTest {
 
