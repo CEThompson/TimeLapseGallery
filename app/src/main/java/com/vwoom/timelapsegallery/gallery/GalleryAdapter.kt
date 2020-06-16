@@ -31,7 +31,8 @@ import java.io.File
 class GalleryAdapter(
         private val mClickHandler: GalleryAdapterOnClickHandler,
         val externalFilesDir: File,
-        private val scheduleDisplaysEnabled: Boolean)
+        private val scheduleDisplaysEnabled: Boolean,
+        private val gifDisplaysEnabled: Boolean)
     : ListAdapter<ProjectView, GalleryAdapterViewHolder>(ProjectViewDiffCallback()) {
     private val constraintSet: ConstraintSet = ConstraintSet()
 
@@ -110,26 +111,28 @@ class GalleryAdapter(
         holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.transitionName = "${imageTransitionName}interval"
 
         // Load the gif for the project if created
-        val gifFile = ProjectUtils.getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
-        if (gifFile != null) {
-            // TODO: figure out why gif is stuck on first frame after return
-            Glide.with(holder.itemView.context)
-                    .asGif()
-                    .load(gifFile)
-                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).listener(object : RequestListener<GifDrawable> {
-                        override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable>?, isFirstResource: Boolean): Boolean {
-                            loadImage(holder, photoUrl)
-                            return false
-                        }
+        if (gifDisplaysEnabled) {
+            val gifFile = ProjectUtils.getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
+            if (gifFile != null) {
+                // TODO: figure out why gif is stuck on first frame after return
+                Glide.with(holder.itemView.context)
+                        .asGif()
+                        .load(gifFile)
+                        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).listener(object : RequestListener<GifDrawable> {
+                            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable>?, isFirstResource: Boolean): Boolean {
+                                loadImage(holder, photoUrl)
+                                return false
+                            }
 
-                        override fun onResourceReady(resource: GifDrawable?, model: Any?, target: Target<GifDrawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                            // If GIF loads set to loop 3 times for now
-                            resource?.setLoopCount(3)
-                            return false
-                        }
-                    })
-                    .into(holder.binding.projectImage)
-            return
+                            override fun onResourceReady(resource: GifDrawable?, model: Any?, target: Target<GifDrawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                                // If GIF loads set to loop 3 times for now
+                                resource?.setLoopCount(3)
+                                return false
+                            }
+                        })
+                        .into(holder.binding.projectImage)
+                return
+            }
         }
 
         // Otherwise load the image or an error image

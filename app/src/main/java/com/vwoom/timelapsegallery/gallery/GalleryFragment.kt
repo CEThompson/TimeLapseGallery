@@ -134,11 +134,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val schedulesDisplayed = preferences.getBoolean(getString(R.string.key_schedule_display), true)
+        val gifsDisplayed = preferences.getBoolean(getString(R.string.key_gif_display), true)
 
         // Set up the adapter for the recycler view
         try {
             val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-            mGalleryAdapter = GalleryAdapter(this, externalFilesDir, schedulesDisplayed)
+            mGalleryAdapter = GalleryAdapter(this, externalFilesDir, schedulesDisplayed, gifsDisplayed)
         } catch (e: KotlinNullPointerException) {
             // TODO: set up analytics to track external files drive failure
             Toast.makeText(requireContext(), getString(R.string.error_retrieving_files_dir), Toast.LENGTH_LONG).show()

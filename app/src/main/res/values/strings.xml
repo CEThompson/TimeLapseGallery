@@ -212,10 +212,13 @@
     <string name="notification_time_title">Notification time</string>
 
     <!-- Schedule -->
-    <string name ="scheduling_header">Scheduling</string>
-    <string name ="enable_schedule_display_title">Schedule Display</string>
+    <string name ="gallery_header">Gallery</string>
+    <string name ="enable_schedule_display_title">Display Schedules</string>
     <string name ="schedule_display_summary_on">Schedules are shown in the gallery</string>
     <string name ="schedule_display_summary_off">Schedules are hidden from the gallery</string>
+    <string name ="enable_gif_display_title">Show Project GIFs</string>
+    <string name ="gif_display_summary_on">Projects with GIFs are shown</string>
+    <string name ="gif_display_summary_off">Projects with GIFs are hidden</string>
 
     <!-- Playback -->
     <string name="playback_header">Playback</string>
@@ -240,6 +243,7 @@
     <string name="key_sync_allowed" translatable="false">sync_allowed</string>
     <string name="key_schedule_display" translatable="false">schedule_display</string>
     <string name="key_gps_allowed" translatable="false">schedule_display</string>
+    <string name="key_gif_display" translatable="false">gif_display</string>
 
     <!-- Shared preference -->
     <string name="key_add_transition" translatable="false">add</string>
