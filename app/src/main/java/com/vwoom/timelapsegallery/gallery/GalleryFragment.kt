@@ -36,9 +36,7 @@ import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.weather.WeatherChartDialog
 import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
 import com.vwoom.timelapsegallery.weather.WeatherResult
-import dagger.android.AndroidInjection
 import dagger.android.support.AndroidSupportInjection
-import java.lang.Exception
 import javax.inject.Inject
 
 // TODO: create gifs or mp4s from photo sets
@@ -48,7 +46,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
 
     private val args: GalleryFragmentArgs by navArgs()
-    
+
     @Inject
     lateinit var mGalleryViewModel: GalleryViewModel
 
@@ -136,11 +134,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val schedulesDisplayed = preferences.getBoolean(getString(R.string.key_schedule_display), true)
+        val gifsDisplayed = preferences.getBoolean(getString(R.string.key_gif_display), true)
 
         // Set up the adapter for the recycler view
         try {
             val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-            mGalleryAdapter = GalleryAdapter(this, externalFilesDir, schedulesDisplayed)
+            mGalleryAdapter = GalleryAdapter(this, externalFilesDir, schedulesDisplayed, gifsDisplayed)
         } catch (e: KotlinNullPointerException) {
             // TODO: set up analytics to track external files drive failure
             Toast.makeText(requireContext(), getString(R.string.error_retrieving_files_dir), Toast.LENGTH_LONG).show()
@@ -353,10 +352,16 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         val lm: LocationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         // Determine if network or gps are enabled
-        val gpsEnabled = try { lm.isProviderEnabled(LocationManager.GPS_PROVIDER) }
-            catch (e: Exception) { false }
-        val networkEnabled = try { lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) }
-            catch (e: Exception) { false }
+        val gpsEnabled = try {
+            lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        } catch (e: Exception) {
+            false
+        }
+        val networkEnabled = try {
+            lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        } catch (e: Exception) {
+            false
+        }
 
         if (gpsPermissionsGranted()) {
             // If gps permissions have been granted:

@@ -6,24 +6,21 @@
     android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/dialog_info_constraint_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="250dp"
-        android:orientation="vertical"
-        android:padding="@dimen/medium">
+        android:orientation="vertical">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/project_info_exit_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/medium"
+            android:layout_margin="@dimen/small"
             android:src="@drawable/ic_clear_white_24dp"
             android:contentDescription="@string/content_description_info_exit_fab"
             app:backgroundTint="@color/colorSubtleRedAccent"
             app:fabSize="mini"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1"
-            app:layout_constraintStart_toEndOf="@id/edit_project_name_button"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -31,13 +28,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/project_information"
+            android:layout_margin="@dimen/medium"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/project_info_exit_fab"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/project_info_exit_fab"
-            app:layout_constraintVertical_bias="0.5" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/project_info_exit_fab"
+            app:layout_constraintHorizontal_bias="0" />
 
         <!-- Id Label -->
         <TextView
@@ -49,7 +47,7 @@
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/project_info_dialog_label"
             app:layout_constraintTop_toBottomOf="@id/project_info_dialog_label"
             tools:text="@string/project_id_label" />
 
@@ -76,7 +74,7 @@
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/project_info_dialog_label"
             app:layout_constraintTop_toBottomOf="@id/dialog_project_info_id_label" />
         <!-- Name Field -->
         <TextView
@@ -119,7 +117,7 @@
             android:text="@string/schedule_label"
             android:textColor="@color/black"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/project_info_dialog_label"
             app:layout_constraintTop_toBottomOf="@id/dialog_project_info_name_label" />
         <!-- Schedule Field -->
         <TextView
@@ -141,7 +139,7 @@
             android:text="@string/tags_label"
             android:textColor="@color/black"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/project_info_dialog_label"
             app:layout_constraintTop_toBottomOf="@+id/info_dialog_schedule_label"
             app:layout_constraintBottom_toTopOf="@id/dialog_info_dismiss"/>
 
@@ -177,8 +175,7 @@
             android:textColor="@color/colorAccent"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintEnd_toEndOf="@id/project_info_exit_fab"
+            app:layout_constraintHorizontal_bias="1" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

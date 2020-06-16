@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 
+// TODO: remove table cover photo
 @Entity(tableName = "cover_photo",
         primaryKeys = ["project_id"],
         foreignKeys = [ForeignKey(entity = ProjectEntry::class,

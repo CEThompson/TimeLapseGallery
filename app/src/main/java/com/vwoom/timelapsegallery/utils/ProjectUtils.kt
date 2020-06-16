@@ -1,5 +1,8 @@
 package com.vwoom.timelapsegallery.utils
 
+import android.util.Log
+import com.arthenica.mobileffmpeg.Config
+import com.arthenica.mobileffmpeg.FFmpeg
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
@@ -18,13 +21,19 @@ object ProjectUtils {
     fun getMetaDirectoryForProject(externalFilesDir: File, projectId: Long): File {
         val metaDir = File(externalFilesDir, FileUtils.META_FILE_SUBDIRECTORY)
         val projectSubfolder = File(metaDir, projectId.toString())
-        projectSubfolder.mkdirs()
+        if (!projectSubfolder.exists()) projectSubfolder.mkdirs()
         return projectSubfolder
+    }
+
+    private fun getGifDirectory(externalFilesDir: File): File {
+        val gifDir = File(externalFilesDir, FileUtils.GIF_FILE_SUBDIRECTORY)
+        if (!gifDir.exists()) gifDir.mkdir()
+        return gifDir
     }
 
     // Creates a list of photo entries in a project folder sorted by timestamp
     fun getPhotoEntriesInProjectDirectory(externalFilesDir: File,
-                                          projectEntry: ProjectEntry): List<PhotoEntry>? {
+                                          projectEntry: ProjectEntry): List<PhotoEntry> {
         val photos: MutableList<PhotoEntry> = ArrayList()
         val projectFolder = getProjectFolder(externalFilesDir, projectEntry)
         val files = projectFolder.listFiles()
@@ -43,7 +52,7 @@ object ProjectUtils {
                 val photoEntry = PhotoEntry(projectEntry.id, timestamp)
                 photos.add(photoEntry)
             }
-        } else return null
+        }
         // Sort the photo entries by timestamp
         photos.sortBy { it.timestamp }
         return photos
@@ -114,6 +123,42 @@ object ProjectUtils {
         val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(projectView.cover_photo_timestamp, System.currentTimeMillis())
         val daysUntilDue = projectView.interval_days - daysSinceLastPhoto
         return daysUntilDue == 1.toLong()
+    }
+
+    // Creates a .gif from the set of photos for a project
+    fun makeGif(externalFilesDir: File, project: ProjectEntry){
+        // Write the list of paths for the files to a text file for use by ffmpeb
+        //Log.d("TLG.GIF:", "Creating list of text files")
+        val listTextFile = FileUtils.createTempListPhotoFiles(externalFilesDir, project)
+
+        // Get the meta directory for the project
+        val projectGifDir = getGifDirectory(externalFilesDir)
+
+        // TODO: centralize location of all output gifs and name them by project ID
+        // Define the output path for the gif
+        val outputGif = "${projectGifDir.absolutePath}/${project.id}.gif"
+        //Log.d("TLG.GIF:", "Output gif path is: $outputGif")
+
+        // TODO: create control for framerate
+        // TODO: create control for scale
+
+        // Create the command for ffmpeg
+        val ffmpegCommand = "-r 14 -y -f concat -safe 0 -i $listTextFile -vf scale=400:-1 $outputGif"
+        //Log.d("TLG.GIF:", "Executing ffmpeg command: $ffmpegCommand")
+
+        // Execute the command
+        val rc = FFmpeg.execute(ffmpegCommand)
+        //Log.d("TLG.GIF:", "Executed, rc is: $rc")
+
+        val lastCommandOutput = Config.getLastCommandOutput()
+        //Log.d("TLG.GIF:", "Last command output: $lastCommandOutput")
+    }
+
+    fun getGifForProject(externalFilesDir: File, project: ProjectEntry): File? {
+        val projectGifDir = getGifDirectory(externalFilesDir)
+        val gifFile = File("${projectGifDir.absolutePath}/${project.id}.gif")
+        return if (gifFile.exists()) gifFile
+        else null
     }
 }
 

@@ -157,6 +157,9 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                         "timestamp INTEGER NOT NULL, " +
                         "PRIMARY KEY(id)" +
                         ")")
+
+                // TODO: drop table cover photo. Always assume cover photo is last.
+
             }
         }
     }

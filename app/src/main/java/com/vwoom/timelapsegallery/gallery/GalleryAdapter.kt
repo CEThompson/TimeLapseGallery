@@ -11,6 +11,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
@@ -20,14 +27,13 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
-import java.util.*
 
 class GalleryAdapter(
         private val mClickHandler: GalleryAdapterOnClickHandler,
         val externalFilesDir: File,
-        private val scheduleDisplaysEnabled: Boolean)
-    : ListAdapter<ProjectView, GalleryAdapterViewHolder>(ProjectViewDiffCallback())
-{
+        private val scheduleDisplaysEnabled: Boolean,
+        private val gifDisplaysEnabled: Boolean)
+    : ListAdapter<ProjectView, GalleryAdapterViewHolder>(ProjectViewDiffCallback()) {
     private val constraintSet: ConstraintSet = ConstraintSet()
 
     interface GalleryAdapterOnClickHandler {
@@ -104,7 +110,32 @@ class GalleryAdapter(
         holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.transitionName = "${imageTransitionName}due"
         holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.transitionName = "${imageTransitionName}interval"
 
-        // Load the image or an error image
+        // Load the gif for the project if created
+        if (gifDisplaysEnabled) {
+            val gifFile = ProjectUtils.getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
+            if (gifFile != null) {
+                // TODO: figure out why gif is stuck on first frame after return
+                Glide.with(holder.itemView.context)
+                        .asGif()
+                        .load(gifFile)
+                        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).listener(object : RequestListener<GifDrawable> {
+                            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable>?, isFirstResource: Boolean): Boolean {
+                                loadImage(holder, photoUrl)
+                                return false
+                            }
+
+                            override fun onResourceReady(resource: GifDrawable?, model: Any?, target: Target<GifDrawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                                // If GIF loads set to loop 3 times for now
+                                resource?.setLoopCount(3)
+                                return false
+                            }
+                        })
+                        .into(holder.binding.projectImage)
+                return
+            }
+        }
+
+        // Otherwise load the image or an error image
         if (photoUrl == null) {
             Glide.with(holder.itemView.context)
                     .load(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
@@ -112,11 +143,15 @@ class GalleryAdapter(
                     .into(holder.binding.projectImage)
         } else {
             // Load the image
-            Glide.with(holder.itemView.context)
-                    .load(File(photoUrl))
-                    .error(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
-                    .into(holder.binding.projectImage)
+            loadImage(holder, photoUrl)
         }
+    }
+
+    private fun loadImage(holder: GalleryAdapterViewHolder, photoUrl: String?) {
+        Glide.with(holder.itemView.context)
+                .load(File(photoUrl))
+                .error(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
+                .into(holder.binding.projectImage)
     }
 
     // Updates the UI for the schedule layout
@@ -170,7 +205,7 @@ class GalleryAdapter(
     }
 }
 
-class ProjectViewDiffCallback: DiffUtil.ItemCallback<ProjectView>() {
+class ProjectViewDiffCallback : DiffUtil.ItemCallback<ProjectView>() {
     override fun areContentsTheSame(oldItem: ProjectView, newItem: ProjectView): Boolean {
         return oldItem.project_id == newItem.project_id
     }
