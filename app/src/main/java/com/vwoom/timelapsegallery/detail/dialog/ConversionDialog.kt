@@ -20,14 +20,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
+// TODO: handle gif sharing
+// TODO: add relevant tests for ffmpeg branch
 class ConversionDialog(context: Context, detailViewModel: DetailViewModel, externalFilesDir: File, project: ProjectView) : Dialog(context) {
-
     init {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.dialog_project_conversion)
         this.setOnCancelListener { detailViewModel.convertDialogShowing = false }
 
-        // TODO: handle vertical / oriental modes
+        // TODO: handle vertical / horizontal modes
         // Constrain dialog size
         val dm = context.resources.displayMetrics
         val width = dm.widthPixels
@@ -36,7 +37,6 @@ class ConversionDialog(context: Context, detailViewModel: DetailViewModel, exter
         val newHeight = (height * 0.7).toInt()
         this.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout).layoutParams.width = newWidth
         this.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout).layoutParams.height = newHeight
-
 
         // Initialize the gif preview
         val gifFile = ProjectUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
