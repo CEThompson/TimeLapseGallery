@@ -11,6 +11,7 @@ import android.view.View
 import android.view.View.OnTouchListener
 import kotlin.math.max
 
+// TODO: investigate improving focus up close to subjects
 class CameraFocusOnTouchHandler(
         private val mCameraCharacteristics: CameraCharacteristics,
         private val mCaptureRequestBuilder: CaptureRequest.Builder,
@@ -31,10 +32,11 @@ class CameraFocusOnTouchHandler(
             return true
         }
         val sensorArraySize = mCameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE)
-        //TODO (update 1.2): investigate corresponding flipped x / y to actual sensor orientation
+
+        // Note: this may not be flipped (x / y) to actual sensor orientation
         val y = (motionEvent.x / view.width.toFloat() * sensorArraySize!!.height().toFloat()).toInt()
         val x = (motionEvent.y / view.height.toFloat() * sensorArraySize.width().toFloat()).toInt()
-        // TODO (update 1.2): investigate representing actual touch size in pixels
+        // Note: this does not represent actual touch size in pixels, just the hardcoded values
         val halfTouchWidth = 50
         val halfTouchHeight = 50
         val focusAreaTouch = MeteringRectangle(max(x - halfTouchWidth, 0),
