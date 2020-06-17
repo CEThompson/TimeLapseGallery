@@ -11,17 +11,23 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class WeatherLocalDataSource
-@Inject constructor (private val weatherDao: WeatherDao) {
+@Inject constructor(private val weatherDao: WeatherDao) {
 
     // Gets the forecast from the database
     // Returns either (1) No Data (2) Todays Forecast or (3) A Cached Forecast
-    suspend fun getWeather(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO){
+    suspend fun getWeather(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO) {
         val weatherEntry: WeatherEntry? = weatherDao.getWeather()
 
         return@withContext if (weatherEntry == null) WeatherResult.NoData()
         else {
-            val localResponse: ForecastResponse? = moshi.adapter(ForecastResponse::class.java)
-                    .fromJson(weatherEntry.forecastJsonString)
+            val localResponse: ForecastResponse?
+            try {
+                // TODO: figure out how to properly handle this blocking call
+                localResponse = moshi.adapter(ForecastResponse::class.java)
+                        .fromJson(weatherEntry.forecastJsonString)
+            } catch (e: Exception) {
+                return@withContext WeatherResult.NoData()
+            }
             return@withContext when {
                 localResponse == null -> WeatherResult.NoData()
                 DateUtils.isToday(weatherEntry.timestamp) -> {
@@ -34,7 +40,8 @@ class WeatherLocalDataSource
         }
     }
 
-    suspend fun getCache(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO){
+
+    suspend fun getCache(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO) {
         val weatherEntry: WeatherEntry? = weatherDao.getWeather()
 
         return@withContext if (weatherEntry == null) WeatherResult.NoData()
@@ -49,7 +56,7 @@ class WeatherLocalDataSource
     }
 
     // Saves the forecast as a json string to the database
-    suspend fun cacheForecast(forecastResponse: ForecastResponse) = withContext(Dispatchers.IO){
+    suspend fun cacheForecast(forecastResponse: ForecastResponse) = withContext(Dispatchers.IO) {
         val jsonString = moshi.adapter(ForecastResponse::class.java).toJson(forecastResponse)
         val cacheTime = System.currentTimeMillis()
         val weather = WeatherEntry(jsonString, cacheTime)
