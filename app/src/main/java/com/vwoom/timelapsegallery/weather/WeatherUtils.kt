@@ -35,15 +35,12 @@ object WeatherUtils {
             // Otherwise clear
             else -> {
                 if (isDay) R.drawable.ic_wb_sunny_black_24dp
-                // TODO handle moon phases
                 // If night AND its clear show full moons, new moons, or intermediate state
                 else {
                     if (timestamp == null) R.drawable.ic_brightness_2_black_24dp
                     else when (getMoonPhaseFromTimestamp(timestamp)){
                         NEW_MOON -> R.drawable.ic_star_black_24dp
                         FULL_MOON -> R.drawable.ic_brightness_1_black_24dp
-                        //WAXING -> R.drawable.ic_brightness_2_black_24dp
-                        //WANING -> R.drawable.ic_brightness_3_black_24dp
                         else -> R.drawable.ic_brightness_2_black_24dp
                     }
                 }
