@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.weather
 
-import android.util.Log
 import java.util.*
 
 const val NEW_MOON = 1
@@ -9,15 +8,6 @@ const val INTERMEDIATE_MOON = 3
 
 // TODO: handle phases of the moon
 // TODO: handle northern vs southern hemisphere representations
-// TODO: (1) handle new moon
-// TODO: (2) handle waxing crescent
-// TODO: (3) handle first quarter
-// TODO: (4) waxing gibbous
-// TODO: (5) full moon
-// TODO: (6) waning gibbous
-// TODO: (7) third quarter
-// TODO: (8) waning crescent
-
 
 object MoonPhaseCalculator {
     private val TAG = MoonPhaseCalculator::class.simpleName
@@ -48,8 +38,7 @@ object MoonPhaseCalculator {
     private const val fullMoonReference: Long = 1588848300000
 
 
-    fun getMoonPhaseFromTimestamp(timestamp: Long): Int{
-        //Log.d(TAG, "Getting timestamp for moon phase: timestamp is $timestamp")
+    fun getMoonPhaseFromTimestamp(timestamp: Long): Int {
         // Calc newMoon prev to timestamp
         val calendar = Calendar.getInstance(Locale.getDefault())
         calendar.timeInMillis = fullMoonReference
@@ -60,7 +49,6 @@ object MoonPhaseCalculator {
             calendar.add(Calendar.HOUR_OF_DAY, synodicMonthHours)
             calendar.add(Calendar.MINUTE, synodicMonthMin)
             calendar.add(Calendar.SECOND, synodicMonthSec)
-            //calendar.add(Calendar.MILLISECOND, synodicMonthMs)
         }
 
         val nextFullMoonTimestamp = calendar.timeInMillis
@@ -70,30 +58,23 @@ object MoonPhaseCalculator {
 
         val newMoonYear = calendar.get(Calendar.YEAR)
         val newMoonDay = calendar.get(Calendar.DAY_OF_YEAR)
-        //Log.d(TAG, "newMoonYear is $newMoonYear and newMoonDay is $newMoonDay")
 
         calendar.timeInMillis = timestamp
 
         val comparisonYear = calendar.get(Calendar.YEAR)
         val comparisonDay = calendar.get(Calendar.DAY_OF_YEAR)
-        //Log.d(TAG, "comparisonYear is $comparisonYear and comparisonDay is $comparisonDay")
 
         calendar.timeInMillis = nextFullMoonTimestamp
 
         val fullMoonYear = calendar.get(Calendar.YEAR)
         val fullMoonDay = calendar.get(Calendar.DAY_OF_YEAR)
-        //Log.d(TAG, "fullMoonYear is $fullMoonYear and fullMoonDay is $fullMoonDay")
 
         // Timestamp is new moon
         return if (newMoonYear == comparisonYear && newMoonDay == comparisonDay) {
-            //Log.d(TAG, "Returning new moon")
             NEW_MOON
-        }
-        else if (fullMoonYear == comparisonYear && fullMoonDay == comparisonDay) {
-            //Log.d(TAG, "Returning full moon")
+        } else if (fullMoonYear == comparisonYear && fullMoonDay == comparisonDay) {
             FULL_MOON
-        }
-        else INTERMEDIATE_MOON
+        } else INTERMEDIATE_MOON
 
     }
 }
