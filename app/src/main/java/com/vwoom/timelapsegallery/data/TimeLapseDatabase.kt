@@ -10,6 +10,8 @@ import com.vwoom.timelapsegallery.data.dao.*
 import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.view.ProjectView
 
+// TODO: consider removing table cover photo
+
 @Database(entities = [
     ProjectEntry::class,
     PhotoEntry::class,
@@ -157,9 +159,6 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                         "timestamp INTEGER NOT NULL, " +
                         "PRIMARY KEY(id)" +
                         ")")
-
-                // TODO: drop table cover photo. Always assume cover photo is last.
-
             }
         }
     }

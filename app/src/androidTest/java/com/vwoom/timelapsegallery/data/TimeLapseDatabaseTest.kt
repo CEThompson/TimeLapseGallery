@@ -16,7 +16,6 @@ import java.io.IOException
 class TimeLapseDatabaseTest {
 
     // DAOs
-    // TODO write comprehensive tests for each dao
     private lateinit var weatherDao: WeatherDao
     private lateinit var projectDao: ProjectDao
     private lateinit var projectTagDao: ProjectTagDao
