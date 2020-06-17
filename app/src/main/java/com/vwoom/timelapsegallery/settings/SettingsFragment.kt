@@ -31,13 +31,7 @@ import com.vwoom.timelapsegallery.utils.RESERVED_CHARACTERS
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 
-// TODO:  Create setting to disable gif display in the gallery
-
-// TODO: (update 1.2) reevaluate shared preference options and content
-// TODO: (update 1.2) re-evaluate free and paid variants
-// TODO: (update 1.2) re-evaluate  analytics metrics
 class SettingsFragment : PreferenceFragmentCompat() {
-
     private var prefs: SharedPreferences? = null
     private var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
     private val settingsViewModel: SettingsViewModel by viewModels {
