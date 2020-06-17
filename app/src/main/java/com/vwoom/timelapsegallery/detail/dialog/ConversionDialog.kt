@@ -2,11 +2,16 @@ package com.vwoom.timelapsegallery.detail.dialog
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.view.View
 import android.view.Window
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -87,6 +92,26 @@ class ConversionDialog(context: Context, detailViewModel: DetailViewModel, exter
         exitFab.setOnClickListener {
             this.dismiss()
             detailViewModel.convertDialogShowing = false
+        }
+
+        val shareFab = this.findViewById<FloatingActionButton>(R.id.dialog_conversion_share_FAB)
+        shareFab.setOnClickListener {
+            val gif = ProjectUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
+            if (gif != null) {
+                val shareIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    type = "image/gif"
+                    val photoURI: Uri = FileProvider.getUriForFile(context,
+                            context.applicationContext.packageName.toString() + ".fileprovider",
+                            gif)
+                    putExtra(Intent.EXTRA_STREAM, photoURI)
+                }
+                context.startActivity(Intent.createChooser(shareIntent, "Share Image"))
+            }
+            // Gif has not yet been created
+            else {
+                Toast.makeText(context, "Create a GIF first to share", Toast.LENGTH_LONG).show()
+            }
         }
 
     }

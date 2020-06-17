@@ -297,30 +297,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            // Opens the gif conversion dialog
             R.id.convert_to_gif -> {
                 lazyShowConvertDialog()
                 true
             }
-            R.id.share_project -> {
-                val gifFile = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
-                if (gifFile != null) {
-                    val shareIntent: Intent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        type = "image/gif"
-                        val photoURI: Uri = FileProvider.getUriForFile(requireContext(),
-                                requireContext().applicationContext.packageName.toString() + ".fileprovider",
-                                gifFile)
-                        putExtra(Intent.EXTRA_STREAM, photoURI)
-                    }
-                    startActivity(Intent.createChooser(shareIntent, "Share Image"))
-                }
-                // Gif has not yet been created
-                else {
-                    Toast.makeText(requireContext(), "No GIF available for project", Toast.LENGTH_LONG).show()
-                    // TODO: Open create gif/video dialog
-                }
-                true
-            }
+            // Overflow option to share the current photo
             R.id.share_photo -> {
                 val photoUrl = ProjectUtils.getProjectPhotoUrl(mExternalFilesDir,
                         getProjectEntryFromProjectView(mCurrentProjectView),
@@ -342,6 +324,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 }
                 true
             }
+            // Overflow option to delete the current photo
             R.id.delete_photo -> {
                 if (mPhotos.size == 1) {
                     verifyLastPhotoDeletion()
@@ -350,6 +333,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 }
                 true
             }
+            // Overflow option to delete the current project
             R.id.delete_project -> {
                 verifyProjectDeletion()
                 true
