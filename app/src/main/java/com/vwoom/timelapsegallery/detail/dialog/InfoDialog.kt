@@ -30,15 +30,6 @@ class InfoDialog(context: Context,
         // Set fab colors
         editNameButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
         editNameButton.setOnClickListener { verifyEditName() }
-        val tagsTextView = this.findViewById<TextView>(R.id.dialog_information_tags)
-
-
-        // TODO reconsider click listener on tags
-        /*tagsTextView.setOnClickListener {
-            if (mTagDialog == null) initializeTagDialog()
-            this.show()
-            detailViewModel.tagDialogShowing = true
-        }*/
 
         val infoOkTextView = this.findViewById<TextView>(R.id.dialog_info_dismiss)
         infoOkTextView.setOnClickListener {
@@ -50,10 +41,6 @@ class InfoDialog(context: Context,
             this.dismiss()
             detailViewModel.infoDialogShowing = false
         }
-
-        // TODO figure out where to initialize dialog and tags
-        //setInfoDialog()
-        //setInfoTags()
     }
 
     // Verifies the user wishes to rename the project
@@ -74,7 +61,6 @@ class InfoDialog(context: Context,
 
     // This updates the rest of the info in the project info dialog
     // Name, id, schedule, etc.
-    // TODO: take updated project arg
     fun setInfoDialog(updatedProject: ProjectView) {
         project = updatedProject
         // Set info dialog fields
