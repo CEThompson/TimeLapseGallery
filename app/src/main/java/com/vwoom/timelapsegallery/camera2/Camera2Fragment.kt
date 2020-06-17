@@ -30,7 +30,6 @@ import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
 import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
@@ -138,7 +137,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap, 0, 0, viewFinder.bitmap.width, viewFinder.bitmap.height, matrix, true)
                     adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
 
-                    // TODO update(1.2): re-evaluate exif data for future use
                     // Write exif data for image
                     val exif = ExifInterface(file.absolutePath)
                     val timestamp = System.currentTimeMillis()
@@ -150,7 +148,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir, timestamp)
 
                     // Log photo or project addition
-                    if (args.projectView == null){
+                    if (args.projectView == null) {
                         mFirebaseAnalytics?.logEvent(getString(R.string.analytics_new_project), null)
                     } else {
                         mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_photo), null)
@@ -215,11 +213,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                 Log.d(TAG, "Orientation changed to $orientation")
             })
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // TODO handle action bar: (activity as TimeLapseGalleryActivity).supportActionBar?.hide()
     }
 
     private fun initializeCamera() = lifecycleScope.launchIdling {
@@ -303,7 +296,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
         } catch (exc: Throwable) {
             Log.e(TAG, "Error closing camera", exc)
         }
-        // TODO handle action bar: (activity as TimeLapseGalleryActivity).supportActionBar?.show()
     }
 
     override fun onDestroy() {
