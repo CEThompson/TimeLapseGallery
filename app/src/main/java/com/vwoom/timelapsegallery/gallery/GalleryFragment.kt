@@ -39,11 +39,9 @@ import com.vwoom.timelapsegallery.weather.WeatherResult
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-// TODO: create gifs or mp4s from photo sets
-// TODO: increase test coverage
+
 // TODO: optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
-
 
     private val args: GalleryFragmentArgs by navArgs()
 
@@ -117,12 +115,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // Set up options menu
-        // TODO refactor toolbar so that it does not violate inversion of control
+        // TODO refactor toolbar to navigation drawer
         setHasOptionsMenu(true)
         toolbar = binding?.galleryFragmentToolbar
         toolbar?.title = getString(R.string.app_name)
-        // TODO: refactor so that toolbar does not violate inversion of control
-        // TODO: convert to navigation drawer
         (activity as TimeLapseGalleryActivity).setSupportActionBar(toolbar)
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
 

@@ -26,7 +26,6 @@ const val SEARCH_TYPE_PENDING = "pending"
 const val SEARCH_TYPE_SCHEDULED = "scheduled"
 const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 
-// TODO: encapsulate view models
 class GalleryViewModel
 @Inject constructor (projectRepository: ProjectRepository,
                      private val tagRepository: TagRepository,
