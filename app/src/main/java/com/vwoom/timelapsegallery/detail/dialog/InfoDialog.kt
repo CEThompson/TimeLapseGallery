@@ -11,7 +11,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.detail.DetailViewModel
 import java.io.File
@@ -19,8 +18,7 @@ import java.io.File
 class InfoDialog(context: Context,
                  private val detailViewModel: DetailViewModel,
                  val externalFilesDir: File,
-                 var project: ProjectView) : Dialog(context)
-{
+                 var project: ProjectView) : Dialog(context) {
     init {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.dialog_project_information)
@@ -31,6 +29,11 @@ class InfoDialog(context: Context,
         editNameButton.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
         editNameButton.setOnClickListener { verifyEditName() }
 
+        // Set the project ID
+        val projectInfoDialogId = this.findViewById<TextView>(R.id.dialog_project_info_id_field)
+        projectInfoDialogId?.text = project.project_id.toString()
+
+        // Set the listeners
         val infoOkTextView = this.findViewById<TextView>(R.id.dialog_info_dismiss)
         infoOkTextView.setOnClickListener {
             this.dismiss()
@@ -63,11 +66,8 @@ class InfoDialog(context: Context,
     // Name, id, schedule, etc.
     fun setInfoDialog(updatedProject: ProjectView) {
         project = updatedProject
-        // Set info dialog fields
-        // TODO move to init block?
-        val projectInfoDialogId = this.findViewById<TextView>(R.id.dialog_project_info_id_field)
-        projectInfoDialogId?.text = project.project_id.toString()
 
+        // Set info dialog fields
         val projectInfoNameTv = this.findViewById<TextView>(R.id.dialog_project_info_name)
         if (project.project_name == null || project.project_name!!.isEmpty()) {
             projectInfoNameTv.text = context.getString(R.string.unnamed)
