@@ -67,8 +67,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
-// TODO: debug dialogs failing to persist, perhaps something to do with dagger injection
-// TODO: (update 1.2) use NDK to implement converting photo sets to .gif and .mp4/.mov etc
+// TODO: debug dialogs failing to persist, dagger injection is not set up correctly
 // TODO: (update 1.2) implement pinch zoom on fullscreen image
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
@@ -183,7 +182,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
         mPlaybackInterval = playbackIntervalSharedPref?.toLong() ?: 50
 
-        // TODO refactor toolbar so that it does not violate inversion of control
+        // TODO refactor toolbar to navigation drawer
         // Set up toolbar
         setHasOptionsMenu(true)
         toolbar = binding?.detailsFragmentToolbar
@@ -490,7 +489,6 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
     }
 
-    // TODO: (update 1.2) re-evaluate and speed up image loading
     // This function loads an image into a top view, then loads an image into the bottom view and hides the top view
     // This makes 'playing' the images look seamless
     private fun loadImagePair(f: File?, bottomImage: ImageView, topImage: ImageView) {
