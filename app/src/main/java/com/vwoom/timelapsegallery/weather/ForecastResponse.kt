@@ -11,9 +11,8 @@ data class ForecastResponse(
     val properties: Properties,
     val type: String
 ) {
-
     data class Geometry(
-            val geometries: List<GeometryX>,
+            val coordinates: List<List<List<Double>>>,
             val type: String
     )
 
@@ -26,11 +25,6 @@ data class ForecastResponse(
             val updateTime: String,
             val updated: String,
             val validTimes: String
-    )
-
-    data class GeometryX(
-            val coordinates: List<Any>,
-            val type: String
     )
 
     data class Elevation(
