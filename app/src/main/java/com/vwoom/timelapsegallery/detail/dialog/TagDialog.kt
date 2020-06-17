@@ -32,9 +32,6 @@ class TagDialog(context: Context, val detailViewModel: DetailViewModel, val proj
                 tagText.length > 14 -> showTagValidationAlertDialog(context.getString(R.string.invalid_tag_length))
                 else -> {
                     detailViewModel.addTag(tagText, project)
-
-                    // TODO: re-eval use of analytics
-                    //mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_tag), null)
                     editText?.text?.clear()
                 }
             }
@@ -49,9 +46,6 @@ class TagDialog(context: Context, val detailViewModel: DetailViewModel, val proj
             this.dismiss()
             detailViewModel.tagDialogShowing = false
         }
-
-        // TODO initialize tag dialog in frag
-        //setProjectTagDialog()
     }
 
     // Gives user feedback on tags
@@ -115,8 +109,6 @@ class TagDialog(context: Context, val detailViewModel: DetailViewModel, val proj
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     // If this photo is the last photo then set the new thumbnail to its previous
                     detailViewModel.deleteTagFromDatabase(tagEntry)
-                    // TODO: re-eval analytics
-                    //mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_tag), null)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
