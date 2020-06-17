@@ -38,10 +38,6 @@ class ScheduleDialog(context: Context, val detailViewModel: DetailViewModel, ext
         noneLayout?.addView(mNoneSelector)
         mNoneSelector.setOnClickListener {
             detailViewModel.setSchedule(externalFilesDir, project, 0)
-
-            // TODO: move analytics to view model?
-            // TODO: reconsider logging schedule info
-            //mFirebaseAnalytics?.logEvent(context.getString(R.string.analytics_delete_schedule), null)
         }
 
         // Set up days selection
@@ -54,8 +50,6 @@ class ScheduleDialog(context: Context, val detailViewModel: DetailViewModel, ext
             textView.text = dayInterval.toString()
             selectionLayout.setOnClickListener {
                 detailViewModel.setSchedule(externalFilesDir, project, dayInterval)
-                // TODO: move analytics to view model?
-                //mFirebaseAnalytics.logEvent(context.getString(R.string.analytics_add_schedule_days), null)
             }
             daysLayout?.addView(selectionLayout)
             selectionLayout.contentDescription = context.getString(R.string.content_description_schedule_selector_days, dayInterval)
@@ -71,8 +65,6 @@ class ScheduleDialog(context: Context, val detailViewModel: DetailViewModel, ext
             textView.text = weekInterval.toString()
             selectionLayout.setOnClickListener {
                 detailViewModel.setSchedule(externalFilesDir, project, weekInterval * 7)
-                // TODO: move analytics to view model?
-                //mFirebaseAnalytics?.logEvent(context.getString(R.string.analytics_add_schedule_weeks), null)
             }
             weeksLayout?.addView(selectionLayout)
             selectionLayout.contentDescription = context.getString(R.string.content_description_schedule_selector_weeks, weekInterval)
@@ -84,12 +76,8 @@ class ScheduleDialog(context: Context, val detailViewModel: DetailViewModel, ext
             val interval = it.toString()
             if (interval.isNotEmpty()) {
                 detailViewModel.setSchedule(externalFilesDir, project, interval.toInt())
-                // TODO: reconsider analytics
-                //mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_schedule_custom), null)
             } else {
-                // TODO: reconsider analytics
                 detailViewModel.setSchedule(externalFilesDir, project, 0)
-                //mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_schedule), null)
             }
         }
 
