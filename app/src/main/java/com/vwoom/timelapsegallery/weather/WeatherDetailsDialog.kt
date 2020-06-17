@@ -63,7 +63,7 @@ class WeatherDetailsDialog(context: Context, galleryViewModel: GalleryViewModel)
                 showWeatherData()
             }
             is WeatherResult.NoData -> {
-                // TODO handle no data state
+                // No need to handle: details cannot be launched with no data state
             }
             is WeatherResult.CachedForecast -> {
                 mWeatherAdapter.setWeatherData(result.data.properties.periods)
