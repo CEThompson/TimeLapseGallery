@@ -89,20 +89,21 @@
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/dialog_project_info_name_label"
             app:layout_constraintTop_toTopOf="@id/dialog_project_info_name_label"
-            tools:text="project name" />
+            tools:text="long project name \n with linebreak" />
 
         <!-- Edit name image -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/edit_project_name_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/small"
             android:layout_marginStart="@dimen/large"
-            android:src="@drawable/ic_edit_black_24dp"
             android:contentDescription="@string/content_description_edit_project_name_fab"
+            android:src="@drawable/ic_edit_black_24dp"
             app:backgroundTint="@color/white"
             app:fabSize="mini"
             app:layout_constraintBottom_toBottomOf="@id/dialog_project_info_name"
-            app:layout_constraintEnd_toStartOf="@id/project_info_exit_fab"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/dialog_project_info_name"
             app:layout_constraintTop_toTopOf="@id/dialog_project_info_name"
@@ -118,7 +119,7 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/project_info_dialog_label"
-            app:layout_constraintTop_toBottomOf="@id/dialog_project_info_name_label" />
+            app:layout_constraintTop_toBottomOf="@+id/dialog_project_info_name" />
         <!-- Schedule Field -->
         <TextView
             android:id="@+id/info_dialog_schedule_description"
