@@ -40,7 +40,7 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 
-// TODO: optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
+// TODO (update 1.3): optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
@@ -115,7 +115,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         }
 
         // Set up options menu
-        // TODO refactor toolbar to navigation drawer
         setHasOptionsMenu(true)
         toolbar = binding?.galleryFragmentToolbar
         toolbar?.title = getString(R.string.app_name)

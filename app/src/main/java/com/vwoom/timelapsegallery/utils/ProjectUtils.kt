@@ -138,8 +138,8 @@ object ProjectUtils {
         val outputGif = "${projectGifDir.absolutePath}/${project.id}.gif"
         //Log.d("TLG.GIF:", "Output gif path is: $outputGif")
 
-        // TODO: create control for framerate
-        // TODO: create control for scale
+        // TODO (update 1.3): create control for framerate
+        // TODO (update 1.3): create control for scale
         // Create the command for ffmpeg
         val ffmpegCommand = "-r 14 -y -f concat -safe 0 -i $listTextFile -vf scale=400:-1 $outputGif"
         //Log.d("TLG.GIF:", "Executing ffmpeg command: $ffmpegCommand")

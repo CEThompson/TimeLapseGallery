@@ -10,7 +10,7 @@ import com.vwoom.timelapsegallery.data.dao.*
 import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.view.ProjectView
 
-// TODO: consider removing table cover photo
+// TODO (update 1.3): consider removing table cover photo and instead just use last in photo set
 
 @Database(entities = [
     ProjectEntry::class,

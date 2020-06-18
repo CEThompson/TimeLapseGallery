@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+// TODO: figure out how to properly handle blocking calls in coroutines
 class WeatherLocalDataSource
 @Inject constructor(private val weatherDao: WeatherDao) {
 
@@ -22,7 +23,6 @@ class WeatherLocalDataSource
         else {
             val localResponse: ForecastResponse?
             try {
-                // TODO: figure out how to properly handle this blocking call
                 localResponse = moshi.adapter(ForecastResponse::class.java)
                         .fromJson(weatherEntry.forecastJsonString)
             } catch (e: Exception) {
@@ -39,7 +39,6 @@ class WeatherLocalDataSource
             }
         }
     }
-
 
     suspend fun getCache(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO) {
         val weatherEntry: WeatherEntry? = weatherDao.getWeather()

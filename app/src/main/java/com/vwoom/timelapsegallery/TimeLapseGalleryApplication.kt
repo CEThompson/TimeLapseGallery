@@ -10,6 +10,7 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import javax.inject.Inject
 
+// TODO: fix dagger injection or convert to koin
 class TimeLapseGalleryApplication : Application(), CameraXConfig.Provider, HasAndroidInjector {
 
     @Inject

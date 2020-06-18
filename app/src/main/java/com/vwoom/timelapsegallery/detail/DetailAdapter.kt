@@ -62,7 +62,7 @@ class DetailAdapter(
 
         // Otherwise continue on to load the correct image
         val f = if (photoPath == null) null else File(photoPath)
-        // TODO (update 1.2) dynamically resize detail view
+        // TODO (update 1.3) dynamically resize detail view
 
         if (f == null){
             Glide.with(context)

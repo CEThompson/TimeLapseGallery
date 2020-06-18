@@ -37,7 +37,8 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
 
-// TODO: (update 1.2) hunt down memory leak in fragment
+// TODO: (deferred) hunt down memory leak
+// TODO (deferred): investigate cameraX for possible future usage
 class CameraXFragment : Fragment(), LifecycleOwner {
 
     private var mTakePictureFab: FloatingActionButton? = null
@@ -129,9 +130,6 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         preview = Preview.Builder()
                 .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                 .build()
-
-        // TODO (update 1.2): test out new cameraX set up for possible future usage
-        //preview?.setSurfaceProvider(previewView.previewSurfaceProvider)
 
         // Build the image capture use case and attach button click listener
         val imageCapture = ImageCapture.Builder()

@@ -9,7 +9,7 @@ import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.settings.SettingsViewModelFactory
 
-// TODO: refactor to dagger injection or perhaps koin injection
+// TODO: remove this object after refactoring dependency injection
 object InjectorUtils {
 
     fun getProjectRepository(context: Context): ProjectRepository {

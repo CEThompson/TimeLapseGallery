@@ -11,7 +11,7 @@ import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.ProjectUtils
 
-// TODO (update 1.2): showcase a random project per day
+// TODO (deferred): showcase a random project per day
 class WidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         UpdateWidgetService.startActionUpdateWidgets(context)

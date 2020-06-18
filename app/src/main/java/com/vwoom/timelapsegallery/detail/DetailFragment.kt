@@ -67,8 +67,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
-// TODO: debug dialogs failing to persist, dagger injection is not set up correctly
-// TODO: (update 1.2) implement pinch zoom on fullscreen image
+// TODO: (update 1.3) implement pinch zoom on fullscreen image
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private val args: DetailFragmentArgs by navArgs()
@@ -182,7 +181,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
         mPlaybackInterval = playbackIntervalSharedPref?.toLong() ?: 50
 
-        // TODO refactor toolbar to navigation drawer
+        // TODO (update 1.3): refactor toolbar to navigation drawer
         // Set up toolbar
         setHasOptionsMenu(true)
         toolbar = binding?.detailsFragmentToolbar

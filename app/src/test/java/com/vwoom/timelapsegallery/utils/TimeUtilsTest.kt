@@ -3,7 +3,7 @@ package com.vwoom.timelapsegallery.utils
 import org.junit.Test
 import java.util.*
 
-// TODO: (update 1.2) assess locales for time
+// TODO: (deferred) assess locales for time
 // NOTE: Timestamps are in milliseconds
 class TimeUtilsTest {
 
