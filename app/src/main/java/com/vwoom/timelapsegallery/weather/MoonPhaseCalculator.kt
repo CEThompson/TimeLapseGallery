@@ -6,8 +6,8 @@ const val NEW_MOON = 1
 const val FULL_MOON = 2
 const val INTERMEDIATE_MOON = 3
 
-// TODO: handle phases of the moon
-// TODO: handle northern vs southern hemisphere representations
+// TODO (update 1.3): handle phases of the moon in a moon phase dialog
+// TODO (deferred): handle northern vs southern hemisphere representations, localization for moon phases
 
 object MoonPhaseCalculator {
     private val TAG = MoonPhaseCalculator::class.simpleName
@@ -19,9 +19,8 @@ object MoonPhaseCalculator {
     private const val synodicMonthMin = 43  // 43.2 seconds
     private const val synodicMonthSec = 12 // .2 of a min is 12 seconds
 
-
     // NOTE: Calculating synodic month for 29.530587981 days could perhaps be more accurate
-    // in this case
+    // however doing the calculation as such does not match reference dates for tests
     /*private const val interval = 29.530587981
     private const val synodicMonthDays = 29 //29.530587981 days
     private const val synodicMonthHours = 12 //12.734111544 hours
@@ -36,7 +35,6 @@ object MoonPhaseCalculator {
     // Ref timestamp for full moon
     // May 7, 2020 3:45 AM PST
     private const val fullMoonReference: Long = 1588848300000
-
 
     fun getMoonPhaseFromTimestamp(timestamp: Long): Int {
         // Calc newMoon prev to timestamp
