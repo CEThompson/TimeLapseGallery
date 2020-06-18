@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/conversion_dialog_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -31,15 +31,16 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/dialog_convert_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/convert_to_gif"
         android:textStyle="bold"
         android:textSize="18sp"
         android:layout_margin="@dimen/medium"
-        app:layout_constraintLeft_toLeftOf="@id/dialog_conversion_gif_preview"
-        app:layout_constraintRight_toLeftOf="@id/dialog_conversion_exit_fab"
-        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/dialog_conversion_share_FAB"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/dialog_conversion_gif_preview"
         />
@@ -48,12 +49,13 @@
         android:id="@+id/dialog_conversion_gif_preview"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="9:16"
         android:layout_margin="@dimen/large"
         android:src="@color/imagePlaceholder"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dialog_conversion_exit_fab"
-        app:layout_constraintBottom_toTopOf="@id/dialog_project_conversion_convert_FAB"
+        app:layout_constraintRight_toLeftOf="@id/dialog_project_conversion_remove_FAB"
+        app:layout_constraintTop_toBottomOf="@id/dialog_convert_title"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
     <ProgressBar

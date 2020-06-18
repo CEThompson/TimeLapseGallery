@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.detail.dialog
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.view.View
 import android.view.Window
@@ -10,7 +11,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
@@ -25,9 +25,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-// TODO: handle vertical / horizontal modes
 // TODO: review ffmpeg / gif feature tests
-class ConversionDialog(context: Context, detailViewModel: DetailViewModel, externalFilesDir: File, project: ProjectView) : Dialog(context) {
+class ConversionDialog(context: Context,
+                       detailViewModel: DetailViewModel,
+                       externalFilesDir: File,
+                       project: ProjectView) : Dialog(context) {
     init {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.dialog_project_conversion)
@@ -37,10 +39,20 @@ class ConversionDialog(context: Context, detailViewModel: DetailViewModel, exter
         val dm = context.resources.displayMetrics
         val width = dm.widthPixels
         val height = dm.heightPixels
-        val newWidth = (width * 0.7).toInt()
-        val newHeight = (height * 0.7).toInt()
-        this.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout).layoutParams.width = newWidth
-        this.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout).layoutParams.height = newHeight
+
+        val orientation = this.context.resources.configuration.orientation
+        // If portrait set new width and height
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            val newWidth = (width * 0.7).toInt()
+            val newHeight = (height * 0.7).toInt()
+            this.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout).layoutParams.height = newHeight
+            this.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout).layoutParams.width = newWidth
+        }
+        // If landscape just set by height (width auto adjusts for different layout)
+        else {
+            val newHeight = (height * 0.85).toInt()
+            this.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout).layoutParams.height = newHeight
+        }
 
         // Initialize the gif preview
         val gifFile = ProjectUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
