@@ -42,9 +42,6 @@
         <argument
             android:name="clickedProjectView"
             app:argType="com.vwoom.timelapsegallery.data.view.ProjectView" />
-        <argument
-            android:name="transitionPosition"
-            app:argType="integer" />
         <action
             android:id="@+id/action_detailsFragment_to_fullscreenFragment"
             app:destination="@id/fullscreenFragment" />

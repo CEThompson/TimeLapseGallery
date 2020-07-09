@@ -380,7 +380,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         if (reenterTransition == null) reenterTransition = galleryReenterTransition
 
         // Navigate to the detail fragment
-        val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProjectView, position)
+        val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProjectView)
         val extras = FragmentNavigatorExtras(
                 mAddProjectFAB as View to getString(R.string.key_add_transition),
                 binding.projectImage to binding.projectImage.transitionName,

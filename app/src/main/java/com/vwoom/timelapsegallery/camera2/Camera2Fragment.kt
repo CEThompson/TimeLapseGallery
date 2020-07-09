@@ -157,7 +157,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     // For new projects navigate to project detail after insertion
                     if (isNewProject) {
                         val newProjectView = camera2ViewModel.addNewProject(file, externalFilesDir, timestamp)
-                        val action = Camera2FragmentDirections.actionCamera2FragmentToDetailsFragment(newProjectView, 0)
+                        val action = Camera2FragmentDirections.actionCamera2FragmentToDetailsFragment(newProjectView)
                         findNavController().navigate(action)
                     }
                     // For existing projects pop back to the project detail after adding the picture
