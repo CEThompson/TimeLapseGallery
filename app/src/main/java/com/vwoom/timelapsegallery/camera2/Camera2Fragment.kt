@@ -154,6 +154,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                         mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_photo), null)
                     }
 
+                    // TODO (priority 1): navigate to detail fragment for new project. pop backstack for adding photo to project
                     findNavController().popBackStack()
                 } catch (e: Exception) {
                     viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
