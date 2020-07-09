@@ -71,6 +71,10 @@
             android:name="projectView"
             app:argType="com.vwoom.timelapsegallery.data.view.ProjectView"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_camera2Fragment_to_detailsFragment"
+            app:destination="@id/detailsFragment"
+            app:popUpTo="@id/galleryFragment"/>
     </fragment>
     <fragment
         android:id="@+id/cameraXFragment"

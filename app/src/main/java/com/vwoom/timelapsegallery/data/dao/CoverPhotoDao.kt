@@ -19,7 +19,7 @@ interface CoverPhotoDao {
     fun getAllCoverPhotosLiveData(): LiveData<List<CoverPhotoEntry>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPhoto(entry: CoverPhotoEntry)
+    suspend fun insertPhoto(entry: CoverPhotoEntry): Long
 
     @Update
     suspend fun updatePhoto(entry: CoverPhotoEntry)

@@ -17,7 +17,7 @@ import java.io.File
 import javax.inject.Inject
 
 class ProjectRepository
-@Inject constructor (private val projectDao: ProjectDao,
+@Inject constructor(private val projectDao: ProjectDao,
                     private val photoDao: PhotoDao,
                     private val coverPhotoDao: CoverPhotoDao,
                     private val projectScheduleDao: ProjectScheduleDao) {
@@ -31,7 +31,7 @@ class ProjectRepository
     /**
      * Project updating and deletion
      */
-    suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int = 0) {
+    suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int = 0): ProjectView {
         // Create and insert the project
         val projectEntry = ProjectEntry(null)
         val projectId = projectDao.insertProject(projectEntry)
@@ -45,12 +45,14 @@ class ProjectRepository
         // Create cover photo and schedule then insert
         val coverPhotoEntry = CoverPhotoEntry(projectId, photoId)
         val projectScheduleEntry = ProjectScheduleEntry(projectId, scheduleInterval)
-        coverPhotoDao.insertPhoto(coverPhotoEntry)
+        val coverPhotoId = coverPhotoDao.insertPhoto(coverPhotoEntry)
         projectScheduleDao.insertProjectSchedule(projectScheduleEntry)
 
         withContext(Dispatchers.IO) {
             FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
         }
+
+        return ProjectView(projectEntry.id, projectEntry.project_name, scheduleInterval, coverPhotoId, timestamp)
     }
 
     suspend fun updateProjectName(externalFilesDir: File, sourceProjectView: ProjectView, name: String) {

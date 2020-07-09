@@ -67,10 +67,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     private var mWeatherDetailsDialog: WeatherDetailsDialog? = null
     private var mLocation: Location? = null
 
-    // For scrolling to the end when adding a new project
-    private var mPrevProjectsSize: Int? = null
-
-    private var mNumberOfColumns = 3
+    private var mNumberOfColumns = PORTRAIT_COLUMN_COUNT
 
     // Transitions
     private lateinit var galleryExitTransition: Transition
@@ -123,8 +120,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Increase columns for horizontal orientation
         when (resources.configuration.orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> mNumberOfColumns = HORIZONTAL_COLUMN_COUNT
-            Configuration.ORIENTATION_PORTRAIT -> mNumberOfColumns = VERTICAL_COLUMN_COUNT
+            Configuration.ORIENTATION_LANDSCAPE -> mNumberOfColumns = LANDSCAPE_COLUMN_COUNT
+            Configuration.ORIENTATION_PORTRAIT -> mNumberOfColumns = PORTRAIT_COLUMN_COUNT
         }
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -271,21 +268,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
      */
     private fun setupViewModel() {
         // Observe the entire list projects in the database
-        // Note: this does not bind directly to displayed projects
         mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer { currentProjects ->
-            // 1. Detect if we have added a project and scroll to the end
-
-            val projectHasBeenAdded = (mPrevProjectsSize != null && mPrevProjectsSize!! < currentProjects.size)
-            if (projectHasBeenAdded) {
-                if (mGalleryViewModel.displayedProjectViews.value != null) {
-                    val size = mGalleryViewModel.displayedProjectViews.value!!.size
-                    mGalleryRecyclerView?.scrollToPosition(size)
-                }
-            }
-            mPrevProjectsSize = currentProjects.size // Keep track of number of projects for comparison to previous
-
-            // 2. Update the displayed projects by the current filter
-            // Note: default filter is none and will display currentProjects
+            // Update the displayed projects by filtering current projects
+            // Note: default filter is none and currentProjects will simply display
             mGalleryViewModel.filterProjects()
         })
 
@@ -444,8 +429,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     }
 
     companion object {
-        private const val HORIZONTAL_COLUMN_COUNT = 6
-        private const val VERTICAL_COLUMN_COUNT = 3
+        private const val LANDSCAPE_COLUMN_COUNT = 6
+        private const val PORTRAIT_COLUMN_COUNT = 3
         private const val BUNDLE_RECYCLER_LAYOUT = "recycler_layout_key"
         private const val GPS_REQUEST_CODE_PERMISSIONS = 1
         private val GPS_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)

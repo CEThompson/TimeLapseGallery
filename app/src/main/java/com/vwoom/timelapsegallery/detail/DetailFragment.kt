@@ -1,7 +1,6 @@
 package com.vwoom.timelapsegallery.detail
 
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -10,7 +9,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.text.InputType
 import android.transition.Transition
 import android.transition.TransitionInflater
 import android.util.Log
@@ -18,13 +16,11 @@ import android.view.*
 import android.view.View.*
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.widget.*
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
-import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -34,14 +30,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.room.util.FileUtil
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.google.android.flexbox.FlexboxLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
@@ -56,12 +49,17 @@ import com.vwoom.timelapsegallery.detail.dialog.InfoDialog
 import com.vwoom.timelapsegallery.detail.dialog.ScheduleDialog
 import com.vwoom.timelapsegallery.detail.dialog.TagDialog
 import com.vwoom.timelapsegallery.notification.NotificationUtils
-import com.vwoom.timelapsegallery.utils.*
+import com.vwoom.timelapsegallery.utils.FileUtils
+import com.vwoom.timelapsegallery.utils.PhotoUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
+import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -127,6 +125,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // TODO remove this poor injection pattern
         // Inject view model and its passed argument
         AndroidSupportInjection.inject(this)
         detailViewModel.injectProjectId(args.clickedProjectView.project_id)

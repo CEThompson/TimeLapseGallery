@@ -27,12 +27,13 @@ const val SEARCH_TYPE_SCHEDULED = "scheduled"
 const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 
 class GalleryViewModel
-@Inject constructor (projectRepository: ProjectRepository,
-                     private val tagRepository: TagRepository,
-                     private val weatherRepository: WeatherRepository) : ViewModel() {
+@Inject constructor(projectRepository: ProjectRepository,
+                    private val tagRepository: TagRepository,
+                    private val weatherRepository: WeatherRepository) : ViewModel() {
     // For observing all projects
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
 
+    // TODO: reconsider these getter patterns. Is this really necessary?
     // For the displayed projects in search filtration
     private val _displayedProjectViews = MutableLiveData(emptyList<ProjectView>())
     val displayedProjectViews: LiveData<List<ProjectView>>
@@ -97,7 +98,7 @@ class GalleryViewModel
         }
     }
 
-    fun setLoading(){
+    fun setLoading() {
         _weather.value = WeatherResult.Loading
     }
 

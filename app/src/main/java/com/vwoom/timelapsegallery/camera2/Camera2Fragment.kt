@@ -144,18 +144,27 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
                     exif.setAttribute(ExifInterface.TAG_DATETIME_ORIGINAL, timeString)
                     exif.saveAttributes()
 
-                    // Handle the final photo file: copies the final file to the projects directory and inserts into db
-                    camera2ViewModel.handleFinalPhotoFile(file, externalFilesDir, timestamp)
+                    // Determine if new project
+                    val isNewProject = args.projectView == null
 
-                    // Log photo or project addition
-                    if (args.projectView == null) {
+                    // Handle analytics
+                    if (isNewProject) {
                         mFirebaseAnalytics?.logEvent(getString(R.string.analytics_new_project), null)
                     } else {
                         mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_photo), null)
                     }
 
-                    // TODO (priority 1): navigate to detail fragment for new project. pop backstack for adding photo to project
-                    findNavController().popBackStack()
+                    // For new projects navigate to project detail after insertion
+                    if (isNewProject) {
+                        val newProjectView = camera2ViewModel.addNewProject(file, externalFilesDir, timestamp)
+                        val action = Camera2FragmentDirections.actionCamera2FragmentToDetailsFragment(newProjectView, 0)
+                        findNavController().navigate(action)
+                    }
+                    // For existing projects pop back to the project detail after adding the picture
+                    else {
+                        camera2ViewModel.addPhotoToProject(file, externalFilesDir, timestamp)
+                        findNavController().popBackStack()
+                    }
                 } catch (e: Exception) {
                     viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
                     Log.d(TAG, "Take picture exception: ${e.message}")
