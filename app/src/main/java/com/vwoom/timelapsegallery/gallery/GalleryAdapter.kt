@@ -110,8 +110,15 @@ class GalleryAdapter(
         holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.transitionName = "${imageTransitionName}due"
         holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.transitionName = "${imageTransitionName}interval"
 
-        // Load the gif for the project if created
-        if (gifDisplaysEnabled) {
+        // If not photo load an error
+        if (photoUrl == null) {
+            Glide.with(holder.itemView.context)
+                    .load(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
+                    .centerInside()
+                    .into(holder.binding.projectImage)
+        }
+        // Otherwise the gif for the project if created
+        else if (gifDisplaysEnabled) {
             val gifFile = ProjectUtils.getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
             if (gifFile != null) {
                 // TODO: figure out why gif is intermittently stuck on first frame after return
@@ -134,20 +141,14 @@ class GalleryAdapter(
                 return
             }
         }
-
-        // Otherwise load the image or an error image
-        if (photoUrl == null) {
-            Glide.with(holder.itemView.context)
-                    .load(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
-                    .centerInside()
-                    .into(holder.binding.projectImage)
-        } else {
+        // Otherwise load the static image for the project
+        else {
             // Load the image
             loadImage(holder, photoUrl)
         }
     }
 
-    private fun loadImage(holder: GalleryAdapterViewHolder, photoUrl: String?) {
+    private fun loadImage(holder: GalleryAdapterViewHolder, photoUrl: String) {
         Glide.with(holder.itemView.context)
                 .load(File(photoUrl))
                 .error(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
