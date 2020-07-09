@@ -110,42 +110,47 @@ class GalleryAdapter(
         holder.binding.galleryScheduleLayout.scheduleDaysUntilDueTv.transitionName = "${imageTransitionName}due"
         holder.binding.galleryScheduleLayout.scheduleIndicatorIntervalTv.transitionName = "${imageTransitionName}interval"
 
-        // If not photo load an error
+        // Load an error image
         if (photoUrl == null) {
             Glide.with(holder.itemView.context)
                     .load(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
                     .centerInside()
                     .into(holder.binding.projectImage)
         }
-        // Otherwise the gif for the project if created
-        else if (gifDisplaysEnabled) {
-            val gifFile = ProjectUtils.getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
-            if (gifFile != null) {
-                // TODO: figure out why gif is intermittently stuck on first frame after return
-                Glide.with(holder.itemView.context)
-                        .asGif()
-                        .load(gifFile)
-                        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).listener(object : RequestListener<GifDrawable> {
-                            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable>?, isFirstResource: Boolean): Boolean {
-                                loadImage(holder, photoUrl)
-                                return false
-                            }
+        // Otherwise either load the project gif or static image
+        else {
+            if (gifDisplaysEnabled) {
+                val gifFile = ProjectUtils.getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
+                if (gifFile != null) {
+                    // TODO: figure out why gif is intermittently stuck on first frame after return
+                    Glide.with(holder.itemView.context)
+                            .asGif()
+                            .load(gifFile)
+                            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC)).listener(object : RequestListener<GifDrawable> {
+                                override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable>?, isFirstResource: Boolean): Boolean {
+                                    loadImage(holder, photoUrl!!)
+                                    return false
+                                }
 
-                            override fun onResourceReady(resource: GifDrawable?, model: Any?, target: Target<GifDrawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                                // If GIF loads set to loop 3 times for now
-                                resource?.setLoopCount(3)
-                                return false
-                            }
-                        })
-                        .into(holder.binding.projectImage)
-                return
+                                override fun onResourceReady(resource: GifDrawable?, model: Any?, target: Target<GifDrawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                                    // If GIF loads set to loop 3 times for now
+                                    resource?.setLoopCount(3)
+                                    return false
+                                }
+                            })
+                            .into(holder.binding.projectImage)
+                    return
+                }
+                else {
+                    loadImage(holder, photoUrl)
+                }
+            } else {
+                loadImage(holder, photoUrl)
             }
         }
-        // Otherwise load the static image for the project
-        else {
-            // Load the image
-            loadImage(holder, photoUrl)
-        }
+
+
+
     }
 
     private fun loadImage(holder: GalleryAdapterViewHolder, photoUrl: String) {
