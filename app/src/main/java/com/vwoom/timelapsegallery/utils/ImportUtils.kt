@@ -144,22 +144,22 @@ object ImportUtils {
         //Log.d(TAG, "Importing photos for project")
         // Create a list of all photos in the project directory
         val allPhotosInFolder = ProjectUtils.getPhotoEntriesInProjectDirectory(externalFilesDir, currentProject)
+        if (allPhotosInFolder.isEmpty()) return
+
         // Insert the photos from the file structure
-        if (allPhotosInFolder != null) {
-            // Insert the new entries
-            for (photoEntry in allPhotosInFolder) {
-                db.photoDao().insertPhoto(photoEntry)
-                //Log.d(TAG, "inserting photo id $id $photoEntry")
-                if (!testing) {
-                    SyncProgressCounter.incrementPhoto()
-                }
+        for (photoEntry in allPhotosInFolder) {
+            db.photoDao().insertPhoto(photoEntry)
+            //Log.d(TAG, "inserting photo id $id $photoEntry")
+            if (!testing) {
+                SyncProgressCounter.incrementPhoto()
             }
-            val lastPhoto: PhotoEntry? = db.photoDao().getLastPhoto(currentProject.id)
-            if (lastPhoto != null) {
-                val coverPhoto = CoverPhotoEntry(lastPhoto.project_id, lastPhoto.id)
-                //Log.d(TAG, "inserting cover photo $coverPhoto")
-                db.coverPhotoDao().insertPhoto(coverPhoto)
-            }
+        }
+
+        // Insert the last photo as a cover photo
+        val lastPhoto: PhotoEntry? = db.photoDao().getLastPhoto(currentProject.id)
+        if (lastPhoto != null) {
+            val coverPhoto = CoverPhotoEntry(lastPhoto.project_id, lastPhoto.id)
+            db.coverPhotoDao().insertPhoto(coverPhoto)
         }
     }
 

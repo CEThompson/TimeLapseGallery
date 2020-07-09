@@ -268,8 +268,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
      */
     private fun setupViewModel() {
         // Observe the entire list projects in the database
-        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer { currentProjects ->
-            // Update the displayed projects by filtering current projects
+        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer { _ ->
+            // Update the displayed projects by filtering all projects
             // Note: default filter is none and currentProjects will simply display
             mGalleryViewModel.filterProjects()
         })

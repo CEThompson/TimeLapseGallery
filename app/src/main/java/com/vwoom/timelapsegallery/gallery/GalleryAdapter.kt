@@ -128,12 +128,12 @@ class GalleryAdapter(
                             .load(gifFile)
                             .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC)).listener(object : RequestListener<GifDrawable> {
                                 override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable>?, isFirstResource: Boolean): Boolean {
-                                    loadImage(holder, photoUrl!!)
+                                    loadImage(holder, photoUrl)
                                     return false
                                 }
 
                                 override fun onResourceReady(resource: GifDrawable?, model: Any?, target: Target<GifDrawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                                    // If GIF loads set to loop 3 times for now
+                                    // Set to loop 3 times for now
                                     resource?.setLoopCount(3)
                                     return false
                                 }
@@ -141,14 +141,16 @@ class GalleryAdapter(
                             .into(holder.binding.projectImage)
                     return
                 }
+                // If no gif file load the static image
                 else {
                     loadImage(holder, photoUrl)
                 }
-            } else {
+            }
+            // If gif display not enabled load the static image
+            else {
                 loadImage(holder, photoUrl)
             }
         }
-
 
 
     }

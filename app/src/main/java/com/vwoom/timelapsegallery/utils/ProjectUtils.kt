@@ -1,7 +1,5 @@
 package com.vwoom.timelapsegallery.utils
 
-import android.util.Log
-import com.arthenica.mobileffmpeg.Config
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
@@ -85,7 +83,8 @@ object ProjectUtils {
     // Deletes file referred to in photo entry by project view
     fun deleteProjectPhoto(externalFilesDir: File, projectEntry: ProjectEntry, photoEntry: PhotoEntry) {
         // photo file does not exist already return
-        val photoUrl = getProjectPhotoUrl(externalFilesDir, projectEntry, photoEntry.timestamp) ?: return
+        val photoUrl = getProjectPhotoUrl(externalFilesDir, projectEntry, photoEntry.timestamp)
+                ?: return
         val photoFile = File(photoUrl)
         FileUtils.deleteRecursive(photoFile)
     }
@@ -126,9 +125,8 @@ object ProjectUtils {
     }
 
     // Creates a .gif from the set of photos for a project
-    fun makeGif(externalFilesDir: File, project: ProjectEntry){
+    fun makeGif(externalFilesDir: File, project: ProjectEntry) {
         // Write the list of paths for the files to a text file for use by ffmpeb
-        //Log.d("TLG.GIF:", "Creating list of text files")
         val listTextFile = FileUtils.createTempListPhotoFiles(externalFilesDir, project)
 
         // Get the meta directory for the project
@@ -136,19 +134,20 @@ object ProjectUtils {
 
         // Define the output path for the gif
         val outputGif = "${projectGifDir.absolutePath}/${project.id}.gif"
-        //Log.d("TLG.GIF:", "Output gif path is: $outputGif")
 
         // TODO (update 1.3): create control for framerate
         // TODO (update 1.3): create control for scale
         // Create the command for ffmpeg
         val ffmpegCommand = "-r 14 -y -f concat -safe 0 -i $listTextFile -vf scale=400:-1 $outputGif"
+        FFmpeg.execute(ffmpegCommand)
+
+        //Use this block for logging
+        //val rc = FFmpeg.execute(ffmpegCommand)
+        //val lastCommandOutput = Config.getLastCommandOutput()
+        //Log.d("TLG.GIF:", "Creating list of text files")
+        //Log.d("TLG.GIF:", "Output gif path is: $outputGif")
         //Log.d("TLG.GIF:", "Executing ffmpeg command: $ffmpegCommand")
-
-        // Execute the command
-        val rc = FFmpeg.execute(ffmpegCommand)
         //Log.d("TLG.GIF:", "Executed, rc is: $rc")
-
-        val lastCommandOutput = Config.getLastCommandOutput()
         //Log.d("TLG.GIF:", "Last command output: $lastCommandOutput")
     }
 
