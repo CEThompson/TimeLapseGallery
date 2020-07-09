@@ -18,10 +18,11 @@ import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+// TODO: verify notification channel info
 object NotificationUtils {
     private const val PROJECT_NOTIFICATION_CHANNEL_ID = "project_channel_id"
-    private const val CHANNEL_NAME = "channel_name"
-    private const val CHANNEL_DESCRIPTION = "channel_description"
+    private const val CHANNEL_NAME = "Project Notifications"
+    private const val CHANNEL_DESCRIPTION = "Notifications for scheduled projects"
     private val TAG = NotificationUtils::class.java.simpleName
 
     /* Creates a notification that launches the main activity and filters by today's scheduled projects */
