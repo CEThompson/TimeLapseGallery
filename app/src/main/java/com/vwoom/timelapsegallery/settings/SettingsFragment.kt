@@ -31,6 +31,7 @@ import com.vwoom.timelapsegallery.utils.RESERVED_CHARACTERS
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 
+// TODO: allow adjustment of gallery columns
 class SettingsFragment : PreferenceFragmentCompat() {
     private var prefs: SharedPreferences? = null
     private var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
