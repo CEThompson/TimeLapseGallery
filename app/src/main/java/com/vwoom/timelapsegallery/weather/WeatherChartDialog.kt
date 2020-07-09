@@ -58,7 +58,11 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
         this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
 
         // Show reason for showing forecast that hasn't been updated today
-        this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString((R.string.forecast_error))
+        val exceptionMessage = if (result.exception != null && result.exception!!.localizedMessage != null)
+            result.exception!!.localizedMessage!!
+        else context.getString(R.string.unknown)
+
+        this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString(R.string.forecast_error, exceptionMessage)
         this.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
 
         // Hide the progress
@@ -96,6 +100,7 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.VISIBLE
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.INVISIBLE
         this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.INVISIBLE
+        this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
     }
 
     private fun showWeatherNoData() {

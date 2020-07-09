@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,22 +36,22 @@ class GalleryViewModel
 
     // TODO: reconsider these getter patterns. Is this really necessary?
     // For the displayed projects in search filtration
-    private val _displayedProjectViews = MutableLiveData(emptyList<ProjectView>())
-    val displayedProjectViews: LiveData<List<ProjectView>>
-        get() = _displayedProjectViews
+    val displayedProjectViews = MutableLiveData(emptyList<ProjectView>())
+    /*val displayedProjectViews: LiveData<List<ProjectView>>
+        get() = _displayedProjectViews*/
 
     // Tags for all projects to populate the search dialog
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
 
     // Weather forecast
-    private val _weather = MutableLiveData<WeatherResult<ForecastResponse>>(WeatherResult.Loading)
-    val weather: LiveData<WeatherResult<ForecastResponse>>
-        get() = _weather
+    val weather = MutableLiveData<WeatherResult<ForecastResponse>>(WeatherResult.Loading)
+    /*val weather: LiveData<WeatherResult<ForecastResponse>>
+        get() = _weather*/
 
     // Search state: weather a search is active or not
-    private val _search = MutableLiveData(false)
-    val search: LiveData<Boolean>
-        get() = _search
+    val search = MutableLiveData(false)
+    /*val search: LiveData<Boolean>
+        get() = _search*/
 
     // Inputted search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
@@ -68,6 +69,13 @@ class GalleryViewModel
 
     private var searchJob: Job = Job()
 
+    init {
+        viewModelScope.launch {
+            weather.value = weatherRepository.getForecast()
+        }
+
+    }
+
     override fun onCleared() {
         super.onCleared()
         searchJob.cancel()
@@ -84,33 +92,41 @@ class GalleryViewModel
         return searchTags.contains(tag)
     }
 
-    // Retrieves today's forecast or a cached forecast if unable to query
+    // Retrieves cached forecast and attempts to update it if forecast does not belong to today
     fun getForecast(location: Location?) {
         viewModelScope.launch {
-            _weather.value = weatherRepository.getForecast(location)
+            // Get the cached forecast
+            //weather.value = weatherRepository.getForecast()
+
+            // If it doesn't belong to today then try to update
+            if (weather.value !is WeatherResult.TodaysForecast && location!=null) {
+                //Log.d("WeatherDebug", "location is not null, calling update forecast")
+                updateForecast(location)
+            }
         }
     }
 
-    // Attempts to force update the forecast
+    // Attempts to update the forecast
     fun updateForecast(location: Location) {
         viewModelScope.launch {
-            _weather.value = weatherRepository.updateForecast(location)
+            weather.value = weatherRepository.updateForecast(location)
+            //Log.d("WeatherDebug", "called update forecast")
         }
     }
 
     fun setLoading() {
-        _weather.value = WeatherResult.Loading
+        weather.value = WeatherResult.Loading
     }
 
     fun forecastDenied() {
-        _weather.value = WeatherResult.NoData()
+        weather.value = WeatherResult.NoData()
     }
 
     // Filters the projects by the inputted search parameters
     fun filterProjects() {
         searchJob.cancel()
         searchJob = viewModelScope.launch {
-            if (projects.value == null) _displayedProjectViews.value = listOf()
+            if (projects.value == null) displayedProjectViews.value = listOf()
             var resultProjects = projects.value!!
 
             if (searchTags.isNotEmpty()) {
@@ -164,12 +180,12 @@ class GalleryViewModel
                     resultProjects = resultProjects.sortedBy { daysUntilDue(it) } // show projects due earlier first
                 }
             }
-            _displayedProjectViews.value = resultProjects
+            displayedProjectViews.value = resultProjects
         }
     }
 
     fun setSearch() {
-        _search.value = userIsSearching()
+        search.value = userIsSearching()
     }
 
     fun clearSearch() {

@@ -21,30 +21,22 @@ class WeatherRepository
             WeatherResult.TodaysForecast(remoteResponse.data, remoteResponse.timestamp)
         }
         else {
+            // Otherwise there was no response
             val noDataResponse = remoteResponse as WeatherResult.NoData
+
+            // Return the cached response if exists
             val cache = weatherLocalDataSource.getCache()
             if (cache is WeatherResult.CachedForecast)
                 WeatherResult.CachedForecast(cache.data, cache.timestamp, remoteResponse.exception, remoteResponse.message)
             else
+                // Otherwise return the failed update
                 noDataResponse
         }
     }
 
     // Retrieves the forecast from the database
-    // Also if the forecast is not today's then attempts to update the national weather service api
     // Returns (1) Weather Result: No Data (2) Weather Result: Cached Forecast or (3) Weather Result: Today's Forecast
-    suspend fun getForecast(location: Location?): WeatherResult<ForecastResponse> {
-        val databaseForecast: WeatherResult<ForecastResponse> = weatherLocalDataSource.getWeather()  // Can be (2) cached or (3) today's forecast
-        if (location == null) return databaseForecast
-
-        if (databaseForecast !is WeatherResult.TodaysForecast){
-            val remoteResponse = updateForecast(location)
-            if (remoteResponse is WeatherResult.TodaysForecast) {
-                weatherLocalDataSource.cacheForecast(remoteResponse.data)
-                return remoteResponse   // Can be (1) no data or (3) today's forecast
-            }
-        }
-
-        return databaseForecast
+    suspend fun getForecast(): WeatherResult<ForecastResponse> {
+        return weatherLocalDataSource.getWeather()  // Can be (2) cached or (3) today's forecast
     }
 }
