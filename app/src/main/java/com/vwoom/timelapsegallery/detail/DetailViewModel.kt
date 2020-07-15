@@ -41,7 +41,7 @@ class DetailViewModel @Inject constructor(
     val currentPhoto: MutableLiveData<PhotoEntry?> = MutableLiveData(null)
     var lastPhoto: Photo? = null    // used to pass to the camera fragment
     var photoIndex: Int = 0
-    var maxIndex: Int = 0
+    var maxIndex: Int = Integer.MAX_VALUE
 
     // TODO (1.2): inject properly
     fun injectProjectId(id: Long){

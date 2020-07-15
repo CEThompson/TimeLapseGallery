@@ -788,7 +788,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             mDetailAdapter?.submitList(photoEntries)
 
             // Bind cover photo to the end of the list always
-            val lastPhotoEntry = photoEntries.last()
+            var lastPhotoEntry = photoEntries.last()
             detailViewModel.setLastPhotoByEntry(mExternalFilesDir, mCurrentProjectView, lastPhotoEntry)
             detailViewModel.setCoverPhoto(lastPhotoEntry)
             // Update the UI based upon the range of photo dates
@@ -806,31 +806,31 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             val oldMaxIndex = detailViewModel.maxIndex
             val previousSize = oldMaxIndex + 1
             val currentSize = photoEntries.size
-            val added: Boolean = (currentSize > previousSize)
+            val added: Boolean = if (oldMaxIndex == Integer.MAX_VALUE) false else (currentSize > previousSize)
 
-            lateinit var newCurrentPhoto: PhotoEntry
+            detailViewModel.photoIndex = newMaxIndex
+
             // If added set to the last photo
             if (added) {
-                newCurrentPhoto = lastPhotoEntry
-                detailViewModel.photoIndex = newMaxIndex
-                
+
                 // Update gif if exists and preference is set to auto-update
                 val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 val updateGifs = pref.getBoolean(getString(R.string.key_gif_auto_convert), true)
                 if (updateGifs) {
+                    Toast.makeText(requireContext(), "updating gif", Toast.LENGTH_SHORT).show()
                     val gif = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
                     if (gif != null) detailViewModel.updateGif(mExternalFilesDir, mCurrentProjectView)
                 }
             }
             // If deleted, set current photo
             else {
-                newCurrentPhoto = photoEntries[detailViewModel.photoIndex]
+                lastPhotoEntry = photoEntries[detailViewModel.photoIndex]
             }
 
             // Restore the play position
-            mCurrentPlayPosition = mPhotos.indexOf(newCurrentPhoto)
+            mCurrentPlayPosition = mPhotos.indexOf(lastPhotoEntry)
             // Load the current photo
-            detailViewModel.currentPhoto.value = newCurrentPhoto
+            detailViewModel.currentPhoto.value = lastPhotoEntry
             // Make sure to save the position of the max index in the view model
             detailViewModel.maxIndex = newMaxIndex
 

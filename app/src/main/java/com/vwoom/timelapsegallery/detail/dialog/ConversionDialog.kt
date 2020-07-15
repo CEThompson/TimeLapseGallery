@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.ImageView
@@ -14,8 +15,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.signature.MediaStoreSignature
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.view.ProjectView
@@ -110,13 +117,23 @@ class ConversionDialog(context: Context,
                 Toast.makeText(context, context.getString(R.string.create_gif_to_share), Toast.LENGTH_LONG).show()
             }
         }
-
     }
 
     private fun loadGif(context: Context, gifFile: File, gifPreview: ImageView) {
         Glide.with(context)
                 .asGif()
                 .load(gifFile)
+                //.signature(MediaStoreSignature(null, null, null))
+                //.apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
+                .listener(object : RequestListener<GifDrawable> {
+                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable>?, isFirstResource: Boolean): Boolean {
+                        Log.d("GifDebug", "${e?.message}")
+                        return false
+                    }
+                    override fun onResourceReady(resource: GifDrawable?, model: Any?, target: Target<GifDrawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                        return false
+                    }
+                })
                 .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
                 .skipMemoryCache(true)
                 .fitCenter()
