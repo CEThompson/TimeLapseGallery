@@ -7,7 +7,7 @@ import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import javax.inject.Inject
 
-// TODO test repository and local/remote data sources
+// TODO (1.2): test repository and local/remote data sources
 class WeatherRepository
 @Inject constructor (private val weatherLocalDataSource: WeatherLocalDataSource,
                      private val weatherRemoteDataSource: WeatherRemoteDataSource) {

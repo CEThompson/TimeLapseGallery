@@ -125,7 +125,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TODO remove this poor injection pattern
+        // TODO (1.2) remove this poor injection pattern
         // Inject view model and its passed argument
         AndroidSupportInjection.inject(this)
         detailViewModel.injectProjectId(args.clickedProjectView.project_id)

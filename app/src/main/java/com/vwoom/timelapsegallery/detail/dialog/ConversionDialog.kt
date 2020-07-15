@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-// TODO: review ffmpeg / gif feature tests
+// TODO (1.2): review ffmpeg / gif feature tests
 class ConversionDialog(context: Context,
                        detailViewModel: DetailViewModel,
                        externalFilesDir: File,

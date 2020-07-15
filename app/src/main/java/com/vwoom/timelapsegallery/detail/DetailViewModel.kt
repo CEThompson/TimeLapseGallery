@@ -20,7 +20,6 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
-// TODO implement on cleared for any view model jobs
 class DetailViewModel @Inject constructor(
         private val projectRepository: ProjectRepository,
         private val tagRepository: TagRepository) : ViewModel() {
@@ -45,13 +44,13 @@ class DetailViewModel @Inject constructor(
     var photoIndex: Int = 0
     var maxIndex: Int = 0
 
+    // TODO (1.2): inject properly
     fun injectProjectId(id: Long){
         projectId = id
         projectView = projectRepository.getProjectViewLiveData(projectId)
         photos = projectRepository.getProjectPhotosLiveData(projectId)
         projectTags = tagRepository.getProjectTagsLiveData(projectId)
         tags = tagRepository.getTagsLiveData()
-
     }
 
     fun setSchedule(externalFilesDir: File, projectView: ProjectView, intervalInDays: Int) {

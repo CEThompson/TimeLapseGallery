@@ -122,7 +122,7 @@ class GalleryAdapter(
             if (gifDisplaysEnabled) {
                 val gifFile = ProjectUtils.getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
                 if (gifFile != null) {
-                    // TODO: figure out why gif is intermittently stuck on first frame after return
+                    // TODO (1.2): figure out why gif is intermittently stuck on first frame after return
                     Glide.with(holder.itemView.context)
                             .asGif()
                             .load(gifFile)

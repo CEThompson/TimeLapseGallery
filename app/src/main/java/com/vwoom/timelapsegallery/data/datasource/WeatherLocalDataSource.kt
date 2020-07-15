@@ -10,17 +10,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-// TODO: figure out how to properly handle blocking calls in coroutines
-
-// TODO (priority 1): refactor to immediately return cache and trigger automatic update only if cache does not belong to today
+// TODO (1.3): figure out how to properly handle blocking calls in coroutines
 class WeatherLocalDataSource
 @Inject constructor(private val weatherDao: WeatherDao) {
-
     // Gets the forecast from the database
     // Returns either (1) No Data (2) Today's Forecast or (3) A Cached Forecast
     suspend fun getWeather(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO) {
         val weatherEntry: WeatherEntry? = weatherDao.getWeather()
-
         return@withContext if (weatherEntry == null) WeatherResult.NoData()
         else {
             val localResponse: ForecastResponse?
@@ -44,7 +40,6 @@ class WeatherLocalDataSource
 
     suspend fun getCache(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO) {
         val weatherEntry: WeatherEntry? = weatherDao.getWeather()
-
         return@withContext if (weatherEntry == null) WeatherResult.NoData()
         else {
             val localResponse: ForecastResponse? = moshi.adapter(ForecastResponse::class.java)

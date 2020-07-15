@@ -33,25 +33,15 @@ class GalleryViewModel
                     private val weatherRepository: WeatherRepository) : ViewModel() {
     // For observing all projects
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
-
-    // TODO: reconsider these getter patterns. Is this really necessary?
     // For the displayed projects in search filtration
     val displayedProjectViews = MutableLiveData(emptyList<ProjectView>())
-    /*val displayedProjectViews: LiveData<List<ProjectView>>
-        get() = _displayedProjectViews*/
-
     // Tags for all projects to populate the search dialog
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
-
     // Weather forecast
     val weather = MutableLiveData<WeatherResult<ForecastResponse>>(WeatherResult.Loading)
-    /*val weather: LiveData<WeatherResult<ForecastResponse>>
-        get() = _weather*/
-
     // Search state: weather a search is active or not
     val search = MutableLiveData(false)
-    /*val search: LiveData<Boolean>
-        get() = _search*/
+
 
     // Inputted search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
@@ -73,7 +63,6 @@ class GalleryViewModel
         viewModelScope.launch {
             weather.value = weatherRepository.getForecast()
         }
-
     }
 
     override fun onCleared() {
