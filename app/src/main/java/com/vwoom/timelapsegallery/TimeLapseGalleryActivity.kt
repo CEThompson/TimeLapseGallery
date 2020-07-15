@@ -11,7 +11,6 @@ import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 // TODO (deferred): implement content grouping where appropriate for accessibility
 // TODO (deferred): consider any content descriptions that need dynamic content descriptions with live regions
 // TODO (1.3): consider implement search tag filters as chips instead of checkboxes
-
 class TimeLapseGalleryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

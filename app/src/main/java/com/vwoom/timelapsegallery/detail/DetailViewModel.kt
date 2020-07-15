@@ -14,8 +14,7 @@ import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.io.File
 import javax.inject.Inject
 import kotlin.properties.Delegates
@@ -140,4 +139,16 @@ class DetailViewModel @Inject constructor(
             projectRepository.deleteProject(externalFilesDir, projectId)
         }
     }
+
+    fun updateGif(externalFilesDir: File, projectView: ProjectView): Job {
+        return viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                // First delete the old GIF
+                ProjectUtils.deleteGif(externalFilesDir, projectView)
+                // Then write the new one
+                ProjectUtils.makeGif(externalFilesDir, getProjectEntryFromProjectView(projectView))
+            }
+        }
+    }
+
 }

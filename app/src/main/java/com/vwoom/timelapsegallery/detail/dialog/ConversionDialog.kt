@@ -14,6 +14,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.view.ProjectView
@@ -58,45 +60,29 @@ class ConversionDialog(context: Context,
         val gifFile = ProjectUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
         val gifPreview = this.findViewById<ImageView>(R.id.dialog_conversion_gif_preview)
         if (gifPreview != null && gifFile != null)
-            Glide.with(context)
-                    .load(gifFile)
-                    .fitCenter()
-                    .into(gifPreview)
+            loadGif(context, gifFile, gifPreview)
 
         // Convert the project photos to gif on click
         val convertFab = this.findViewById<FloatingActionButton>(R.id.dialog_project_conversion_convert_FAB)
         convertFab?.setOnClickListener {
             this.findViewById<ProgressBar>(R.id.conversion_progress)?.visibility = View.VISIBLE
-            // Launch the conversion on IO thread
-            val convertJob = detailViewModel.viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    // First delete the old GIF
-                    deleteGif(externalFilesDir, project)
-                    // Then write the new one
-                    ProjectUtils.makeGif(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
-                }
-            }
+
+            // Launch the conversion in a job
+            val convertJob = detailViewModel.updateGif(externalFilesDir, project)
             // On completion update the preview
             convertJob.invokeOnCompletion {
                 val updatedGif = ProjectUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
                 this.findViewById<ProgressBar>(R.id.conversion_progress)?.visibility = View.INVISIBLE
                 if (gifPreview != null && updatedGif != null)
-                    Glide.with(context)
-                            .load(updatedGif)
-                            .fitCenter()
-                            .into(gifPreview)
+                    loadGif(context, updatedGif, gifPreview)
             }
         }
 
         // Delete the gif for the project
         val delFab = this.findViewById<FloatingActionButton>(R.id.dialog_project_conversion_remove_FAB)
         delFab.setOnClickListener {
-            deleteGif(externalFilesDir, project)
-            if (gifPreview != null)
-                Glide.with(context)
-                        .load(R.color.imagePlaceholder)
-                        .fitCenter()
-                        .into(gifPreview)
+            ProjectUtils.deleteGif(externalFilesDir, project)
+            gifPreview.setImageResource(R.color.imagePlaceholder)
         }
 
         val exitFab = this.findViewById<FloatingActionButton>(R.id.dialog_conversion_exit_fab)
@@ -117,20 +103,24 @@ class ConversionDialog(context: Context,
                             gif)
                     putExtra(Intent.EXTRA_STREAM, photoURI)
                 }
-                context.startActivity(Intent.createChooser(shareIntent, "Share Image"))
+                context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share_gif_title)))
             }
             // Gif has not yet been created
             else {
-                Toast.makeText(context, "Create a GIF first to share", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.create_gif_to_share), Toast.LENGTH_LONG).show()
             }
         }
 
     }
 
-    private fun deleteGif(externalFilesDir: File, project: ProjectView) {
-        val curGif = ProjectUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
-        if (curGif != null) FileUtils.deleteRecursive(curGif)
+    private fun loadGif(context: Context, gifFile: File, gifPreview: ImageView) {
+        Glide.with(context)
+                .asGif()
+                .load(gifFile)
+                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+                .skipMemoryCache(true)
+                .fitCenter()
+                .into(gifPreview)
     }
-
 
 }

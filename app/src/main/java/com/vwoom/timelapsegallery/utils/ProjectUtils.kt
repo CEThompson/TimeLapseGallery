@@ -157,5 +157,10 @@ object ProjectUtils {
         return if (gifFile.exists()) gifFile
         else null
     }
+
+    fun deleteGif(externalFilesDir: File, project: ProjectView) {
+        val curGif = getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
+        if (curGif != null) FileUtils.deleteRecursive(curGif)
+    }
 }
 

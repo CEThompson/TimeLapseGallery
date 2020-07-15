@@ -69,6 +69,7 @@
     <string name="cd_gallery_item_bottom_gradient">Gradient on the bottom of a gallery item for highlighting a check mark if a photo was taken today.</string>
     <string name="cd_camera_previous_photo">The last photo for a time-lapse project if it exists.</string>
     <string name="cd_weather_recyclerview">Displays localized weather data from the National Weather Service api.</string>
+    <string name="cd_gif_preview">Imageview showing the set of images animated as a time lapse gif.</string>
 
     <!-- Options -->
     <string name="disable_notifications">Disable notifications</string>
@@ -292,5 +293,7 @@
     <string name="convert_to_gif">Convert to GIF</string>
     <string name="share_photo">Share Current Photo</string>
     <string name="unknown">unknown</string>
+    <string name="create_gif_to_share">Create a GIF to share</string>
+    <string name="share_gif_title">Share Gif</string>
 
 </resources>
