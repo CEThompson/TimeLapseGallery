@@ -32,6 +32,16 @@
             app:defaultValue="true"/>
     </PreferenceCategory>
 
+    <!-- Gif conversion settings -->
+    <PreferenceCategory app:title="@string/gif_conversion_header">
+        <SwitchPreferenceCompat
+            app:key="@string/key_gif_auto_convert"
+            app:title="@string/enable_gif_auto_convert_title"
+            app:summaryOff="@string/gif_auto_convert_summary_off"
+            app:summaryOn="@string/gif_auto_convert_summary_on"
+            app:defaultValue="true"/>
+    </PreferenceCategory>
+
     <!-- Notifications -->
     <PreferenceCategory app:title="@string/notifications_header">
 

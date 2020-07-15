@@ -813,11 +813,13 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
             if (added) {
                 newCurrentPhoto = lastPhotoEntry
                 detailViewModel.photoIndex = newMaxIndex
-                // TODO create setting to automatically update gifs for projects with active gifs
-
-                val gif = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
-                if (gif!=null){
-                    detailViewModel.updateGif(mExternalFilesDir, mCurrentProjectView)
+                
+                // Update gif if exists and preference is set to auto-update
+                val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                val updateGifs = pref.getBoolean(getString(R.string.key_gif_auto_convert), true)
+                if (updateGifs) {
+                    val gif = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
+                    if (gif != null) detailViewModel.updateGif(mExternalFilesDir, mCurrentProjectView)
                 }
             }
             // If deleted, set current photo

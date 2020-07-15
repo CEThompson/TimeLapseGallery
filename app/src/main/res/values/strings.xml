@@ -212,6 +212,13 @@
     <string name="notifications_summary_off">Notifications disabled</string>
     <string name="notification_time_title">Notification time</string>
 
+    <!-- Gif conversion -->
+    <string name="gif_conversion_header">GIF conversion</string>
+    <string name="key_gif_auto_convert">key_gif_auto_update</string>
+    <string name="enable_gif_auto_convert_title">Auto update GIFs</string>
+    <string name="gif_auto_convert_summary_off">GIFs will not be updated when pictures are added</string>
+    <string name="gif_auto_convert_summary_on">GIFs will be updated when pictures are added</string>
+
     <!-- Schedule -->
     <string name ="gallery_header">Gallery</string>
     <string name ="enable_schedule_display_title">Display Schedules</string>
@@ -267,7 +274,6 @@
     <string name="days_label">Days:</string>
     <string name="weeks_label">Weeks:</string>
     <string name="result_label">Result:</string>
-
 
     <!-- Project synchronization feedback -->
     <string name="project_sync_text">Importing projects: %1$d/%2$d</string>
