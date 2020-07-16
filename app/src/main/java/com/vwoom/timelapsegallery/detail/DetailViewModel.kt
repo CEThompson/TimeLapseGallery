@@ -134,9 +134,10 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    fun deleteCurrentProject(externalFilesDir: File) {
+    fun deleteCurrentProject(externalFilesDir: File, project: ProjectView) {
         viewModelScope.launch {
             projectRepository.deleteProject(externalFilesDir, projectId)
+            ProjectUtils.deleteGif(externalFilesDir, project)
         }
     }
 

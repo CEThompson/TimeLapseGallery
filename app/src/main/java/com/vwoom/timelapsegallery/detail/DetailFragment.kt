@@ -966,7 +966,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                 .setMessage(R.string.double_verify_project_deletion)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    detailViewModel.deleteCurrentProject(mExternalFilesDir)
+                    detailViewModel.deleteCurrentProject(mExternalFilesDir, mCurrentProjectView)
                     // If current project had a schedule remove the notification and update widgets
                     if (mCurrentProjectView.interval_days != 0) {
                         NotificationUtils.scheduleNotificationWorker(requireContext())
