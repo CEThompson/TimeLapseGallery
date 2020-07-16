@@ -12,9 +12,11 @@ import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.repository.TagRepository
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.ProjectView
+import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
-import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import javax.inject.Inject
 import kotlin.properties.Delegates
@@ -44,7 +46,7 @@ class DetailViewModel @Inject constructor(
     var maxIndex: Int = Integer.MAX_VALUE
 
     // TODO (1.2): inject properly
-    fun injectProjectId(id: Long){
+    fun injectProjectId(id: Long) {
         projectId = id
         projectView = projectRepository.getProjectViewLiveData(projectId)
         photos = projectRepository.getProjectPhotosLiveData(projectId)
@@ -137,18 +139,7 @@ class DetailViewModel @Inject constructor(
     fun deleteCurrentProject(externalFilesDir: File, project: ProjectView) {
         viewModelScope.launch {
             projectRepository.deleteProject(externalFilesDir, projectId)
-            ProjectUtils.deleteGif(externalFilesDir, project)
-        }
-    }
-
-    fun updateGif(externalFilesDir: File, projectView: ProjectView): Job {
-        return viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                // First delete the old GIF
-                ProjectUtils.deleteGif(externalFilesDir, projectView)
-                // Then write the new one
-                ProjectUtils.makeGif(externalFilesDir, getProjectEntryFromProjectView(projectView))
-            }
+            GifUtils.deleteGif(externalFilesDir, getProjectEntryFromProjectView(project))
         }
     }
 

@@ -22,6 +22,7 @@ import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.gallery.GalleryAdapter.GalleryAdapterViewHolder
+import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
@@ -120,7 +121,7 @@ class GalleryAdapter(
         // Otherwise either load the project gif or static image
         else {
             if (gifDisplaysEnabled) {
-                val gifFile = ProjectUtils.getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
+                val gifFile = GifUtils.getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
                 if (gifFile != null) {
                     // TODO (1.2): figure out why gif is intermittently stuck on first frame after return
                     Glide.with(holder.itemView.context)

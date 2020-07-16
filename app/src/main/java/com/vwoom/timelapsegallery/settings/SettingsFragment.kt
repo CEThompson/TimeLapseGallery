@@ -24,6 +24,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.ImportUtils
 import com.vwoom.timelapsegallery.utils.InjectorUtils
@@ -109,6 +110,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
         prefs = PreferenceManager.getDefaultSharedPreferences(activity)
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
             Log.d("settings activity", "Notification listener activating for key = $key")
+
+            if (key == this.getString(R.string.key_gif_auto_convert)) {
+                val autoConvert = prefs.getBoolean(key, true)
+                // If auto convert disabled cancel any gif workers
+                if (!autoConvert) GifUtils.cancelGifWorker(requireContext())
+                // NOTE: if enabled gif workers will only trigger when projects with gifs have photos added
+                // Therefore do not trigger a gif workers when this setting is enabled
+            }
 
             // If the user changes the notifications enabled preference trigger the notification worker to update any alarms
             if (key == this.getString(R.string.key_notifications_enabled)) {

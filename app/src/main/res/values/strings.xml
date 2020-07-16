@@ -214,10 +214,9 @@
 
     <!-- Gif conversion -->
     <string name="gif_conversion_header">GIF conversion</string>
-    <string name="key_gif_auto_convert">key_gif_auto_update</string>
     <string name="enable_gif_auto_convert_title">Auto update GIFs</string>
-    <string name="gif_auto_convert_summary_off">GIFs will not be updated when pictures are added</string>
-    <string name="gif_auto_convert_summary_on">GIFs will be updated when pictures are added</string>
+    <string name="gif_auto_convert_summary_off">GIFs will not be updated in the background</string>
+    <string name="gif_auto_convert_summary_on">GIFs will be updated in the background after pictures are added</string>
 
     <!-- Schedule -->
     <string name ="gallery_header">Gallery</string>
@@ -252,6 +251,7 @@
     <string name="key_schedule_display" translatable="false">schedule_display</string>
     <string name="key_gps_allowed" translatable="false">schedule_display</string>
     <string name="key_gif_display" translatable="false">gif_display</string>
+    <string name="key_gif_auto_convert" translatable="false">key_gif_auto_update</string>
 
     <!-- Shared preference -->
     <string name="key_add_transition" translatable="false">add</string>

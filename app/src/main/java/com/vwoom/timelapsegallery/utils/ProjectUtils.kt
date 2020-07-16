@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.utils
 
-import com.arthenica.mobileffmpeg.FFmpeg
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
@@ -21,12 +20,6 @@ object ProjectUtils {
         val projectSubfolder = File(metaDir, projectId.toString())
         if (!projectSubfolder.exists()) projectSubfolder.mkdirs()
         return projectSubfolder
-    }
-
-    private fun getGifDirectory(externalFilesDir: File): File {
-        val gifDir = File(externalFilesDir, FileUtils.GIF_FILE_SUBDIRECTORY)
-        if (!gifDir.exists()) gifDir.mkdir()
-        return gifDir
     }
 
     // Creates a list of photo entries in a project folder sorted by timestamp
@@ -122,45 +115,6 @@ object ProjectUtils {
         val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(projectView.cover_photo_timestamp, System.currentTimeMillis())
         val daysUntilDue = projectView.interval_days - daysSinceLastPhoto
         return daysUntilDue == 1.toLong()
-    }
-
-    // Creates a .gif from the set of photos for a project
-    fun makeGif(externalFilesDir: File, project: ProjectEntry) {
-        // Write the list of paths for the files to a text file for use by ffmpeb
-        val listTextFile = FileUtils.createTempListPhotoFiles(externalFilesDir, project)
-
-        // Get the meta directory for the project
-        val projectGifDir = getGifDirectory(externalFilesDir)
-
-        // Define the output path for the gif
-        val outputGif = "${projectGifDir.absolutePath}/${project.id}.gif"
-
-        // TODO (update 1.3): create control for framerate
-        // TODO (update 1.3): create control for scale
-        // Create the command for ffmpeg
-        val ffmpegCommand = "-r 14 -y -f concat -safe 0 -i $listTextFile -vf scale=400:-1 $outputGif"
-        FFmpeg.execute(ffmpegCommand)
-
-        //Use this block for logging
-        //val rc = FFmpeg.execute(ffmpegCommand)
-        //val lastCommandOutput = Config.getLastCommandOutput()
-        //Log.d("TLG.GIF:", "Creating list of text files")
-        //Log.d("TLG.GIF:", "Output gif path is: $outputGif")
-        //Log.d("TLG.GIF:", "Executing ffmpeg command: $ffmpegCommand")
-        //Log.d("TLG.GIF:", "Executed, rc is: $rc")
-        //Log.d("TLG.GIF:", "Last command output: $lastCommandOutput")
-    }
-
-    fun getGifForProject(externalFilesDir: File, project: ProjectEntry): File? {
-        val projectGifDir = getGifDirectory(externalFilesDir)
-        val gifFile = File("${projectGifDir.absolutePath}/${project.id}.gif")
-        return if (gifFile.exists()) gifFile
-        else null
-    }
-
-    fun deleteGif(externalFilesDir: File, project: ProjectView) {
-        val curGif = getGifForProject(externalFilesDir, getProjectEntryFromProjectView(project))
-        if (curGif != null) FileUtils.deleteRecursive(curGif)
     }
 }
 

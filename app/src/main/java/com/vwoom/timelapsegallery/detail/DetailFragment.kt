@@ -48,6 +48,7 @@ import com.vwoom.timelapsegallery.detail.dialog.ConversionDialog
 import com.vwoom.timelapsegallery.detail.dialog.InfoDialog
 import com.vwoom.timelapsegallery.detail.dialog.ScheduleDialog
 import com.vwoom.timelapsegallery.detail.dialog.TagDialog
+import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.PhotoUtils
@@ -305,8 +306,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                         getProjectEntryFromProjectView(mCurrentProjectView),
                         mCurrentPhoto.timestamp)
 
-                if (photoUrl != null)
-                {
+                if (photoUrl != null) {
                     val shareIntent: Intent = Intent().apply {
                         action = Intent.ACTION_SEND
                         type = "image/jpeg"
@@ -352,10 +352,18 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     override fun onResume() {
         super.onResume()
         // Restore any showing dialogs
-        if (detailViewModel.infoDialogShowing) { lazyShowInfoDialog() }
-        if (detailViewModel.scheduleDialogShowing) { lazyShowScheduleDialog() }
-        if (detailViewModel.tagDialogShowing) { lazyShowProjectTagDialog() }
-        if (detailViewModel.convertDialogShowing) { lazyShowConvertDialog() }
+        if (detailViewModel.infoDialogShowing) {
+            lazyShowInfoDialog()
+        }
+        if (detailViewModel.scheduleDialogShowing) {
+            lazyShowScheduleDialog()
+        }
+        if (detailViewModel.tagDialogShowing) {
+            lazyShowProjectTagDialog()
+        }
+        if (detailViewModel.convertDialogShowing) {
+            lazyShowConvertDialog()
+        }
     }
 
     override fun onPause() {
@@ -415,7 +423,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private fun loadUi(photoEntry: PhotoEntry) {
         // Notify the adapter: this updates the detail recycler view red highlight indicator
         //if (!mPlaying)
-            mDetailAdapter?.setCurrentPhoto(photoEntry)
+        mDetailAdapter?.setCurrentPhoto(photoEntry)
 
         // Get the image path, handle orientation indicator and load the image
         val imagePath: String? = ProjectUtils.getProjectPhotoUrl(
@@ -459,7 +467,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // Handles whether or not to display an indicator showing that an image is in the wrong orientation
     private fun handleOrientationIndicator(imagePath: String?) {
         // If no path hide indicator
-        if (imagePath == null){
+        if (imagePath == null) {
             binding?.rotationIndicator?.startAnimation(stopAnimation)
             return
         }
@@ -483,7 +491,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private fun loadImage(imagePath: String?) {
         mImageIsLoaded = false // this set to true after load image pair completes
         // Load the image to the fullscreen dialog if it is showing or to the detail cardview otherwise
-        val f = if (imagePath==null) null else File(imagePath)
+        val f = if (imagePath == null) null else File(imagePath)
         loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
     }
 
@@ -491,7 +499,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     // This makes 'playing' the images look seamless
     private fun loadImagePair(f: File?, bottomImage: ImageView, topImage: ImageView) {
         // If error with file
-        if (f==null){
+        if (f == null) {
             Glide.with(this)
                     .load(R.color.darkImagePlaceHolder)
                     .into(bottomImage)
@@ -700,7 +708,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
     private fun setupViewModel() {
         // Observe the project for name and schedule changes
         detailViewModel.projectView.observe(viewLifecycleOwner, Observer { projectView: ProjectView? ->
-            if (projectView==null) return@Observer
+            if (projectView == null) return@Observer
             mCurrentProjectView = projectView
             mDetailAdapter?.setProject(mCurrentProjectView)
             // This updates the project information card, project info dialog,
@@ -810,16 +818,17 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
             detailViewModel.photoIndex = newMaxIndex
 
+            // TODO: convert these to appropriate boolean mutable live data fields to observe
             // If added set to the last photo
             if (added) {
-
                 // Update gif if exists and preference is set to auto-update
                 val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 val updateGifs = pref.getBoolean(getString(R.string.key_gif_auto_convert), true)
                 if (updateGifs) {
-                    Toast.makeText(requireContext(), "updating gif", Toast.LENGTH_SHORT).show()
-                    val gif = ProjectUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
-                    if (gif != null) detailViewModel.updateGif(mExternalFilesDir, mCurrentProjectView)
+                    val gif = GifUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
+                    if (gif != null) {
+                        GifUtils.scheduleGifWorker(requireContext())
+                    }
                 }
             }
             // If deleted, set current photo
@@ -842,7 +851,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
                             mExternalFilesDir,
                             getProjectEntryFromProjectView(mCurrentProjectView),
                             photo.timestamp)
-                    if (photoUrl==null){
+                    if (photoUrl == null) {
                         Log.d(TAG, "error loading timestamp ${photo.timestamp}")
                         continue
                     }

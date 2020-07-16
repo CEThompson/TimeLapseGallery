@@ -24,9 +24,11 @@ class ProjectRepository
     /**
      * Project observables
      */
-    fun getScheduledProjectViews() = projectDao.getScheduledProjectViews()
     fun getProjectViewLiveData(projectId: Long) = projectDao.getProjectViewLiveData(projectId)
     fun getProjectViewsLiveData() = projectDao.getProjectViewsLiveData()
+
+    fun getScheduledProjectViews() = projectDao.getScheduledProjectViews()
+    fun getAllProjects() = projectDao.getProjects()
 
     /**
      * Project updating and deletion

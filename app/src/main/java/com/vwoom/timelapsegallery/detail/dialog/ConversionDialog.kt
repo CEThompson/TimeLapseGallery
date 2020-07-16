@@ -22,16 +22,13 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.signature.MediaStoreSignature
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.detail.DetailViewModel
-import com.vwoom.timelapsegallery.utils.FileUtils
+import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 
 // TODO (1.2): review ffmpeg / gif feature tests
@@ -64,7 +61,7 @@ class ConversionDialog(context: Context,
         }
 
         // Initialize the gif preview
-        val gifFile = ProjectUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
+        val gifFile = GifUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
         val gifPreview = this.findViewById<ImageView>(R.id.dialog_conversion_gif_preview)
         if (gifPreview != null && gifFile != null)
             loadGif(context, gifFile, gifPreview)
@@ -75,10 +72,13 @@ class ConversionDialog(context: Context,
             this.findViewById<ProgressBar>(R.id.conversion_progress)?.visibility = View.VISIBLE
 
             // Launch the conversion in a job
-            val convertJob = detailViewModel.updateGif(externalFilesDir, project)
+            val convertJob = detailViewModel.viewModelScope.launch {
+                GifUtils.updateGif(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
+            }
+
             // On completion update the preview
             convertJob.invokeOnCompletion {
-                val updatedGif = ProjectUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
+                val updatedGif = GifUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
                 this.findViewById<ProgressBar>(R.id.conversion_progress)?.visibility = View.INVISIBLE
                 if (gifPreview != null && updatedGif != null)
                     loadGif(context, updatedGif, gifPreview)
@@ -88,8 +88,13 @@ class ConversionDialog(context: Context,
         // Delete the gif for the project
         val delFab = this.findViewById<FloatingActionButton>(R.id.dialog_project_conversion_remove_FAB)
         delFab.setOnClickListener {
-            ProjectUtils.deleteGif(externalFilesDir, project)
-            gifPreview.setImageResource(R.color.imagePlaceholder)
+            // TODO determine if there is a better way to delete this
+            val delJob = detailViewModel.viewModelScope.launch {
+                GifUtils.deleteGif(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
+            }
+            delJob.invokeOnCompletion {
+                gifPreview.setImageResource(R.color.imagePlaceholder)
+            }
         }
 
         val exitFab = this.findViewById<FloatingActionButton>(R.id.dialog_conversion_exit_fab)
@@ -100,7 +105,7 @@ class ConversionDialog(context: Context,
 
         val shareFab = this.findViewById<FloatingActionButton>(R.id.dialog_conversion_share_FAB)
         shareFab.setOnClickListener {
-            val gif = ProjectUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
+            val gif = GifUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
             if (gif != null) {
                 val shareIntent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
@@ -130,6 +135,7 @@ class ConversionDialog(context: Context,
                         Log.d("GifDebug", "${e?.message}")
                         return false
                     }
+
                     override fun onResourceReady(resource: GifDrawable?, model: Any?, target: Target<GifDrawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                         return false
                     }
