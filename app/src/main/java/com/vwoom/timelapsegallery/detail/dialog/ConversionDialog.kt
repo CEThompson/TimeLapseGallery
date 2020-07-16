@@ -28,7 +28,9 @@ import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.detail.DetailViewModel
 import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 // TODO (1.2): review ffmpeg / gif feature tests
@@ -69,31 +71,36 @@ class ConversionDialog(context: Context,
         // Convert the project photos to gif on click
         val convertFab = this.findViewById<FloatingActionButton>(R.id.dialog_project_conversion_convert_FAB)
         convertFab?.setOnClickListener {
+            // Disable the button
+            val button = it
+            button.isEnabled = false
+
+            // Show the progress indicator and hide the old GIF
             this.findViewById<ProgressBar>(R.id.conversion_progress)?.visibility = View.VISIBLE
+            gifPreview.setImageResource(R.color.imagePlaceholder)
 
             // Launch the conversion in a job
             val convertJob = detailViewModel.viewModelScope.launch {
-                GifUtils.updateGif(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
+                withContext(Dispatchers.IO) {
+                    GifUtils.updateGif(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
+                }
             }
-
             // On completion update the preview
             convertJob.invokeOnCompletion {
                 val updatedGif = GifUtils.getGifForProject(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
                 this.findViewById<ProgressBar>(R.id.conversion_progress)?.visibility = View.INVISIBLE
                 if (gifPreview != null && updatedGif != null)
                     loadGif(context, updatedGif, gifPreview)
+                button.isEnabled = true
             }
         }
 
         // Delete the gif for the project
         val delFab = this.findViewById<FloatingActionButton>(R.id.dialog_project_conversion_remove_FAB)
         delFab.setOnClickListener {
-            // TODO determine if there is a better way to delete this
-            val delJob = detailViewModel.viewModelScope.launch {
+            gifPreview.setImageResource(R.color.imagePlaceholder)
+            detailViewModel.viewModelScope.launch {
                 GifUtils.deleteGif(externalFilesDir, ProjectUtils.getProjectEntryFromProjectView(project))
-            }
-            delJob.invokeOnCompletion {
-                gifPreview.setImageResource(R.color.imagePlaceholder)
             }
         }
 
@@ -135,7 +142,6 @@ class ConversionDialog(context: Context,
                         Log.d("GifDebug", "${e?.message}")
                         return false
                     }
-
                     override fun onResourceReady(resource: GifDrawable?, model: Any?, target: Target<GifDrawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                         return false
                     }
