@@ -15,7 +15,7 @@ object WeatherUtils {
 
     // Returns a weather icon from a forecast period description
     fun getWeatherIcon(context: Context, isDay: Boolean, forecastDescription: String, timestamp: Long?): Drawable? {
-        val description = forecastDescription.toLowerCase()
+        val description = forecastDescription.toLowerCase(Locale.ROOT)
         val drawableInt: Int = when {
             // If cloudy or foggy
             description.contains("cloud") ||
@@ -62,6 +62,5 @@ object WeatherUtils {
             null
         }
     }
-
 }
 

@@ -10,12 +10,10 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.viewModelScope
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import kotlinx.coroutines.launch
 import java.util.*
 
 class SearchDialog(context: Context, private val galleryViewModel: GalleryViewModel) : Dialog(context) {

@@ -19,9 +19,9 @@ import java.util.ArrayList
 
 class ScheduleDialog(context: Context, val detailViewModel: DetailViewModel, externalFilesDir: File, var project: ProjectView): Dialog(context) {
 
-    private val mNoneSelector: CardView
-    private val mDaySelectionViews: ArrayList<CardView> = arrayListOf()
-    private val mWeekSelectionViews: ArrayList<CardView> = arrayListOf()
+    private val noneSelector: CardView
+    private val daySelectionViews: ArrayList<CardView> = arrayListOf()
+    private val weekSelectionViews: ArrayList<CardView> = arrayListOf()
 
     init {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -31,12 +31,12 @@ class ScheduleDialog(context: Context, val detailViewModel: DetailViewModel, ext
         // Set up selector for no schedule
         val noneLayout = this.findViewById<FrameLayout>(R.id.dialog_schedule_none_layout)
         noneLayout.removeAllViews()
-        mNoneSelector = layoutInflater.inflate(R.layout.dialog_schedule_selector, noneLayout, false) as CardView
-        val noneTv = mNoneSelector.findViewById<TextView>(R.id.selector_child_tv)
+        noneSelector = layoutInflater.inflate(R.layout.dialog_schedule_selector, noneLayout, false) as CardView
+        val noneTv = noneSelector.findViewById<TextView>(R.id.selector_child_tv)
         noneTv?.text = context.getString(R.string.unscheduled)
-        mNoneSelector.contentDescription = context.getString(R.string.content_description_schedule_selector_none)
-        noneLayout?.addView(mNoneSelector)
-        mNoneSelector.setOnClickListener {
+        noneSelector.contentDescription = context.getString(R.string.content_description_schedule_selector_none)
+        noneLayout?.addView(noneSelector)
+        noneSelector.setOnClickListener {
             detailViewModel.setSchedule(externalFilesDir, project, 0)
         }
 
@@ -53,7 +53,7 @@ class ScheduleDialog(context: Context, val detailViewModel: DetailViewModel, ext
             }
             daysLayout?.addView(selectionLayout)
             selectionLayout.contentDescription = context.getString(R.string.content_description_schedule_selector_days, dayInterval)
-            mDaySelectionViews.add(selectionLayout)
+            daySelectionViews.add(selectionLayout)
         }
 
         // Set up weeks selection
@@ -68,7 +68,7 @@ class ScheduleDialog(context: Context, val detailViewModel: DetailViewModel, ext
             }
             weeksLayout?.addView(selectionLayout)
             selectionLayout.contentDescription = context.getString(R.string.content_description_schedule_selector_weeks, weekInterval)
-            mWeekSelectionViews.add(selectionLayout)
+            weekSelectionViews.add(selectionLayout)
         }
 
         // Set up custom input
@@ -107,13 +107,13 @@ class ScheduleDialog(context: Context, val detailViewModel: DetailViewModel, ext
 
         val currentInterval = project.interval_days
         if (currentInterval == 0) {
-            mNoneSelector.setCardBackgroundColor(ContextCompat.getColor(context, colorSelected))
-            mNoneSelector.elevation = selectedElevation
+            noneSelector.setCardBackgroundColor(ContextCompat.getColor(context, colorSelected))
+            noneSelector.elevation = selectedElevation
         } else {
-            mNoneSelector.setCardBackgroundColor(ContextCompat.getColor(context, colorDefault))
-            mNoneSelector.elevation = defaultElevation
+            noneSelector.setCardBackgroundColor(ContextCompat.getColor(context, colorDefault))
+            noneSelector.elevation = defaultElevation
         }
-        for (selector in mDaySelectionViews) {
+        for (selector in daySelectionViews) {
             selector.setCardBackgroundColor(ContextCompat.getColor(context, colorDefault))
             selector.elevation = defaultElevation
             val selectorTv = selector.findViewById<TextView>(R.id.selector_child_tv)
@@ -122,7 +122,7 @@ class ScheduleDialog(context: Context, val detailViewModel: DetailViewModel, ext
                 selector.elevation = selectedElevation
             }
         }
-        for (selector in mWeekSelectionViews) {
+        for (selector in weekSelectionViews) {
             selector.setCardBackgroundColor(ContextCompat.getColor(context, colorDefault))
             selector.elevation = defaultElevation
             val selectorTv = selector.findViewById<TextView>(R.id.selector_child_tv)

@@ -6,8 +6,11 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 
 object SingleShotLocationProvider {
+
+    private val TAG = SingleShotLocationProvider::class.java.simpleName
 
     interface LocationCallback {
         fun onNewLocationAvailable(location: Location?)
@@ -46,7 +49,8 @@ object SingleShotLocationProvider {
                 override fun onProviderDisabled(provider: String) {}
             }, null)
         } catch (e: SecurityException){
-
+            Log.d(TAG, "Single shot location request failed. Reason: ${e.message}")
         }
     }
+
 }

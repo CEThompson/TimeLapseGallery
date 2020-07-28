@@ -10,7 +10,7 @@ import com.vwoom.timelapsegallery.weather.WeatherUtils.getTimestampFromPeriod
 import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherIcon
 
 
-class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHolder>() {
+class WeatherAdapter : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHolder>() {
 
     private var days: List<ForecastDay> = emptyList()
 
@@ -81,7 +81,6 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewH
     }
 
     fun setWeatherData(data: List<ForecastResponse.Period>) {
-        //periods = data
         days = convertPeriodsToForecastDays(data)
         notifyDataSetChanged()
     }
@@ -113,6 +112,5 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewH
             }
             return result.toList()
         }
-
     }
 }

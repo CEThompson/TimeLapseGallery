@@ -5,6 +5,8 @@ import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.settings.SyncProgressCounter
 import com.vwoom.timelapsegallery.settings.ValidationResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
@@ -96,7 +98,7 @@ object ImportUtils {
     suspend fun importProjects(db: TimeLapseDatabase,
                                externalFilesDir: File,
                                projectBundles: List<ProjectDataBundle>,
-                               testing: Boolean = false) {
+                               testing: Boolean = false) = withContext(Dispatchers.IO){
 
         // Delete projects and tags in the database: should clear all tables by cascade
         db.projectDao().deleteAllProjects()

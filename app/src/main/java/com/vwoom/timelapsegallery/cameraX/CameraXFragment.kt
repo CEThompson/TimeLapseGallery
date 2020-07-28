@@ -28,21 +28,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.Executors
-import javax.inject.Inject
-
-// Arbitrary number to keep track of permission request
-private const val REQUEST_CODE_PERMISSIONS = 10
-
-
-// Array of all permissions specified in the manifest
-private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-
 
 // TODO: (deferred) hunt down memory leak
 // TODO (deferred): investigate cameraX for possible future usage
 class CameraXFragment : Fragment(), LifecycleOwner {
 
-    private var mTakePictureFab: FloatingActionButton? = null
+    private var takePictureFab: FloatingActionButton? = null
     private var previewView: PreviewView? = null
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private val executor = Executors.newSingleThreadExecutor()
@@ -60,7 +51,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         //InjectorUtils.provideCameraXViewModelFactory(requireActivity(), args.photo, args.projectView)
     }
 
-    private var mLastClickTime: Long? = null
+    private var lastClickTime: Long? = null
 
     override fun onStop() {
         super.onStop()
@@ -75,7 +66,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         previewView = null
         preview?.setSurfaceProvider(null)
         preview = null
-        mTakePictureFab = null
+        takePictureFab = null
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -84,7 +75,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         }
 
         previewView = binding.cameraPreview
-        mTakePictureFab = binding.takePictureFab
+        takePictureFab = binding.takePictureFab
         cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         // Request camera permissions & start on success
@@ -142,7 +133,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
                 .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                 .build()
 
-        mTakePictureFab?.setOnClickListener {
+        takePictureFab?.setOnClickListener {
             val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
             val photoFile = FileUtils.createTemporaryImageFile(externalFilesDir)
 
@@ -179,8 +170,8 @@ class CameraXFragment : Fragment(), LifecycleOwner {
         @Suppress("ClickableViewAccessibility")
         previewView?.setOnTouchListener { _, event ->
             // Only allow metering action once per second
-            if (mLastClickTime != null && SystemClock.elapsedRealtime() - mLastClickTime!! < 1000) return@setOnTouchListener false
-            mLastClickTime = SystemClock.elapsedRealtime()
+            if (lastClickTime != null && SystemClock.elapsedRealtime() - lastClickTime!! < 1000) return@setOnTouchListener false
+            lastClickTime = SystemClock.elapsedRealtime()
 
             val factory = DisplayOrientedMeteringPointFactory(
                     display,
@@ -210,5 +201,7 @@ class CameraXFragment : Fragment(), LifecycleOwner {
 
     companion object {
         val TAG = CameraXFragment::class.java.simpleName
+        private const val REQUEST_CODE_PERMISSIONS = 10
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
 }

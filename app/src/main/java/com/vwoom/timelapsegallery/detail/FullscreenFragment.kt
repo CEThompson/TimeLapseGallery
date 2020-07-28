@@ -34,7 +34,7 @@ class FullscreenFragment : Fragment() {
     private var position by Delegates.notNull<Int>()
     private lateinit var photos: Array<String>
     private var binding: FragmentFullscreenBinding? = null
-    private var mImageIsLoaded = false
+    private var imageIsLoaded = false
     private var playJob: Job? = null
 
     private var playing: Boolean = false
@@ -101,7 +101,7 @@ class FullscreenFragment : Fragment() {
         val f = photoFiles[position]
         val bottomImage = binding!!.fullscreenImageBottom
         val topImage = binding!!.fullscreenImageTop
-        mImageIsLoaded = false
+        imageIsLoaded = false
 
         binding?.fullscreenPositionTextview?.text = getString(R.string.details_photo_number_out_of, position+1,photos.size)
 
@@ -135,7 +135,7 @@ class FullscreenFragment : Fragment() {
                                         // When complete hide the top image
                                         topImage.visibility = View.INVISIBLE
                                         // Record state
-                                        mImageIsLoaded = true
+                                        imageIsLoaded = true
                                         // And begin the shared element transition if appropriate
                                         startPostponedEnterTransition()
                                         return false
@@ -186,7 +186,7 @@ class FullscreenFragment : Fragment() {
         playJob = lifecycleScope.launch {
             delay(playbackInterval)
             // If image is loaded load the next photo
-            if (mImageIsLoaded) {
+            if (imageIsLoaded) {
                 loadImagePair()
                 position++
                 scheduleLoadPhoto()

@@ -19,15 +19,6 @@ object MoonPhaseCalculator {
     private const val synodicMonthMin = 43  // 43.2 seconds
     private const val synodicMonthSec = 12 // .2 of a min is 12 seconds
 
-    // NOTE: Calculating synodic month for 29.530587981 days could perhaps be more accurate
-    // however doing the calculation as such does not match reference dates for tests
-    /*private const val interval = 29.530587981
-    private const val synodicMonthDays = 29 //29.530587981 days
-    private const val synodicMonthHours = 12 //12.734111544 hours
-    private const val synodicMonthMin = 44 //44.04669264‬ minutes
-    private const val synodicMonthSec = 2 //2.8015584 seconds
-    private const val synodicMonthMs = 801 //801.5584‬ milliseconds*/
-
     // reference timestamp for new moon
     // April 22, 2020 7:25 PM PST
     private const val newMoonReference: Long = 1587608700000
@@ -73,6 +64,5 @@ object MoonPhaseCalculator {
         } else if (fullMoonYear == comparisonYear && fullMoonDay == comparisonDay) {
             FULL_MOON
         } else INTERMEDIATE_MOON
-
     }
 }

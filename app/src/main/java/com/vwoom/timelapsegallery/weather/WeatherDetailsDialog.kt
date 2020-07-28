@@ -13,8 +13,8 @@ import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 
 class WeatherDetailsDialog(context: Context, galleryViewModel: GalleryViewModel): Dialog(context) {
 
-    private val mWeatherRecyclerView: RecyclerView
-    private val mWeatherAdapter: WeatherAdapter
+    private val weatherRecyclerView: RecyclerView
+    private val weatherAdapter: WeatherAdapter
 
     init {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -24,13 +24,13 @@ class WeatherDetailsDialog(context: Context, galleryViewModel: GalleryViewModel)
             this.cancel()
         }
         
-        mWeatherRecyclerView = this.findViewById(R.id.weather_recycler_view)
-        mWeatherAdapter = WeatherAdapter()
+        weatherRecyclerView = this.findViewById(R.id.weather_recycler_view)
+        weatherAdapter = WeatherAdapter()
         val weatherLayoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
-        mWeatherRecyclerView.apply {
+        weatherRecyclerView.apply {
             layoutManager = weatherLayoutManager
             setHasFixedSize(false)
-            adapter = mWeatherAdapter
+            adapter = weatherAdapter
         }
 
         // Constrain the size of the chart to 80% of the smallest dimension
@@ -59,14 +59,14 @@ class WeatherDetailsDialog(context: Context, galleryViewModel: GalleryViewModel)
         when (result){
             is WeatherResult.Loading -> this.showWeatherLoading()
             is WeatherResult.TodaysForecast -> {
-                mWeatherAdapter.setWeatherData(result.data.properties.periods)
+                weatherAdapter.setWeatherData(result.data.properties.periods)
                 showWeatherData()
             }
             is WeatherResult.NoData -> {
                 // No need to handle: details cannot be launched with no data state
             }
             is WeatherResult.CachedForecast -> {
-                mWeatherAdapter.setWeatherData(result.data.properties.periods)
+                weatherAdapter.setWeatherData(result.data.properties.periods)
                 showWeatherData()
             }
         }

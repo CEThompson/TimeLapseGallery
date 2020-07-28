@@ -79,30 +79,30 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         viewModelFactory
     }
 
-    private lateinit var mExternalFilesDir: File
+    private lateinit var externalFilesDir: File
     private var binding: FragmentDetailBinding? = null
     private var toolbar: Toolbar? = null
 
     // Photo and project Information
-    private lateinit var mCurrentProjectView: ProjectView
-    private var mPhotos: List<PhotoEntry> = emptyList()
-    private var mProjectTags: List<TagEntry> = emptyList()
-    private var mAllTags: List<TagEntry> = emptyList()
-    private lateinit var mCurrentPhoto: PhotoEntry
+    private lateinit var currentProjectView: ProjectView
+    private var photos: List<PhotoEntry> = emptyList()
+    private var projectTags: List<TagEntry> = emptyList()
+    private var allTags: List<TagEntry> = emptyList()
+    private lateinit var currentPhoto: PhotoEntry
 
-    private var mCurrentPlayPosition by Delegates.notNull<Int>()
-    private var mDetailAdapter: DetailAdapter? = null
+    private var currentPlayPosition by Delegates.notNull<Int>()
+    private var detailAdapter: DetailAdapter? = null
 
     // Dialogs
-    private var mTagDialog: TagDialog? = null
-    private var mInfoDialog: InfoDialog? = null
-    private var mScheduleDialog: ScheduleDialog? = null
-    private var mConvertDialog: ConversionDialog? = null
+    private var tagDialog: TagDialog? = null
+    private var infoDialog: InfoDialog? = null
+    private var scheduleDialog: ScheduleDialog? = null
+    private var convertDialog: ConversionDialog? = null
 
     // For playing time lapse
-    private var mPlaying = false
-    private var mImageIsLoaded = false
-    private var mPlaybackInterval by Delegates.notNull<Long>()
+    private var playing = false
+    private var imageIsLoaded = false
+    private var playbackInterval by Delegates.notNull<Long>()
 
     // Jobs
     private var playJob: Job? = null
@@ -112,7 +112,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     private var photoUrls: Array<String> = arrayOf()
 
     // Analytics
-    private var mFirebaseAnalytics: FirebaseAnalytics? = null
+    private var firebaseAnalytics: FirebaseAnalytics? = null
 
     // Animations for orientation indicator
     private val blinkAnimation: Animation by lazy {
@@ -130,24 +130,18 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // TODO (1.2) remove this poor injection pattern
-        // Inject view model and its passed argument
-        //AndroidSupportInjection.inject(this)
-
-
-        mCurrentProjectView = args.clickedProjectView
-        mPlaybackInterval = getString(R.string.playback_interval_default).toLong()
+        currentProjectView = args.clickedProjectView
+        playbackInterval = getString(R.string.playback_interval_default).toLong()
 
         try {
-            mExternalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
+            externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
         } catch (exc: KotlinNullPointerException) {
             // TODO (update 1.2): Investigate potential failures with external files.
             Log.e(TAG, "Couldn't get external files directory.")
             Toast.makeText(requireContext(), "Fatal Error: Could not load external files!", Toast.LENGTH_LONG).show()
         }
 
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+        firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
         val sharedElemTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
         sharedElemTransition.addListener(object : Transition.TransitionListener {
             override fun onTransitionEnd(transition: Transition?) {
@@ -184,7 +178,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         // Initialize the playback interval from the shared preferences
         val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
-        mPlaybackInterval = playbackIntervalSharedPref?.toLong() ?: 50
+        playbackInterval = playbackIntervalSharedPref?.toLong() ?: 50
 
         // TODO (update 1.3): refactor toolbar to navigation drawer
         // Set up toolbar
@@ -195,10 +189,10 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         (activity as TimeLapseGalleryActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Set up adapter and recycler view
-        mDetailAdapter = DetailAdapter(this, mExternalFilesDir, args.clickedProjectView)
+        detailAdapter = DetailAdapter(this, externalFilesDir, args.clickedProjectView)
         val linearLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding?.detailsRecyclerview?.layoutManager = linearLayoutManager
-        binding?.detailsRecyclerview?.adapter = mDetailAdapter
+        binding?.detailsRecyclerview?.adapter = detailAdapter
 
         // 1. Initialize the color of the play as video fab
         // NOTE: this is not set in XML because setting by xml seems to lock the value of the color
@@ -212,7 +206,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                 Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
             } else {
                 val action = DetailFragmentDirections
-                        .actionDetailsFragmentToCamera2Fragment(cameraId, detailViewModel.lastPhoto, mCurrentProjectView)
+                        .actionDetailsFragmentToCamera2Fragment(cameraId, detailViewModel.lastPhoto, currentProjectView)
                 findNavController().navigate(action)
             }
         }
@@ -233,8 +227,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
             findNavController().navigate(action, extras)
         }
         // Set a swipe listener for the image
-        val onRightSwipe = { if (!mPlaying) detailViewModel.previousPhoto() }
-        val onLeftSwipe = { if (!mPlaying) detailViewModel.nextPhoto() }
+        val onRightSwipe = { if (!playing) detailViewModel.previousPhoto() }
+        val onLeftSwipe = { if (!playing) detailViewModel.nextPhoto() }
         val swipeListener = OnSwipeTouchListener(
                 requireContext(),
                 onRightSwipe,
@@ -243,7 +237,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         binding?.detailCurrentImage?.setOnTouchListener(swipeListener)
 
         // Set the transition tags
-        val transitionName = "${mCurrentProjectView.project_id}"
+        val transitionName = "${currentProjectView.project_id}"
         binding?.detailCurrentImage?.transitionName = transitionName
         binding?.detailsCardContainer?.transitionName = "${transitionName}card"
         binding?.detailsGradientOverlay?.transitionName = "${transitionName}bottomGradient"
@@ -255,42 +249,41 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         detailViewModel.setProject(args.clickedProjectView.project_id)
-        // Finally set up the observables
         setupViewModel()
     }
 
     private fun lazyShowInfoDialog() {
-        if (mInfoDialog == null) {
-            mInfoDialog = InfoDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
-            mInfoDialog?.setInfoDialog(mCurrentProjectView)
-            mInfoDialog?.setInfoTags(getTagsText(mProjectTags))
+        if (infoDialog == null) {
+            infoDialog = InfoDialog(requireContext(), detailViewModel, externalFilesDir, currentProjectView)
+            infoDialog?.setInfoDialog(currentProjectView)
+            infoDialog?.setInfoTags(getTagsText(projectTags))
         }
-        mInfoDialog?.show()
+        infoDialog?.show()
         detailViewModel.infoDialogShowing = true
     }
 
     private fun lazyShowProjectTagDialog() {
-        if (mTagDialog == null) {
-            mTagDialog = TagDialog(requireContext(), detailViewModel, mCurrentProjectView)
-            mTagDialog?.setProjectTagDialog(mAllTags, mProjectTags)
+        if (tagDialog == null) {
+            tagDialog = TagDialog(requireContext(), detailViewModel, currentProjectView)
+            tagDialog?.setProjectTagDialog(allTags, projectTags)
         }
-        mTagDialog?.show()
+        tagDialog?.show()
         detailViewModel.tagDialogShowing = true
     }
 
     private fun lazyShowScheduleDialog() {
-        if (mScheduleDialog == null) {
-            mScheduleDialog = ScheduleDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
+        if (scheduleDialog == null) {
+            scheduleDialog = ScheduleDialog(requireContext(), detailViewModel, externalFilesDir, currentProjectView)
         }
-        mScheduleDialog?.show()
+        scheduleDialog?.show()
         detailViewModel.scheduleDialogShowing = true
     }
 
     private fun lazyShowConvertDialog() {
-        if (mConvertDialog == null) {
-            mConvertDialog = ConversionDialog(requireContext(), detailViewModel, mExternalFilesDir, mCurrentProjectView)
+        if (convertDialog == null) {
+            convertDialog = ConversionDialog(requireContext(), detailViewModel, externalFilesDir, currentProjectView)
         }
-        mConvertDialog?.show()
+        convertDialog?.show()
         detailViewModel.convertDialogShowing = true
     }
 
@@ -309,9 +302,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
             }
             // Overflow option to share the current photo
             R.id.share_photo -> {
-                val photoUrl = ProjectUtils.getProjectPhotoUrl(mExternalFilesDir,
-                        getProjectEntryFromProjectView(mCurrentProjectView),
-                        mCurrentPhoto.timestamp)
+                val photoUrl = ProjectUtils.getProjectPhotoUrl(externalFilesDir,
+                        getProjectEntryFromProjectView(currentProjectView),
+                        currentPhoto.timestamp)
 
                 if (photoUrl != null) {
                     val shareIntent: Intent = Intent().apply {
@@ -330,7 +323,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
             }
             // Overflow option to delete the current photo
             R.id.delete_photo -> {
-                if (mPhotos.size == 1) {
+                if (photos.size == 1) {
                     verifyLastPhotoDeletion()
                 } else {
                     verifyPhotoDeletion()
@@ -376,14 +369,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     override fun onPause() {
         super.onPause()
         // Cancel any jobs
-        if (mPlaying) stopPlaying()
+        if (playing) stopPlaying()
         tagJob?.cancel()
 
         // Dismiss any dialogs
-        mInfoDialog?.dismiss()
-        mTagDialog?.dismiss()
-        mScheduleDialog?.dismiss()
-        mConvertDialog?.dismiss()
+        infoDialog?.dismiss()
+        tagDialog?.dismiss()
+        scheduleDialog?.dismiss()
+        convertDialog?.dismiss()
     }
 
     override fun onStop() {
@@ -394,11 +387,11 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        mTagDialog = null
-        mScheduleDialog = null
-        mInfoDialog = null
-        mConvertDialog = null
-        mDetailAdapter = null
+        tagDialog = null
+        scheduleDialog = null
+        infoDialog = null
+        convertDialog = null
+        detailAdapter = null
         toolbar = null
     }
 
@@ -430,32 +423,32 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     private fun loadUi(photoEntry: PhotoEntry) {
         // Notify the adapter: this updates the detail recycler view red highlight indicator
         //if (!mPlaying)
-        mDetailAdapter?.setCurrentPhoto(photoEntry)
+        detailAdapter?.setCurrentPhoto(photoEntry)
 
         // Get the image path, handle orientation indicator and load the image
         val imagePath: String? = ProjectUtils.getProjectPhotoUrl(
-                mExternalFilesDir,
-                getProjectEntryFromProjectView(mCurrentProjectView),
+                externalFilesDir,
+                getProjectEntryFromProjectView(currentProjectView),
                 photoEntry.timestamp)
 
 
-        if (!mPlaying) handleOrientationIndicator(imagePath)
+        if (!playing) handleOrientationIndicator(imagePath)
         loadImage(imagePath)
 
         // Update position of progress view and thumbnail
-        val position = mPhotos.indexOf(photoEntry)
+        val position = photos.indexOf(photoEntry)
         val photoNumber = position + 1
-        if (!mPlaying)
+        if (!playing)
             binding?.detailsRecyclerview?.scrollToPosition(position)
         binding?.imageLoadingProgress?.progress = position
 
         // If playing do not update the individual photo info (skip the rest)
-        if (mPlaying) return
+        if (playing) return
         // Otherwise update photo information
         else {
             // Get info for the current photo
             val timestamp = photoEntry.timestamp
-            val photosInProject: Int = mPhotos.size
+            val photosInProject: Int = photos.size
             Log.d(TAG, "photoNumber is $photoNumber")
             Log.d(TAG, "photosInProject is $photosInProject")
             // Get formatted strings
@@ -496,7 +489,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
 
     // Loads the passed url
     private fun loadImage(imagePath: String?) {
-        mImageIsLoaded = false // this set to true after load image pair completes
+        imageIsLoaded = false // this set to true after load image pair completes
         // Load the image to the fullscreen dialog if it is showing or to the detail cardview otherwise
         val f = if (imagePath == null) null else File(imagePath)
         loadImagePair(f, binding!!.detailCurrentImage, binding!!.detailNextImage)
@@ -512,7 +505,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                     .into(bottomImage)
             startPostponedEnterTransition()
             binding?.errorImage?.visibility = VISIBLE
-            if (mPlaying) stopPlaying()
+            if (playing) stopPlaying()
             return
         } else {
             binding?.errorImage?.visibility = INVISIBLE
@@ -546,7 +539,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                                         // When complete hide the top image
                                         topImage.visibility = INVISIBLE
                                         // Record state
-                                        mImageIsLoaded = true
+                                        imageIsLoaded = true
                                         // And begin the shared element transition if appropriate
                                         startPostponedEnterTransition()
                                         return false
@@ -562,13 +555,13 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     // Loads the set of images in sequence
     private fun playSetOfImages() {
         // If already playing then stop
-        if (mPlaying) {
+        if (playing) {
             stopPlaying()
-            mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
+            firebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
             return
         }
         // If not enough photos give user feedback
-        if (mPhotos.size <= 1) {
+        if (photos.size <= 1) {
             Snackbar.make(binding!!.detailsCoordinatorLayout, R.string.add_more_photos,
                     Snackbar.LENGTH_LONG)
                     .show()
@@ -576,35 +569,35 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         }
 
         // Handle play state
-        mPlaying = true
-        mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto)
+        playing = true
+        currentPlayPosition = photos.indexOf(currentPhoto)
         // Handle UI
         fadeOutPhotoInformation()
         setFabStatePlaying(backward = false)
         // Override the play position to beginning if currently already at the end
-        if (mCurrentPlayPosition == mPhotos.size - 1) {
-            mCurrentPlayPosition = 0
-            detailViewModel.setPhoto(mPhotos[0])
+        if (currentPlayPosition == photos.size - 1) {
+            currentPlayPosition = 0
+            detailViewModel.setPhoto(photos[0])
         }
 
         // Schedule the recursive sequence
-        binding?.imageLoadingProgress?.progress = mCurrentPlayPosition
-        scheduleNextPhoto(mCurrentPlayPosition) // Recursively loads the rest of set from beginning
+        binding?.imageLoadingProgress?.progress = currentPlayPosition
+        scheduleNextPhoto(currentPlayPosition) // Recursively loads the rest of set from beginning
 
         // Track play button interaction
-        mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_play_time_lapse), null)
+        firebaseAnalytics!!.logEvent(getString(R.string.analytics_play_time_lapse), null)
     }
 
     // Loads the set of images backwards
     private fun rewindSetOfImages() {
         // If already playing then stop
-        if (mPlaying) {
+        if (playing) {
             stopPlaying()
-            mFirebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
+            firebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
             return
         }
         // If not enough photos give user feedback
-        if (mPhotos.size <= 1) {
+        if (photos.size <= 1) {
             Snackbar.make(binding!!.detailsCoordinatorLayout, R.string.add_more_photos,
                     Snackbar.LENGTH_LONG)
                     .show()
@@ -612,21 +605,21 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         }
 
         // Handle play state
-        mPlaying = true
-        mCurrentPlayPosition = mPhotos.indexOf(mCurrentPhoto)
+        playing = true
+        currentPlayPosition = photos.indexOf(currentPhoto)
         // Handle UI
         fadeOutPhotoInformation()
         setFabStatePlaying(true)
 
         // Rewind from the end if currently at the beginning
-        if (mCurrentPlayPosition == 0) {
-            mCurrentPlayPosition = mPhotos.size - 1
-            detailViewModel.setPhoto(mPhotos[mPhotos.size - 1])
+        if (currentPlayPosition == 0) {
+            currentPlayPosition = photos.size - 1
+            detailViewModel.setPhoto(photos[photos.size - 1])
         }
 
         // Schedule the recursive sequence
-        binding?.imageLoadingProgress?.progress = mCurrentPlayPosition
-        scheduleRewindPhoto(mCurrentPlayPosition) // Recursively loads the rest of set from beginning
+        binding?.imageLoadingProgress?.progress = currentPlayPosition
+        scheduleRewindPhoto(currentPlayPosition) // Recursively loads the rest of set from beginning
     }
 
 
@@ -654,25 +647,25 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     // Resets the UI & handles state after playing
     private fun stopPlaying() {
         playJob?.cancel()
-        mPlaying = false
-        binding?.imageLoadingProgress?.progress = mCurrentPlayPosition
+        playing = false
+        binding?.imageLoadingProgress?.progress = currentPlayPosition
         setFabStateStopped()
-        loadUi(mCurrentPhoto)
+        loadUi(currentPhoto)
         fadeInPhotoInformation()
     }
 
     // Sets a coroutine to load the next photo every 50 ms, or whatever has been chosen from the shared preferences
     private fun scheduleNextPhoto(position: Int) {
         Log.d("DetailsFragment", "schedule loading position $position")
-        if (position < 0 || position >= mPhotos.size) {
+        if (position < 0 || position >= photos.size) {
             stopPlaying()
             return
         }
-        mCurrentPlayPosition = position
+        currentPlayPosition = position
         playJob = detailViewModel.viewModelScope.launch {
-            delay(mPlaybackInterval)
+            delay(playbackInterval)
             // If image is loaded load the next photo
-            if (mImageIsLoaded) {
+            if (imageIsLoaded) {
                 detailViewModel.nextPhoto()
                 binding?.imageLoadingProgress?.progress = position + 1
                 scheduleNextPhoto(position + 1)
@@ -687,15 +680,15 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     // Sets a coroutine to load the previous photo every 50 ms, or whatever has been chosen from the shared preferences
     private fun scheduleRewindPhoto(position: Int) {
         Log.d("DetailsFragment", "schedule loading position $position")
-        if (position < 0 || position >= mPhotos.size) {
+        if (position < 0 || position >= photos.size) {
             stopPlaying()
             return
         }
-        mCurrentPlayPosition = position
+        currentPlayPosition = position
         playJob = detailViewModel.viewModelScope.launch {
-            delay(mPlaybackInterval)
+            delay(playbackInterval)
             // If image is loaded load the next photo
-            if (mImageIsLoaded) {
+            if (imageIsLoaded) {
                 detailViewModel.previousPhoto()
                 binding?.imageLoadingProgress?.progress = position - 1
                 scheduleRewindPhoto(position - 1)
@@ -716,16 +709,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         // Observe the project for name and schedule changes
         detailViewModel.projectView.observe(viewLifecycleOwner, Observer { projectView: ProjectView? ->
             if (projectView == null) return@Observer
-            mCurrentProjectView = projectView
-            mDetailAdapter?.setProject(mCurrentProjectView)
+            currentProjectView = projectView
+            detailAdapter?.setProject(currentProjectView)
             // This updates the project information card, project info dialog,
             // schedule layout over the image and the schedule dialog
 
             // Set the ui for the project information layout cardview
             // 1. Set the ID
-            binding?.projectInformationLayout?.detailsProjectId?.text = mCurrentProjectView.project_id.toString()
+            binding?.projectInformationLayout?.detailsProjectId?.text = currentProjectView.project_id.toString()
             // 2. Set the name, handle appropriately if no name specified
-            val name = mCurrentProjectView.project_name
+            val name = currentProjectView.project_name
             // Style for no name
             if (name == null || name.isEmpty()) {
                 binding?.projectInformationLayout
@@ -753,7 +746,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
 
             // 3. Set the schedule information
             // If there isn't a schedule set the color of the fab to white and hide the layout
-            if (mCurrentProjectView.interval_days == 0) {
+            if (currentProjectView.interval_days == 0) {
                 binding?.projectScheduleFab?.backgroundTintList =
                         ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
                 binding?.detailScheduleLayout?.scheduleLayout?.visibility = INVISIBLE
@@ -764,9 +757,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                         ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.colorYellow))
                 // Show the interval of the schedule
                 binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.text =
-                        mCurrentProjectView.interval_days.toString()
+                        currentProjectView.interval_days.toString()
 
-                val daysUntilDue = daysUntilDue(mCurrentProjectView)
+                val daysUntilDue = daysUntilDue(currentProjectView)
                 // Show how many days until project is due
                 binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.text =
                         daysUntilDue.toString()
@@ -788,9 +781,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                 binding?.detailScheduleLayout?.scheduleLayout?.visibility = VISIBLE
             }
             // Also update the fields in the info dialog
-            mInfoDialog?.setInfoDialog(projectView)
+            infoDialog?.setInfoDialog(projectView)
             // And update the fields in the schedule dialog
-            mScheduleDialog?.setScheduleInformation(projectView)
+            scheduleDialog?.setScheduleInformation(projectView)
         })
 
         // Observe the list of photos
@@ -799,12 +792,12 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         // Lastly this updates UI showing the date range for photos and the progress bar max
         detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
             // Update the recycler view
-            mPhotos = photoEntries
-            mDetailAdapter?.submitList(photoEntries)
+            photos = photoEntries
+            detailAdapter?.submitList(photoEntries)
 
             // Bind cover photo to the end of the list always
             var lastPhotoEntry = photoEntries.last()
-            detailViewModel.setLastPhotoByEntry(mExternalFilesDir, mCurrentProjectView, lastPhotoEntry)
+            detailViewModel.setLastPhotoByEntry(externalFilesDir, currentProjectView, lastPhotoEntry)
             detailViewModel.setCoverPhoto(lastPhotoEntry)
             // Update the UI based upon the range of photo dates
             val firstTimestamp = photoEntries[0].timestamp
@@ -832,7 +825,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                 val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 val updateGifs = pref.getBoolean(getString(R.string.key_gif_auto_convert), true)
                 if (updateGifs) {
-                    val gif = GifUtils.getGifForProject(mExternalFilesDir, getProjectEntryFromProjectView(mCurrentProjectView))
+                    val gif = GifUtils.getGifForProject(externalFilesDir, getProjectEntryFromProjectView(currentProjectView))
                     if (gif != null) {
                         GifUtils.scheduleGifWorker(requireContext())
                     }
@@ -844,7 +837,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
             }
 
             // Restore the play position
-            mCurrentPlayPosition = mPhotos.indexOf(lastPhotoEntry)
+            currentPlayPosition = photos.indexOf(lastPhotoEntry)
             // Load the current photo
             detailViewModel.currentPhoto.value = lastPhotoEntry
             // Make sure to save the position of the max index in the view model
@@ -855,8 +848,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                 val list = arrayListOf<String>()
                 for (photo in photoEntries) {
                     val photoUrl = ProjectUtils.getProjectPhotoUrl(
-                            mExternalFilesDir,
-                            getProjectEntryFromProjectView(mCurrentProjectView),
+                            externalFilesDir,
+                            getProjectEntryFromProjectView(currentProjectView),
                             photo.timestamp)
                     if (photoUrl == null) {
                         Log.d(TAG, "error loading timestamp ${photo.timestamp}")
@@ -872,7 +865,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         // This loads the image and timestamp information based on the current photo
         detailViewModel.currentPhoto.observe(viewLifecycleOwner, Observer { currentPhoto: PhotoEntry? ->
             if (currentPhoto != null) {
-                mCurrentPhoto = currentPhoto
+                this.currentPhoto = currentPhoto
                 loadUi(currentPhoto)
             }
         })
@@ -883,18 +876,18 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         detailViewModel.projectTags.observe(viewLifecycleOwner, Observer { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 // 1. Get the Tag Entries from the Project Tag Entries sorted
-                mProjectTags = detailViewModel.getTags(projectTagEntries)
+                projectTags = detailViewModel.getTags(projectTagEntries)
                         .sortedBy { it.text.toLowerCase(Locale.getDefault()) }
 
                 // 2. Set the tags for the project tag dialog
-                mTagDialog?.setProjectTagDialog(mAllTags, mProjectTags)
+                tagDialog?.setProjectTagDialog(allTags, projectTags)
 
                 // 3. Get the string representing the tags and set the info dialog
-                val tagsText = getTagsText(mProjectTags)
-                mInfoDialog?.setInfoTags(tagsText)
+                val tagsText = getTagsText(projectTags)
+                infoDialog?.setInfoTags(tagsText)
 
                 // 4. Use the string to set the tags in the project info card view unless there are none
-                if (mProjectTags.isEmpty()) {
+                if (projectTags.isEmpty()) {
                     binding?.projectInformationLayout?.detailsProjectTagsTextview?.visibility = GONE
                 } else {
                     binding?.projectInformationLayout?.detailsProjectTagsTextview?.text = tagsText
@@ -902,7 +895,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                 }
 
                 // 5. Lastly write the list of tags to the text file (overwriting any previously)
-                FileUtils.writeProjectTagsFile(mExternalFilesDir, mCurrentProjectView.project_id, mProjectTags)
+                FileUtils.writeProjectTagsFile(externalFilesDir, currentProjectView.project_id, projectTags)
             }
         })
 
@@ -910,8 +903,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         // This is used to set up the list of all the tags in the project tag dialog
         // So that the user may simply click on a tag to add them to a project
         detailViewModel.tags.observe(viewLifecycleOwner, Observer { tagEntries: List<TagEntry> ->
-            mAllTags = tagEntries.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
-            mTagDialog?.setProjectTagDialog(mAllTags, mProjectTags)
+            allTags = tagEntries.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
+            tagDialog?.setProjectTagDialog(allTags, projectTags)
         })
     }
 
@@ -945,8 +938,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                 .setMessage(R.string.verify_delete_photo)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    detailViewModel.deleteCurrentPhoto(mExternalFilesDir)
-                    mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_photo), null)
+                    detailViewModel.deleteCurrentPhoto(externalFilesDir)
+                    firebaseAnalytics?.logEvent(getString(R.string.analytics_delete_photo), null)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
@@ -982,16 +975,16 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                 .setMessage(R.string.double_verify_project_deletion)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
-                    detailViewModel.deleteCurrentProject(mExternalFilesDir, mCurrentProjectView)
+                    detailViewModel.deleteCurrentProject(externalFilesDir, currentProjectView)
                     // If current project had a schedule remove the notification and update widgets
-                    if (mCurrentProjectView.interval_days != 0) {
+                    if (currentProjectView.interval_days != 0) {
                         NotificationUtils.scheduleNotificationWorker(requireContext())
                         UpdateWidgetService.startActionUpdateWidgets(requireContext())
                     }
                     sharedElementReturnTransition = null
 
                     // Log project deletion to analytics
-                    mFirebaseAnalytics?.logEvent(getString(R.string.analytics_delete_project), null)
+                    firebaseAnalytics?.logEvent(getString(R.string.analytics_delete_project), null)
 
                     findNavController().popBackStack()
                 }

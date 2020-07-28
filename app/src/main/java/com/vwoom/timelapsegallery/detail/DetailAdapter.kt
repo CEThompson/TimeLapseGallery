@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
-import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.DetailRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.detail.DetailAdapter.DetailAdapterViewHolder
@@ -33,7 +32,6 @@ class DetailAdapter(
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
             val clickedPhoto = getItem(adapterPosition)
-            //mCurrentPhoto = clickedPhoto
             setCurrentPhoto(clickedPhoto)
             mClickHandler.onClick(clickedPhoto)
         }
@@ -64,7 +62,7 @@ class DetailAdapter(
         val f = if (photoPath == null) null else File(photoPath)
         // TODO (update 1.3) dynamically resize detail view
 
-        if (f == null){
+        if (f == null) {
             Glide.with(context)
                     .load(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
                     .centerInside()
@@ -103,7 +101,8 @@ class DetailAdapter(
     }
 }
 
-class PhotoDiffCallback: DiffUtil.ItemCallback<PhotoEntry>() {
+// TODO can this be an inner class?
+class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoEntry>() {
     override fun areContentsTheSame(oldItem: PhotoEntry, newItem: PhotoEntry): Boolean {
         return oldItem.id == newItem.id
     }

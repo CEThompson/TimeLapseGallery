@@ -1,8 +1,6 @@
 package com.vwoom.timelapsegallery.di
 
 import android.app.Application
-import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.dao.*
 import com.vwoom.timelapsegallery.data.datasource.WeatherRemoteDataSource
@@ -12,6 +10,8 @@ import javax.inject.Singleton
 
 @Module(includes = [ViewModelModule::class])
 class AppModule {
+
+    // TODO: consider injecting shared preferences
     /*@Provides
     fun provideSharedPreferences(
             app: Application

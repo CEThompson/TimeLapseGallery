@@ -49,12 +49,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-// Arbitrary number to keep track of permission request
-private const val REQUEST_CODE_PERMISSIONS = 10
-
-// Array of all permissions specified in the manifest
-private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-
 class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
 
     private val args: Camera2FragmentArgs by navArgs()
@@ -84,16 +78,15 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private val camera2ViewModel: Camera2ViewModel by viewModels {
-        //InjectorUtils.provideCamera2ViewModelFactory(requireActivity(), args.photo, args.projectView)
         viewModelFactory
     }
-    private var mTakePictureFab: FloatingActionButton? = null
+    private var takePictureFab: FloatingActionButton? = null
 
-    private var mFirebaseAnalytics: FirebaseAnalytics? = null
+    private var firebaseAnalytics: FirebaseAnalytics? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+        firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -101,7 +94,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
             lifecycleOwner = viewLifecycleOwner
         }
         viewFinder = binding.cameraPreview
-        mTakePictureFab = binding.takePictureFab
+        takePictureFab = binding.takePictureFab
 
         // Load the last photo from a project into the compare view if available
         if (args.photo != null) {
@@ -129,7 +122,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
         // If no project photo was passed hide the quick compare
         else if (args.photo == null) binding.quickCompareFab.hide()
 
-        mTakePictureFab?.setOnClickListener {
+        takePictureFab?.setOnClickListener {
             it.isEnabled = false
             takePictureJob = lifecycleScope.launchIdling(Dispatchers.IO) {
                 var outputPhoto: FileOutputStream? = null
@@ -155,9 +148,9 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
 
                     // Handle analytics
                     if (isNewProject) {
-                        mFirebaseAnalytics?.logEvent(getString(R.string.analytics_new_project), null)
+                        firebaseAnalytics?.logEvent(getString(R.string.analytics_new_project), null)
                     } else {
-                        mFirebaseAnalytics?.logEvent(getString(R.string.analytics_add_photo), null)
+                        firebaseAnalytics?.logEvent(getString(R.string.analytics_add_photo), null)
                     }
 
                     // For new projects navigate to project detail after insertion
@@ -389,5 +382,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
 
     companion object {
         val TAG = Camera2Fragment::class.java.simpleName
+        private const val REQUEST_CODE_PERMISSIONS = 10
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
 }

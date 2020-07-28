@@ -10,7 +10,6 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import javax.inject.Inject
 
-// TODO: fix dagger injection or convert to koin
 class TimeLapseGalleryApplication : Application(), CameraXConfig.Provider, HasActivityInjector {
 
     @Inject
@@ -26,16 +25,4 @@ class TimeLapseGalleryApplication : Application(), CameraXConfig.Provider, HasAc
     override fun getCameraXConfig(): CameraXConfig {
         return Camera2Config.defaultConfig()
     }
-
-    // Use this block for delayed launch
-    /*override fun onCreate() {
-        super.onCreate()
-        delayedInit()
-    }
-    private val applicationScope = CoroutineScope(Dispatchers.Default)
-    private fun delayedInit(){
-        applicationScope.launch {
-            // Late init application stuff here in order to prevent launch delay
-        }
-    }*/
 }

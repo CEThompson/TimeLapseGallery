@@ -14,7 +14,7 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.detail.DetailViewModel
 
-class TagDialog(context: Context, val detailViewModel: DetailViewModel, val project: ProjectView) : Dialog(context) {
+class TagDialog(context: Context, private val detailViewModel: DetailViewModel, val project: ProjectView) : Dialog(context) {
     init {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.dialog_project_tag)

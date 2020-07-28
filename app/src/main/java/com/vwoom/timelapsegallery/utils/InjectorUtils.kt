@@ -4,6 +4,7 @@ import android.content.Context
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 
+// Used for injecting into services, broadcast receivers, and workers
 object InjectorUtils {
     fun getProjectRepository(context: Context): ProjectRepository {
         return ProjectRepository.getInstance(

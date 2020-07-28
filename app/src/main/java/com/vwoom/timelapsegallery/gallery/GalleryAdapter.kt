@@ -30,7 +30,7 @@ import com.vwoom.timelapsegallery.utils.TimeUtils
 import java.io.File
 
 class GalleryAdapter(
-        private val mClickHandler: GalleryAdapterOnClickHandler,
+        private val clickHandler: GalleryAdapterOnClickHandler,
         val externalFilesDir: File,
         private val scheduleDisplaysEnabled: Boolean,
         private val gifDisplaysEnabled: Boolean)
@@ -46,7 +46,7 @@ class GalleryAdapter(
         override fun onClick(view: View) {
             val adapterPosition = adapterPosition
             val clickedProject = getItem(adapterPosition)
-            mClickHandler.onClick(
+            clickHandler.onClick(
                     clickedProject,
                     binding,
                     adapterPosition)

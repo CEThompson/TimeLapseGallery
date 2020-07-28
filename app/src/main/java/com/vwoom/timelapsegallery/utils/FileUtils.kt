@@ -143,7 +143,7 @@ object FileUtils {
             projectScheduleEntry: ProjectScheduleEntry) {
         val metaDir = getMetaDirectoryForProject(externalFilesDir, projectId)
         val scheduleFile = File(metaDir, SCHEDULE_TEXT_FILE)
-        Log.d(TAG, "writing schedule file")
+
         try {
             val output = FileOutputStream(scheduleFile)
             val outputStreamWriter = OutputStreamWriter(output)
@@ -167,11 +167,9 @@ object FileUtils {
             project: ProjectEntry): File? {
 
         // First clean the temp files
-        //Log.d("TLG.GIF:", "Clearing temp directory")
         deleteTempFiles(externalFilesDir)
 
         // Get the list of photos to convert
-        //Log.d("TLG.GIF:", "Getting list of photos to convert")
         val photosToConvert = ProjectUtils.getPhotoEntriesInProjectDirectory(externalFilesDir, project)
 
         // Create the temporary folder and define the text file
@@ -180,7 +178,6 @@ object FileUtils {
         val listFiles = File(tempFolder, LIST_PHOTOS_TEXT_FILE)
 
         // Writ the file paths to the text file
-        //Log.d("TLG.GIF:", "Writing list of photos to convert")
         try {
             val output = FileOutputStream(listFiles)
             val outputStreamWriter = OutputStreamWriter(output)
@@ -188,7 +185,6 @@ object FileUtils {
             for (photo in photosToConvert) {
                 val photoUrlString = ProjectUtils.getProjectPhotoUrl(externalFilesDir, project, photo.timestamp)
                 val fileDefString = "file '$photoUrlString'\n"
-                Log.d("TLG.GIF:", "Writing: $fileDefString")
                 outputStreamWriter.write(fileDefString)
             }
             // Clean up
@@ -198,7 +194,6 @@ object FileUtils {
         }
         // If exception caught return null
         catch (exception: IOException) {
-            //Log.d("TLG.GIF:", "Caught exception trying to write list of files: ${exception.message}")
             return null
         }
         return listFiles

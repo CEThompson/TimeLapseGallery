@@ -301,5 +301,7 @@
     <string name="unknown">unknown</string>
     <string name="create_gif_to_share">Create a GIF to share</string>
     <string name="share_gif_title">Share Gif</string>
+    <string name="notification_channel_name">TLG Notifications</string>
+    <string name="notification_channel_description">Notifications for scheduled time-lapse projects</string>
 
 </resources>

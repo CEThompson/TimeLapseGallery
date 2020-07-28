@@ -1,7 +1,6 @@
 package com.vwoom.timelapsegallery.gallery
 
 import android.location.Location
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,6 +19,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
+// TODO consider convert these to an enum
 const val SEARCH_TYPE_NONE = "none"
 const val SEARCH_TYPE_DUE_TODAY = "due_today"
 const val SEARCH_TYPE_DUE_TOMORROW = "due_tomorrow"
@@ -33,12 +33,16 @@ class GalleryViewModel
                     private val weatherRepository: WeatherRepository) : ViewModel() {
     // For observing all projects
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
+
     // For the displayed projects in search filtration
     val displayedProjectViews = MutableLiveData(emptyList<ProjectView>())
+
     // Tags for all projects to populate the search dialog
     val tags: LiveData<List<TagEntry>> = tagRepository.getTagsLiveData()
+
     // Weather forecast
     val weather = MutableLiveData<WeatherResult<ForecastResponse>>(WeatherResult.Loading)
+
     // Search state: weather a search is active or not
     val search = MutableLiveData(false)
 
@@ -88,7 +92,7 @@ class GalleryViewModel
             //weather.value = weatherRepository.getForecast()
 
             // If it doesn't belong to today then try to update
-            if (weather.value !is WeatherResult.TodaysForecast && location!=null) {
+            if (weather.value !is WeatherResult.TodaysForecast && location != null) {
                 //Log.d("WeatherDebug", "location is not null, calling update forecast")
                 updateForecast(location)
             }

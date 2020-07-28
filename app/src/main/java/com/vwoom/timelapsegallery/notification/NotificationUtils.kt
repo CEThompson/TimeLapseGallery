@@ -21,8 +21,6 @@ import java.util.concurrent.TimeUnit
 // TODO: verify notification channel info
 object NotificationUtils {
     private const val PROJECT_NOTIFICATION_CHANNEL_ID = "project_channel_id"
-    private const val CHANNEL_NAME = "Project Notifications"
-    private const val CHANNEL_DESCRIPTION = "Notifications for scheduled projects"
     private val TAG = NotificationUtils::class.java.simpleName
 
     /* Creates a notification that launches the main activity and filters by today's scheduled projects */
@@ -71,11 +69,13 @@ object NotificationUtils {
     /* Creates the notification channel for android 8.0 + */
     private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelName = context.getString(R.string.notification_channel_name)
+            val channelDescription = context.getString(R.string.notification_channel_description)
             val channel = NotificationChannel(
                     PROJECT_NOTIFICATION_CHANNEL_ID,
-                    CHANNEL_NAME,
+                    channelName,
                     NotificationManager.IMPORTANCE_DEFAULT)
-            channel.description = CHANNEL_DESCRIPTION
+            channel.description = channelDescription
             val notificationManager = context.getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(channel)
         }

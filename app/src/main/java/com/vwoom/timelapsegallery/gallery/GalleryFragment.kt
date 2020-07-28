@@ -99,11 +99,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Inject dependencies for fragment
-        //AndroidSupportInjection.inject(this)
-        //galleryViewModel = ViewModelProvider(this, viewModelFactory).get(GalleryViewModel::class.java)
-
         galleryReenterTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
         galleryReenterTransition.addListener(reenterListener)
         galleryExitTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
