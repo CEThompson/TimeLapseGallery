@@ -104,30 +104,30 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
         mTakePictureFab = binding.takePictureFab
 
         // Load the last photo from a project into the compare view if available
-        if (camera2ViewModel.photo != null) {
-            val file = File(camera2ViewModel.photo?.photo_url!!)
+        if (args.photo != null) {
+            // Load the photo into the compare image view
+            val file = File(args.photo?.photo_url!!)
             Glide.with(requireContext())
                     .load(file).into(binding.previousPhoto)
-        }
 
-        // Set up quick compare to previous photo
-        @Suppress("ClickableViewAccessibility")
-        binding.quickCompareFab.setOnTouchListener { _, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    binding.previousPhoto.visibility = View.VISIBLE
-                    true
+            // Set up quick compare fab to compare current camera input to previous photo
+            @Suppress("ClickableViewAccessibility")
+            binding.quickCompareFab.setOnTouchListener { _, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        binding.previousPhoto.visibility = View.VISIBLE
+                        true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        binding.previousPhoto.visibility = View.INVISIBLE
+                        true
+                    }
+                    else -> false
                 }
-                MotionEvent.ACTION_UP -> {
-                    binding.previousPhoto.visibility = View.INVISIBLE
-                    true
-                }
-                else -> false
             }
         }
-
         // If no project photo was passed hide the quick compare
-        if (args.photo == null) binding.quickCompareFab.hide()
+        else if (args.photo == null) binding.quickCompareFab.hide()
 
         mTakePictureFab?.setOnClickListener {
             it.isEnabled = false
