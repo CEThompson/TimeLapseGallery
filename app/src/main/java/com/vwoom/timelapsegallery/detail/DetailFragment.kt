@@ -791,6 +791,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         // This also keeps track of the list of photos to pass to the details recycler view
         // Lastly this updates UI showing the date range for photos and the progress bar max
         detailViewModel.photos.observe(viewLifecycleOwner, Observer { photoEntries: List<PhotoEntry> ->
+            // Entries should only be possibly empty if deleting the project
+            if (photoEntries.isEmpty()) return@Observer
+
             // Update the recycler view
             photos = photoEntries
             detailAdapter?.submitList(photoEntries)
