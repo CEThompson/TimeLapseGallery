@@ -8,14 +8,13 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
+import com.vwoom.timelapsegallery.utils.InjectorUtils
 import java.io.File
-import javax.inject.Inject
 
 class GifWorker(context: Context, params: WorkerParameters)
     : Worker(context, params) {
 
-    @Inject
-    lateinit var projectRepository: ProjectRepository
+    private lateinit var projectRepository: ProjectRepository
 
     override fun doWork(): Result {
         Log.d(TAG, "Gif Worker Tracker: Executing work")
@@ -37,6 +36,7 @@ class GifWorker(context: Context, params: WorkerParameters)
         }
 
         // Loop through projects and update projects which have gifs
+        projectRepository = InjectorUtils.getProjectRepository(applicationContext)
         val projects = projectRepository.getAllProjects()
         for (project in projects) {
             val gif = GifUtils.getGifForProject(externalFilesDir, project)

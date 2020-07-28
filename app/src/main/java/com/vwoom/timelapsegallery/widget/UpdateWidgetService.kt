@@ -7,18 +7,17 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
+import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.widget.WidgetProvider.Companion.updateWidgets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 class UpdateWidgetService
     : IntentService("UpdateWidgetService"), CoroutineScope {
 
-    @Inject
-    lateinit var projectRepository: ProjectRepository
+    private lateinit var projectRepository: ProjectRepository
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
@@ -33,8 +32,9 @@ class UpdateWidgetService
     }
 
     private fun updateWidgets() {
-        launch{
+        launch {
             // Get the list of all scheduled projects from the database
+            projectRepository = InjectorUtils.getProjectRepository(applicationContext)
             val allScheduledProjects = projectRepository.getScheduledProjectViews()
 
             // Update the widgets
