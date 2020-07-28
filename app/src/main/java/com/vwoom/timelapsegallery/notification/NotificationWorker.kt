@@ -7,17 +7,17 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
-import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
+import javax.inject.Inject
 
 class NotificationWorker(context: Context, params: WorkerParameters)
     : Worker(context, params) {
+
+    @Inject
     lateinit var projectRepository: ProjectRepository
 
     override fun doWork(): Result {
         Log.d(TAG, "Notification Tracker: Executing work")
-
-        projectRepository = InjectorUtils.getProjectRepository(applicationContext)
 
         val notificationAlarm = NotificationAlarm()
         notificationAlarm.cancelAlarms(applicationContext)

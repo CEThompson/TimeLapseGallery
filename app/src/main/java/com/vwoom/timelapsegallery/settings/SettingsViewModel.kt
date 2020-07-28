@@ -6,8 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.utils.ImportUtils
+import javax.inject.Inject
 
-class SettingsViewModel : ViewModel() {
+class SettingsViewModel @Inject constructor() : ViewModel() {
 
     // Sync state
     var syncing: Boolean = false
@@ -41,6 +42,7 @@ class SettingsViewModel : ViewModel() {
             val validatedList = (response as ValidationResult.Success<List<ImportUtils.ProjectDataBundle>>).data
             ImportUtils.importProjects(TimeLapseDatabase.getInstance(context), externalFilesDir!!, validatedList)
             syncing = false
+            showingSyncDialog = true
         }
     }
 

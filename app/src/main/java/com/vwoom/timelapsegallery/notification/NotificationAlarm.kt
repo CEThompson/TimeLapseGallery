@@ -8,16 +8,22 @@ import android.content.Intent
 import android.os.PowerManager
 import android.util.Log
 import com.vwoom.timelapsegallery.BuildConfig
+import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.notification.NotificationUtils.clearPreviousNotifications
 import com.vwoom.timelapsegallery.notification.NotificationUtils.convertDayOfYearToNotificationTime
 import com.vwoom.timelapsegallery.notification.NotificationUtils.notifyUserOfScheduledProjects
-import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
 class NotificationAlarm : BroadcastReceiver() {
+
+    @Inject
+    lateinit var projectRepository: ProjectRepository
+
     // This receives the pending intent broadcast from the notification alarm and creates a notification
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(TAG, "Notification Tracker: Receiving intent to create notification")
@@ -35,10 +41,9 @@ class NotificationAlarm : BroadcastReceiver() {
         // Clear any previous notifications that are unused
         clearPreviousNotifications(context)
 
-        GlobalScope.launch{
+        GlobalScope.launch(Dispatchers.IO){
             // Get the scheduled projects and figure out if any projects are due today
-            val projectRepo = InjectorUtils.getProjectRepository(context)
-            val scheduledProjects = projectRepo.getScheduledProjectViews()
+            val scheduledProjects = projectRepository.getScheduledProjectViews()
             val dueProjects = scheduledProjects.filter {
                 ProjectUtils.isProjectDueToday(it)
             }

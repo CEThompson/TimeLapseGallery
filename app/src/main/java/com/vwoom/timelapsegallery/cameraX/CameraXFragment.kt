@@ -22,12 +22,13 @@ import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.common.util.concurrent.ListenableFuture
 import com.vwoom.timelapsegallery.databinding.FragmentCameraXBinding
+import com.vwoom.timelapsegallery.di.ViewModelFactory
 import com.vwoom.timelapsegallery.utils.FileUtils
-import com.vwoom.timelapsegallery.utils.InjectorUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
 // Arbitrary number to keep track of permission request
 private const val REQUEST_CODE_PERMISSIONS = 10
@@ -51,8 +52,12 @@ class CameraXFragment : Fragment(), LifecycleOwner {
 
     private val args: CameraXFragmentArgs by navArgs()
 
+    //@Inject
+    // todo inject viewmodel factory if using camera x
+    lateinit var viewModelFactory: ViewModelFactory
     private val cameraViewModel: CameraXViewModel by viewModels {
-        InjectorUtils.provideCameraXViewModelFactory(requireActivity(), args.photo, args.projectView)
+        viewModelFactory
+        //InjectorUtils.provideCameraXViewModelFactory(requireActivity(), args.photo, args.projectView)
     }
 
     private var mLastClickTime: Long? = null

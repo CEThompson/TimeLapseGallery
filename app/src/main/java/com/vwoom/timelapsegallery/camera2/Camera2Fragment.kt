@@ -34,15 +34,17 @@ import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
 import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
 import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
+import com.vwoom.timelapsegallery.di.Injectable
+import com.vwoom.timelapsegallery.di.ViewModelFactory
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.FileUtils
-import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
 import java.io.FileOutputStream
+import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -53,7 +55,7 @@ private const val REQUEST_CODE_PERMISSIONS = 10
 // Array of all permissions specified in the manifest
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
-class Camera2Fragment : Fragment(), LifecycleOwner {
+class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
 
     private val args: Camera2FragmentArgs by navArgs()
     private val cameraId: String by lazy { args.cameraId }
@@ -78,8 +80,12 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
     private var baseHeight: Int = 0
 
     private var takePictureJob: Job? = null
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
     private val camera2ViewModel: Camera2ViewModel by viewModels {
-        InjectorUtils.provideCamera2ViewModelFactory(requireActivity(), args.photo, args.projectView)
+        //InjectorUtils.provideCamera2ViewModelFactory(requireActivity(), args.photo, args.projectView)
+        viewModelFactory
     }
     private var mTakePictureFab: FloatingActionButton? = null
 
@@ -183,6 +189,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        camera2ViewModel.setProjectInfo(args.projectView, args.photo)
+
         viewFinder.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
             override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
                 Log.d(TAG, "onSurfaceTextureAvailable called with to width $width and height $height")

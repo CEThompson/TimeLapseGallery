@@ -20,7 +20,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -34,13 +33,12 @@ import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.di.Injectable
-import com.vwoom.timelapsegallery.di.TlgViewModelFactory
+import com.vwoom.timelapsegallery.di.ViewModelFactory
 import com.vwoom.timelapsegallery.location.SingleShotLocationProvider
 import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.weather.WeatherChartDialog
 import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
 import com.vwoom.timelapsegallery.weather.WeatherResult
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 
@@ -50,7 +48,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
     private val args: GalleryFragmentArgs by navArgs()
 
     @Inject
-    internal lateinit var viewModelFactory: TlgViewModelFactory
+    internal lateinit var viewModelFactory: ViewModelFactory
     private val galleryViewModel: GalleryViewModel by viewModels {
         viewModelFactory
     }

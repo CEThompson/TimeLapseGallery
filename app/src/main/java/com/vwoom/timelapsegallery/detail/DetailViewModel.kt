@@ -46,7 +46,7 @@ class DetailViewModel @Inject constructor(
     var maxIndex: Int = Integer.MAX_VALUE
 
     // TODO (1.2): inject properly
-    fun injectProjectId(id: Long) {
+    fun setProject(id: Long) {
         projectId = id
         projectView = projectRepository.getProjectViewLiveData(projectId)
         photos = projectRepository.getProjectPhotosLiveData(projectId)

@@ -24,20 +24,26 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.di.Injectable
+import com.vwoom.timelapsegallery.di.ViewModelFactory
 import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.ImportUtils
-import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.utils.RESERVED_CHARACTERS
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import javax.inject.Inject
 
 // TODO (1.3): consider allowing for adjustment of gallery columns
-class SettingsFragment : PreferenceFragmentCompat() {
+class SettingsFragment : PreferenceFragmentCompat(), Injectable {
     private var prefs: SharedPreferences? = null
     private var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
+
+    @Inject
+    lateinit var viewmodelFactory: ViewModelFactory
     private val settingsViewModel: SettingsViewModel by viewModels {
-        InjectorUtils.provideSettingsViewModelFactory()
+        //InjectorUtils.provideSettingsViewModelFactory()
+        viewmodelFactory
     }
 
     // Dialogs
@@ -62,6 +68,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
         createSyncDialog()
         createVerifyProjectImportDialog()
         createManualFileModificationDialog()
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         // Restore dialog state from view model
         if (settingsViewModel.syncing) {
@@ -73,12 +88,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
         if (settingsViewModel.showingFileModDialog) showFileModificationDialog()
         if (settingsViewModel.showingVerifySyncDialog) showVerifyProjectImportDialog()
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setupViewModel()
-        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onAttach(context: Context) {

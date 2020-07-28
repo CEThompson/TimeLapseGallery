@@ -50,8 +50,7 @@ import com.vwoom.timelapsegallery.detail.dialog.InfoDialog
 import com.vwoom.timelapsegallery.detail.dialog.ScheduleDialog
 import com.vwoom.timelapsegallery.detail.dialog.TagDialog
 import com.vwoom.timelapsegallery.di.Injectable
-import com.vwoom.timelapsegallery.di.TlgViewModelFactory
-import com.vwoom.timelapsegallery.gallery.GalleryViewModel
+import com.vwoom.timelapsegallery.di.ViewModelFactory
 import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
@@ -61,7 +60,6 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectV
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -76,7 +74,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     private val args: DetailFragmentArgs by navArgs()
 
     @Inject
-    internal lateinit var viewModelFactory: TlgViewModelFactory
+    internal lateinit var viewModelFactory: ViewModelFactory
     private val detailViewModel: DetailViewModel by viewModels {
         viewModelFactory
     }
@@ -256,10 +254,9 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        detailViewModel.injectProjectId(args.clickedProjectView.project_id)
+        detailViewModel.setProject(args.clickedProjectView.project_id)
         // Finally set up the observables
         setupViewModel()
-
     }
 
     private fun lazyShowInfoDialog() {

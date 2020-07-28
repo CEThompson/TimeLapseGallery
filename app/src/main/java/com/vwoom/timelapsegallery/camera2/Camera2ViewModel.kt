@@ -5,12 +5,19 @@ import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.data.view.Photo
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import java.io.File
+import javax.inject.Inject
 
-class Camera2ViewModel(
-        private val projectRepository: ProjectRepository,
-        val photo: Photo?,
-        val projectView: ProjectView?
-) : ViewModel() {
+class Camera2ViewModel @Inject constructor(
+        private val projectRepository: ProjectRepository) : ViewModel() {
+
+    var photo: Photo? = null
+    var projectView: ProjectView? = null
+
+    fun setProjectInfo(projectView: ProjectView?, photo: Photo?){
+        this.photo = photo
+        this.projectView = projectView
+    }
+
     // Returns a project view for navigation
     suspend fun addNewProject(file: File, externalFilesDir: File, timestamp: Long): ProjectView {
         return projectRepository.newProject(file, externalFilesDir, timestamp, 0)
@@ -18,8 +25,9 @@ class Camera2ViewModel(
 
     // Adds the photo to the current project
     suspend fun addPhotoToProject(file: File, externalFilesDir: File, timestamp: Long) {
-        projectView ?: return
-        projectRepository.addPhotoToProject(file, externalFilesDir, projectView, timestamp)
+        projectView?.let {
+            projectRepository.addPhotoToProject(file, externalFilesDir, it, timestamp)
+        }
     }
 
 }

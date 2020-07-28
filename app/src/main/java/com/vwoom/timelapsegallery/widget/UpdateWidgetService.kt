@@ -6,15 +6,19 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.widget.WidgetProvider.Companion.updateWidgets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 class UpdateWidgetService
     : IntentService("UpdateWidgetService"), CoroutineScope {
+
+    @Inject
+    lateinit var projectRepository: ProjectRepository
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
@@ -29,18 +33,15 @@ class UpdateWidgetService
     }
 
     private fun updateWidgets() {
-        val context = applicationContext
-        launch {
-            // Retrieve the database
-            val projectRepository = InjectorUtils.getProjectRepository(context)
+        launch{
             // Get the list of all scheduled projects from the database
             val allScheduledProjects = projectRepository.getScheduledProjectViews()
 
             // Update the widgets
-            val appWidgetManager = AppWidgetManager.getInstance(context)
-            val appWidgetIds: IntArray = appWidgetManager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java))
+            val appWidgetManager = AppWidgetManager.getInstance(applicationContext)
+            val appWidgetIds: IntArray = appWidgetManager.getAppWidgetIds(ComponentName(applicationContext, WidgetProvider::class.java))
             updateWidgets(
-                    context,
+                    applicationContext,
                     appWidgetManager,
                     appWidgetIds,
                     allScheduledProjects) // Send the list of all scheduled projects
