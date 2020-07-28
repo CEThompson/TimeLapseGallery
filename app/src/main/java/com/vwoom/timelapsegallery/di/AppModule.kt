@@ -10,8 +10,8 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module
-class DataModule {
+@Module(includes = [ViewModelModule::class])
+class AppModule {
     /*@Provides
     fun provideSharedPreferences(
             app: Application

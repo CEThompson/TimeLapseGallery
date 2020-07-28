@@ -1,33 +1,26 @@
 package com.vwoom.timelapsegallery
 
+import android.app.Activity
 import android.app.Application
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
-import com.vwoom.timelapsegallery.di.AppComponent
-import com.vwoom.timelapsegallery.di.DaggerAppComponent
+import com.vwoom.timelapsegallery.di.AppInjector
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
+import dagger.android.HasActivityInjector
 import javax.inject.Inject
 
 // TODO: fix dagger injection or convert to koin
-class TimeLapseGalleryApplication : Application(), CameraXConfig.Provider, HasAndroidInjector {
+class TimeLapseGalleryApplication : Application(), CameraXConfig.Provider, HasActivityInjector {
 
     @Inject
-    lateinit var androidInjector: DispatchingAndroidInjector<Any>
+    lateinit var androidInjector: DispatchingAndroidInjector<Activity>
 
-    override fun androidInjector(): AndroidInjector<Any> {
-        return androidInjector
-    }
+    override fun activityInjector(): AndroidInjector<Activity> = androidInjector
 
     override fun onCreate() {
-        val component: AppComponent = DaggerAppComponent.builder()
-                .application(this)
-                .context(this)
-                .build()
-        component.inject(this)
-
         super.onCreate()
+        AppInjector.init(this)
     }
 
     override fun getCameraXConfig(): CameraXConfig {

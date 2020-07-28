@@ -18,7 +18,9 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -31,6 +33,8 @@ import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
+import com.vwoom.timelapsegallery.di.Injectable
+import com.vwoom.timelapsegallery.di.TlgViewModelFactory
 import com.vwoom.timelapsegallery.location.SingleShotLocationProvider
 import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.weather.WeatherChartDialog
@@ -41,33 +45,36 @@ import javax.inject.Inject
 
 
 // TODO (update 1.3): optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
-class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
+class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler, Injectable {
 
     private val args: GalleryFragmentArgs by navArgs()
 
     @Inject
-    lateinit var mGalleryViewModel: GalleryViewModel
+    internal lateinit var viewModelFactory: TlgViewModelFactory
+    private val galleryViewModel: GalleryViewModel by viewModels {
+        viewModelFactory
+    }
 
     // Recyclerview
-    private var mGalleryRecyclerView: RecyclerView? = null
-    private var mGalleryAdapter: GalleryAdapter? = null
-    private var mGridLayoutManager: StaggeredGridLayoutManager? = null
+    private var galleryRecyclerView: RecyclerView? = null
+    private var galleryAdapter: GalleryAdapter? = null
+    private var gridLayoutManager: StaggeredGridLayoutManager? = null
 
     // UI
     private var binding: FragmentGalleryBinding? = null
     private var toolbar: Toolbar? = null
-    private var mAddProjectFAB: FloatingActionButton? = null
-    private var mSearchCancelFAB: FloatingActionButton? = null
+    private var addProjectFAB: FloatingActionButton? = null
+    private var searchCancelFAB: FloatingActionButton? = null
 
     // Searching
-    private var mSearchDialog: SearchDialog? = null
+    private var searchDialog: SearchDialog? = null
 
     // Weather
-    private var mWeatherChartDialog: WeatherChartDialog? = null
-    private var mWeatherDetailsDialog: WeatherDetailsDialog? = null
-    private var mLocation: Location? = null
+    private var weatherChartDialog: WeatherChartDialog? = null
+    private var weatherDetailsDialog: WeatherDetailsDialog? = null
+    private var location: Location? = null
 
-    private var mNumberOfColumns = PORTRAIT_COLUMN_COUNT
+    private var numberOfColumns = PORTRAIT_COLUMN_COUNT
 
     // Transitions
     private lateinit var galleryExitTransition: Transition
@@ -96,7 +103,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         super.onCreate(savedInstanceState)
 
         // Inject dependencies for fragment
-        AndroidSupportInjection.inject(this)
+        //AndroidSupportInjection.inject(this)
+        //galleryViewModel = ViewModelProvider(this, viewModelFactory).get(GalleryViewModel::class.java)
 
         galleryReenterTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
         galleryReenterTransition.addListener(reenterListener)
@@ -120,8 +128,8 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
 
         // Increase columns for horizontal orientation
         when (resources.configuration.orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> mNumberOfColumns = LANDSCAPE_COLUMN_COUNT
-            Configuration.ORIENTATION_PORTRAIT -> mNumberOfColumns = PORTRAIT_COLUMN_COUNT
+            Configuration.ORIENTATION_LANDSCAPE -> numberOfColumns = LANDSCAPE_COLUMN_COUNT
+            Configuration.ORIENTATION_PORTRAIT -> numberOfColumns = PORTRAIT_COLUMN_COUNT
         }
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -131,31 +139,31 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Set up the adapter for the recycler view
         try {
             val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-            mGalleryAdapter = GalleryAdapter(this, externalFilesDir, schedulesDisplayed, gifsDisplayed)
+            galleryAdapter = GalleryAdapter(this, externalFilesDir, schedulesDisplayed, gifsDisplayed)
         } catch (e: KotlinNullPointerException) {
             // TODO: navigate to failure layout
             Toast.makeText(requireContext(), getString(R.string.error_retrieving_files_dir), Toast.LENGTH_LONG).show()
         }
         // Set up the recycler view
-        mGridLayoutManager = StaggeredGridLayoutManager(mNumberOfColumns, StaggeredGridLayoutManager.VERTICAL)
-        mGalleryRecyclerView = binding?.galleryRecyclerView
-        mGalleryRecyclerView?.apply {
-            layoutManager = mGridLayoutManager
+        gridLayoutManager = StaggeredGridLayoutManager(numberOfColumns, StaggeredGridLayoutManager.VERTICAL)
+        galleryRecyclerView = binding?.galleryRecyclerView
+        galleryRecyclerView?.apply {
+            layoutManager = gridLayoutManager
             setHasFixedSize(false)
-            adapter = mGalleryAdapter
+            adapter = galleryAdapter
             postponeEnterTransition()
         }
 
-        mGalleryRecyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        galleryRecyclerView?.viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 startPostponedEnterTransition()
-                mGalleryRecyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+                galleryRecyclerView?.viewTreeObserver?.removeOnGlobalLayoutListener(this)
             }
         })
 
         // Set up navigation to add new projects
-        mAddProjectFAB = binding?.addProjectFAB
-        mAddProjectFAB?.setOnClickListener {
+        addProjectFAB = binding?.addProjectFAB
+        addProjectFAB?.setOnClickListener {
             // Skip the gallery fade out transition When navigating to the camera
             exitTransition = null
             reenterTransition = null
@@ -169,19 +177,19 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             }
         }
 
-        mSearchCancelFAB = binding?.searchActiveIndicator
-        mSearchCancelFAB?.setOnClickListener {
-            mGalleryViewModel.userClickedToStopSearch = true
-            mGalleryViewModel.clearSearch()
-            mSearchDialog?.updateSearchDialog()
+        searchCancelFAB = binding?.searchActiveIndicator
+        searchCancelFAB?.setOnClickListener {
+            galleryViewModel.userClickedToStopSearch = true
+            galleryViewModel.clearSearch()
+            searchDialog?.updateSearchDialog()
         }
 
         setupViewModel()
 
         // Launch with search filter if set from the notification
-        if (args.searchLaunchDue && !mGalleryViewModel.userClickedToStopSearch) {
-            mGalleryViewModel.searchType = SEARCH_TYPE_DUE_TODAY
-            mGalleryViewModel.setSearch()
+        if (args.searchLaunchDue && !galleryViewModel.userClickedToStopSearch) {
+            galleryViewModel.searchType = SEARCH_TYPE_DUE_TODAY
+            galleryViewModel.setSearch()
         }
 
         return binding?.root
@@ -195,11 +203,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.search_option -> {
-                if (mSearchDialog == null) {
-                    mSearchDialog = SearchDialog(requireContext(), mGalleryViewModel)
+                if (searchDialog == null) {
+                    searchDialog = SearchDialog(requireContext(), galleryViewModel)
                 }
-                mSearchDialog?.show()
-                mGalleryViewModel.searchDialogShowing = true
+                searchDialog?.show()
+                galleryViewModel.searchDialogShowing = true
                 true
             }
             R.id.settings_option -> {
@@ -208,14 +216,14 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
                 true
             }
             R.id.weather_option -> {
-                if (mWeatherChartDialog == null) {
+                if (weatherChartDialog == null) {
                     initializeWeatherChartDialog()
-                    getLocationAndExecute { mGalleryViewModel.getForecast(mLocation) }
-                } else if (mGalleryViewModel.weather.value !is WeatherResult.TodaysForecast) {
-                    getLocationAndExecute { mGalleryViewModel.getForecast(mLocation) }
+                    getLocationAndExecute { galleryViewModel.getForecast(location) }
+                } else if (galleryViewModel.weather.value !is WeatherResult.TodaysForecast) {
+                    getLocationAndExecute { galleryViewModel.getForecast(location) }
                 }
-                mWeatherChartDialog?.show()
-                mGalleryViewModel.weatherChartDialogShowing = true
+                weatherChartDialog?.show()
+                galleryViewModel.weatherChartDialogShowing = true
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -225,42 +233,42 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     override fun onResume() {
         super.onResume()
         // Re-enable the recycler view
-        mGalleryRecyclerView?.isEnabled = true
+        galleryRecyclerView?.isEnabled = true
 
         // Restore any dialogs
-        if (mGalleryViewModel.searchDialogShowing) {
-            mSearchDialog = SearchDialog(requireContext(), mGalleryViewModel)
-            mSearchDialog?.show()
+        if (galleryViewModel.searchDialogShowing) {
+            searchDialog = SearchDialog(requireContext(), galleryViewModel)
+            searchDialog?.show()
         }
-        if (mGalleryViewModel.weatherChartDialogShowing) {
+        if (galleryViewModel.weatherChartDialogShowing) {
             initializeWeatherChartDialog()
-            mWeatherChartDialog?.show()
+            weatherChartDialog?.show()
         }
-        if (mGalleryViewModel.weatherDetailsDialogShowing) {
-            mWeatherDetailsDialog = WeatherDetailsDialog(requireContext(), mGalleryViewModel)
-            mWeatherDetailsDialog?.show()
+        if (galleryViewModel.weatherDetailsDialogShowing) {
+            weatherDetailsDialog = WeatherDetailsDialog(requireContext(), galleryViewModel)
+            weatherDetailsDialog?.show()
         }
     }
 
     override fun onPause() {
         super.onPause()
-        mSearchDialog?.dismiss()
-        mWeatherChartDialog?.dismiss()
-        mWeatherDetailsDialog?.dismiss()
+        searchDialog?.dismiss()
+        weatherChartDialog?.dismiss()
+        weatherDetailsDialog?.dismiss()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mGalleryRecyclerView = null
-        mAddProjectFAB = null
-        mSearchCancelFAB = null
-        mGridLayoutManager = null
-        mGalleryAdapter = null
+        galleryRecyclerView = null
+        addProjectFAB = null
+        searchCancelFAB = null
+        gridLayoutManager = null
+        galleryAdapter = null
         toolbar = null
         binding = null
-        mSearchDialog = null
-        mWeatherDetailsDialog = null
-        mWeatherChartDialog = null
+        searchDialog = null
+        weatherDetailsDialog = null
+        weatherChartDialog = null
     }
 
     /**
@@ -268,34 +276,34 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
      */
     private fun setupViewModel() {
         // Observe the entire list projects in the database
-        mGalleryViewModel.projects.observe(viewLifecycleOwner, Observer { _ ->
+        galleryViewModel.projects.observe(viewLifecycleOwner, Observer { _ ->
             // Update the displayed projects by filtering all projects
             // Note: default filter is none and currentProjects will simply display
-            mGalleryViewModel.filterProjects()
+            galleryViewModel.filterProjects()
         })
 
         // Observe the projects to be displayed after filtration
-        mGalleryViewModel.displayedProjectViews.observe(viewLifecycleOwner, Observer {
-            mGalleryAdapter?.submitList(it)
+        galleryViewModel.displayedProjectViews.observe(viewLifecycleOwner, Observer {
+            galleryAdapter?.submitList(it)
         })
 
         // Observe the search state
         // This will hide and display the search cancel fab if search filter options are not default (no tags, no search string, no due dates)
-        mGalleryViewModel.search.observe(viewLifecycleOwner, Observer {
-            if (it) mSearchCancelFAB?.show() else mSearchCancelFAB?.hide()
+        galleryViewModel.search.observe(viewLifecycleOwner, Observer {
+            if (it) searchCancelFAB?.show() else searchCancelFAB?.hide()
         })
 
         // Observe the weather response saved in the database
         // This may be WeatherResponse.NoData, WeatherResponse.Loading, WeatherResponse.Cached, WeatherResponse.TodaysForecast
-        mGalleryViewModel.weather.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.weather.observe(viewLifecycleOwner, Observer {
             // Display the data from the response in the dialogs
-            mWeatherChartDialog?.handleWeatherChart(it)
-            mWeatherDetailsDialog?.handleWeatherResult(it)
+            weatherChartDialog?.handleWeatherChart(it)
+            weatherDetailsDialog?.handleWeatherResult(it)
         })
 
         // Watch the tags to update the search dialog
-        mGalleryViewModel.tags.observe(viewLifecycleOwner, Observer {
-            mSearchDialog?.updateSearchDialog()
+        galleryViewModel.tags.observe(viewLifecycleOwner, Observer {
+            searchDialog?.updateSearchDialog()
         })
     }
 
@@ -303,27 +311,27 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
      * Search Dialog methods
      */
     private fun initializeWeatherChartDialog() {
-        mWeatherChartDialog = WeatherChartDialog(requireContext(), mGalleryViewModel)
+        weatherChartDialog = WeatherChartDialog(requireContext(), galleryViewModel)
         // Set click listener to get device location and forecast, otherwise get local cache if available
-        mWeatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
-            mGalleryViewModel.setLoading()
+        weatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
+            galleryViewModel.setLoading()
             getLocationAndExecute {
                 try {
-                    mGalleryViewModel.updateForecast(mLocation!!)
+                    galleryViewModel.updateForecast(location!!)
                 } catch (e: KotlinNullPointerException) {
-                    mGalleryViewModel.getForecast(null)
+                    galleryViewModel.getForecast(null)
                     Toast.makeText(requireContext(), getString(R.string.no_location_error), Toast.LENGTH_SHORT).show()
                 }
             }
         }
         // Set click listener to show the details dialog
-        mWeatherChartDialog?.findViewById<TextView>(R.id.show_weather_details_tv)?.setOnClickListener {
-            mWeatherChartDialog?.cancel()
-            if (mWeatherDetailsDialog == null) {
-                mWeatherDetailsDialog = WeatherDetailsDialog(requireContext(), mGalleryViewModel)
+        weatherChartDialog?.findViewById<TextView>(R.id.show_weather_details_tv)?.setOnClickListener {
+            weatherChartDialog?.cancel()
+            if (weatherDetailsDialog == null) {
+                weatherDetailsDialog = WeatherDetailsDialog(requireContext(), galleryViewModel)
             }
-            mGalleryViewModel.weatherDetailsDialogShowing = true
-            mWeatherDetailsDialog?.show()
+            galleryViewModel.weatherDetailsDialogShowing = true
+            weatherDetailsDialog?.show()
         }
     }
 
@@ -347,7 +355,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             // If gps permissions have been granted:
             // If neither network or gps available, inform the user to activate location services
             if (!gpsEnabled && !networkEnabled) {
-                mGalleryViewModel.getForecast(null)
+                galleryViewModel.getForecast(null)
                 Toast.makeText(requireContext(), getString(R.string.enable_location_resources), Toast.LENGTH_LONG).show()
             }
             // Otherwise request a single shot location
@@ -355,7 +363,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
             else {
                 SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
                     override fun onNewLocationAvailable(location: Location?) {
-                        mLocation = location
+                        this@GalleryFragment.location = location
                         toExecute.invoke()
                     }
                 })
@@ -370,9 +378,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     // Navigates to the clicked project
     override fun onClick(clickedProjectView: ProjectView, binding: GalleryRecyclerviewItemBinding, position: Int) {
         // Only execute if recycler view is enabled
-        if (mGalleryRecyclerView?.isEnabled == false) return
+        if (galleryRecyclerView?.isEnabled == false) return
         // Disable the recycler view to prevent double clicks
-        else mGalleryRecyclerView?.isEnabled = false
+        else galleryRecyclerView?.isEnabled = false
 
         // Restore the exit transition if it has been nullified by navigating to the add project fab
         if (exitTransition == null)
@@ -382,7 +390,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
         // Navigate to the detail fragment
         val action = GalleryFragmentDirections.actionGalleryFragmentToDetailsFragment(clickedProjectView)
         val extras = FragmentNavigatorExtras(
-                mAddProjectFAB as View to getString(R.string.key_add_transition),
+                addProjectFAB as View to getString(R.string.key_add_transition),
                 binding.projectImage to binding.projectImage.transitionName,
                 binding.projectCardView to binding.projectCardView.transitionName,
                 binding.galleryBottomGradient to binding.galleryBottomGradient.transitionName,
@@ -400,13 +408,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
         val recyclerState: Parcelable? = savedInstanceState?.getParcelable(BUNDLE_RECYCLER_LAYOUT)
-        mGalleryRecyclerView?.layoutManager?.onRestoreInstanceState(recyclerState)
+        galleryRecyclerView?.layoutManager?.onRestoreInstanceState(recyclerState)
     }
 
     // Save the scroll state of the recycler view
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mGalleryRecyclerView?.layoutManager?.onSaveInstanceState())
+        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, galleryRecyclerView?.layoutManager?.onSaveInstanceState())
     }
 
     /**
@@ -421,10 +429,10 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler 
     // Get the location and forecast on permission granted
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == GPS_REQUEST_CODE_PERMISSIONS && gpsPermissionsGranted()) {
-            getLocationAndExecute { mGalleryViewModel.getForecast(mLocation) }
+            getLocationAndExecute { galleryViewModel.getForecast(location) }
         } else {
             Toast.makeText(this.requireContext(), getString(R.string.permissions_required_for_forecast), Toast.LENGTH_SHORT).show()
-            mGalleryViewModel.forecastDenied()
+            galleryViewModel.forecastDenied()
         }
     }
 

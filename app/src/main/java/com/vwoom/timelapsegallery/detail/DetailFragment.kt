@@ -22,6 +22,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
@@ -48,6 +49,9 @@ import com.vwoom.timelapsegallery.detail.dialog.ConversionDialog
 import com.vwoom.timelapsegallery.detail.dialog.InfoDialog
 import com.vwoom.timelapsegallery.detail.dialog.ScheduleDialog
 import com.vwoom.timelapsegallery.detail.dialog.TagDialog
+import com.vwoom.timelapsegallery.di.Injectable
+import com.vwoom.timelapsegallery.di.TlgViewModelFactory
+import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
@@ -67,12 +71,15 @@ import javax.inject.Inject
 import kotlin.properties.Delegates
 
 // TODO: (update 1.3) implement pinch zoom on fullscreen image
-class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
+class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, Injectable {
 
     private val args: DetailFragmentArgs by navArgs()
 
     @Inject
-    lateinit var detailViewModel: DetailViewModel
+    internal lateinit var viewModelFactory: TlgViewModelFactory
+    private val detailViewModel: DetailViewModel by viewModels {
+        viewModelFactory
+    }
 
     private lateinit var mExternalFilesDir: File
     private var binding: FragmentDetailBinding? = null
@@ -128,8 +135,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
         // TODO (1.2) remove this poor injection pattern
         // Inject view model and its passed argument
-        AndroidSupportInjection.inject(this)
-        detailViewModel.injectProjectId(args.clickedProjectView.project_id)
+        //AndroidSupportInjection.inject(this)
+
 
         mCurrentProjectView = args.clickedProjectView
         mPlaybackInterval = getString(R.string.playback_interval_default).toLong()
@@ -245,11 +252,14 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler {
         binding?.detailScheduleLayout?.galleryGradientTopDown?.transitionName = "${transitionName}topGradient"
         binding?.detailScheduleLayout?.scheduleDaysUntilDueTv?.transitionName = "${transitionName}due"
         binding?.detailScheduleLayout?.scheduleIndicatorIntervalTv?.transitionName = "${transitionName}interval"
+        return binding?.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        detailViewModel.injectProjectId(args.clickedProjectView.project_id)
         // Finally set up the observables
         setupViewModel()
 
-        return binding?.root
     }
 
     private fun lazyShowInfoDialog() {
