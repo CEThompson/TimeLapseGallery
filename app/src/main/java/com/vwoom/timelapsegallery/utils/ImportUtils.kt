@@ -98,7 +98,7 @@ object ImportUtils {
     suspend fun importProjects(db: TimeLapseDatabase,
                                externalFilesDir: File,
                                projectBundles: List<ProjectDataBundle>,
-                               testing: Boolean = false) = withContext(Dispatchers.IO){
+                               testing: Boolean = false) {
 
         // Delete projects and tags in the database: should clear all tables by cascade
         db.projectDao().deleteAllProjects()
