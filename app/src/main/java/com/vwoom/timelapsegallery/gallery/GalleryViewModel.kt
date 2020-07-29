@@ -65,7 +65,7 @@ class GalleryViewModel
 
     init {
         viewModelScope.launch {
-            weather.value = weatherRepository.getForecast()
+            weather.value = weatherRepository.getCachedForecast()
         }
     }
 
@@ -89,11 +89,10 @@ class GalleryViewModel
     fun getForecast(location: Location?) {
         viewModelScope.launch {
             // Get the cached forecast
-            //weather.value = weatherRepository.getForecast()
+            weather.value = weatherRepository.getCachedForecast()
 
             // If it doesn't belong to today then try to update
             if (weather.value !is WeatherResult.TodaysForecast && location != null) {
-                //Log.d("WeatherDebug", "location is not null, calling update forecast")
                 updateForecast(location)
             }
         }
@@ -101,17 +100,17 @@ class GalleryViewModel
 
     // Attempts to update the forecast
     fun updateForecast(location: Location) {
+        weather.value = WeatherResult.Loading
         viewModelScope.launch {
             weather.value = weatherRepository.updateForecast(location)
-            //Log.d("WeatherDebug", "called update forecast")
         }
     }
 
-    fun setLoading() {
+    fun setForecastLoading() {
         weather.value = WeatherResult.Loading
     }
 
-    fun forecastDenied() {
+    fun setForecastNoData() {
         weather.value = WeatherResult.NoData()
     }
 

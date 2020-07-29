@@ -1,8 +1,8 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    >
-    <androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -12,9 +12,7 @@
             android:id="@+id/appbar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:gravity="top">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/gallery_fragment_toolbar"
@@ -34,36 +32,36 @@
             android:paddingTop="?attr/actionBarSize"
             app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
             app:spanCount="3"
-            tools:listitem="@layout/gallery_recyclerview_item"
-            />
+            tools:listitem="@layout/gallery_recyclerview_item" />
+
+
+        <!-- indicator for active search -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/search_active_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="@dimen/fab_size_plus_padding"
+            android:layout_marginBottom="@dimen/medium"
+            android:backgroundTint="@color/white"
+            android:contentDescription="@string/content_description_search_active_fab"
+            android:src="@drawable/ic_search_cancel_24dp"
+            android:visibility="invisible"
+            app:fabSize="normal"
+            tools:visibility="visible" />
 
         <!-- FAB to create a new project -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_project_FAB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
             android:contentDescription="@string/add_project_FAB_content_description"
             android:src="@drawable/ic_add_white_24dp"
             android:transitionName="gallery_add_fab"
-            app:fabSize="normal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
+            app:fabSize="normal" />
 
-        <!-- indicator for active search -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/search_active_indicator"
-            android:layout_margin="@dimen/fab_margin"
-            android:layout_width="wrap_content"
-            android:visibility="invisible"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/content_description_search_active_fab"
-            android:src="@drawable/ic_search_cancel_24dp"
-            android:backgroundTint="@color/white"
-            app:fabSize="normal"
-            app:layout_constraintEnd_toStartOf="@id/add_project_FAB"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

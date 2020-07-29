@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -27,6 +28,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.view.ProjectView
@@ -35,10 +37,10 @@ import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.di.Injectable
 import com.vwoom.timelapsegallery.di.ViewModelFactory
 import com.vwoom.timelapsegallery.location.SingleShotLocationProvider
+import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.weather.WeatherChartDialog
 import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
-import com.vwoom.timelapsegallery.weather.WeatherResult
 import javax.inject.Inject
 
 
@@ -209,18 +211,24 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
                 true
             }
             R.id.weather_option -> {
-                if (weatherChartDialog == null) {
-                    initializeWeatherChartDialog()
-                    getLocationAndExecute { galleryViewModel.getForecast(location) }
-                } else if (galleryViewModel.weather.value !is WeatherResult.TodaysForecast) {
-                    getLocationAndExecute { galleryViewModel.getForecast(location) }
+                // Request permissions before handling dialog
+                if (gpsPermissionsGranted()) {
+                    showWeatherDialog()
+                } else {
+                    requestPermissions(GPS_PERMISSIONS, GPS_REQUEST_CODE_PERMISSIONS)
                 }
-                weatherChartDialog?.show()
-                galleryViewModel.weatherChartDialogShowing = true
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun showWeatherDialog() {
+        if (weatherChartDialog == null) {
+            initializeWeatherChartDialog()
+        }
+        weatherChartDialog?.show()
+        galleryViewModel.weatherChartDialogShowing = true
     }
 
     override fun onResume() {
@@ -230,15 +238,16 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
 
         // Restore any dialogs
         if (galleryViewModel.searchDialogShowing) {
-            searchDialog = SearchDialog(requireContext(), galleryViewModel)
+            if (searchDialog == null)
+                searchDialog = SearchDialog(requireContext(), galleryViewModel)
             searchDialog?.show()
         }
         if (galleryViewModel.weatherChartDialogShowing) {
-            initializeWeatherChartDialog()
-            weatherChartDialog?.show()
+            showWeatherDialog()
         }
         if (galleryViewModel.weatherDetailsDialogShowing) {
-            weatherDetailsDialog = WeatherDetailsDialog(requireContext(), galleryViewModel)
+            if (weatherDetailsDialog == null)
+                weatherDetailsDialog = WeatherDetailsDialog(requireContext(), galleryViewModel)
             weatherDetailsDialog?.show()
         }
     }
@@ -269,7 +278,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
      */
     private fun setupViewModel() {
         // Observe the entire list projects in the database
-        galleryViewModel.projects.observe(viewLifecycleOwner, Observer { _ ->
+        galleryViewModel.projects.observe(viewLifecycleOwner, Observer {
             // Update the displayed projects by filtering all projects
             // Note: default filter is none and currentProjects will simply display
             galleryViewModel.filterProjects()
@@ -304,10 +313,11 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
      * Search Dialog methods
      */
     private fun initializeWeatherChartDialog() {
+        if (weatherChartDialog != null) return
         weatherChartDialog = WeatherChartDialog(requireContext(), galleryViewModel)
         // Set click listener to get device location and forecast, otherwise get local cache if available
         weatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
-            galleryViewModel.setLoading()
+            galleryViewModel.setForecastLoading()
             getLocationAndExecute {
                 try {
                     galleryViewModel.updateForecast(location!!)
@@ -326,6 +336,12 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
             galleryViewModel.weatherDetailsDialogShowing = true
             weatherDetailsDialog?.show()
         }
+
+        // Get / update the forecast
+        getLocationAndExecute {
+            galleryViewModel.getForecast(location)
+        }
+
     }
 
     // Gets the device location and executes a function passed as a parameter
@@ -344,16 +360,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
             false
         }
 
-        if (gpsPermissionsGranted()) {
-            // If gps permissions have been granted:
-            // If neither network or gps available, inform the user to activate location services
-            if (!gpsEnabled && !networkEnabled) {
-                galleryViewModel.getForecast(null)
-                Toast.makeText(requireContext(), getString(R.string.enable_location_resources), Toast.LENGTH_LONG).show()
-            }
-            // Otherwise request a single shot location
-            // and invoke the passed in function (forecast get or update) on success
-            else {
+        if (!gpsEnabled && !networkEnabled) {
+            galleryViewModel.getForecast(null)
+            Toast.makeText(requireContext(), getString(R.string.enable_location_resources), Toast.LENGTH_LONG).show()
+        }
+        // Otherwise request a single shot location
+        // and invoke the passed in function (forecast get or update) on success
+        else {
+            // TODO figure out how to test weather feature
+            galleryViewModel.viewModelScope.launchIdling {
                 SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
                     override fun onNewLocationAvailable(location: Location?) {
                         this@GalleryFragment.location = location
@@ -362,10 +377,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
                 })
             }
         }
-        // If gps permissions have not been granted request the permissions
-        else {
-            requestPermissions(GPS_PERMISSIONS, GPS_REQUEST_CODE_PERMISSIONS)
-        }
+
     }
 
     // Navigates to the clicked project
@@ -422,10 +434,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
     // Get the location and forecast on permission granted
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == GPS_REQUEST_CODE_PERMISSIONS && gpsPermissionsGranted()) {
-            getLocationAndExecute { galleryViewModel.getForecast(location) }
+            showWeatherDialog()
         } else {
-            Toast.makeText(this.requireContext(), getString(R.string.permissions_required_for_forecast), Toast.LENGTH_SHORT).show()
-            galleryViewModel.forecastDenied()
+            binding?.let {
+                val snackBar = Snackbar.make(it.mainLayout, getString(R.string.permissions_required_for_forecast),
+                        Snackbar.LENGTH_LONG)
+                snackBar.setAction(getString(R.string.allow)) { requestPermissions(GPS_PERMISSIONS, GPS_REQUEST_CODE_PERMISSIONS) }
+                snackBar.show()
+            }
+            galleryViewModel.setForecastNoData()
         }
     }
 

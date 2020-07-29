@@ -9,8 +9,8 @@ import javax.inject.Inject
 
 // TODO (1.2): test repository and local/remote data sources
 class WeatherRepository
-@Inject constructor (private val weatherLocalDataSource: WeatherLocalDataSource,
-                     private val weatherRemoteDataSource: WeatherRemoteDataSource) {
+@Inject constructor(private val weatherLocalDataSource: WeatherLocalDataSource,
+                    private val weatherRemoteDataSource: WeatherRemoteDataSource) {
 
     // This function calls the national weather service API to attempt to update the forecast stored in the database
     // Returns either (1) Weather Result: Update Success or (2) Weather Result: Update Failure
@@ -19,24 +19,23 @@ class WeatherRepository
         return if (remoteResponse is WeatherResult.TodaysForecast) {
             weatherLocalDataSource.cacheForecast(remoteResponse.data)
             WeatherResult.TodaysForecast(remoteResponse.data, remoteResponse.timestamp)
-        }
-        else {
+        } else {
             // Otherwise there was no response
             val noDataResponse = remoteResponse as WeatherResult.NoData
 
             // Return the cached response if exists
-            val cache = weatherLocalDataSource.getCache()
+            val cache = weatherLocalDataSource.getCachedWeather()
             if (cache is WeatherResult.CachedForecast)
                 WeatherResult.CachedForecast(cache.data, cache.timestamp, remoteResponse.exception, remoteResponse.message)
             else
-                // Otherwise return the failed update
+            // Otherwise return the failed update
                 noDataResponse
         }
     }
 
     // Retrieves the forecast from the database
     // Returns (1) Weather Result: No Data (2) Weather Result: Cached Forecast or (3) Weather Result: Today's Forecast
-    suspend fun getForecast(): WeatherResult<ForecastResponse> {
-        return weatherLocalDataSource.getWeather()  // Can be (2) cached or (3) today's forecast
+    suspend fun getCachedForecast(): WeatherResult<ForecastResponse> {
+        return weatherLocalDataSource.getCachedWeather()  // Can be (2) cached or (3) today's forecast
     }
 }

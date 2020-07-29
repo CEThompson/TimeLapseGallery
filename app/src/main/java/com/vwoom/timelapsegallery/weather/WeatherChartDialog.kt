@@ -32,7 +32,9 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
 
         // Set cancellation listeners
         this.setOnCancelListener { galleryViewModel.weatherChartDialogShowing = false }
-        this.findViewById<FloatingActionButton>(R.id.weather_chart_dialog_exit_fab).setOnClickListener { this.cancel() }
+        this.findViewById<FloatingActionButton>(R.id.weather_chart_dialog_exit_fab).setOnClickListener {
+            this.cancel()
+        }
 
         // Constrain the size of the chart to 80% of the smallest screen dimension
         val dm = context.resources.displayMetrics
@@ -106,7 +108,7 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
     private fun showWeatherNoData() {
         this.findViewById<TextView>(R.id.update_time_tv)?.text = context.getString(R.string.error_no_forecast_data)
         this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
-        this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString(R.string.forecast_error)
+        this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString(R.string.forecast_error, context.getString(R.string.error_no_forecast_data))
         this.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE

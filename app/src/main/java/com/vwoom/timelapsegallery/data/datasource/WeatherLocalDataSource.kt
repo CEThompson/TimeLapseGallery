@@ -15,7 +15,7 @@ class WeatherLocalDataSource
 @Inject constructor(private val weatherDao: WeatherDao) {
     // Gets the forecast from the database
     // Returns either (1) No Data (2) Today's Forecast or (3) A Cached Forecast
-    suspend fun getWeather(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO) {
+    suspend fun getCachedWeather(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO) {
         val weatherEntry: WeatherEntry? = weatherDao.getWeather()
         return@withContext if (weatherEntry == null) WeatherResult.NoData()
         else {
@@ -35,19 +35,6 @@ class WeatherLocalDataSource
                     WeatherResult.CachedForecast(localResponse, weatherEntry.timestamp)
                 }
             }
-        }
-    }
-
-    suspend fun getCache(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO) {
-        val weatherEntry: WeatherEntry? = weatherDao.getWeather()
-        return@withContext if (weatherEntry == null) WeatherResult.NoData()
-        else {
-            val localResponse: ForecastResponse? = moshi.adapter(ForecastResponse::class.java)
-                    .fromJson(weatherEntry.forecastJsonString)
-            if (localResponse != null)
-                WeatherResult.CachedForecast(localResponse, weatherEntry.timestamp)
-            else
-                WeatherResult.NoData()
         }
     }
 
