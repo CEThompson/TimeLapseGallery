@@ -20,10 +20,10 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 
-// TODO: look into errors running these database tests. What is the right way to test databases?
+// TODO: find out how to run these tests with coroutines
+// Note: Currently there is an error with coroutines 1.3.7 running these tests, reverting to 1.3.6 fixes this issue
 @RunWith(AndroidJUnit4ClassRunner::class)
 class FilesUtilsDbTest {
-
     @Rule
     @JvmField
     val testFolder = TemporaryFolder()

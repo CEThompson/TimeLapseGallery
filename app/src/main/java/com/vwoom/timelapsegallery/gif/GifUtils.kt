@@ -25,8 +25,8 @@ object GifUtils {
     // TODO (update 1.3): create control for framerate
     // TODO (update 1.3): create control for scale
     // Creates a .gif from the set of photos for a project
-    private fun makeGif(externalFilesDir: File, project: ProjectEntry, fps: Int = 14, scale: Int = 400) {
-        // Write the list of paths for the files to a text file for use by ffmpeb
+    fun makeGif(externalFilesDir: File, project: ProjectEntry, fps: Int = 14, scale: Int = 400) {
+        // Write the list of paths for the files to a text file for use by ffmpeg
         val listTextFile = FileUtils.createTempListPhotoFiles(externalFilesDir, project)
 
         // Get the meta directory for the project

@@ -3,9 +3,9 @@ package com.vwoom.timelapsegallery.utils
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
-import com.vwoom.timelapsegallery.utils.ProjectUtils.getGifForProject
+
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getPhotoEntriesInProjectDirectory
-import com.vwoom.timelapsegallery.utils.ProjectUtils.makeGif
+
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
 import org.junit.Test
@@ -198,35 +198,5 @@ class ProjectUtilsTest {
         assertTrue(isProjectDueTomorrow)
     }
 
-    // Makes sure a project with a gif does return a gif for the project
-    @Test
-    fun getGifForProject_GifExists(){
-        // Given a gif and a project
-        val project = ProjectEntry(1000, null)
-        val gifDir = File(externalFilesTestDir, FileUtils.GIF_FILE_SUBDIRECTORY)
-        if (!gifDir.exists()) gifDir.mkdir()
-        val makeGif = File(gifDir, "${project.id}.gif")
-        makeGif.mkdir()
-
-        // When we get the gif for the project
-        val gif = getGifForProject(externalFilesTestDir, project)
-
-        // It exists
-        assert (gif != null)
-        if (gif != null) assert(gif.exists())
-    }
-
-    // Makes sure a project with no gif does not return a gif for the project
-    @Test
-    fun getGifForProject_No_Gif(){
-        // Given a gif and a project
-        val project = ProjectEntry(1000, null)
-        // When we get the gif for the project
-        val gif = getGifForProject(externalFilesTestDir, project)
-
-        // It does not exist
-        assert(gif == null)
-
-    }
 
 }

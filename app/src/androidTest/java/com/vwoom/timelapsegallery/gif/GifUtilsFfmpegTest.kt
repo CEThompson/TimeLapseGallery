@@ -1,13 +1,15 @@
-package com.vwoom.timelapsegallery.utils
+package com.vwoom.timelapsegallery.gif
 
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.utils.FileUtils
+import com.vwoom.timelapsegallery.utils.ProjectUtils
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.File
 
-class FfmpegTest {
+class GifUtilsFfmpegTest {
 
     @Rule
     @JvmField
@@ -34,10 +36,31 @@ class FfmpegTest {
         }
 
         // When - we call the function to actually make the GIF
-        ProjectUtils.makeGif(externalFilesTestDir, project)
+        GifUtils.makeGif(externalFilesTestDir, project)
 
         // Then a gif for the project should exist
-        val gif = ProjectUtils.getGifForProject(externalFilesTestDir, project)
+        val gif = GifUtils.getGifForProject(externalFilesTestDir, project)
         assert (gif!= null)
+    }
+
+    @Test
+    fun updateGif() {
+        // Given a gif for a project
+        val project = ProjectEntry(1000, null)
+        val gifDir = File(externalFilesTestDir, FileUtils.GIF_FILE_SUBDIRECTORY)
+        if (!gifDir.exists()) gifDir.mkdir()
+        val makeGif = File(gifDir, "${project.id}.gif")
+        makeGif.mkdir()
+
+        val firstGif = GifUtils.getGifForProject(externalFilesTestDir, project)
+        assert(firstGif!=null)
+        if (firstGif == null) return
+
+        // When we update the gif
+        GifUtils.updateGif(externalFilesTestDir, project)
+
+        // It should not be the same file
+        val updatedGif = GifUtils.getGifForProject(externalFilesTestDir, project)
+        assert(firstGif != updatedGif)
     }
 }
