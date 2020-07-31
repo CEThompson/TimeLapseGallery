@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.DialogWeatherRecyclerviewItemBinding
-import com.vwoom.timelapsegallery.weather.WeatherUtils.getTimestampFromPeriod
-import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherIcon
+import com.vwoom.timelapsegallery.weather.WeatherUtils.getTimestampForDayFromPeriod
+import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherType
 
 
 class WeatherAdapter : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHolder>() {
@@ -48,10 +48,14 @@ class WeatherAdapter : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHol
             holder.binding.night.windSpeed.text = night.windSpeed
             holder.binding.night.description.text = night.shortForecast
             // Set the icon
-            holder.binding.night.icon.setImageDrawable(
-                    getWeatherIcon(holder.itemView.context,
-                            false, night.shortForecast,
-                            getTimestampFromPeriod(night)))
+
+            val type = getWeatherType(night.shortForecast)
+            val nightIcon = WeatherUtils.getWeatherIconResource(
+                    holder.itemView.context,
+                    weatherType = type,
+                    isDay = false,
+                    timestamp = getTimestampForDayFromPeriod(night.startTime))
+            holder.binding.night.icon.setImageDrawable(nightIcon)
 
             // Show the layout
             holder.binding.night.detailItemLayout.visibility = View.VISIBLE
@@ -67,9 +71,16 @@ class WeatherAdapter : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHol
             holder.binding.day.windDirection.text = day.windDirection
             holder.binding.day.windSpeed.text = day.windSpeed
             holder.binding.day.description.text = day.shortForecast
+
+
+            val type = getWeatherType(day.shortForecast)
+            val dayIcon = WeatherUtils.getWeatherIconResource(
+                    holder.itemView.context,
+                    weatherType = type,
+                    isDay = true,
+                    timestamp = getTimestampForDayFromPeriod(day.startTime))
             // Set the icon
-            holder.binding.day.icon.setImageDrawable(
-                    getWeatherIcon(holder.itemView.context, true, day.shortForecast, getTimestampFromPeriod(day)))
+            holder.binding.day.icon.setImageDrawable(dayIcon)
 
             // Show the layout
             holder.binding.day.detailItemLayout.visibility = View.VISIBLE

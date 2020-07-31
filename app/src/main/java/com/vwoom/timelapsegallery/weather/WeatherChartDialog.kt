@@ -19,8 +19,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 import com.vwoom.timelapsegallery.utils.TimeUtils
-import com.vwoom.timelapsegallery.weather.WeatherUtils.getTimestampFromPeriod
-import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherIcon
+import com.vwoom.timelapsegallery.weather.WeatherUtils.getTimestampForDayFromPeriod
+import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherType
 import java.text.DecimalFormat
 import java.util.*
 
@@ -133,12 +133,12 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
             for (i in periods.indices) {
                 weatherEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()))
                 // Handle icon per period
-                val drawable = getWeatherIcon(
-                        this.context,
+                val weatherType = getWeatherType(periods[i].shortForecast)
+                val icon = WeatherUtils.getWeatherIconResource(context,
                         periods[i].isDaytime,
-                        periods[i].shortForecast,
-                        getTimestampFromPeriod(periods[i]))
-                iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat() + 5f, drawable))
+                        weatherType,
+                        getTimestampForDayFromPeriod(periods[i].startTime))
+                iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat() + 5f, icon))
             }
 
             // Handle averages
@@ -160,7 +160,7 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
 
             // Get the day from the period and add it as the label
             for (i in 0 until periods.size - 1 step 1) {
-                val timestamp: Long? = getTimestampFromPeriod(periods[i])
+                val timestamp: Long? = getTimestampForDayFromPeriod(periods[i].startTime)
                 if (timestamp == null) {
                     axisLabels.add(((i / 2) + 1).toString()) // Fallback day number
                 } else {
