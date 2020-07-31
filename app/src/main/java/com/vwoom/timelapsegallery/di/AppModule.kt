@@ -3,7 +3,10 @@ package com.vwoom.timelapsegallery.di
 import android.app.Application
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.dao.*
-import com.vwoom.timelapsegallery.data.datasource.WeatherRemoteDataSource
+import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
+import com.vwoom.timelapsegallery.data.source.IWeatherRemoteDataSource
+import com.vwoom.timelapsegallery.data.source.WeatherLocalDataSource
+import com.vwoom.timelapsegallery.data.source.WeatherRemoteDataSource
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -19,8 +22,14 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideRemoteDataSource(): WeatherRemoteDataSource {
+    fun provideRemoteDataSource(): IWeatherRemoteDataSource {
         return WeatherRemoteDataSource()
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocalDataSource(db: TimeLapseDatabase): IWeatherLocalDataSource {
+        return WeatherLocalDataSource(db.weatherDao())
     }
 
     @Provides

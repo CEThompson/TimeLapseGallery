@@ -1,16 +1,18 @@
 package com.vwoom.timelapsegallery.data.repository
 
 import android.location.Location
-import com.vwoom.timelapsegallery.data.datasource.WeatherLocalDataSource
-import com.vwoom.timelapsegallery.data.datasource.WeatherRemoteDataSource
+import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
+import com.vwoom.timelapsegallery.data.source.IWeatherRemoteDataSource
+import com.vwoom.timelapsegallery.data.source.WeatherLocalDataSource
+import com.vwoom.timelapsegallery.data.source.WeatherRemoteDataSource
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import javax.inject.Inject
 
 // TODO (1.2): test repository and local/remote data sources
 class WeatherRepository
-@Inject constructor(private val weatherLocalDataSource: WeatherLocalDataSource,
-                    private val weatherRemoteDataSource: WeatherRemoteDataSource) {
+@Inject constructor(private val weatherLocalDataSource: IWeatherLocalDataSource,
+                    private val weatherRemoteDataSource: IWeatherRemoteDataSource) {
 
     // This function calls the national weather service API to attempt to update the forecast stored in the database
     // Returns either (1) Weather Result: Update Success or (2) Weather Result: Update Failure

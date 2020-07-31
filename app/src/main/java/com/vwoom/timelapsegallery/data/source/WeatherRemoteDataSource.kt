@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.data.datasource
+package com.vwoom.timelapsegallery.data.source
 
 import android.location.Location
 import com.vwoom.timelapsegallery.weather.ForecastLocationResponse
@@ -6,10 +6,16 @@ import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherApi.weatherService
 import com.vwoom.timelapsegallery.weather.WeatherResult
 
-class WeatherRemoteDataSource {
+interface IWeatherRemoteDataSource {
     // Get the forecast from the national weather service api
     // Returns either (1) Weather Result: No Data or (2) Weather Result: Today's Forecast
-    suspend fun getForecast(location: Location): WeatherResult<ForecastResponse> {
+    suspend fun getForecast(location: Location): WeatherResult<ForecastResponse>
+}
+
+class WeatherRemoteDataSource : IWeatherRemoteDataSource {
+    // Get the forecast from the national weather service api
+    // Returns either (1) Weather Result: No Data or (2) Weather Result: Today's Forecast
+    override suspend fun getForecast(location: Location): WeatherResult<ForecastResponse> {
         // 1. Get the url to query the forecast for this devices location
         val forecastLocationResponse: ForecastLocationResponse?
         try {

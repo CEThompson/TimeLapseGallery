@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.data.datasource
+package com.vwoom.timelapsegallery.data.source
 
 import android.text.format.DateUtils
 import com.vwoom.timelapsegallery.data.dao.WeatherDao
@@ -10,13 +10,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+interface IWeatherLocalDataSource {
+    // Gets the forecast from the database
+    // Returns either (1) No Data (2) Today's Forecast or (3) A Cached Forecast
+    suspend fun getCachedWeather(): WeatherResult<ForecastResponse>
+
+    // Saves the forecast as a json string to the database
+    suspend fun cacheForecast(forecastResponse: ForecastResponse)
+}
+
 // TODO (1.3): figure out how to properly handle blocking calls in coroutines
 @Suppress("BlockingMethodInNonBlockingContext")
 class WeatherLocalDataSource
-@Inject constructor(private val weatherDao: WeatherDao) {
+@Inject constructor(private val weatherDao: WeatherDao) : IWeatherLocalDataSource {
     // Gets the forecast from the database
     // Returns either (1) No Data (2) Today's Forecast or (3) A Cached Forecast
-    suspend fun getCachedWeather(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO) {
+    override suspend fun getCachedWeather(): WeatherResult<ForecastResponse> = withContext(Dispatchers.IO) {
         val weatherEntry: WeatherEntry? = weatherDao.getWeather()
         return@withContext if (weatherEntry == null) WeatherResult.NoData()
         else {
@@ -40,7 +49,7 @@ class WeatherLocalDataSource
     }
 
     // Saves the forecast as a json string to the database
-    suspend fun cacheForecast(forecastResponse: ForecastResponse) = withContext(Dispatchers.IO) {
+    override suspend fun cacheForecast(forecastResponse: ForecastResponse) = withContext(Dispatchers.IO) {
         val jsonString = moshi.adapter(ForecastResponse::class.java).toJson(forecastResponse)
         val cacheTime = System.currentTimeMillis()
         val weather = WeatherEntry(jsonString, cacheTime)
