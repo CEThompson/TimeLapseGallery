@@ -11,6 +11,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 // TODO (1.3): figure out how to properly handle blocking calls in coroutines
+@Suppress("BlockingMethodInNonBlockingContext")
 class WeatherLocalDataSource
 @Inject constructor(private val weatherDao: WeatherDao) {
     // Gets the forecast from the database
