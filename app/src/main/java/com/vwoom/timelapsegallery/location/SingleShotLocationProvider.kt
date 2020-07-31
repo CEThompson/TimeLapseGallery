@@ -11,6 +11,11 @@ import android.util.Log
 object SingleShotLocationProvider {
 
     private val TAG = SingleShotLocationProvider::class.java.simpleName
+    private val criteria = object : Criteria() {
+        override fun getAccuracy(): Int {
+            return ACCURACY_FINE
+        }
+    }
 
     interface LocationCallback {
         fun onNewLocationAvailable(location: Location?)
@@ -18,26 +23,10 @@ object SingleShotLocationProvider {
 
     fun requestSingleUpdate(context: Context, callback: LocationCallback) {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-
-        // Prefer network requests for location
-        if (isNetworkEnabled) {
-            val criteria = Criteria()
-            criteria.accuracy = Criteria.ACCURACY_COARSE
-            request(locationManager, criteria, callback)
-        }
-        // If no network available check gps
-        else {
-            val isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-            if (isGPSEnabled) {
-                val criteria = Criteria()
-                criteria.accuracy = Criteria.ACCURACY_FINE
-                request(locationManager, criteria, callback)
-            }
-        }
+        request(locationManager, callback)
     }
 
-    private fun request(locationManager: LocationManager, criteria: Criteria, callback: LocationCallback){
+    private fun request(locationManager: LocationManager, callback: LocationCallback) {
         try {
             locationManager.requestSingleUpdate(criteria, object : LocationListener {
                 override fun onLocationChanged(location: Location) {
@@ -48,7 +37,7 @@ object SingleShotLocationProvider {
                 override fun onProviderEnabled(provider: String) {}
                 override fun onProviderDisabled(provider: String) {}
             }, null)
-        } catch (e: SecurityException){
+        } catch (e: SecurityException) {
             Log.d(TAG, "Single shot location request failed. Reason: ${e.message}")
         }
     }
