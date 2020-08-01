@@ -56,8 +56,7 @@ class WeatherRepositoryTest {
 
         // When we get the cache
         val weatherResult = weatherRepository.getCachedForecast()
-
-        println("$weatherResult")
+        
         // Then the result is today's forecast or a cached forecast
         assert(weatherResult is WeatherResult.TodaysForecast)
     }

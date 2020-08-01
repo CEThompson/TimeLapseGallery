@@ -18,14 +18,11 @@ class FakeLocalDataSource(
         return try {
             val forecastFromStorage: ForecastResponse? = WeatherApi.moshi.adapter(ForecastResponse::class.java)
                     .fromJson(forecastJsonString)
-            println("$forecastFromStorage")
             when {
                 forecastFromStorage == null -> {
-                    println("forecast from storage is null")
                     WeatherResult.NoData()
                 }
                 !isToday -> {
-                    println("is not today")
                     WeatherResult.CachedForecast(
                             forecastFromStorage,
                             System.currentTimeMillis(),
@@ -33,12 +30,10 @@ class FakeLocalDataSource(
                     )
                 }
                 else -> {
-                    println("is today")
                     WeatherResult.TodaysForecast(forecastFromStorage, System.currentTimeMillis())
                 }
             }
         } catch (e: Exception) {
-            println("exception: $e")
             WeatherResult.NoData()
         }
     }
