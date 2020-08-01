@@ -4,17 +4,20 @@ import android.os.Build
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vwoom.timelapsegallery.data.entry.TagEntry
+import com.vwoom.timelapsegallery.data.repository.WeatherRepository
 import com.vwoom.timelapsegallery.data.repository.fakes.FakeProjectRepository
 import com.vwoom.timelapsegallery.data.repository.fakes.FakeTagRepository
 import com.vwoom.timelapsegallery.data.repository.fakes.FakeWeatherRepository
 import com.vwoom.timelapsegallery.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
+// TODO: figure out if robolectric can be removed from this test and gradle
 
 @ExperimentalCoroutinesApi
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
@@ -24,88 +27,70 @@ class GalleryViewModelTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
-    @Test
-    fun galleryViewModel_whenInitialized_fourProjectsExist() {
-        val galleryViewModel = GalleryViewModel(
+    private lateinit var galleryViewModel: GalleryViewModel
+
+    @Before
+    fun setup() {
+        galleryViewModel = GalleryViewModel(
                 projectRepository = FakeProjectRepository(),
                 tagRepository = FakeTagRepository(),
                 weatherRepository = FakeWeatherRepository())
-        val projects = galleryViewModel.projects.getOrAwaitValue()
-        assert(projects.size==4)
     }
 
 
-
-    // Live data test template
     @Test
-    fun galleryViewModelTest_variousFiltersApplied_allAssertionsPass () = runBlockingTest{
-        // Given a view model
-        /*val context: Context = ApplicationProvider.getApplicationContext()
-        */
-        val galleryViewModel = GalleryViewModel(
-                projectRepository = FakeProjectRepository(),
-                tagRepository = FakeTagRepository(),
-                weatherRepository = FakeWeatherRepository())
+    fun galleryViewModel_whenInitialized_fourProjectsExist() = runBlockingTest {
+        // Given a created view model
+        // When we get the test projects
+        val projects = galleryViewModel.projects.getOrAwaitValue()
+        // Then test projects size is four
+        assert(projects.size == 4)
+    }
 
-        // When
+
+    @Test
+    fun galleryViewModelTest_variousFiltersApplied_allAssertionsPass() = runBlockingTest {
+        // Given a view model
+
+        // When we filter for tags that no project has
         galleryViewModel.searchTags = arrayListOf(TagEntry("cat"), TagEntry("orange"))
         galleryViewModel.filterProjects()
 
-        // Then
+        // Then no projects are displayed
         var filterResult = galleryViewModel.displayedProjectViews.getOrAwaitValue()
         assert(filterResult.isEmpty())
 
-        // When
+        // When we filter for one tag
         galleryViewModel.searchTags = arrayListOf(TagEntry("one"))
         galleryViewModel.filterProjects()
 
-        // Then
+        // Then one project is displayed
         filterResult = galleryViewModel.displayedProjectViews.getOrAwaitValue()
         assert(filterResult.size == 1)
 
-
-        // When
+        // When we filter for two tags
         galleryViewModel.searchTags = arrayListOf(TagEntry("zero"), TagEntry("one"))
         galleryViewModel.filterProjects()
 
-        // Then
+        // Then two projects
         filterResult = galleryViewModel.displayedProjectViews.getOrAwaitValue()
         assert(filterResult.size == 2)
 
-        // When
+        // When three tags
         galleryViewModel.searchTags = arrayListOf(TagEntry("zero"), TagEntry("one"), TagEntry("two"))
         galleryViewModel.filterProjects()
 
-        // Then
+        // Then three projects
         filterResult = galleryViewModel.displayedProjectViews.getOrAwaitValue()
         assert(filterResult.size == 3)
 
-        // When
+        // When four
         galleryViewModel.searchTags = arrayListOf(TagEntry("zero"), TagEntry("one"), TagEntry("two"), TagEntry("three"))
         galleryViewModel.filterProjects()
 
-        // Then
+        // Then four
         filterResult = galleryViewModel.displayedProjectViews.getOrAwaitValue()
         assert(filterResult.size == 4)
-    }
-
-    // Live data test template
-    @Test
-    fun galleryViewModelTest_fourProjectsFiltered_onlyTwoRemain () = runBlockingTest{
-        // Given a view model
-        val galleryViewModel = GalleryViewModel(
-                projectRepository = FakeProjectRepository(),
-                tagRepository = FakeTagRepository(),
-                weatherRepository = FakeWeatherRepository())
-
-        // When we filter for two projects
-        galleryViewModel.searchTags = arrayListOf(TagEntry(1, "one"), TagEntry(2,"two"))
-        galleryViewModel.filterProjects()
-
-        // Then projects should contain two items
-        val filterResult = galleryViewModel.displayedProjectViews.getOrAwaitValue()
-        //for (project in filterResult) println(project)
-        assert(filterResult.size == 2)
     }
 
 }
