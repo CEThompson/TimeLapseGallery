@@ -1,28 +1,26 @@
 package com.vwoom.timelapsegallery.gallery
 
-import android.os.Build
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.vwoom.timelapsegallery.MainCoroutineRule
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.data.repository.WeatherRepository
 import com.vwoom.timelapsegallery.data.repository.fakes.FakeProjectRepository
 import com.vwoom.timelapsegallery.data.repository.fakes.FakeTagRepository
 import com.vwoom.timelapsegallery.data.repository.fakes.FakeWeatherRepository
 import com.vwoom.timelapsegallery.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
 // TODO: figure out if robolectric can be removed from this test and gradle
 
 @ExperimentalCoroutinesApi
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
-@RunWith(AndroidJUnit4::class)
+//@Config(sdk = [Build.VERSION_CODES.O_MR1])
+//@RunWith(AndroidJUnit4::class)
 class GalleryViewModelTest {
+
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -39,7 +37,7 @@ class GalleryViewModelTest {
 
 
     @Test
-    fun galleryViewModel_whenInitialized_fourProjectsExist() = runBlockingTest {
+    fun galleryViewModel_whenInitialized_fourProjectsExist() {
         // Given a created view model
         // When we get the test projects
         val projects = galleryViewModel.projects.getOrAwaitValue()
@@ -49,7 +47,7 @@ class GalleryViewModelTest {
 
 
     @Test
-    fun galleryViewModelTest_variousFiltersApplied_allAssertionsPass() = runBlockingTest {
+    fun galleryViewModelTest_variousFiltersApplied_allAssertionsPass() {
         // Given a view model
 
         // When we filter for tags that no project has
