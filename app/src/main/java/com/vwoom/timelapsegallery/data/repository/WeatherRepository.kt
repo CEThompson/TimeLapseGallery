@@ -31,12 +31,13 @@ class WeatherRepository
             val noDataResponse = remoteResponse as WeatherResult.NoData
 
             // Return the cached response if exists
-            val cache = weatherLocalDataSource.getCachedWeather()
-            if (cache is WeatherResult.CachedForecast)
-                WeatherResult.CachedForecast(cache.data, cache.timestamp, remoteResponse.exception, remoteResponse.message)
-            else
-            // Otherwise return the failed update
-                noDataResponse
+            when (val cache = weatherLocalDataSource.getCachedWeather()) {
+                is WeatherResult.TodaysForecast -> WeatherResult.TodaysForecast(cache.data, cache.timestamp)
+                is WeatherResult.CachedForecast -> WeatherResult.CachedForecast(cache.data, cache.timestamp, remoteResponse.exception, remoteResponse.message)
+                else
+                    // Otherwise return the failed update
+                -> noDataResponse
+            }
         }
     }
 
