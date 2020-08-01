@@ -20,4 +20,11 @@ data class ProjectTagEntry(
         var tag_id: Long){
         @PrimaryKey(autoGenerate = true)
         var id: Long = 0
+
+        /* For creation with manual ID */
+        @Ignore
+        constructor(id: Long, project_id: Long, tag_id: Long) : this(project_id, tag_id) {
+                this.id = id
+        }
+
 }

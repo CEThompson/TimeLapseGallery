@@ -9,14 +9,19 @@ import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import javax.inject.Inject
 
+interface IWeatherRepository {
+    suspend fun updateForecast(location: Location): WeatherResult<ForecastResponse>
+    suspend fun getCachedForecast(): WeatherResult<ForecastResponse>
+}
+
 // TODO (1.2): test repository and local/remote data sources
 class WeatherRepository
 @Inject constructor(private val weatherLocalDataSource: IWeatherLocalDataSource,
-                    private val weatherRemoteDataSource: IWeatherRemoteDataSource) {
+                    private val weatherRemoteDataSource: IWeatherRemoteDataSource) : IWeatherRepository {
 
     // This function calls the national weather service API to attempt to update the forecast stored in the database
     // Returns either (1) Weather Result: Update Success or (2) Weather Result: Update Failure
-    suspend fun updateForecast(location: Location): WeatherResult<ForecastResponse> {
+    override suspend fun updateForecast(location: Location): WeatherResult<ForecastResponse> {
         val remoteResponse = weatherRemoteDataSource.getForecast(location)
         return if (remoteResponse is WeatherResult.TodaysForecast) {
             weatherLocalDataSource.cacheForecast(remoteResponse.data)
@@ -37,7 +42,7 @@ class WeatherRepository
 
     // Retrieves the forecast from the database
     // Returns (1) Weather Result: No Data (2) Weather Result: Cached Forecast or (3) Weather Result: Today's Forecast
-    suspend fun getCachedForecast(): WeatherResult<ForecastResponse> {
+    override suspend fun getCachedForecast(): WeatherResult<ForecastResponse> {
         return weatherLocalDataSource.getCachedWeather()  // Can be (2) cached or (3) today's forecast
     }
 }

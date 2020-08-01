@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.data.source
 
 import android.location.Location
+import com.vwoom.timelapsegallery.data.source.fakes.FakeLocalDataSource
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherApi
 import com.vwoom.timelapsegallery.weather.WeatherResult

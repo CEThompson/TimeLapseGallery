@@ -1,11 +1,12 @@
-package com.vwoom.timelapsegallery.data.source
+package com.vwoom.timelapsegallery.data.source.fakes
 
+import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherApi
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import java.lang.Exception
 
-class FakeLocalDataSource(var forecastJsonString: String = EMPTY_LOCAL_JSON) : IWeatherLocalDataSource{
+class FakeLocalDataSource(var forecastJsonString: String = EMPTY_LOCAL_JSON) : IWeatherLocalDataSource {
 
     override suspend fun cacheForecast(forecastResponse: ForecastResponse) {
         val jsonString = WeatherApi.moshi.adapter(ForecastResponse::class.java).toJson(forecastResponse)

@@ -7,9 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.data.repository.ProjectRepository
-import com.vwoom.timelapsegallery.data.repository.TagRepository
-import com.vwoom.timelapsegallery.data.repository.WeatherRepository
+import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.weather.ForecastResponse
@@ -28,9 +26,9 @@ const val SEARCH_TYPE_SCHEDULED = "scheduled"
 const val SEARCH_TYPE_UNSCHEDULED = "unscheduled"
 
 class GalleryViewModel
-@Inject constructor(projectRepository: ProjectRepository,
-                    private val tagRepository: TagRepository,
-                    private val weatherRepository: WeatherRepository) : ViewModel() {
+@Inject constructor(projectRepository: IProjectRepository,
+                    private val tagRepository: ITagRepository,
+                    private val weatherRepository: IWeatherRepository) : ViewModel() {
     // For observing all projects
     val projects: LiveData<List<ProjectView>> = projectRepository.getProjectViewsLiveData()
 

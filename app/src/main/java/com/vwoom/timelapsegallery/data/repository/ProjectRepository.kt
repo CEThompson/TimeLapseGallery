@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.data.repository
 
+import androidx.lifecycle.LiveData
 import com.vwoom.timelapsegallery.data.dao.CoverPhotoDao
 import com.vwoom.timelapsegallery.data.dao.PhotoDao
 import com.vwoom.timelapsegallery.data.dao.ProjectDao
@@ -16,24 +17,63 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
+interface IProjectRepository {
+    /**
+     * Project observables
+     */
+    fun getProjectViewLiveData(projectId: Long): LiveData<ProjectView?>
+    fun getProjectViewsLiveData(): LiveData<List<ProjectView>>
+    fun getScheduledProjectViews(): List<ProjectView>
+
+    /**
+     * Project updating and deletion
+     */
+    suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int = 0): ProjectView
+
+    suspend fun updateProjectName(externalFilesDir: File, sourceProjectView: ProjectView, name: String)
+
+    suspend fun deleteProject(externalFilesDir: File, projectId: Long)
+
+    /**
+     * Project scheduling and cover photo
+     */
+    suspend fun setProjectSchedule(
+            externalFilesDir: File,
+            projectView: ProjectView,
+            projectScheduleEntry: ProjectScheduleEntry)
+
+    suspend fun setProjectCoverPhoto(entry: PhotoEntry)
+
+    /**
+     * Project photo management and observables
+     */
+
+    fun getProjectPhotosLiveData(projectId: Long): LiveData<List<PhotoEntry>>
+
+    suspend fun addPhotoToProject(file: File,
+                                  externalFilesDir: File,
+                                  projectView: ProjectView, timestamp: Long)
+
+    suspend fun deleteProjectPhoto(externalFilesDir: File, photoEntry: PhotoEntry)
+}
+
 class ProjectRepository
 @Inject constructor(private val projectDao: ProjectDao,
                     private val photoDao: PhotoDao,
                     private val coverPhotoDao: CoverPhotoDao,
-                    private val projectScheduleDao: ProjectScheduleDao) {
+                    private val projectScheduleDao: ProjectScheduleDao) : IProjectRepository {
     /**
      * Project observables
      */
-    fun getProjectViewLiveData(projectId: Long) = projectDao.getProjectViewLiveData(projectId)
-    fun getProjectViewsLiveData() = projectDao.getProjectViewsLiveData()
-
-    fun getScheduledProjectViews() = projectDao.getScheduledProjectViews()
+    override fun getProjectViewLiveData(projectId: Long) = projectDao.getProjectViewLiveData(projectId)
+    override fun getProjectViewsLiveData() = projectDao.getProjectViewsLiveData()
+    override fun getScheduledProjectViews() = projectDao.getScheduledProjectViews()
     fun getAllProjects() = projectDao.getProjects()
 
     /**
      * Project updating and deletion
      */
-    suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int = 0): ProjectView {
+    override suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int): ProjectView {
         // Create and insert the project
         val projectEntry = ProjectEntry(null)
         val projectId = projectDao.insertProject(projectEntry)
@@ -57,7 +97,7 @@ class ProjectRepository
         return ProjectView(projectEntry.id, projectEntry.project_name, scheduleInterval, coverPhotoId, timestamp)
     }
 
-    suspend fun updateProjectName(externalFilesDir: File, sourceProjectView: ProjectView, name: String) {
+    override suspend fun updateProjectName(externalFilesDir: File, sourceProjectView: ProjectView, name: String) {
         val source: ProjectEntry = projectDao.getProjectById(sourceProjectView.project_id) ?: return
         val destination = ProjectEntry(source.id, name)
         withContext(Dispatchers.IO) {
@@ -69,7 +109,7 @@ class ProjectRepository
         }
     }
 
-    suspend fun deleteProject(externalFilesDir: File, projectId: Long) {
+    override suspend fun deleteProject(externalFilesDir: File, projectId: Long) {
         val projectEntry = projectDao.getProjectById(projectId) ?: return
         withContext(Dispatchers.IO) {
             // Delete files first since there is a listener on the project
@@ -82,7 +122,7 @@ class ProjectRepository
     /**
      * Project scheduling and cover photo
      */
-    suspend fun setProjectSchedule(
+    override suspend fun setProjectSchedule(
             externalFilesDir: File,
             projectView: ProjectView,
             projectScheduleEntry: ProjectScheduleEntry) {
@@ -96,7 +136,7 @@ class ProjectRepository
         }
     }
 
-    suspend fun setProjectCoverPhoto(entry: PhotoEntry) {
+    override suspend fun setProjectCoverPhoto(entry: PhotoEntry) {
         coverPhotoDao.insertPhoto(CoverPhotoEntry(entry.project_id, entry.id))
     }
 
@@ -104,11 +144,11 @@ class ProjectRepository
      * Project photo management and observables
      */
 
-    fun getProjectPhotosLiveData(projectId: Long) = photoDao.getPhotosLiveDataByProjectId(projectId)
+    override fun getProjectPhotosLiveData(projectId: Long) = photoDao.getPhotosLiveDataByProjectId(projectId)
 
-    suspend fun addPhotoToProject(file: File,
-                                  externalFilesDir: File,
-                                  projectView: ProjectView, timestamp: Long) {
+    override suspend fun addPhotoToProject(file: File,
+                                           externalFilesDir: File,
+                                           projectView: ProjectView, timestamp: Long) {
         // Do not add photo if project cannot be found
         val projectEntry = projectDao.getProjectById(projectView.project_id) ?: return
 
@@ -126,7 +166,7 @@ class ProjectRepository
         }
     }
 
-    suspend fun deleteProjectPhoto(externalFilesDir: File, photoEntry: PhotoEntry) {
+    override suspend fun deleteProjectPhoto(externalFilesDir: File, photoEntry: PhotoEntry) {
         val projectEntry = projectDao.getProjectById(photoEntry.project_id) ?: return
         withContext(Dispatchers.IO) {
             ProjectUtils.deleteProjectPhoto(externalFilesDir, projectEntry, photoEntry)

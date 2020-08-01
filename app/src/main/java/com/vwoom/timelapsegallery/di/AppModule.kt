@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.di
 import android.app.Application
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.dao.*
+import com.vwoom.timelapsegallery.data.repository.*
 import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
 import com.vwoom.timelapsegallery.data.source.IWeatherRemoteDataSource
 import com.vwoom.timelapsegallery.data.source.WeatherLocalDataSource
@@ -22,21 +23,40 @@ class AppModule {
 
     @Provides
     @Singleton
+    fun provideDb(app: Application): TimeLapseDatabase {
+        return TimeLapseDatabase.getInstance(app)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTagRepository(tagRepository: TagRepository): ITagRepository {
+        return tagRepository
+    }
+
+    @Provides
+    @Singleton
+    fun provideWeatherRepository(weatherRepository: WeatherRepository): IWeatherRepository {
+        return weatherRepository
+    }
+
+    @Provides
+    @Singleton
+    fun provideProjectRepository(projectRepository: ProjectRepository): IProjectRepository {
+        return projectRepository
+    }
+
+    @Provides
+    @Singleton
     fun provideRemoteDataSource(): IWeatherRemoteDataSource {
         return WeatherRemoteDataSource()
     }
 
     @Provides
     @Singleton
-    fun provideLocalDataSource(db: TimeLapseDatabase): IWeatherLocalDataSource {
-        return WeatherLocalDataSource(db.weatherDao())
+    fun provideLocalDataSource(weatherLocalDataSource: WeatherLocalDataSource): IWeatherLocalDataSource {
+        return weatherLocalDataSource
     }
 
-    @Provides
-    @Singleton
-    fun provideDb(app: Application): TimeLapseDatabase {
-        return TimeLapseDatabase.getInstance(app)
-    }
 
     @Provides
     fun provideCoverPhotoDao(db: TimeLapseDatabase): CoverPhotoDao {

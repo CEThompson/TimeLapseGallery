@@ -1,15 +1,13 @@
 package com.vwoom.timelapsegallery.data.repository
 
 import android.location.Location
-import com.vwoom.timelapsegallery.data.source.FakeLocalDataSource
+import com.vwoom.timelapsegallery.data.source.fakes.FakeLocalDataSource
 import com.vwoom.timelapsegallery.data.source.FakeRemoteDataSource
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 
-import org.junit.Assert.*
 import org.junit.Before
 
 @ExperimentalCoroutinesApi
