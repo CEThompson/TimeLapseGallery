@@ -4,9 +4,10 @@ import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherApi
 import com.vwoom.timelapsegallery.weather.WeatherResult
-import java.lang.Exception
 
-class FakeLocalDataSource(var forecastJsonString: String = EMPTY_LOCAL_JSON) : IWeatherLocalDataSource {
+class FakeLocalDataSource(
+        var forecastJsonString: String = EMPTY_LOCAL_JSON,
+        var isToday: Boolean = false) : IWeatherLocalDataSource {
 
     override suspend fun cacheForecast(forecastResponse: ForecastResponse) {
         val jsonString = WeatherApi.moshi.adapter(ForecastResponse::class.java).toJson(forecastResponse)
@@ -17,16 +18,29 @@ class FakeLocalDataSource(var forecastJsonString: String = EMPTY_LOCAL_JSON) : I
         return try {
             val forecastFromStorage: ForecastResponse? = WeatherApi.moshi.adapter(ForecastResponse::class.java)
                     .fromJson(forecastJsonString)
-            if (forecastFromStorage == null) WeatherResult.NoData()
-            else WeatherResult.CachedForecast(
-                    forecastFromStorage,
-                    System.currentTimeMillis(),
-                    null
-            )
+            println("$forecastFromStorage")
+            when {
+                forecastFromStorage == null -> {
+                    println("forecast from storage is null")
+                    WeatherResult.NoData()
+                }
+                !isToday -> {
+                    println("is not today")
+                    WeatherResult.CachedForecast(
+                            forecastFromStorage,
+                            System.currentTimeMillis(),
+                            null
+                    )
+                }
+                else -> {
+                    println("is today")
+                    WeatherResult.TodaysForecast(forecastFromStorage, System.currentTimeMillis())
+                }
+            }
         } catch (e: Exception) {
+            println("exception: $e")
             WeatherResult.NoData()
         }
-
     }
 
     companion object {

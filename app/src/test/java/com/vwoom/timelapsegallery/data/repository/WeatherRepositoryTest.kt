@@ -2,13 +2,12 @@ package com.vwoom.timelapsegallery.data.repository
 
 import android.location.Location
 import com.vwoom.timelapsegallery.data.source.fakes.FakeLocalDataSource
-import com.vwoom.timelapsegallery.data.source.FakeRemoteDataSource
+import com.vwoom.timelapsegallery.data.source.fakes.FakeRemoteDataSource
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
-import org.junit.Test
-
 import org.junit.Before
+import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class WeatherRepositoryTest {
@@ -18,25 +17,113 @@ class WeatherRepositoryTest {
     private lateinit var weatherRepository: WeatherRepository
 
     @Before
-    fun setup(){
+    fun setup() {
         weatherLocalDataSource = FakeLocalDataSource()
         weatherRemoteDataSource = FakeRemoteDataSource()
         weatherRepository = WeatherRepository(weatherLocalDataSource, weatherRemoteDataSource)
     }
 
     @Test
-    fun getCachedForecast() = runBlockingTest {
+    fun getCachedForecast_whenInitialized_isEmpty() = runBlockingTest {
+        // Given an initialized weather repository
+        weatherLocalDataSource.forecastJsonString = FakeLocalDataSource.EMPTY_LOCAL_JSON
+
+        // When we get the cached forecast
         val weatherResult = weatherRepository.getCachedForecast()
+
+        // Then the result is WeatherResult.NoData
         assert(weatherResult is WeatherResult.NoData)
     }
 
     @Test
-    fun updateForecast() = runBlockingTest {
+    fun getCachedForecast_whenNotForToday_isCachedForecast() = runBlockingTest {
+        // Given a repository where the local data source is set with a cache that does not belong to today
         weatherLocalDataSource.forecastJsonString = FakeLocalDataSource.TEST_JSON
-        val location = Location("fake_provider")
-        val weatherResult = weatherRepository.updateForecast(location)
-        assert(weatherResult !is WeatherResult.NoData)
+        weatherLocalDataSource.isToday = false
+
+        // When we get the cache
+        val weatherResult = weatherRepository.getCachedForecast()
+
+        // Then the result is today's forecast or a cached forecast
+        assert(weatherResult is WeatherResult.CachedForecast)
     }
 
+    @Test
+    fun getCachedForecast_whenCacheIsSetForToday_isTodaysForecast() = runBlockingTest {
+        // Given a repository where the local data source is set with a cache that does not belong to today
+        weatherLocalDataSource.forecastJsonString = FakeLocalDataSource.TEST_JSON
+        weatherLocalDataSource.isToday = true
+
+        // When we get the cache
+        val weatherResult = weatherRepository.getCachedForecast()
+
+        println("$weatherResult")
+        // Then the result is today's forecast or a cached forecast
+        assert(weatherResult is WeatherResult.TodaysForecast)
+    }
+
+
+    @Test
+    fun updateForecast_whenRemoteUpdateSuccessful_resultIsTodaysForecast() = runBlockingTest {
+        // Given a repository where the local data source is empty
+        weatherLocalDataSource.forecastJsonString = FakeLocalDataSource.EMPTY_LOCAL_JSON
+        // and there is a simulated connection
+        weatherRemoteDataSource.updateSuccess = true
+
+        // When we call the update code
+        val location = Location("test_provider")
+        val weatherResult = weatherRepository.updateForecast(location)
+
+        // Then the result is todays forecast
+        assert(weatherResult is WeatherResult.TodaysForecast)
+    }
+
+    @Test
+    fun updateForecast_whenRemoteUpdateFails_resultIsTheLocalCache() = runBlockingTest {
+        // 1.
+        // Given a repository where the local data source is empty
+        weatherLocalDataSource.forecastJsonString = FakeLocalDataSource.EMPTY_LOCAL_JSON
+        // and there is a simulated failed connection
+        weatherRemoteDataSource.updateSuccess = false
+
+        // When we call the update code
+        var location = Location("test_provider")
+        var weatherResult = weatherRepository.updateForecast(location)
+
+        // Then the result is the local cache
+        assert(weatherResult is WeatherResult.NoData)
+
+
+        // 2.
+        // Given a repository where the local data source is empty
+        weatherLocalDataSource.forecastJsonString = FakeLocalDataSource.TEST_JSON
+        weatherLocalDataSource.isToday = false
+
+        // and there is a simulated failed connection
+        weatherRemoteDataSource.updateSuccess = false
+
+        // When we call the update code
+        location = Location("test_provider")
+        weatherResult = weatherRepository.updateForecast(location)
+
+        // Then the result is the local cache
+        assert(weatherResult is WeatherResult.CachedForecast)
+
+
+        // 3.
+        // Given a repository where the local data source is empty
+        weatherLocalDataSource.forecastJsonString = FakeLocalDataSource.TEST_JSON
+        weatherLocalDataSource.isToday = true
+
+        // and there is a simulated failed connection
+        weatherRemoteDataSource.updateSuccess = false
+
+        // When we call the update code
+        location = Location("test_provider")
+        weatherResult = weatherRepository.updateForecast(location)
+
+        // Then the result is the local cache
+        assert(weatherResult is WeatherResult.TodaysForecast)
+    }
 
 }
