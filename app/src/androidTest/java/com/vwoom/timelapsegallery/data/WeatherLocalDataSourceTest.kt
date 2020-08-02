@@ -10,7 +10,7 @@ import org.junit.Before
 import org.junit.Test
 
 // TODO implement tests for local data source
-class LocalDataSourceTest {
+class WeatherLocalDataSourceTest {
 
     private lateinit var fakeWeatherDao: FakeWeatherDao
     private lateinit var localDataSource: WeatherLocalDataSource
