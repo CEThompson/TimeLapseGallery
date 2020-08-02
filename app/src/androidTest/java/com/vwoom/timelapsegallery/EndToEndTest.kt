@@ -56,13 +56,10 @@ class EndToEndTest {
         // Click on add project fab, should wait for camera to initialize
         onView(withId(R.id.add_project_FAB)).perform(click())
 
-        // Click on the take picture fab and return to gallery fragment
+        // Click on the take picture fab, this should add a new project and go to its detail
         onView(withId(R.id.take_picture_fab)).perform(click())
 
-        // Click on the first recycler view item, the project just created
-        onView(withId(R.id.gallery_recycler_view)).perform(
-                RecyclerViewActions.actionOnItemAtPosition<GalleryAdapter.GalleryAdapterViewHolder>(0, click()))
-
+        
         // Click on the fab to go to the camera to add a photo to the project
         onView(withId(R.id.add_photo_fab)).perform(click())
 
