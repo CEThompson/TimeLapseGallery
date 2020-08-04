@@ -8,6 +8,7 @@ import com.vwoom.timelapsegallery.data.repository.fakes.FakeTagRepository
 import com.vwoom.timelapsegallery.data.repository.fakes.FakeWeatherRepository
 import com.vwoom.timelapsegallery.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -35,9 +36,8 @@ class GalleryViewModelTest {
                 weatherRepository = FakeWeatherRepository())
     }
 
-
     @Test
-    fun galleryViewModel_whenInitialized_fourProjectsExist() {
+    fun galleryViewModel_whenInitialized_fourProjectsExist() = mainCoroutineRule.runBlockingTest {
         // Given a created view model
         // When we get the test projects
         val projects = galleryViewModel.projects.getOrAwaitValue()
@@ -47,7 +47,7 @@ class GalleryViewModelTest {
 
 
     @Test
-    fun galleryViewModelTest_variousFiltersApplied_allAssertionsPass() {
+    fun galleryViewModelTest_variousFiltersApplied_allAssertionsPass() = mainCoroutineRule.runBlockingTest {
         // Given a view model
 
         // When we filter for tags that no project has
