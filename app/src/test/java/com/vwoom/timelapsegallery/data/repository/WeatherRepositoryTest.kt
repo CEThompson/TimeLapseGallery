@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.data.repository
 
 import android.location.Location
+import com.vwoom.timelapsegallery.MainCoroutineRule
 import com.vwoom.timelapsegallery.data.source.fakes.FakeLocalDataSource
 import com.vwoom.timelapsegallery.data.source.fakes.FakeRemoteDataSource
 import com.vwoom.timelapsegallery.testing.TestForecastResponse
@@ -8,7 +9,10 @@ import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+
+// TODO use and inject test dispatcher for coroutines
 
 @ExperimentalCoroutinesApi
 class WeatherRepositoryTest {
@@ -17,15 +21,19 @@ class WeatherRepositoryTest {
     private lateinit var weatherRemoteDataSource: FakeRemoteDataSource
     private lateinit var weatherRepository: WeatherRepository
 
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule()
+
     @Before
     fun setup() {
+        // TODO inject test dispatcher somewhere here ... this will take the form of passing in Dispatchers.Main to the repository
         weatherLocalDataSource = FakeLocalDataSource()
         weatherRemoteDataSource = FakeRemoteDataSource()
         weatherRepository = WeatherRepository(weatherLocalDataSource, weatherRemoteDataSource)
     }
 
     @Test
-    fun getCachedForecast_whenInitialized_isEmpty() = runBlockingTest {
+    fun getCachedForecast_whenInitialized_isEmpty() = mainCoroutineRule.runBlockingTest {
         // Given an initialized weather repository without local cache data
         weatherLocalDataSource.forecastJsonString = null
 
@@ -37,7 +45,7 @@ class WeatherRepositoryTest {
     }
 
     @Test
-    fun getCachedForecast_whenNotForToday_isCachedForecast() = runBlockingTest {
+    fun getCachedForecast_whenNotForToday_isCachedForecast() = mainCoroutineRule.runBlockingTest {
         // Given a repository where the local data source is set with a cache that does not belong to today
         weatherLocalDataSource.forecastJsonString = TestForecastResponse.TEST_JSON
         weatherLocalDataSource.isToday = false
@@ -50,7 +58,7 @@ class WeatherRepositoryTest {
     }
 
     @Test
-    fun getCachedForecast_whenCacheIsSetForToday_isTodaysForecast() = runBlockingTest {
+    fun getCachedForecast_whenCacheIsSetForToday_isTodaysForecast() = mainCoroutineRule.runBlockingTest {
         // Given a repository where the local data source is set with a cache that does not belong to today
         weatherLocalDataSource.forecastJsonString = TestForecastResponse.TEST_JSON
         weatherLocalDataSource.isToday = true
@@ -64,7 +72,7 @@ class WeatherRepositoryTest {
 
 
     @Test
-    fun updateForecast_whenRemoteUpdateSuccessful_resultIsTodaysForecast() = runBlockingTest {
+    fun updateForecast_whenRemoteUpdateSuccessful_resultIsTodaysForecast() = mainCoroutineRule.runBlockingTest {
         // Given a repository where the local data source is empty
         weatherLocalDataSource.forecastJsonString = null
         // and there is a simulated connection
@@ -79,7 +87,7 @@ class WeatherRepositoryTest {
     }
 
     @Test
-    fun updateForecast_whenRemoteUpdateFails_resultIsTheLocalCache() = runBlockingTest {
+    fun updateForecast_whenRemoteUpdateFails_resultIsTheLocalCache() = mainCoroutineRule.runBlockingTest {
         // 1.
         // Given a repository where the local data source is empty
         weatherLocalDataSource.forecastJsonString = null
