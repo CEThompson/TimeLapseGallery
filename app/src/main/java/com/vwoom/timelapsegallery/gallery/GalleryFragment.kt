@@ -45,6 +45,7 @@ import com.vwoom.timelapsegallery.weather.WeatherResult
 import javax.inject.Inject
 
 
+// TODO: set mini fabs, or some way to scroll quickly to the bottom of the gallery
 // TODO (update 1.3): optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler, Injectable {
 
