@@ -2,13 +2,10 @@ package com.vwoom.timelapsegallery.gif
 
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.utils.FileUtils
-import com.vwoom.timelapsegallery.utils.ProjectUtils
-import org.junit.After
-import org.junit.Test
-
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.File
 
@@ -22,13 +19,13 @@ class GifUtilsTest {
     private lateinit var externalFilesTestDir: File
 
     @Before
-    fun setUp(){
+    fun setUp() {
         externalFilesTestDir = testFolder.newFolder("pictures")
     }
 
     // Makes sure a project with a gif does return a gif for the project
     @Test
-    fun `getGifForProject() when project GIF exists`(){
+    fun `getGifForProject() when project GIF exists`() {
         // 1. Given a project and a created GIF (faked .gif file)
         val project = ProjectEntry(1000, null)
         val gifDir = File(externalFilesTestDir, FileUtils.GIF_FILE_SUBDIRECTORY)
@@ -38,19 +35,19 @@ class GifUtilsTest {
         // 2. When we get the gif for the project
         val gif = GifUtils.getGifForProject(externalFilesTestDir, project)
         // 3. It exists
-        assert (gif != null)
+        assertTrue(gif != null)
         if (gif != null) assert(gif.exists())
     }
 
     // Makes sure a project with no gif does not return a gif for the project
     @Test
-    fun `getGifForProject() when no GIF exists`(){
+    fun `getGifForProject() when no GIF exists`() {
         // 1. Given a gif and a project
         val project = ProjectEntry(1000, null)
         // 2. When we get the gif for the project
         val gif = GifUtils.getGifForProject(externalFilesTestDir, project)
         // It does not exist
-        assert(gif == null)
+        assertTrue(gif == null)
     }
 
     @Test
@@ -67,7 +64,7 @@ class GifUtilsTest {
 
         // Then no GIF for that project should exist
         val gif = GifUtils.getGifForProject(externalFilesTestDir, project)
-        assert(gif == null)
+        assertTrue(gif == null)
     }
 
 

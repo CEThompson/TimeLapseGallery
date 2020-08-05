@@ -11,6 +11,7 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getMetaDirectoryForProject
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,6 +45,7 @@ class FilesUtilsDbTest {
         db.close()
     }
 
+    // TODO investigate this failing test
     @Test
     fun addTagToProject_listOfTwoTags_resultInTwoTagsRepresented() {
         // begin with empty directory and database
@@ -66,22 +68,22 @@ class FilesUtilsDbTest {
         // then
         // each tag retrieved from the database should be in the list passed to the utility
         val projectTagEntries = runBlocking { db.projectTagDao().getProjectTagsByProjectId(projectEntry.id) }
-        assert(projectTagEntries.size == tags.size) // two tags should be retrieved since we fed in two tags
+        assertTrue(projectTagEntries.size == tags.size) // two tags should be retrieved since we fed in two tags
         for (tag in projectTagEntries) {
             val currentTag = runBlocking { db.tagDao().getTagById(tag.tag_id) }
-            assert(tags.contains(currentTag)) // make the assertions
+            assertTrue(tags.contains(currentTag)) // make the assertions
         }
         // and a tag file should exist in the projects meta directory
         val meta = getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
         val tagsFile = File(meta, FileUtils.TAGS_DEFINITION_TEXT_FILE)
-        assert(tagsFile.exists()) // make the assertion
+        assertTrue(tagsFile.exists()) // make the assertion
         // and the text file should contain both of the tags
         val inputAsString = FileInputStream(tagsFile).bufferedReader().use { it.readText() }
         val tagsInFile: List<String> = inputAsString.split('\n')
         for (text in tagsInFile) {
             if (text.isEmpty()) continue
             val currentTag = runBlocking { db.tagDao().getTagByText(text) }
-            assert(tags.contains(currentTag)) // make the assertion
+            assertTrue(tags.contains(currentTag)) // make the assertion
         }
     }
 
@@ -107,16 +109,17 @@ class FilesUtilsDbTest {
         // then
         // tags retrieved should be an empty list
         val projectTagEntries = runBlocking { db.projectTagDao().getProjectTagsByProjectId(projectEntry.id) }
-        assert(projectTagEntries.isEmpty())
+        assertTrue(projectTagEntries.isEmpty())
 
         // and an empty tag file should exist in the projects meta directory
         val meta = getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
         val tagsFile = File(meta, FileUtils.TAGS_DEFINITION_TEXT_FILE)
-        assert(tagsFile.exists()) // make the assertion
+        assertTrue(tagsFile.exists()) // make the assertion
         val inputAsString = FileInputStream(tagsFile).bufferedReader().use { it.readText() }
-        assert(inputAsString.isEmpty())
+        assertTrue(inputAsString.isEmpty())
     }
 
+    // TODO investigate this failing test
     @Test
     fun scheduleProject() {
         // begin with empty directory and database
@@ -139,14 +142,14 @@ class FilesUtilsDbTest {
         // then
         // the retrieved schedule from the db exists and represents the interval
         val retrievedSchedule = runBlocking { db.projectScheduleDao().getProjectScheduleByProjectId(projectEntry.id) }
-        assert(retrievedSchedule != null)
-        assert(retrievedSchedule?.interval_days == 7)
+        assertTrue(retrievedSchedule != null)
+        assertTrue(retrievedSchedule?.interval_days == 7)
 
         // and the text file exists and represents the interval
         val meta = getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
         val scheduleFile = File(meta, FileUtils.SCHEDULE_TEXT_FILE)
-        assert(scheduleFile.exists())
+        assertTrue(scheduleFile.exists())
         val inputAsString = FileInputStream(scheduleFile).bufferedReader().use { it.readText() }
-        assert(inputAsString.toInt() == 7)
+        assertTrue(inputAsString.toInt() == 7)
     }
 }

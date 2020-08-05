@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.utils
 
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -9,13 +10,14 @@ import java.io.File
 
 class FileUtilsTest {
 
-    @Rule @JvmField
+    @Rule
+    @JvmField
     val testFolder = TemporaryFolder()
 
     private lateinit var externalFilesTestDir: File
 
     @Before
-    fun setUp(){
+    fun setUp() {
         externalFilesTestDir = testFolder.newFolder("pictures")
     }
 
@@ -29,7 +31,7 @@ class FileUtilsTest {
         FileUtils.createTemporaryImageFile(tempFolder)
 
         // Then the temp directory should not be empty
-        assert(tempFolder.listFiles()?.size!=0)
+        assertTrue(tempFolder.listFiles()?.size != 0)
     }
 
     @Test
@@ -52,9 +54,9 @@ class FileUtilsTest {
                 timestamp)
 
         // Then the temp file should have been deleted
-        assert(!tempFile.exists())
+        assertTrue(!tempFile.exists())
         // And the final file should exist
-        assert(finalFile.exists())
+        assertTrue(finalFile.exists())
     }
 
     @Test
@@ -70,9 +72,9 @@ class FileUtilsTest {
         FileUtils.deleteTempFiles(externalFilesTestDir)
 
         // Then the directory is gone
-        assert(!tempFolder.exists())
+        assertTrue(!tempFolder.exists())
         // and the child is gone
-        assert(!child.exists())
+        assertTrue(!child.exists())
     }
 
     @Test
@@ -84,7 +86,7 @@ class FileUtilsTest {
         val containsReservedCharacters = FileUtils.pathContainsReservedCharacter(testString)
 
         // Then - the utility should indicate false: the path does not contain a reserved character
-        assert(!containsReservedCharacters)
+        assertTrue(!containsReservedCharacters)
     }
 
     @Test
@@ -96,7 +98,7 @@ class FileUtilsTest {
         val containsReservedCharacters = FileUtils.pathContainsReservedCharacter(testString)
 
         // Then - the utility should indicate true
-        assert(containsReservedCharacters)
+        assertTrue(containsReservedCharacters)
     }
 
     @Test
@@ -108,12 +110,9 @@ class FileUtilsTest {
         val filenames = FileUtils.getPhotoFileExtensions(timestamp)
 
         // Then an array of three different image extensions should exist
-        assert(filenames[0] == "$timestamp.jpg")
-        assert(filenames[1] == "$timestamp.png")
-        assert(filenames[2] == "$timestamp.jpeg")
+        assertTrue(filenames[0] == "$timestamp.jpg")
+        assertTrue(filenames[1] == "$timestamp.png")
+        assertTrue(filenames[2] == "$timestamp.jpeg")
     }
 
-    companion object {
-        private val TAG = FileUtilsTest::class.java.simpleName
-    }
 }

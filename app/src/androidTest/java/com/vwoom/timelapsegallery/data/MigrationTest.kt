@@ -8,6 +8,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
@@ -62,17 +63,17 @@ class MigrationTest {
         Log.d(TAG, "$photos")
 
         // Make various assertions on the retrieved data
-        assert(projects.size == 2)
-        assert(photos.size == 5)
-        assert(projects[0].id == 1.toLong())
-        assert(projects[0].project_name == "test name one")
-        assert(projects[1].id == 2.toLong())
-        assert(projects[1].project_name == "test name two")
+        assertTrue(projects.size == 2)
+        assertTrue(photos.size == 5)
+        assertTrue(projects[0].id == 1.toLong())
+        assertTrue(projects[0].project_name == "test name one")
+        assertTrue(projects[1].id == 2.toLong())
+        assertTrue(projects[1].project_name == "test name two")
 
         val photosForProjectOne = resultDb.photoDao().getPhotosByProjectId(projects[0].id)
-        assert(photosForProjectOne.size == 2)
+        assertTrue(photosForProjectOne.size == 2)
         val photosForProjectTwo = resultDb.photoDao().getPhotosByProjectId(projects[1].id)
-        assert(photosForProjectTwo.size == 3)
+        assertTrue(photosForProjectTwo.size == 3)
 
         // make sure to close the database
         resultDb.close()
@@ -105,17 +106,17 @@ class MigrationTest {
         // Assert that resulting database persists the projects on migration
         val projects = resultDb.projectDao().getProjects()
         val photos = resultDb.photoDao().getPhotos()
-        assert(projects.size == 1)
-        assert(photos.size == 2)
-        assert(projects[0].id == 1.toLong())
-        assert(projects[0].project_name == "test name one")
+        assertTrue(projects.size == 1)
+        assertTrue(photos.size == 2)
+        assertTrue(projects[0].id == 1.toLong())
+        assertTrue(projects[0].project_name == "test name one")
 
 
         // Assert that weather table now useful
         var weather = runBlocking { resultDb.weatherDao().getWeather() }
 
         // First assert no entry
-        assert(weather == null)
+        assertTrue(weather == null)
 
         // Insert an entry
         val testTime = System.currentTimeMillis()
@@ -125,13 +126,13 @@ class MigrationTest {
 
         // Check for entry match
         weather = runBlocking { resultDb.weatherDao().getWeather() }
-        assert(weather?.forecastJsonString == forecastString)
-        assert(weather?.timestamp == testTime)
+        assertTrue(weather?.forecastJsonString == forecastString)
+        assertTrue(weather?.timestamp == testTime)
 
         // Check deletion
         runBlocking { resultDb.weatherDao().deleteWeather() }
         weather = runBlocking { resultDb.weatherDao().getWeather() }
-        assert(weather == null)
+        assertTrue(weather == null)
 
         // Clean up
         resultDb.close()

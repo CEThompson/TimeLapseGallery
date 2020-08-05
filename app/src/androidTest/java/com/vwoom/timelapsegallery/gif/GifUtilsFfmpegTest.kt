@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.gif
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -22,6 +23,7 @@ class GifUtilsFfmpegTest {
         externalFilesTestDir = testFolder.newFolder("pictures")
     }
 
+    // TODO: investigate this failing test
     // This test ensures that a project with a set of images can convert to a GIF
     // Note: This seems to require instrumentation to run ffmpeg commands
     @Test
@@ -40,7 +42,7 @@ class GifUtilsFfmpegTest {
 
         // Then a gif for the project should exist
         val gif = GifUtils.getGifForProject(externalFilesTestDir, project)
-        assert (gif!= null)
+        assertTrue(gif!= null)
     }
 
     @Test
@@ -53,7 +55,7 @@ class GifUtilsFfmpegTest {
         makeGif.mkdir()
 
         val firstGif = GifUtils.getGifForProject(externalFilesTestDir, project)
-        assert(firstGif!=null)
+        assertTrue(firstGif!=null)
         if (firstGif == null) return
 
         // When we update the gif
@@ -61,6 +63,6 @@ class GifUtilsFfmpegTest {
 
         // It should not be the same file
         val updatedGif = GifUtils.getGifForProject(externalFilesTestDir, project)
-        assert(firstGif != updatedGif)
+        assertTrue(firstGif != updatedGif)
     }
 }

@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.weather
 
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 import java.util.*
@@ -17,14 +18,14 @@ class MoonPhaseCalculatorTest {
         val phase = MoonPhaseCalculator.getMoonPhaseFromTimestamp(timestampNewMoon)
 
         println(phase)
-        assert(phase == NEW_MOON)
+        assertTrue(phase == NEW_MOON)
     }
 
     @Test
     fun getMoonPhaseFromTimestamp_shouldBeFullMoon() {
         val phase = MoonPhaseCalculator.getMoonPhaseFromTimestamp(timestampFullMoon)
         println(phase)
-        assert(phase == FULL_MOON)
+        assertTrue(phase == FULL_MOON)
     }
 
     @Test
@@ -36,9 +37,9 @@ class MoonPhaseCalculatorTest {
         var phaseBefore = MoonPhaseCalculator.getMoonPhaseFromTimestamp(timeBefore)
         var phaseAfter = MoonPhaseCalculator.getMoonPhaseFromTimestamp(timeAfter)
         println(phaseBefore)
-        assert(phaseBefore == INTERMEDIATE_MOON)
+        assertTrue(phaseBefore == INTERMEDIATE_MOON)
         println(phaseAfter)
-        assert(phaseAfter == INTERMEDIATE_MOON)
+        assertTrue(phaseAfter == INTERMEDIATE_MOON)
 
         timeBefore = timestampFullMoon - millisecondsDay
         timeAfter = timestampNewMoon + millisecondsDay
@@ -47,9 +48,9 @@ class MoonPhaseCalculatorTest {
         phaseAfter = MoonPhaseCalculator.getMoonPhaseFromTimestamp(timeAfter)
 
         println(phaseBefore)
-        assert(phaseBefore == INTERMEDIATE_MOON)
+        assertTrue(phaseBefore == INTERMEDIATE_MOON)
         println(phaseAfter)
-        assert(phaseAfter == INTERMEDIATE_MOON)
+        assertTrue(phaseAfter == INTERMEDIATE_MOON)
     }
 
 }

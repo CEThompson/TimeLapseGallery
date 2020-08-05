@@ -77,12 +77,12 @@ class ProjectUtilsTest {
         ProjectUtils.renameProject(externalFilesTestDir, projectEntry, projectEntryToRename)
 
         // Then we expect the previous folder to be gone
-        assert(!projectFolder.exists())
+        assertTrue(!projectFolder.exists())
         // and the renamed folder to exist
         val renamedProject = File(externalFilesTestDir, "${id}_$projectRenameString")
-        assert(renamedProject.exists())
+        assertTrue(renamedProject.exists())
         // with the same children
-        for (child in children) assert(File(renamedProject, child).exists())
+        for (child in children) assertTrue(File(renamedProject, child).exists())
     }
 
     @Test
@@ -105,9 +105,9 @@ class ProjectUtilsTest {
         ProjectUtils.deleteProject(externalFilesTestDir, projectEntry)
 
         // Then the project folder and its children no longer exist
-        assert(!first.exists())
-        assert(!second.exists())
-        assert(!projectFolder.exists())
+        assertTrue(!first.exists())
+        assertTrue(!second.exists())
+        assertTrue(!projectFolder.exists())
     }
 
     @Test
@@ -132,9 +132,9 @@ class ProjectUtilsTest {
         ProjectUtils.deleteProjectPhoto(externalFilesTestDir, projectEntry, firstPhotoEntry)
 
         // Then first photo no longer exists
-        assert(!first.exists())
+        assertTrue(!first.exists())
         // but the second does exist
-        assert(second.exists())
+        assertTrue(second.exists())
     }
 
     @Test
@@ -157,7 +157,7 @@ class ProjectUtilsTest {
         val photoUrl = ProjectUtils.getProjectPhotoUrl(externalFilesTestDir, projectEntry, photoEntry.timestamp)
 
         // Then the returned path should be the same as the created path
-        assert(photoUrl == first.absolutePath)
+        assertTrue(photoUrl == first.absolutePath)
     }
 
     @Test
@@ -172,9 +172,9 @@ class ProjectUtilsTest {
         val relPath = absPath.substring(metaDir.absolutePath.lastIndexOf(File.separatorChar)+1)
 
         // Then the meta directory exists
-        assert(metaDir.exists())
+        assertTrue(metaDir.exists())
         // the relative path is equal to the project ID (ex. "meta/5")
-        assert(relPath == project.id.toString())
+        assertTrue(relPath == project.id.toString())
     }
 
     @Test

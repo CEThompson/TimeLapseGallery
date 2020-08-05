@@ -8,6 +8,7 @@ import com.vwoom.timelapsegallery.testing.TestForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,7 +42,7 @@ class WeatherRepositoryTest {
         val weatherResult = weatherRepository.getCachedForecast()
 
         // Then the result is WeatherResult.NoData
-        assert(weatherResult is WeatherResult.NoData)
+        assertTrue(weatherResult is WeatherResult.NoData)
     }
 
     @Test
@@ -54,7 +55,7 @@ class WeatherRepositoryTest {
         val weatherResult = weatherRepository.getCachedForecast()
 
         // Then the result is today's forecast or a cached forecast
-        assert(weatherResult is WeatherResult.CachedForecast)
+        assertTrue(weatherResult is WeatherResult.CachedForecast)
     }
 
     @Test
@@ -67,7 +68,7 @@ class WeatherRepositoryTest {
         val weatherResult = weatherRepository.getCachedForecast()
         
         // Then the result is today's forecast or a cached forecast
-        assert(weatherResult is WeatherResult.TodaysForecast)
+        assertTrue(weatherResult is WeatherResult.TodaysForecast)
     }
 
 
@@ -83,7 +84,7 @@ class WeatherRepositoryTest {
         val weatherResult = weatherRepository.updateForecast(location)
 
         // Then the result is todays forecast
-        assert(weatherResult is WeatherResult.TodaysForecast)
+        assertTrue(weatherResult is WeatherResult.TodaysForecast)
     }
 
     @Test
@@ -99,7 +100,7 @@ class WeatherRepositoryTest {
         var weatherResult = weatherRepository.updateForecast(location)
 
         // Then the result is the local cache
-        assert(weatherResult is WeatherResult.NoData)
+        assertTrue(weatherResult is WeatherResult.NoData)
 
 
         // 2.
@@ -115,7 +116,7 @@ class WeatherRepositoryTest {
         weatherResult = weatherRepository.updateForecast(location)
 
         // Then the result is the local cache
-        assert(weatherResult is WeatherResult.CachedForecast)
+        assertTrue(weatherResult is WeatherResult.CachedForecast)
 
 
         // 3.
@@ -131,7 +132,7 @@ class WeatherRepositoryTest {
         weatherResult = weatherRepository.updateForecast(location)
 
         // Then the result is the local cache
-        assert(weatherResult is WeatherResult.TodaysForecast)
+        assertTrue(weatherResult is WeatherResult.TodaysForecast)
     }
 
 }

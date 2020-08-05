@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.utils
 
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.*
 
@@ -32,7 +33,7 @@ class TimeUtilsTest {
 
         // Then the days returned should be two
         println("days since is $daysSinceTimestamp")
-        assert(daysSinceTimestamp == 1.toLong())
+        assertTrue(daysSinceTimestamp == 1.toLong())
 
         // 3-11-2020 (wednesday) @ midnight
         calendar[Calendar.MONTH] = Calendar.MARCH
@@ -52,7 +53,7 @@ class TimeUtilsTest {
 
         // Then the days returned should be two
         println("days since is $daysSinceTimestamp")
-        assert(daysSinceTimestamp == 1.toLong())
+        assertTrue(daysSinceTimestamp == 1.toLong())
     }
 
     @Test
@@ -75,7 +76,7 @@ class TimeUtilsTest {
 
         // Then the days returned should be two
         println("days since is $daysSinceTimestamp")
-        assert(daysSinceTimestamp == 2.toLong())
+        assertTrue(daysSinceTimestamp == 2.toLong())
     }
 
     @Test
@@ -98,7 +99,7 @@ class TimeUtilsTest {
 
         // Then the days since the timestamp should be four
         println("days since is $daysSinceTimestamp")
-        assert(daysSinceTimestamp == 4.toLong())
+        assertTrue(daysSinceTimestamp == 4.toLong())
     }
 
     @Test
@@ -121,7 +122,7 @@ class TimeUtilsTest {
 
         // Then the days since the timestamp should be four
         println("days since is $daysSinceTimestamp")
-        assert(daysSinceTimestamp != 4.toLong())
+        assertTrue(daysSinceTimestamp != 4.toLong())
     }
 
     @Test
@@ -144,7 +145,7 @@ class TimeUtilsTest {
 
         // Then the days since the timestamp should return a -1 error indication
         println("days since is $daysSinceTimestamp")
-        assert(daysSinceTimestamp == -(1.toLong()))
+        assertTrue(daysSinceTimestamp == -(1.toLong()))
     }
 
     @Test
@@ -177,6 +178,6 @@ class TimeUtilsTest {
         // Then the timestamp is from the start of the day
         println("start of day value is $startOfDayTimestamp")
         println("calculated value from function is $calculatedStartOfDay")
-        assert(calculatedStartOfDay == startOfDayTimestamp)
+        assertTrue(calculatedStartOfDay == startOfDayTimestamp)
     }
 }

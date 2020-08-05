@@ -12,6 +12,7 @@ import com.vwoom.timelapsegallery.utils.ImportUtils.validateFileStructure
 import com.vwoom.timelapsegallery.utils.ImportUtils.importProjects
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -99,7 +100,7 @@ class ImportUtilsTest {
 
         // When: Projects are imported
         val result = validateFileStructure(externalFilesTestDir)
-        assert(result is ValidationResult.Success<List<ImportUtils.ProjectDataBundle>>)
+        assertTrue(result is ValidationResult.Success<List<ImportUtils.ProjectDataBundle>>)
         val projectBundles = (result as ValidationResult.Success<List<ImportUtils.ProjectDataBundle>>).data
         runBlocking {importProjects(db, externalFilesTestDir, projectBundles, true)}
 
@@ -107,46 +108,46 @@ class ImportUtilsTest {
         runBlocking {
             // Assert state of project 1 files matches state of database
             var projectEntry = db.projectDao().getProjectById(1)
-            assert(projectEntry?.project_name == "test")
+            assertTrue(projectEntry?.project_name == "test")
             var photoEntry = db.photoDao().getLastPhoto(1)
-            assert(photoEntry?.timestamp == 300.toLong())
+            assertTrue(photoEntry?.timestamp == 300.toLong())
             var tags = db.projectTagDao().getProjectTagsByProjectId(1)
-            assert(tags.size==1)
+            assertTrue(tags.size==1)
             var tag = db.tagDao().getTagById(tags[0].tag_id)
-            assert(tag.text == "c")
+            assertTrue(tag.text == "c")
             var projectSchedule = db.projectScheduleDao().getProjectScheduleByProjectId(1)
-            assert(projectSchedule?.interval_days == 1)
+            assertTrue(projectSchedule?.interval_days == 1)
 
             // Assert state of project 2 files matches state of database
             projectEntry = db.projectDao().getProjectById(3)
-            assert(projectEntry?.project_name =="test two")
+            assertTrue(projectEntry?.project_name =="test two")
             photoEntry = db.photoDao().getLastPhoto(3)
-            assert (photoEntry?.timestamp == 400.toLong())
+            assertTrue(photoEntry?.timestamp == 400.toLong())
             tags = db.projectTagDao().getProjectTagsByProjectId(3)
-            assert(tags.size==1)
+            assertTrue(tags.size==1)
             tag = db.tagDao().getTagById(tags[0].tag_id)
-            assert(tag.text=="d")
+            assertTrue(tag.text=="d")
             projectSchedule = db.projectScheduleDao().getProjectScheduleByProjectId(3)
-            assert(projectSchedule?.interval_days == 3)
+            assertTrue(projectSchedule?.interval_days == 3)
 
             // Check database deletions: These assertions check that the database was cleared!
             val projects = db.projectDao().getProjects()
-            assert(projects.size == 2)
+            assertTrue(projects.size == 2)
 
             val projectSchedules = db.projectScheduleDao().getProjectSchedules()
-            assert(projectSchedules.size==2)
+            assertTrue(projectSchedules.size==2)
 
             val projectTags = db.projectTagDao().getProjectTags()
-            assert(projectTags.size == 2)
+            assertTrue(projectTags.size == 2)
 
             val allTags = db.tagDao().getTags()
-            assert(allTags.size == 2)
+            assertTrue(allTags.size == 2)
 
             val coverPhotos = db.coverPhotoDao().getCoverPhotos()
-            assert(coverPhotos.size == 2)
+            assertTrue(coverPhotos.size == 2)
 
             val photos = db.photoDao().getPhotos()
-            assert(photos.size==2)
+            assertTrue(photos.size==2)
         }
 
     }
@@ -161,7 +162,7 @@ class ImportUtilsTest {
         val response = validateFileStructure(externalFilesTestDir)
 
         // Then
-        assert(response is ValidationResult.Error.NoFilesError)
+        assertTrue(response is ValidationResult.Error.NoFilesError)
     }
 
     @Test
@@ -175,7 +176,7 @@ class ImportUtilsTest {
         val response = validateFileStructure(externalFilesTestDir)
 
         // Then
-        assert(response is ValidationResult.Error.InvalidFolder)
+        assertTrue(response is ValidationResult.Error.InvalidFolder)
     }
 
 
@@ -192,7 +193,7 @@ class ImportUtilsTest {
         val response = validateFileStructure(externalFilesTestDir)
 
         // Then
-        assert(response is ValidationResult.Error.InvalidPhotoFileError)
+        assertTrue(response is ValidationResult.Error.InvalidPhotoFileError)
     }
 
     @Test
@@ -214,7 +215,7 @@ class ImportUtilsTest {
         val response = validateFileStructure(externalFilesTestDir)
         println(response)
         // Then
-        assert(response is ValidationResult.Error.DuplicateIdError)
+        assertTrue(response is ValidationResult.Error.DuplicateIdError)
     }
 
     @Test
@@ -245,7 +246,7 @@ class ImportUtilsTest {
 
             // Then
             println(response)
-            assert(response is ValidationResult.Error.InvalidCharacterError)
+            assertTrue(response is ValidationResult.Error.InvalidCharacterError)
         }
     }
 
@@ -266,7 +267,7 @@ class ImportUtilsTest {
         val response = validateFileStructure(externalFilesTestDir)
 
         // Then
-        assert(response is ValidationResult.Success<List<ImportUtils.ProjectDataBundle>>)
+        assertTrue(response is ValidationResult.Success<List<ImportUtils.ProjectDataBundle>>)
     }
 
 }

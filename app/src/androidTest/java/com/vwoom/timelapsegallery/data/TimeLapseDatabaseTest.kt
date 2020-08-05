@@ -7,6 +7,7 @@ import com.vwoom.timelapsegallery.data.dao.*
 import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,13 +55,13 @@ class TimeLapseDatabaseTest {
     fun insertWeather() {
         // Should be null without an entry
         var res = runBlocking { weatherDao.getWeather() }
-        assert(res == null)
+        assertTrue(res == null)
 
         // Should not be null if an entry is added
         val entry = WeatherEntry(forecastJsonString = "fake_json_string", timestamp = System.currentTimeMillis())
         runBlocking { weatherDao.insertWeather(entry) }
         res = runBlocking { weatherDao.getWeather() }
-        assert(res != null)
+        assertTrue(res != null)
     }
 
 }

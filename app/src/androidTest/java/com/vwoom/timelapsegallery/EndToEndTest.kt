@@ -18,6 +18,7 @@ import androidx.test.rule.GrantPermissionRule
 import com.vwoom.timelapsegallery.gallery.GalleryAdapter
 import com.vwoom.timelapsegallery.testing.EspressoIdlingResource
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,7 +70,7 @@ class EndToEndTest {
         // Assert that two photos are present in the detail fragment
         var itemCount = mTimeLapseGalleryActivityTestRule.activity
                 .findViewById<RecyclerView>(R.id.details_recyclerview).adapter?.itemCount
-        assert(itemCount == 2)
+        assertTrue(itemCount == 2)
 
         // Use overflow to delete a photo from the project
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
@@ -82,7 +83,7 @@ class EndToEndTest {
         // Assert that one item is left
         itemCount = mTimeLapseGalleryActivityTestRule.activity
                 .findViewById<RecyclerView>(R.id.details_recyclerview).adapter?.itemCount
-        assert(itemCount == 1)
+        assertTrue(itemCount == 1)
 
         // Use overflow to delete the project
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
@@ -99,6 +100,6 @@ class EndToEndTest {
         // Assert that no projects are left
         itemCount = mTimeLapseGalleryActivityTestRule.activity
                 .findViewById<RecyclerView>(R.id.gallery_recycler_view).adapter?.itemCount
-        assert(itemCount == 0)
+        assertTrue(itemCount == 0)
     }
 }

@@ -40,7 +40,7 @@ class GalleryViewModelTest {
         // When we get the test projects
         val projects = galleryViewModel.projects.getOrAwaitValue()
         // Then test projects size is four
-        assert(projects.size == 4)
+        assertTrue(projects.size == 4)
     }
 
 
