@@ -81,6 +81,28 @@ android {
     sourceSets {
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
+
+    // TODO: Figure out if there is a better way around making the same androidTest and test dependencies work well together
+    // Note: These packaging options are a work around for declaring the same dependency to two different sources
+    // example: testImplementation and androidTestImplementation
+    // What is the right way to handle this?
+    packagingOptions {
+        /*exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'*/
+        exclude 'META-INF/AL2.0'
+        exclude 'META-INF/LGPL2.1'
+        exclude "**/attach_hotspot_windows.dll"
+        exclude "META-INF/licenses/**"
+        //exclude 'META-INF/main.kotlin_module'
+        //exclude("META-INF/*.kotlin_module")
+    }
+
 }
 
 dependencies {
@@ -89,9 +111,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.preference:preference:1.1.1'
 
-    // Kotlin extensions
-    implementation "androidx.core:core-ktx:1.3.1"
-
+    /* Unit Testing */
     // For local unit tests
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'
@@ -99,89 +119,105 @@ dependencies {
     testImplementation 'androidx.test.ext:junit:1.1.1'
     testImplementation 'androidx.test:core-ktx:1.2.0'
     testImplementation 'androidx.arch.core:core-testing:2.1.0'
-
-    // For live data testing
-    //testImplementation 'org.robolectric:robolectric:4.2.1'
-
+    // Use For live data testing
+    // testImplementation 'org.robolectric:robolectric:4.2.1'
     // For coroutines testing
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7'
 
+    /* Instrumented Testing */
     // For instrumented testing
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test:rules:1.2.0'
-
-    /* Espresso core */
+    // Espresso core
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.2.0'
     implementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
+    // For Room DAO / DB testing
+    androidTestImplementation 'androidx.arch.core:core-testing:2.1.0'
+    // For testing room migrations
+    androidTestImplementation 'androidx.room:room-testing:2.2.5'
+    // For fragment scenario
+    androidTestImplementation 'junit:junit:4.12'
+    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7'
+    debugImplementation 'androidx.fragment:fragment-testing:1.2.5'  // TODO figure out if this can go to android test implementation
+    implementation 'androidx.test:core:1.2.0'   // TODO figure out if this can go to android test implementation
+    // For mocking
+    androidTestImplementation 'org.mockito:mockito-core:3.3.3'
+    androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito:2.28.0'
 
+    /*
+    * Non-Testing Dependencies
+    *  */
+
+    // Kotlin extensions
+    implementation "androidx.core:core-ktx:1.3.1"
+
+    // Material Design
     implementation 'com.google.android.material:material:1.1.0'
 
-    /* analytics */
+    // Analytics
     implementation 'com.google.firebase:firebase-analytics:17.4.4'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
-    /* navigation */
+    // Navigation
     def nav_version = "2.3.0"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
-    /* room */
+    // Room
     implementation 'androidx.room:room-ktx:2.2.5'
     kapt 'androidx.room:room-compiler:2.2.5'
-    // For testing room migrations
-    androidTestImplementation 'androidx.room:room-testing:2.2.5'
 
-    /* live data & view model */
+    // Live data & view model
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
 
-    /* Used instead of lifecycle-compiler for java 8 */
-    //implementation "androidx.lifecycle:lifecycle-common-java8:2.2.0"
-
-    /* Glide */
+    // Glide - Image Loading
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
 
-    /* Exif support */
+    // Exif support
     implementation "androidx.exifinterface:exifinterface:1.2.0"
 
-    /* work manager */
+    // Work manager
     implementation "androidx.work:work-runtime:2.4.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    /* LeakCanary */
+    // LeakCanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.0-beta-3'
 
-    /* Flex box Layout for tags */
+    // Flex box Layout for tags
     implementation 'com.google.android:flexbox:2.0.0'
 
-    /* Camera X */
+    // Camera X
     implementation "androidx.camera:camera-core:1.0.0-beta07"
     implementation "androidx.camera:camera-camera2:1.0.0-beta07"
     implementation "androidx.camera:camera-view:1.0.0-alpha14"
     implementation "androidx.camera:camera-extensions:1.0.0-alpha14"
     implementation "androidx.camera:camera-lifecycle:1.0.0-beta07"
 
-    /* Retrofit 2 & moshi */
+    // Retrofit 2 & moshi - Network calls and JSON serialization / deserialization
     def version_moshi = "1.9.2"
     implementation 'com.squareup.retrofit2:retrofit:2.8.1'
     implementation 'com.squareup.retrofit2:converter-moshi:2.8.1'
     implementation "com.squareup.moshi:moshi:$version_moshi"
     implementation "com.squareup.moshi:moshi-kotlin:$version_moshi"
 
-    /* Charting for weather data */
+    // Charting for weather data
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
-    /* Coroutines adapter for deferred */
+    // Coroutines adapter for deferred
     // Note: downgraded to 1.3.6 from 1.3.7 to fix problem running tests
+    // TODO figure out how to coroutines version without breaking tests
     def version_kotlin_coroutines = "1.3.6"
     def version_kotlin_coroutines_adapter = "0.9.2"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version_kotlin_coroutines"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version_kotlin_coroutines"
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$version_kotlin_coroutines_adapter"
 
-    /* Dagger 2 - Dependency Injection */
+    // Dagger 2 - Dependency Injection
+    // Note: Using older version to follow code example
+    // TODO: Update to newer dagger 2 version
     def dagger_version = "2.16"
     implementation "com.google.dagger:dagger:$dagger_version"
     implementation "com.google.dagger:dagger-android:$dagger_version"
@@ -189,7 +225,10 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
-    /* ffmpeg */
+    // FFMPEG
     // Note: LTS version required to support API level 16+ rather than API level 24+
     implementation 'com.arthenica:mobile-ffmpeg-full:4.3.1.LTS'
+
+    // Timber For Logging
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 }
