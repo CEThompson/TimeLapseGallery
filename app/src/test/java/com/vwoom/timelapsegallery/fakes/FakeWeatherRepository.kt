@@ -1,11 +1,9 @@
-package com.vwoom.timelapsegallery.data.repository.fakes
+package com.vwoom.timelapsegallery.fakes
 
 import android.location.Location
 import com.vwoom.timelapsegallery.data.repository.IWeatherRepository
 import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
 import com.vwoom.timelapsegallery.data.source.IWeatherRemoteDataSource
-import com.vwoom.timelapsegallery.data.source.fakes.FakeLocalDataSource
-import com.vwoom.timelapsegallery.data.source.fakes.FakeRemoteDataSource
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 

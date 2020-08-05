@@ -48,6 +48,7 @@ class TimeLapseDatabaseTest {
         db.close()
     }
 
+    // TODO refactor this to a DAO test
     @Test
     @Throws(Exception::class)
     fun insertWeather() {

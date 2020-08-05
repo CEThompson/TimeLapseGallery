@@ -1,8 +1,8 @@
-package com.vwoom.timelapsegallery.data
+package com.vwoom.timelapsegallery.data.source
 
-import com.vwoom.timelapsegallery.data.dao.WeatherDao
 import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import com.vwoom.timelapsegallery.data.source.WeatherLocalDataSource
+import com.vwoom.timelapsegallery.fakes.FakeWeatherDao
 import com.vwoom.timelapsegallery.testing.TestForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.runBlocking
@@ -77,21 +77,4 @@ class WeatherLocalDataSourceTest {
         assert(newEntry.forecastJsonString != "test")
         assert(newEntry.timestamp != 1.toLong())
     }
-}
-
-class FakeWeatherDao: WeatherDao {
-    var weatherEntry: WeatherEntry? = null
-
-    override suspend fun getWeather(): WeatherEntry? {
-        return weatherEntry
-    }
-
-    override suspend fun insertWeather(weatherEntry: WeatherEntry) {
-        this.weatherEntry = weatherEntry
-    }
-
-    override suspend fun deleteWeather() {
-        weatherEntry = null
-    }
-
 }

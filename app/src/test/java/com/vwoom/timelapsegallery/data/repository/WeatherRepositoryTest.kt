@@ -2,8 +2,8 @@ package com.vwoom.timelapsegallery.data.repository
 
 import android.location.Location
 import com.vwoom.timelapsegallery.MainCoroutineRule
-import com.vwoom.timelapsegallery.data.source.fakes.FakeLocalDataSource
-import com.vwoom.timelapsegallery.data.source.fakes.FakeRemoteDataSource
+import com.vwoom.timelapsegallery.fakes.FakeLocalDataSource
+import com.vwoom.timelapsegallery.fakes.FakeRemoteDataSource
 import com.vwoom.timelapsegallery.testing.TestForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi

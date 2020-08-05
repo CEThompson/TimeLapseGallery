@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.data.source.fakes
+package com.vwoom.timelapsegallery.fakes
 
 import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
 import com.vwoom.timelapsegallery.testing.TestForecastResponse

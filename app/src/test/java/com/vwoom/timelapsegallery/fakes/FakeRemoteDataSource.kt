@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.data.source.fakes
+package com.vwoom.timelapsegallery.fakes
 
 import android.location.Location
 import com.vwoom.timelapsegallery.data.source.IWeatherRemoteDataSource

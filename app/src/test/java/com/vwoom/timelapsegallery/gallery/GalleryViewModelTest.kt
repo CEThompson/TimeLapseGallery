@@ -3,9 +3,9 @@ package com.vwoom.timelapsegallery.gallery
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.vwoom.timelapsegallery.MainCoroutineRule
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.data.repository.fakes.FakeProjectRepository
-import com.vwoom.timelapsegallery.data.repository.fakes.FakeTagRepository
-import com.vwoom.timelapsegallery.data.repository.fakes.FakeWeatherRepository
+import com.vwoom.timelapsegallery.fakes.FakeProjectRepository
+import com.vwoom.timelapsegallery.fakes.FakeTagRepository
+import com.vwoom.timelapsegallery.fakes.FakeWeatherRepository
 import com.vwoom.timelapsegallery.getOrAwaitValue
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import junit.framework.Assert.assertTrue

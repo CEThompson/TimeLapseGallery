@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.data.repository.fakes
+package com.vwoom.timelapsegallery.fakes
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
