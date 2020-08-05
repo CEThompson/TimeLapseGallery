@@ -119,8 +119,7 @@ dependencies {
     testImplementation 'androidx.test.ext:junit:1.1.1'
     testImplementation 'androidx.test:core-ktx:1.2.0'
     testImplementation 'androidx.arch.core:core-testing:2.1.0'
-    // Use For live data testing
-    // testImplementation 'org.robolectric:robolectric:4.2.1'
+    
     // For coroutines testing
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7'
 

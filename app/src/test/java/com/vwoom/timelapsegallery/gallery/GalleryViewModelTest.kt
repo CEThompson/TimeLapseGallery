@@ -7,17 +7,15 @@ import com.vwoom.timelapsegallery.data.repository.fakes.FakeProjectRepository
 import com.vwoom.timelapsegallery.data.repository.fakes.FakeTagRepository
 import com.vwoom.timelapsegallery.data.repository.fakes.FakeWeatherRepository
 import com.vwoom.timelapsegallery.getOrAwaitValue
+import com.vwoom.timelapsegallery.weather.WeatherResult
+import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-// TODO: figure out if robolectric can be removed from this test and gradle
-
 @ExperimentalCoroutinesApi
-//@Config(sdk = [Build.VERSION_CODES.O_MR1])
-//@RunWith(AndroidJUnit4::class)
 class GalleryViewModelTest {
 
     @get:Rule
@@ -38,7 +36,7 @@ class GalleryViewModelTest {
 
     @Test
     fun galleryViewModel_whenInitialized_fourProjectsExist() = mainCoroutineRule.runBlockingTest {
-        // Given a created view model
+        // Given a view model set up in @before
         // When we get the test projects
         val projects = galleryViewModel.projects.getOrAwaitValue()
         // Then test projects size is four
@@ -47,16 +45,15 @@ class GalleryViewModelTest {
 
 
     @Test
-    fun galleryViewModelTest_variousFiltersApplied_allAssertionsPass() = mainCoroutineRule.runBlockingTest {
-        // Given a view model
-
+    fun galleryViewModelTest_whenVariousSearchFiltersApplied_displayedProjectsAreCorrect() = mainCoroutineRule.runBlockingTest {
+        // Given a view model set up in @before
         // When we filter for tags that no project has
         galleryViewModel.searchTags = arrayListOf(TagEntry("cat"), TagEntry("orange"))
         galleryViewModel.filterProjects()
 
         // Then no projects are displayed
         var filterResult = galleryViewModel.displayedProjectViews.getOrAwaitValue()
-        assert(filterResult.isEmpty())
+        assertTrue(filterResult.isEmpty())
 
         // When we filter for one tag
         galleryViewModel.searchTags = arrayListOf(TagEntry("one"))
@@ -64,7 +61,7 @@ class GalleryViewModelTest {
 
         // Then one project is displayed
         filterResult = galleryViewModel.displayedProjectViews.getOrAwaitValue()
-        assert(filterResult.size == 1)
+        assertTrue(filterResult.size == 1)
 
         // When we filter for two tags
         galleryViewModel.searchTags = arrayListOf(TagEntry("zero"), TagEntry("one"))
@@ -72,7 +69,7 @@ class GalleryViewModelTest {
 
         // Then two projects
         filterResult = galleryViewModel.displayedProjectViews.getOrAwaitValue()
-        assert(filterResult.size == 2)
+        assertTrue(filterResult.size == 2)
 
         // When three tags
         galleryViewModel.searchTags = arrayListOf(TagEntry("zero"), TagEntry("one"), TagEntry("two"))
@@ -80,7 +77,7 @@ class GalleryViewModelTest {
 
         // Then three projects
         filterResult = galleryViewModel.displayedProjectViews.getOrAwaitValue()
-        assert(filterResult.size == 3)
+        assertTrue(filterResult.size == 3)
 
         // When four
         galleryViewModel.searchTags = arrayListOf(TagEntry("zero"), TagEntry("one"), TagEntry("two"), TagEntry("three"))
@@ -88,7 +85,19 @@ class GalleryViewModelTest {
 
         // Then four
         filterResult = galleryViewModel.displayedProjectViews.getOrAwaitValue()
-        assert(filterResult.size == 4)
+        assertTrue(filterResult.size == 4)
+    }
+
+
+    // Note: This is an example of how to pause and resume test coroutines
+    // This test ensures that when getForecast is called the weather is loading and then is something else when completed
+    @Test
+    fun getForecast_whenWeGetForecast_weatherIsLoadingThenCompleted() {
+        mainCoroutineRule.pauseDispatcher()
+        galleryViewModel.getForecast(null)
+        assertTrue(galleryViewModel.weather.getOrAwaitValue() == WeatherResult.Loading)
+        mainCoroutineRule.resumeDispatcher()
+        assertTrue(galleryViewModel.weather.getOrAwaitValue() != WeatherResult.Loading)
     }
 
 }
