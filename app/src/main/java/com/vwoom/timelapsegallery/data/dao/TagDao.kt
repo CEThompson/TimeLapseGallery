@@ -21,6 +21,9 @@ interface TagDao {
     @Insert
     suspend fun insertTag(tagEntry: TagEntry): Long
 
+    @Insert
+    suspend fun bulkInsert(tags: List<TagEntry>)
+
     @Delete
     suspend fun deleteTag(tagEntry: TagEntry)
 
@@ -29,4 +32,5 @@ interface TagDao {
 
     @Query("DELETE FROM tag")
     suspend fun deleteAllTags()
+
 }

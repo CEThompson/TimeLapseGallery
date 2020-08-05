@@ -21,6 +21,9 @@ interface ProjectTagDao {
     @Insert
     suspend fun insertProjectTag(projectTagEntry: ProjectTagEntry)
 
+    @Insert
+    suspend fun bulkInsert(projectTags: List<ProjectTagEntry>)
+
     @Delete
     suspend fun bulkDelete(tagsToDelete: List<ProjectTagEntry>)
 
