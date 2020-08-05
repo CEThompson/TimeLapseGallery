@@ -8,6 +8,7 @@ import com.vwoom.timelapsegallery.di.AppInjector
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
+import timber.log.Timber
 import javax.inject.Inject
 
 class TimeLapseGalleryApplication : Application(), CameraXConfig.Provider, HasActivityInjector {
@@ -20,6 +21,8 @@ class TimeLapseGalleryApplication : Application(), CameraXConfig.Provider, HasAc
     override fun onCreate() {
         super.onCreate()
         AppInjector.init(this)
+        if (BuildConfig.DEBUG)
+            Timber.plant(Timber.DebugTree())
     }
 
     override fun getCameraXConfig(): CameraXConfig {
