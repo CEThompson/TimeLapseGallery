@@ -61,11 +61,11 @@ class GalleryViewModel
 
     private var searchJob: Job = Job()
 
-    init {
+/*    init {
         viewModelScope.launch {
             weather.value = weatherRepository.getCachedForecast()
         }
-    }
+    }*/
 
     override fun onCleared() {
         super.onCleared()
@@ -85,6 +85,7 @@ class GalleryViewModel
 
     // Retrieves cached forecast and attempts to update it if forecast does not belong to today
     fun getForecast(location: Location?) {
+        weather.value = WeatherResult.Loading
         viewModelScope.launch {
             // Get the cached forecast
             weather.value = weatherRepository.getCachedForecast()
@@ -98,14 +99,10 @@ class GalleryViewModel
 
     // Attempts to update the forecast
     fun updateForecast(location: Location) {
-        weather.value = WeatherResult.Loading
+        if (weather.value != WeatherResult.Loading) weather.value = WeatherResult.Loading
         viewModelScope.launch {
             weather.value = weatherRepository.updateForecast(location)
         }
-    }
-
-    fun setForecastLoading() {
-        weather.value = WeatherResult.Loading
     }
 
     fun setForecastNoData() {

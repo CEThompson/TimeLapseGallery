@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.data.source
 
 import android.location.Location
+import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.weather.ForecastLocationResponse
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherApi.weatherService
@@ -11,6 +12,9 @@ interface IWeatherRemoteDataSource {
     // Returns either (1) Weather Result: No Data or (2) Weather Result: Today's Forecast
     suspend fun getForecast(location: Location): WeatherResult<ForecastResponse>
 }
+
+const val ERROR_NO_LOCATION_RESPONSE = "no_location_response"
+const val ERROR_NO_RESPONSE = "no_response"
 
 class WeatherRemoteDataSource : IWeatherRemoteDataSource {
     // Get the forecast from the national weather service api
@@ -23,10 +27,10 @@ class WeatherRemoteDataSource : IWeatherRemoteDataSource {
                     .getForecastLocationAsync(location.latitude.toString(), location.longitude.toString())
             forecastLocationResponse = forecastLocationDeferred.await()
         } catch (e: Exception) {
-            return WeatherResult.NoData(e, "Error retrieving forecast location")
+            return WeatherResult.NoData(e, e.localizedMessage)
         }
         // If the url did not return then no data can be returned
-        if (forecastLocationResponse == null) return WeatherResult.NoData(null, "Error retrieving forecast location")
+        if (forecastLocationResponse == null) return WeatherResult.NoData(null, ERROR_NO_LOCATION_RESPONSE)
 
         // 2. Call the url to get the forecast for the location and return the result
         val url = forecastLocationResponse.properties.forecast
@@ -38,7 +42,7 @@ class WeatherRemoteDataSource : IWeatherRemoteDataSource {
             if (forecastResponse != null)
                 WeatherResult.TodaysForecast(forecastResponse, System.currentTimeMillis())
             // Otherwise give back an error
-            else WeatherResult.NoData(null, "Error retrieving forecast")
+            else WeatherResult.NoData(null, ERROR_NO_RESPONSE)
         } catch (e: Exception) {
             WeatherResult.NoData(e)
         }

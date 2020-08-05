@@ -41,6 +41,7 @@ import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.PhotoUtils
 import com.vwoom.timelapsegallery.weather.WeatherChartDialog
 import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
+import com.vwoom.timelapsegallery.weather.WeatherResult
 import javax.inject.Inject
 
 
@@ -229,6 +230,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         }
         weatherChartDialog?.show()
         galleryViewModel.weatherChartDialogShowing = true
+        checkForWeatherUpdate()
+    }
+
+    private fun checkForWeatherUpdate() {
+        if (galleryViewModel.weather.value is WeatherResult.TodaysForecast
+                || galleryViewModel.weather.value is WeatherResult.Loading) return
+        getLocationAndExecute {
+            galleryViewModel.getForecast(location)
+        }
     }
 
     override fun onResume() {
@@ -317,7 +327,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         weatherChartDialog = WeatherChartDialog(requireContext(), galleryViewModel)
         // Set click listener to get device location and forecast, otherwise get local cache if available
         weatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
-            galleryViewModel.setForecastLoading()
             getLocationAndExecute {
                 try {
                     galleryViewModel.updateForecast(location!!)

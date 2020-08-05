@@ -288,9 +288,9 @@
     <string name="weather">Weather</string>
     <string name="degree">%1$d%2$s</string>
     <string name="show_details">Show Details</string>
-    <string name="error_no_forecast_data">No forecast data available</string>
+    <!--<string name="error_no_forecast_data">No forecast data available</string>-->
     <string name="cache_time">Cached: %1$s %2$s</string>
-    <string name="forecast_error">Could not retrieve forecast from remote source. Reason: %1$s</string>
+    <string name="forecast_error">Unable to get forecast. Reason: %1$s</string>
     <string name="update_time">Today: %1$s %2$s</string>
     <string name="no_location_error">Unable to sync: no location available</string>
     <string name="permissions_required_for_forecast">Permissions required to get localized forecast</string>
@@ -304,5 +304,8 @@
     <string name="notification_channel_name">TLG Notifications</string>
     <string name="notification_channel_description">Notifications for scheduled time-lapse projects</string>
     <string name="allow">allow</string>
+    <string name="no_forecast_available">No local or network forecast available.</string>
+    <string name="error_no_remote_location_response">No remote location response</string>
+    <string name="error_no_remote_response">No response from remote</string>
 
 </resources>

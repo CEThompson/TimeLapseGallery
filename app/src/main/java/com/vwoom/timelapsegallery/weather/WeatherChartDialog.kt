@@ -17,6 +17,8 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
+import com.vwoom.timelapsegallery.data.source.ERROR_NO_LOCATION_RESPONSE
+import com.vwoom.timelapsegallery.data.source.ERROR_NO_RESPONSE
 import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.weather.WeatherUtils.getTimestampForDayFromPeriod
@@ -103,12 +105,27 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.INVISIBLE
         this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.INVISIBLE
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
+        this.findViewById<TextView>(R.id.error_message_tv)?.text = "Fetching forecast"
+        this.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
     }
 
-    private fun showWeatherNoData() {
-        this.findViewById<TextView>(R.id.update_time_tv)?.text = context.getString(R.string.error_no_forecast_data)
+    private fun showWeatherNoData(message: String?) {
+        //this.findViewById<TextView>(R.id.update_time_tv)?.text = context.getString(R.string.error_no_forecast_data)
         this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
-        this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString(R.string.forecast_error, context.getString(R.string.error_no_forecast_data))
+        
+        if (message == null)
+            this.findViewById<TextView>(R.id.error_message_tv)?.text =
+                    context.getString(R.string.forecast_error, context.getString(R.string.no_forecast_available))
+        else {
+            val localizedMessage = when (message) {
+                ERROR_NO_RESPONSE -> context.getString(R.string.error_no_remote_response)
+                ERROR_NO_LOCATION_RESPONSE -> context.getString(R.string.error_no_remote_location_response)
+                else -> message
+            }
+
+            this.findViewById<TextView>(R.id.error_message_tv)?.text =
+                    context.getString(R.string.forecast_error, localizedMessage)
+        }
         this.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
@@ -240,7 +257,7 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
                 this.showTodaysForecast(result)
             }
             is WeatherResult.NoData -> {
-                this.showWeatherNoData()
+                this.showWeatherNoData(result.message)
             }
             is WeatherResult.CachedForecast -> {
                 this.setWeatherChart(result.data)
