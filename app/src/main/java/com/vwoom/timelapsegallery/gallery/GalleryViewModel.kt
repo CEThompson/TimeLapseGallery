@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
-// TODO consider convert these to an enum
 enum class SearchType {
     None, DueToday, DueTomorrow, Pending, Scheduled, Unscheduled
 }
