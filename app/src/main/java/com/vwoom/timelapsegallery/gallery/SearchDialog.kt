@@ -47,36 +47,36 @@ class SearchDialog(context: Context, private val galleryViewModel: GalleryViewMo
         // Handle search selection of scheduled / unscheduled projects
         dueTodayCheckBox?.setOnClickListener {
             val checked = (it as CheckBox).isChecked
-            if (checked) galleryViewModel.searchType = SEARCH_TYPE_DUE_TODAY
-            else galleryViewModel.searchType = SEARCH_TYPE_NONE
+            if (checked) galleryViewModel.searchType = SearchType.DueToday
+            else galleryViewModel.searchType = SearchType.None
             updateSearchDialogCheckboxes()
             updateSearchFilter()
         }
         dueTomorrowCheckBox?.setOnClickListener {
             val checked = (it as CheckBox).isChecked
-            if (checked) galleryViewModel.searchType = SEARCH_TYPE_DUE_TOMORROW
-            else galleryViewModel.searchType = SEARCH_TYPE_NONE
+            if (checked) galleryViewModel.searchType = SearchType.DueTomorrow
+            else galleryViewModel.searchType = SearchType.None
             updateSearchDialogCheckboxes()
             updateSearchFilter()
         }
         pendingCheckBox?.setOnClickListener {
             val checked = (it as CheckBox).isChecked
-            if (checked) galleryViewModel.searchType = SEARCH_TYPE_PENDING
-            else galleryViewModel.searchType = SEARCH_TYPE_NONE
+            if (checked) galleryViewModel.searchType = SearchType.Pending
+            else galleryViewModel.searchType = SearchType.None
             updateSearchDialogCheckboxes()
             updateSearchFilter()
         }
         scheduledCheckBox?.setOnClickListener {
             val checked = (it as CheckBox).isChecked
-            if (checked) galleryViewModel.searchType = SEARCH_TYPE_SCHEDULED
-            else galleryViewModel.searchType = SEARCH_TYPE_NONE
+            if (checked) galleryViewModel.searchType = SearchType.Scheduled
+            else galleryViewModel.searchType = SearchType.None
             updateSearchDialogCheckboxes()
             updateSearchFilter()
         }
         unscheduledCheckBox?.setOnClickListener {
             val checked = (it as CheckBox).isChecked
-            if (checked) galleryViewModel.searchType = SEARCH_TYPE_UNSCHEDULED
-            else galleryViewModel.searchType = SEARCH_TYPE_NONE
+            if (checked) galleryViewModel.searchType = SearchType.Unscheduled
+            else galleryViewModel.searchType = SearchType.None
             updateSearchDialogCheckboxes()
             updateSearchFilter()
         }
@@ -139,11 +139,11 @@ class SearchDialog(context: Context, private val galleryViewModel: GalleryViewMo
         val pendingCheckBox = this.findViewById<CheckBox>(R.id.search_pending_checkbox)
         val scheduledCheckBox = this.findViewById<CheckBox>(R.id.search_scheduled_checkbox)
         val unscheduledCheckBox = this.findViewById<CheckBox>(R.id.search_unscheduled_checkbox)
-        dueTodayCheckBox?.isChecked = galleryViewModel.searchType == SEARCH_TYPE_DUE_TODAY
-        dueTomorrowCheckBox?.isChecked = galleryViewModel.searchType == SEARCH_TYPE_DUE_TOMORROW
-        pendingCheckBox?.isChecked = galleryViewModel.searchType == SEARCH_TYPE_PENDING
-        scheduledCheckBox?.isChecked = galleryViewModel.searchType == SEARCH_TYPE_SCHEDULED
-        unscheduledCheckBox?.isChecked = galleryViewModel.searchType == SEARCH_TYPE_UNSCHEDULED
+        dueTodayCheckBox?.isChecked = galleryViewModel.searchType == SearchType.DueToday
+        dueTomorrowCheckBox?.isChecked = galleryViewModel.searchType == SearchType.DueTomorrow
+        pendingCheckBox?.isChecked = galleryViewModel.searchType == SearchType.Pending
+        scheduledCheckBox?.isChecked = galleryViewModel.searchType == SearchType.Scheduled
+        unscheduledCheckBox?.isChecked = galleryViewModel.searchType == SearchType.Unscheduled
     }
 
     private fun updateSearchFilter() {

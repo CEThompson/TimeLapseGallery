@@ -185,7 +185,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
 
         // Launch with search filter if set from the notification
         if (args.searchLaunchDue && !galleryViewModel.userClickedToStopSearch) {
-            galleryViewModel.searchType = SEARCH_TYPE_DUE_TODAY
+            galleryViewModel.searchType = SearchType.DueToday
             galleryViewModel.setSearch()
         }
 
