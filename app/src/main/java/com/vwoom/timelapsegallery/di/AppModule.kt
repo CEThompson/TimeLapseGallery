@@ -13,7 +13,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module(includes = [ViewModelModule::class])
-class AppModule {
+object AppModule {
 
     // TODO: consider injecting shared preferences
     /*@Provides
