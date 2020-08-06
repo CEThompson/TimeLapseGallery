@@ -140,7 +140,7 @@ dependencies {
     androidTestImplementation 'junit:junit:4.12'
     androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7'
     debugImplementation 'androidx.fragment:fragment-testing:1.2.5'  // TODO figure out if this can go to android test implementation
-    implementation 'androidx.test:core:1.2.0'   // TODO figure out if this can go to android test implementation
+    androidTestImplementation 'androidx.test:core:1.2.0'
     // For mocking
     androidTestImplementation 'org.mockito:mockito-core:3.3.3'
     androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito:2.28.0'
@@ -207,7 +207,6 @@ dependencies {
 
     // Coroutines adapter for deferred
     // Note: downgraded to 1.3.6 from 1.3.7 to fix problem running tests
-    // TODO figure out how to coroutines version without breaking tests
     def version_kotlin_coroutines = "1.3.7"
     def version_kotlin_coroutines_adapter = "0.9.2"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version_kotlin_coroutines"
@@ -216,7 +215,6 @@ dependencies {
 
     // Dagger 2 - Dependency Injection
     // Note: Using older version to follow code example
-    // TODO: Update to newer dagger 2 version
     def dagger_version = "2.28.3"
     implementation "com.google.dagger:dagger:$dagger_version"
     implementation "com.google.dagger:dagger-android:$dagger_version"
