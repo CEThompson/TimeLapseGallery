@@ -52,15 +52,20 @@ class EndToEndTest {
         IdlingRegistry.getInstance().unregister(idlingResource)
     }
 
+    // TODO: Improve this test to verify that the exact project added is now deleted somehow
+    // Adds a project, adds a photo to the project (for two photos total) then deletes the project
+    // Verifies that the gallery ends with the number that it started at
     @Test
     fun endToEndTest() {
+        val startItemCount = mTimeLapseGalleryActivityTestRule.activity
+                .findViewById<RecyclerView>(R.id.gallery_recycler_view).adapter?.itemCount
+
         // Click on add project fab, should wait for camera to initialize
         onView(withId(R.id.add_project_FAB)).perform(click())
 
         // Click on the take picture fab, this should add a new project and go to its detail
         onView(withId(R.id.take_picture_fab)).perform(click())
 
-        
         // Click on the fab to go to the camera to add a photo to the project
         onView(withId(R.id.add_photo_fab)).perform(click())
 
@@ -98,8 +103,8 @@ class EndToEndTest {
                 .perform(click())
 
         // Assert that no projects are left
-        itemCount = mTimeLapseGalleryActivityTestRule.activity
+        val endItemCount = mTimeLapseGalleryActivityTestRule.activity
                 .findViewById<RecyclerView>(R.id.gallery_recycler_view).adapter?.itemCount
-        assertTrue(itemCount == 0)
+        assertTrue(startItemCount == endItemCount)
     }
 }
