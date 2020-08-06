@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.utils
 
 import android.content.Context
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
@@ -10,7 +11,9 @@ import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getMetaDirectoryForProject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -25,11 +28,15 @@ import java.io.IOException
 
 // TODO: find out how to run these tests with coroutines
 // Note: Currently there is an error with coroutines 1.3.7 running these tests, reverting to 1.3.6 fixes this issue
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4ClassRunner::class)
 class FilesUtilsDbTest {
     @Rule
     @JvmField
     val testFolder = TemporaryFolder()
+
+    @get:Rule
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var externalFilesTestDir: File
     private lateinit var db: TimeLapseDatabase
@@ -49,11 +56,11 @@ class FilesUtilsDbTest {
 
     // Ensures that when a project is tagged, tags are represented in database and in a text file
     @Test
-    fun addTagToProject_listOfTwoTags_resultInTwoTagsRepresented() {
+    fun addTagToProject_listOfTwoTags_resultInTwoTagsRepresented() = runBlockingTest {
         // Given
         // A project in the file structure and database
         val projectEntry = ProjectEntry("test name")
-        val insertedId = runBlocking { db.projectDao().insertProject(projectEntry) }
+        val insertedId = db.projectDao().insertProject(projectEntry)
         projectEntry.id = insertedId
 
         // And a list of tags and projectTags
@@ -65,21 +72,20 @@ class FilesUtilsDbTest {
 
 
         // When we add the project tags to the db
-        runBlocking {
-            db.tagDao().bulkInsert(tags)
-            db.projectTagDao().bulkInsert(projectTags)
-        }
+        db.tagDao().bulkInsert(tags)
+        db.projectTagDao().bulkInsert(projectTags)
+
         // and when we use the utility to write the tags to file
         FileUtils.writeProjectTagsFile(externalFilesTestDir, projectEntry.id, tags)
 
         // Then
         // Each tag retrieved from the database should be in the list passed to the utility
-        val projectTagEntries = runBlocking { db.projectTagDao().getProjectTagsByProjectId(projectEntry.id) }
+        val projectTagEntries = db.projectTagDao().getProjectTagsByProjectId(projectEntry.id)
         Timber.d("projectTagEntries size = ${projectTagEntries.size}")
         Timber.d("tags size = ${tags.size}")
         assertTrue(projectTagEntries.size == tags.size) // two tags should be retrieved since we fed in two tags
         for (tag in projectTagEntries) {
-            val currentTag = runBlocking { db.tagDao().getTagById(tag.tag_id) }
+            val currentTag = db.tagDao().getTagById(tag.tag_id)
             assertTrue(tags.contains(currentTag)) // make the assertions
         }
         // And a tag file should exist in the projects meta directory
@@ -91,18 +97,18 @@ class FilesUtilsDbTest {
         val tagsInFile: List<String> = inputAsString.split('\n')
         for (text in tagsInFile) {
             if (text.isEmpty()) continue
-            val currentTag = runBlocking { db.tagDao().getTagByText(text) }
+            val currentTag = db.tagDao().getTagByText(text)
             assertTrue(tags.contains(currentTag)) // make the assertion
         }
     }
 
     // Ensures that when a project is tagged, tags are represented in the database and as a text file
     @Test
-    fun addTagToProject_emptyTags_resultInZeroTagsRepresented() {
+    fun addTagToProject_emptyTags_resultInZeroTagsRepresented() = runBlockingTest {
         // Given
         // A project in the file structure and database
         val projectEntry = ProjectEntry("test name")
-        val insertedId = runBlocking { db.projectDao().insertProject(projectEntry) }
+        val insertedId = db.projectDao().insertProject(projectEntry)
         projectEntry.id = insertedId
 
         // And an empty list of tags
@@ -111,14 +117,13 @@ class FilesUtilsDbTest {
 
         // When we use the utility and insert into db
         FileUtils.writeProjectTagsFile(externalFilesTestDir, projectEntry.id, tags)
-        runBlocking {
-            db.tagDao().bulkInsert(tags)
-            db.projectTagDao().bulkInsert(projectTags)
-        }
+        db.tagDao().bulkInsert(tags)
+        db.projectTagDao().bulkInsert(projectTags)
+
 
         // Then
         // Tags retrieved should be an empty list
-        val projectTagEntries = runBlocking { db.projectTagDao().getProjectTagsByProjectId(projectEntry.id) }
+        val projectTagEntries = db.projectTagDao().getProjectTagsByProjectId(projectEntry.id)
         assertTrue(projectTagEntries.isEmpty())
 
         // Agnd an empty tag file should exist in the projects meta directory
@@ -131,11 +136,11 @@ class FilesUtilsDbTest {
 
     // Ensures that when a project is scheduled it is represented both in the database and as a text file
     @Test
-    fun scheduleProject() {
+    fun scheduleProject() = runBlockingTest {
         // Given
         // A project in the file structure and database
         val projectEntry = ProjectEntry("test name")
-        val insertedId = runBlocking { db.projectDao().insertProject(projectEntry) }
+        val insertedId = db.projectDao().insertProject(projectEntry)
         projectEntry.id = insertedId
 
         // And a schedule entry
@@ -144,11 +149,11 @@ class FilesUtilsDbTest {
         // When we use the utility
         FileUtils.writeProjectScheduleFile(externalFilesTestDir, projectEntry.id, schedule)
         // And insert into the db
-        runBlocking { db.projectScheduleDao().insertProjectSchedule(schedule) }
+        db.projectScheduleDao().insertProjectSchedule(schedule)
 
         // Then
         // The retrieved schedule from the db exists and represents the interval
-        val retrievedSchedule = runBlocking { db.projectScheduleDao().getProjectScheduleByProjectId(projectEntry.id) }
+        val retrievedSchedule = db.projectScheduleDao().getProjectScheduleByProjectId(projectEntry.id)
         assertTrue(retrievedSchedule != null)
         assertTrue(retrievedSchedule?.interval_days == 7)
 
