@@ -18,7 +18,6 @@ import org.junit.runner.RunWith
 
 
 // TODO: test other DAO methods
-// TODO: Convert all test assert methods to assertTrue or assertFalse etc.
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4ClassRunner::class)
 @SmallTest

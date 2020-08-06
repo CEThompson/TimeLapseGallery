@@ -14,7 +14,6 @@ interface IWeatherRepository {
     suspend fun getCachedForecast(): WeatherResult<ForecastResponse>
 }
 
-// TODO (1.2): test repository and local/remote data sources
 class WeatherRepository
 @Inject constructor(private val weatherLocalDataSource: IWeatherLocalDataSource,
                     private val weatherRemoteDataSource: IWeatherRemoteDataSource) : IWeatherRepository {
