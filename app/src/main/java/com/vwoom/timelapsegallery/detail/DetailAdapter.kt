@@ -60,8 +60,8 @@ class DetailAdapter(
 
         // Otherwise continue on to load the correct image
         val f = if (photoPath == null) null else File(photoPath)
-        // TODO (update 1.3) dynamically resize detail view
 
+        // TODO (update 1.3) dynamically resize detail view
         if (f == null) {
             Glide.with(context)
                     .load(R.drawable.ic_sentiment_very_dissatisfied_white_24dp)
@@ -99,15 +99,14 @@ class DetailAdapter(
             this.notifyItemChanged(currentPos)
         }
     }
-}
 
-// TODO can this be an inner class?
-class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoEntry>() {
-    override fun areContentsTheSame(oldItem: PhotoEntry, newItem: PhotoEntry): Boolean {
-        return oldItem.id == newItem.id
-    }
+    class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoEntry>() {
+        override fun areContentsTheSame(oldItem: PhotoEntry, newItem: PhotoEntry): Boolean {
+            return oldItem.id == newItem.id
+        }
 
-    override fun areItemsTheSame(oldItem: PhotoEntry, newItem: PhotoEntry): Boolean {
-        return oldItem == newItem
+        override fun areItemsTheSame(oldItem: PhotoEntry, newItem: PhotoEntry): Boolean {
+            return oldItem == newItem
+        }
     }
 }
