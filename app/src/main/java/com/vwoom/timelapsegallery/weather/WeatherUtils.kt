@@ -2,16 +2,15 @@ package com.vwoom.timelapsegallery.weather
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.core.content.ContextCompat
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.weather.MoonPhaseCalculator.getMoonPhaseFromTimestamp
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
 object WeatherUtils {
-    private val TAG = WeatherUtils::class.simpleName
-
+    
     enum class WeatherType {
         Snowy, Rainy, Cloudy, Foggy, Stormy, Clear
     }
@@ -77,7 +76,7 @@ object WeatherUtils {
             val date = dateFormat.parse(dateString)
             date?.time
         } catch (e: Exception) {
-            Log.d(TAG, "Error getting timestamp from period: ${e.message}")
+            Timber.d("Error getting timestamp from period: ${e.message}")
             null
         }
     }
