@@ -5,13 +5,13 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.utils.InjectorUtils
 import com.vwoom.timelapsegallery.widget.WidgetProvider.Companion.updateWidgets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 class UpdateWidgetService
@@ -50,9 +50,8 @@ class UpdateWidgetService
 
     companion object {
         const val ACTION_UPDATE_WIDGETS = "com.example.android.timelapsegallery.UPDATE_WIDGETS"
-        private val TAG = UpdateWidgetService::class.java.simpleName
         fun startActionUpdateWidgets(context: Context) {
-            Log.d(TAG, "WidgetTracker: starting service to update widgets")
+            Timber.d("WidgetTracker: starting service to update widgets")
             val intent = Intent(context, UpdateWidgetService::class.java)
             intent.action = ACTION_UPDATE_WIDGETS
             context.startService(intent)

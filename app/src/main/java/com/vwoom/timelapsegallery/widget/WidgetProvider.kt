@@ -18,8 +18,6 @@ class WidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        val TAG = WidgetProvider::class.java.simpleName
-
         @JvmStatic
         fun updateWidgets(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, projectViews: List<ProjectView>) {
             for (appWidgetId in appWidgetIds) {
@@ -37,7 +35,9 @@ class WidgetProvider : AppWidgetProvider() {
 
             // If there are projects due today, put the search key for due projects as true
             // Otherwise normal start up
-            if (projectsDueToday.isNotEmpty()) { bundle.putBoolean(context.getString(R.string.search_launch_due), true) }
+            if (projectsDueToday.isNotEmpty()) {
+                bundle.putBoolean(context.getString(R.string.search_launch_due), true)
+            }
 
             val pendingIntent = NavDeepLinkBuilder(context)
                     .setComponentName(TimeLapseGalleryActivity::class.java)

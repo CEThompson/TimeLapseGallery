@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object WeatherUtils {
-    
+
     enum class WeatherType {
         Snowy, Rainy, Cloudy, Foggy, Stormy, Clear
     }
