@@ -17,7 +17,7 @@ import com.vwoom.timelapsegallery.detail.DetailViewModel
 import java.io.File
 import java.util.ArrayList
 
-class ScheduleDialog(context: Context, val detailViewModel: DetailViewModel, externalFilesDir: File, var project: ProjectView): Dialog(context) {
+class ScheduleDialog(context: Context, private val detailViewModel: DetailViewModel, externalFilesDir: File, var project: ProjectView): Dialog(context) {
 
     private val noneSelector: CardView
     private val daySelectionViews: ArrayList<CardView> = arrayListOf()

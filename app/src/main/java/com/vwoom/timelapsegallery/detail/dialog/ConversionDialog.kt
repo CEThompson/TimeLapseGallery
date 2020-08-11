@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
-import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.ImageView
@@ -31,6 +30,7 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 
 class ConversionDialog(context: Context,
@@ -138,9 +138,10 @@ class ConversionDialog(context: Context,
                 //.apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
                 .listener(object : RequestListener<GifDrawable> {
                     override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable>?, isFirstResource: Boolean): Boolean {
-                        Log.d("GifDebug", "${e?.message}")
+                        Timber.d("${e?.message}")
                         return false
                     }
+
                     override fun onResourceReady(resource: GifDrawable?, model: Any?, target: Target<GifDrawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                         return false
                     }
