@@ -6,11 +6,10 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
+import timber.log.Timber
 
 object SingleShotLocationProvider {
 
-    private val TAG = SingleShotLocationProvider::class.java.simpleName
     private val criteria = object : Criteria() {
         override fun getAccuracy(): Int {
             return ACCURACY_FINE
@@ -38,7 +37,7 @@ object SingleShotLocationProvider {
                 override fun onProviderDisabled(provider: String) {}
             }, null)
         } catch (e: SecurityException) {
-            Log.d(TAG, "Single shot location request failed. Reason: ${e.message}")
+            Timber.d("Single shot location request failed. Reason: ${e.message}")
         }
     }
 
