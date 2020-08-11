@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
@@ -15,10 +14,10 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
+import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-// TODO: verify notification channel info
 object NotificationUtils {
     private const val PROJECT_NOTIFICATION_CHANNEL_ID = "project_channel_id"
     private val TAG = NotificationUtils::class.java.simpleName
@@ -26,7 +25,7 @@ object NotificationUtils {
     /* Creates a notification that launches the main activity and filters by today's scheduled projects */
     @JvmStatic
     fun notifyUserOfScheduledProjects(context: Context, requestCode: Int) {
-        Log.d(TAG, "Notification Tracker: Notifying user of scheduled projects for request code $requestCode")
+        Timber.d("Notification Tracker: Notifying user of scheduled projects for request code $requestCode")
         val title = context.getString(R.string.app_name)
         val content = context.getString(R.string.projects_due_today)
 
@@ -87,13 +86,13 @@ object NotificationUtils {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         val notificationTimeString = prefs.getString(context.getString(R.string.key_notification_time), "7")
         val notificationTime = notificationTimeString!!.toInt()
-        Log.d(TAG, "Notification Tracker: shared pref time = $notificationTimeString int is $notificationTime")
+        Timber.d("Notification Tracker: shared pref time = $notificationTimeString int is $notificationTime")
         val c = Calendar.getInstance()
         c[Calendar.DAY_OF_YEAR] = dayOfYear
         c[Calendar.HOUR_OF_DAY] = notificationTime
         c[Calendar.MINUTE] = 0
         c[Calendar.SECOND] = 0
-        Log.d(TAG, "Notification Tracker: returning notification time in ms = " + c.timeInMillis)
+        Timber.d("Notification Tracker: returning notification time in ms =  ${c.timeInMillis}")
         return c.timeInMillis
     }
 
@@ -101,7 +100,7 @@ object NotificationUtils {
     * The notification workers checks each day to set a notification for tomorrow. */
     fun scheduleNotificationWorker(context: Context) {
         WorkManager.getInstance(context).cancelAllWorkByTag(NotificationWorker.TAG)
-        Log.d(TAG, "Notification Tracker: Creating and enqueuing work request")
+        Timber.d("Notification Tracker: Creating and enqueuing work request")
         val constraints = Constraints.Builder()
                 .setRequiresBatteryNotLow(true)
                 .build()
@@ -114,7 +113,7 @@ object NotificationUtils {
 
     /* Cancels alarms AND cancels any notification workers*/
     fun cancelNotificationWorker(context: Context) {
-        Log.d(TAG, "Notification Tracker: Canceling notifications")
+        Timber.d("Notification Tracker: Canceling notifications")
         val notificationAlarm = NotificationAlarm()
         notificationAlarm.cancelAlarms(context)
         WorkManager.getInstance(context).cancelAllWorkByTag(TAG)
