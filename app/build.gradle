@@ -17,7 +17,7 @@ android {
         applicationId "com.vwoom.timelapsegallery"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 23
+        versionCode 24
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -107,7 +107,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.preference:preference:1.1.1'
 
@@ -153,7 +153,7 @@ dependencies {
     implementation "androidx.core:core-ktx:1.3.1"
 
     // Material Design
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.material:material:1.2.0'
 
     // Analytics
     implementation 'com.google.firebase:firebase-analytics:17.4.4'
