@@ -3,16 +3,9 @@ package com.vwoom.timelapsegallery.data.repository
 import android.location.Location
 import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
 import com.vwoom.timelapsegallery.data.source.IWeatherRemoteDataSource
-import com.vwoom.timelapsegallery.data.source.WeatherLocalDataSource
-import com.vwoom.timelapsegallery.data.source.WeatherRemoteDataSource
 import com.vwoom.timelapsegallery.weather.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import javax.inject.Inject
-
-interface IWeatherRepository {
-    suspend fun updateForecast(location: Location): WeatherResult<ForecastResponse>
-    suspend fun getCachedForecast(): WeatherResult<ForecastResponse>
-}
 
 class WeatherRepository
 @Inject constructor(private val weatherLocalDataSource: IWeatherLocalDataSource,

@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.data.repository
 
-import androidx.lifecycle.LiveData
 import com.vwoom.timelapsegallery.data.dao.ProjectTagDao
 import com.vwoom.timelapsegallery.data.dao.TagDao
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
@@ -8,32 +7,13 @@ import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import javax.inject.Inject
 
-interface ITagRepository {
-    // Tag observables
-    suspend fun getProjectTags(projectId: Long): List<ProjectTagEntry>
-    fun getProjectTagsLiveData(projectId: Long): LiveData<List<ProjectTagEntry>>
-    fun getTagsLiveData(): LiveData<List<TagEntry>>
-
-    // Get the tag entries from a list of project tag entries
-    suspend fun getTagsFromProjectTags(projectTags: List<ProjectTagEntry>): List<TagEntry>
-
-    // Tag management
-    suspend fun deleteTag(tagEntry: TagEntry)
-    suspend fun deleteTagFromProject(tagEntry: TagEntry, projectView: ProjectView)
-    suspend fun addTagToProject(tagText: String, projectView: ProjectView)
-}
-
 class TagRepository
-@Inject constructor (private val projectTagDao: ProjectTagDao,
+@Inject constructor(private val projectTagDao: ProjectTagDao,
                     private val tagDao: TagDao) : ITagRepository {
 
-    /**
-     * Tag observables
-     */
+    // Tag observables
     override suspend fun getProjectTags(projectId: Long) = projectTagDao.getProjectTagsByProjectId(projectId)
-
     override fun getProjectTagsLiveData(projectId: Long) = projectTagDao.getProjectTagsLiveDataByProjectId(projectId)
-
     override fun getTagsLiveData() = tagDao.getTagsLiveData()
 
     // Get the tag entries from a list of project tag entries
@@ -46,14 +26,10 @@ class TagRepository
         return tags
     }
 
-    /**
-     * Tag management
-     */
-
+    // Tag management
     override suspend fun deleteTag(tagEntry: TagEntry) {
         tagDao.deleteTag(tagEntry)
     }
-
 
     override suspend fun deleteTagFromProject(tagEntry: TagEntry, projectView: ProjectView) {
         val projectTagEntry = projectTagDao.getProjectTag(projectView.project_id, tagEntry.id)
@@ -63,7 +39,6 @@ class TagRepository
 
     override suspend fun addTagToProject(tagText: String, projectView: ProjectView) {
         var tagEntry: TagEntry? = tagDao.getTagByText(tagText)
-
         // If tag does not exist create it
         if (tagEntry == null) {
             tagEntry = TagEntry(tagText)
