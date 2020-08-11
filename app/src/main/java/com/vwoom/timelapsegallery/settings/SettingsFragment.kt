@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -30,6 +29,7 @@ import com.vwoom.timelapsegallery.utils.ImportUtils
 import com.vwoom.timelapsegallery.utils.RESERVED_CHARACTERS
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import timber.log.Timber
 import javax.inject.Inject
 
 // TODO (1.3): consider allowing for adjustment of gallery columns
@@ -112,7 +112,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Injectable {
         // Listen for changes to shared preferences and update notification worker on change
         prefs = PreferenceManager.getDefaultSharedPreferences(activity)
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
-            Log.d("settings activity", "Notification listener activating for key = $key")
+            Timber.d("Notification listener activating for key = $key")
 
             if (key == this.getString(R.string.key_gif_auto_convert)) {
                 val autoConvert = prefs.getBoolean(key, true)
@@ -180,7 +180,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Injectable {
                 .setTitle(R.string.warning)
                 .setMessage(R.string.database_sync_warning)
                 .setPositiveButton(R.string.ok) { _, _ ->
-                    Log.d("settings activity", "Launching database sync async task")
+                    Timber.d("Launching database sync async task")
                     settingsViewModel.showingVerifySyncDialog = false
                     executeSync()
                 }
@@ -199,7 +199,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Injectable {
     }
 
     private fun createSyncDialog() {
-        Log.d(TAG, "creating sync dialog")
+        Timber.d("creating sync dialog")
         syncDialog = Dialog(requireContext())
         syncDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         // Set the dialog
@@ -216,7 +216,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Injectable {
 
     // Shows a dialog to give progress feedback on synchronization
     private fun showSyncDialog() {
-        Log.d(TAG, "showing sync dialog")
+        Timber.d("showing sync dialog")
         // Set the response
         val responseView = syncDialog?.findViewById(R.id.sync_response) as TextView
         responseView.text = this.getString(R.string.executing_sync_notification)
@@ -243,7 +243,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Injectable {
 
     // Updates the dialog showing progress on synchronization
     private fun updateSyncDialog(result: ValidationResult<List<ImportUtils.ProjectDataBundle>>) {
-        Log.d(TAG, "updating sync dialog")
+        Timber.d("updating sync dialog")
         // Set the response
         val responseView = syncDialog?.findViewById(R.id.sync_response) as TextView
         val overallProgress = syncDialog?.findViewById(R.id.overall_sync_progress) as ProgressBar
@@ -352,9 +352,5 @@ class SettingsFragment : PreferenceFragmentCompat(), Injectable {
             progress?.max = it + 1
         })
 
-    }
-
-    companion object {
-        private val TAG = SettingsFragment::class.java.simpleName
     }
 }
