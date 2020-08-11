@@ -45,7 +45,7 @@ class DetailViewModel @Inject constructor(
     var photoIndex: Int = 0
     var maxIndex: Int = Integer.MAX_VALUE
 
-    // TODO (1.2): inject properly
+    // For setting project info after viewModel creation
     fun setProject(id: Long) {
         projectId = id
         projectView = projectRepository.getProjectViewLiveData(projectId)
