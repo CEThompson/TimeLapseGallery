@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @Module(includes = [ViewModelModule::class])
 object AppModule {
 
-    // TODO: consider injecting shared preferences
+    // TODO: inject shared preferences
     /*@Provides
     fun provideSharedPreferences(
             app: Application

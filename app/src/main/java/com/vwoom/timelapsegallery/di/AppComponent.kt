@@ -21,10 +21,9 @@ interface AppComponent {
     @Component.Builder
     interface Builder {
         @BindsInstance
-        fun application (application: Application): Builder
-        //@BindsInstance
-        //fun context(context: Context): Builder
+        fun application(application: Application): Builder
         fun build(): AppComponent
     }
+
     fun inject(app: TimeLapseGalleryApplication)
 }
