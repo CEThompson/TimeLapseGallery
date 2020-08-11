@@ -13,7 +13,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.HandlerThread
-import android.util.Log
 import android.util.Size
 import android.view.*
 import android.widget.Toast
@@ -28,8 +27,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
 import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
@@ -42,6 +39,7 @@ import com.vwoom.timelapsegallery.utils.TimeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.suspendCancellableCoroutine
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
@@ -50,12 +48,12 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
-
     private val args: Camera2FragmentArgs by navArgs()
+
+    // Camera Fields
     private val cameraId: String by lazy { args.cameraId }
     private val cameraManager: CameraManager by lazy {
-        val context = requireContext().applicationContext
-        context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        requireContext().applicationContext.getSystemService(Context.CAMERA_SERVICE) as CameraManager
     }
     private val characteristics: CameraCharacteristics by lazy {
         cameraManager.getCameraCharacteristics(cameraId)
@@ -69,34 +67,32 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
     private lateinit var captureRequestBuilder: CaptureRequest.Builder
     private var previewSize: Size? = null
 
-    // For capturing image to match preview output
+    // For matching capture image to preview output
     private var baseWidth: Int = 0
     private var baseHeight: Int = 0
 
-    private var takePictureJob: Job? = null
-
+    // ViewModel
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private val camera2ViewModel: Camera2ViewModel by viewModels {
         viewModelFactory
     }
+
+    // Take picture functionality
+    private var takePictureJob: Job? = null
     private var takePictureFab: FloatingActionButton? = null
 
-    private var firebaseAnalytics: FirebaseAnalytics? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = FragmentCamera2Binding.inflate(inflater, container, false).apply {
-            lifecycleOwner = viewLifecycleOwner
-        }
+        val binding = FragmentCamera2Binding
+                .inflate(inflater, container, false)
+                .apply {
+                    lifecycleOwner = viewLifecycleOwner
+                }
         viewFinder = binding.cameraPreview
         takePictureFab = binding.takePictureFab
 
-        // Load the last photo from a project into the compare view if available
+        // If a comparison photo is passed as an argument
+        // Set a touch listener to show the quick compare photo
         if (args.photo != null) {
             // Load the photo into the compare image view
             val file = File(args.photo?.photo_url!!)
@@ -104,6 +100,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                     .load(file).into(binding.previousPhoto)
 
             // Set up quick compare fab to compare current camera input to previous photo
+            // TODO: clickable view accessibility for on touch listener
             @Suppress("ClickableViewAccessibility")
             binding.quickCompareFab.setOnTouchListener { _, event ->
                 when (event.action) {
@@ -119,11 +116,14 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                 }
             }
         }
-        // If no project photo was passed hide the quick compare
+        // Otherwise if no project photo was passed hide the quick compare
         else if (args.photo == null) binding.quickCompareFab.hide()
 
+        // Set a click listener to take the photo, either adding it to an existing project or creating a new project
         takePictureFab?.setOnClickListener {
+            // Disable the take picture fab
             it.isEnabled = false
+            // Launch the picture as an idling resource job
             takePictureJob = lifecycleScope.launchIdling(Dispatchers.IO) {
                 var outputPhoto: FileOutputStream? = null
                 try {
@@ -144,14 +144,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                     exif.saveAttributes()
 
                     // Determine if new project
-                    val isNewProject = args.projectView == null
-
-                    // Handle analytics
-                    if (isNewProject) {
-                        firebaseAnalytics?.logEvent(getString(R.string.analytics_new_project), null)
-                    } else {
-                        firebaseAnalytics?.logEvent(getString(R.string.analytics_add_photo), null)
-                    }
+                    val isNewProject = (args.projectView == null)
 
                     // For new projects navigate to project detail after insertion
                     if (isNewProject) {
@@ -166,14 +159,15 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                     }
                 } catch (e: Exception) {
                     viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
-                    Log.d(TAG, "Take picture exception: ${e.message}")
+                    Timber.d("Take picture exception: ${e.message}")
                 } finally {
                     try {
                         outputPhoto?.close()
                     } catch (e: Exception) {
-                        Log.d(TAG, "Take picture exception in finally block, exception closing photo: ${e.message}")
+                        Timber.d("Take picture exception in finally block, exception closing photo: ${e.message}")
                     }
                 }
+                // Re-enable the take picture fab
                 it.post { it.isEnabled = true }
             }
         }
@@ -184,22 +178,24 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
         super.onViewCreated(view, savedInstanceState)
         camera2ViewModel.setProjectInfo(args.projectView, args.photo)
 
+        // Set up a texture listener which initializes the camera
         viewFinder.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
             override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
-                Log.d(TAG, "onSurfaceTextureAvailable called with to width $width and height $height")
+                Timber.d("onSurfaceTextureAvailable called with to width $width and height $height")
                 previewSize = getPreviewOutputSize(
                         viewFinder.display,
                         characteristics,
                         SurfaceHolder::class.java)
-                Log.d(TAG, "previewSize is width ${previewSize!!.width} and height ${previewSize!!.height}")
+                Timber.d("previewSize is width ${previewSize!!.width} and height ${previewSize!!.height}")
                 viewFinder.setAspectRatio(previewSize!!.width, previewSize!!.height)
 
                 // Transform the viewfinder to device rotation
                 transformImage(width, height)
 
                 // Initialize camera in the viewfinders thread so that size is set
+                // Note: camera initialization launches in requestPermissions
                 viewFinder.post {
-                    // But first request the permissions, if permissions cleared or granted then camera is initialized
+                    // First request the permissions, if permissions cleared or granted then camera is initialized
                     // Initialization occurs after request permission result
                     requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
                 }
@@ -219,9 +215,10 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
             override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
             }
         }
+        // Set live data for phone orientation
         relativeOrientation = OrientationLiveData(requireContext(), characteristics).apply {
             observe(viewLifecycleOwner, Observer { orientation ->
-                Log.d(TAG, "Orientation changed to $orientation")
+                Timber.d("Orientation changed to $orientation")
             })
         }
     }
@@ -246,6 +243,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
         }
 
         // Set the touch focus listener on the viewfinder
+        // TODO: handle clickable view accessibility for on touch listener
         @Suppress("ClickableViewAccessibility")
         viewFinder.setOnTouchListener(
                 CameraFocusOnTouchHandler(
@@ -270,7 +268,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
             override fun onDisconnected(camera: CameraDevice) {
                 Toast.makeText(requireContext(), "Error: Camera disconnected.", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
-                Log.d(TAG, "Camera disconnected")
+                Timber.d("Camera disconnected")
             }
 
             override fun onError(camera: CameraDevice, error: Int) {
@@ -294,7 +292,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
             override fun onConfigured(session: CameraCaptureSession) = cont.resume(session)
             override fun onConfigureFailed(session: CameraCaptureSession) {
                 val exc = RuntimeException("Camera ${device.id} session config failed")
-                Log.e(TAG, exc.message, exc)
+                Timber.e(exc)
                 cont.resumeWithException(exc)
             }
         }, handler)
@@ -305,7 +303,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
         try {
             camera.close()
         } catch (exc: Throwable) {
-            Log.e(TAG, "Error closing camera", exc)
+            Timber.e(exc)
         }
     }
 
@@ -381,7 +379,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
     }
 
     companion object {
-        val TAG = Camera2Fragment::class.java.simpleName
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
