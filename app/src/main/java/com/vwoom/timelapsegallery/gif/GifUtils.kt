@@ -10,6 +10,7 @@ import androidx.work.WorkManager
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.utils.FileUtils
+import timber.log.Timber
 import java.io.File
 
 object GifUtils {
@@ -62,7 +63,7 @@ object GifUtils {
     }
 
     fun scheduleGifWorker(context: Context) {
-        Log.d(TAG, "Gif Util Tracker: Creating and enqueuing gif work request")
+        Timber.d("Gif Util Tracker: Creating and enqueuing gif work request")
         val constraints = Constraints.Builder()
                 .setRequiresBatteryNotLow(true)
                 .setRequiresCharging(true)
@@ -83,7 +84,7 @@ object GifUtils {
 
     /* Cancels alarms AND cancels any notification workers*/
     fun cancelGifWorker(context: Context) {
-        Log.d(TAG, "Gif Util Tracker: Canceling gif worker")
+        Timber.d("Gif Util Tracker: Canceling gif worker")
         WorkManager.getInstance(context).cancelAllWorkByTag(GifWorker.TAG)
     }
 
