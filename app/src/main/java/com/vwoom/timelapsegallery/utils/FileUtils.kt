@@ -1,17 +1,16 @@
 package com.vwoom.timelapsegallery.utils
 
-import android.util.Log
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getMetaDirectoryForProject
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectFolder
+import timber.log.Timber
 import java.io.*
 
 const val RESERVED_CHARACTERS = "|\\?*<\":>+[]/'"
 
 object FileUtils {
-    private val TAG = FileUtils::class.java.simpleName
 
     // Directory definitions
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
@@ -131,7 +130,7 @@ object FileUtils {
             output.fd.sync()
             outputStreamWriter.close()
         } catch (exception: IOException) {
-            Log.e(TAG, "error writing tag to text file: ${exception.message}")
+            Timber.e("error writing tag to text file: ${exception.message}")
         }
     }
 
@@ -152,11 +151,11 @@ object FileUtils {
             output.fd.sync()
             outputStreamWriter.close()
         } catch (exception: IOException) {
-            Log.e(TAG, "error writing schedule to text file: ${exception.message}")
+            Timber.e("error writing schedule to text file: ${exception.message}")
         }
     }
 
-    // TODO: write test for temp list
+    // TODO (1.3): write test for temp list
     // Creates a temporary text file list of the photo urls for a project
     // In the format:
     // file '/path/to/file1'
