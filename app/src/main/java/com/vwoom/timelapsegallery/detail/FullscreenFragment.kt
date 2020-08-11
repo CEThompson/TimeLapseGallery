@@ -91,6 +91,7 @@ class FullscreenFragment : Fragment() {
 
         // Set a listener to change the current photo on swipe
         val swipeListener = OnSwipeTouchListener(requireContext(), { previousPhoto() }, { nextPhoto() })
+        // TODO handle clickable view accessibility
         @Suppress("ClickableViewAccessibility")
         binding?.fullscreenImageBottom?.setOnTouchListener(swipeListener)
         loadImagePair()

@@ -9,6 +9,7 @@ import kotlin.math.absoluteValue
 class OnSwipeTouchListener(ctx: Context?, private val onSwipeRight: () -> Unit, private val onSwipeLeft: () -> Unit) : View.OnTouchListener {
     private val gestureDetector: GestureDetector
 
+    // TODO: handle clickable view accessibility
     @Suppress("ClickableViewAccessibility")
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         return gestureDetector.onTouchEvent(event)
