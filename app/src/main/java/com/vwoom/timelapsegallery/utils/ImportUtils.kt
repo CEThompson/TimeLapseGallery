@@ -1,18 +1,16 @@
 package com.vwoom.timelapsegallery.utils
 
-import android.util.Log
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.settings.SyncProgressCounter
 import com.vwoom.timelapsegallery.settings.ValidationResult
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
+// TODO (1.3): handle blocking in coroutines
 object ImportUtils {
-    private val TAG = ImportUtils::class.java.simpleName
 
     // Used to bundle a project with the number of photos in it
     // Passed to the project import utility
@@ -90,7 +88,7 @@ object ImportUtils {
             val currentDataBundle = ProjectDataBundle(currentProject, photoCounter)
             resultList.add(currentDataBundle)
         }
-        Log.d(TAG, "return validation result, list of size ${resultList.size}")
+        Timber.d("return validation result, list of size ${resultList.size}")
         return ValidationResult.Success(resultList.toList())
     }
 
@@ -106,13 +104,13 @@ object ImportUtils {
 
         if (!testing) {
             SyncProgressCounter.initProjectCount(projectBundles.size)
-            Log.d("ProgressCheck", "setting max ${SyncProgressCounter.projectMax}")
+            Timber.d("ProgressCheck: Setting max ${SyncProgressCounter.projectMax}")
         }
 
         for (projectBundle in projectBundles) {
             if (!testing) {
                 SyncProgressCounter.incrementProject()
-                Log.d("ProgressCheck", "incrementing progress ${SyncProgressCounter.projectProgress}")
+                Timber.d("ProgressCheck: incrementing progress ${SyncProgressCounter.projectProgress}")
             }
 
             // Get the files within the directory
@@ -122,7 +120,7 @@ object ImportUtils {
             if (projectFiles != null) {
                 // Create the project entry
                 val currentProject = projectBundle.projectEntry
-                Log.d(TAG, "inserting project = $currentProject")
+                Timber.d("inserting project = $currentProject")
                 // Insert the project - this updates on conflict
                 db.projectDao().insertProject(currentProject)
 
@@ -180,7 +178,7 @@ object ImportUtils {
             // Convert text to tag entries and enter into database
             for (text in tags) {
                 if (text.isEmpty()) continue
-                Log.d(TAG, "handling $text")
+                Timber.d("handling $text")
                 // Get the tag
                 var tagEntry: TagEntry? = db.tagDao().getTagByText(text)
                 // If it does not exist insert into tag table
@@ -188,13 +186,13 @@ object ImportUtils {
                     tagEntry = TagEntry(text)
                     val tagId = db.tagDao().insertTag(tagEntry)
                     tagEntry.id = tagId
-                    Log.d(TAG, "inserted $tagEntry")
+                    Timber.d("inserted $tagEntry")
                 }
 
                 val projectTagEntry = ProjectTagEntry(currentProject.id, tagEntry.id)
                 // Insert tag and project tag into db
                 db.projectTagDao().insertProjectTag(projectTagEntry)
-                Log.d(TAG, "inserted $projectTagEntry")
+                Timber.d("inserted $projectTagEntry")
             }
         }
 
@@ -205,7 +203,7 @@ object ImportUtils {
                 val projectScheduleEntry = ProjectScheduleEntry(currentProject.id, inputAsString.toInt())
                 db.projectScheduleDao().insertProjectSchedule(projectScheduleEntry)
             } catch (e: Exception) {
-                Log.e(TAG, "error importing schedule for $currentProject")
+                Timber.e("error importing schedule for $currentProject")
             }
         }
     }
