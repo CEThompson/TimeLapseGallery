@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.data.repository
 
-import androidx.lifecycle.LiveData
 import com.vwoom.timelapsegallery.data.dao.CoverPhotoDao
 import com.vwoom.timelapsegallery.data.dao.PhotoDao
 import com.vwoom.timelapsegallery.data.dao.ProjectDao
@@ -16,52 +15,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
-
-interface IProjectRepository {
-    /**
-     * Project observables
-     */
-    fun getProjectViewLiveData(projectId: Long): LiveData<ProjectView?>
-    fun getProjectViewsLiveData(): LiveData<List<ProjectView>>
-    fun getScheduledProjectViews(): List<ProjectView>
-
-    /**
-     * Project updating and deletion
-     */
-    suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int = 0): ProjectView
-
-    suspend fun updateProjectName(externalFilesDir: File, sourceProjectView: ProjectView, name: String)
-
-    suspend fun deleteProject(externalFilesDir: File, projectId: Long)
-
-    /**
-     * Project scheduling and cover photo
-     */
-    suspend fun setProjectSchedule(
-            externalFilesDir: File,
-            projectView: ProjectView,
-            projectScheduleEntry: ProjectScheduleEntry)
-
-    suspend fun setProjectCoverPhoto(entry: PhotoEntry)
-
-    /**
-     * Project photo management and observables
-     */
-
-    fun getProjectPhotosLiveData(projectId: Long): LiveData<List<PhotoEntry>>
-
-    suspend fun addPhotoToProject(file: File,
-                                  externalFilesDir: File,
-                                  projectView: ProjectView, timestamp: Long)
-
-    suspend fun deleteProjectPhoto(externalFilesDir: File, photoEntry: PhotoEntry)
-}
+import kotlin.coroutines.CoroutineContext
 
 class ProjectRepository
 @Inject constructor(private val projectDao: ProjectDao,
                     private val photoDao: PhotoDao,
                     private val coverPhotoDao: CoverPhotoDao,
                     private val projectScheduleDao: ProjectScheduleDao) : IProjectRepository {
+
+    var coroutineContext: CoroutineContext = Dispatchers.IO
+
     /**
      * Project observables
      */
@@ -73,7 +36,10 @@ class ProjectRepository
     /**
      * Project updating and deletion
      */
-    override suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int): ProjectView {
+    override suspend fun newProject(file: File,
+                                    externalFilesDir: File,
+                                    timestamp: Long,
+                                    scheduleInterval: Int): ProjectView {
         // Create and insert the project
         val projectEntry = ProjectEntry(null)
         val projectId = projectDao.insertProject(projectEntry)
@@ -90,7 +56,9 @@ class ProjectRepository
         val coverPhotoId = coverPhotoDao.insertPhoto(coverPhotoEntry)
         projectScheduleDao.insertProjectSchedule(projectScheduleEntry)
 
-        withContext(Dispatchers.IO) {
+        // TODO: handle blocking method in non blocking context
+        @Suppress("BlockingMethodInNonBlockingContext")
+        withContext(coroutineContext) {
             FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
         }
 
@@ -100,7 +68,7 @@ class ProjectRepository
     override suspend fun updateProjectName(externalFilesDir: File, sourceProjectView: ProjectView, name: String) {
         val source: ProjectEntry = projectDao.getProjectById(sourceProjectView.project_id) ?: return
         val destination = ProjectEntry(source.id, name)
-        withContext(Dispatchers.IO) {
+        withContext(coroutineContext) {
             val success = ProjectUtils.renameProject(externalFilesDir, source, destination)
             if (success) {
                 source.project_name = destination.project_name
@@ -111,7 +79,7 @@ class ProjectRepository
 
     override suspend fun deleteProject(externalFilesDir: File, projectId: Long) {
         val projectEntry = projectDao.getProjectById(projectId) ?: return
-        withContext(Dispatchers.IO) {
+        withContext(coroutineContext) {
             // Delete files first since there is a listener on the project
             ProjectUtils.deleteProject(externalFilesDir, projectEntry)
             // Now remove reference from the database
@@ -130,7 +98,7 @@ class ProjectRepository
         // Write the project schedule to the database
         projectScheduleDao.insertProjectSchedule(projectScheduleEntry)
 
-        withContext(Dispatchers.IO) {
+        withContext(coroutineContext) {
             // Handle the file representation of the schedule
             FileUtils.writeProjectScheduleFile(externalFilesDir, projectView.project_id, projectScheduleEntry)
         }
@@ -161,23 +129,25 @@ class ProjectRepository
         coverPhotoDao.insertPhoto(coverPhotoEntry)
 
         // Create the final file
-        withContext(Dispatchers.IO) {
+        // TODO: handle blocking method in non blocking context
+        @Suppress("BlockingMethodInNonBlockingContext")
+        withContext(coroutineContext) {
             FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
         }
     }
 
     override suspend fun deleteProjectPhoto(externalFilesDir: File, photoEntry: PhotoEntry) {
         val projectEntry = projectDao.getProjectById(photoEntry.project_id) ?: return
-        withContext(Dispatchers.IO) {
+        withContext(coroutineContext) {
             ProjectUtils.deleteProjectPhoto(externalFilesDir, projectEntry, photoEntry)
         }
         photoDao.deletePhoto(photoEntry)
     }
 
+    // Note: instance is used by injector utils for the repository, it is not used by dagger 2
     companion object {
         @Volatile
         private var instance: ProjectRepository? = null
-
         fun getInstance(projectDao: ProjectDao,
                         photoDao: PhotoDao,
                         coverPhotoDao: CoverPhotoDao,
