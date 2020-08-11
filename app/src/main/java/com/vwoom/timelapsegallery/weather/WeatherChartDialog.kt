@@ -105,7 +105,7 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.INVISIBLE
         this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.INVISIBLE
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-        this.findViewById<TextView>(R.id.error_message_tv)?.text = "Fetching forecast"
+        this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString(R.string.fetching_forecast)
         this.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
     }
 

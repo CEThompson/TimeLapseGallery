@@ -307,5 +307,6 @@
     <string name="no_forecast_available">No local or network forecast available.</string>
     <string name="error_no_remote_location_response">No remote location response</string>
     <string name="error_no_remote_response">No response from remote</string>
+    <string name="fetching_forecast">Fetching forecast</string>
 
 </resources>
