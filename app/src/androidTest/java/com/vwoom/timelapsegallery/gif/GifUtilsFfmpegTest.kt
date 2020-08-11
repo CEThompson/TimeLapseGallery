@@ -1,12 +1,7 @@
 package com.vwoom.timelapsegallery.gif
 
-import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.TimeLapseGalleryApplication
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
@@ -28,13 +23,13 @@ class GifUtilsFfmpegTest {
     val testFolder = TemporaryFolder()
 
     private lateinit var externalFilesTestDir: File
+
     @Before
     fun setUp() {
         externalFilesTestDir = testFolder.newFolder("pictures")
     }
 
-    // TODO: investigate this failing test
-    // This test ensures that a project with a set of images can convert to a GIF
+    // This test ensures that a project with a set of images converts to a GIF
     // Note: This seems to require instrumentation to run ffmpeg commands
     @Test
     fun makeGif_createsGifFromProject() {
@@ -44,7 +39,7 @@ class GifUtilsFfmpegTest {
         if (!projectFolder.exists()) projectFolder.mkdir()
 
         // Create a few empty bitmaps written to jpeg files
-        val bm = Bitmap.createBitmap(100,100, Bitmap.Config.ARGB_8888)
+        val bm = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
         for (i in 0..3) {
             val filename = "${i}.jpeg"
             saveBitmapToFile(projectFolder, filename, bm)
@@ -58,6 +53,7 @@ class GifUtilsFfmpegTest {
         assertTrue(gif != null)
     }
 
+    // This test ensures that an updated gif is not its previous version
     @Test
     fun updateGif() {
         // Given a gif for a project
@@ -79,13 +75,13 @@ class GifUtilsFfmpegTest {
         assertTrue(firstGif != updatedGif)
     }
 
-
+    // A helper function for creating an image to make GIFs out of
     private fun saveBitmapToFile(
             dir: File,
             filename: String,
             bm: Bitmap,
             format: Bitmap.CompressFormat = Bitmap.CompressFormat.JPEG,
-            quality: Int = 50){
+            quality: Int = 50) {
         val imageFile = File(dir, filename)
         var fos: FileOutputStream? = null
         try {

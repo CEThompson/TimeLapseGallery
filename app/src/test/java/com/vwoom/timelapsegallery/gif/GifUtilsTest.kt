@@ -11,7 +11,6 @@ import java.io.File
 
 class GifUtilsTest {
 
-
     @Rule
     @JvmField
     val testFolder = TemporaryFolder()
@@ -68,11 +67,10 @@ class GifUtilsTest {
     }
 
 
-    // TODO test GIF worker
+    // TODO: figure out how to test GIF worker
     /*@Test
     fun scheduleGifWorker() {
     }
-
     @Test
     fun cancelGifWorker() {
     }*/
