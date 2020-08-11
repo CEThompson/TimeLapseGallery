@@ -110,7 +110,6 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
     }
 
     private fun showWeatherNoData(message: String?) {
-        //this.findViewById<TextView>(R.id.update_time_tv)?.text = context.getString(R.string.error_no_forecast_data)
         this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
         
         if (message == null)
