@@ -11,15 +11,6 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-interface IWeatherLocalDataSource {
-    // Gets the forecast from the database
-    // Returns either (1) No Data (2) Today's Forecast or (3) A Cached Forecast
-    suspend fun getCachedWeather(): WeatherResult<ForecastResponse>
-
-    // Saves the forecast as a json string to the database
-    suspend fun cacheForecast(forecastResponse: ForecastResponse)
-}
-
 // TODO (1.3): figure out how to properly handle blocking calls in coroutines
 @Suppress("BlockingMethodInNonBlockingContext")
 class WeatherLocalDataSource
