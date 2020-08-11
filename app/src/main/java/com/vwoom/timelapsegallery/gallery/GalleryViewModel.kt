@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vwoom.timelapsegallery.data.entry.ProjectTagEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
-import com.vwoom.timelapsegallery.data.repository.*
+import com.vwoom.timelapsegallery.data.repository.IProjectRepository
+import com.vwoom.timelapsegallery.data.repository.ITagRepository
+import com.vwoom.timelapsegallery.data.repository.IWeatherRepository
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
 import com.vwoom.timelapsegallery.weather.ForecastResponse
@@ -56,12 +58,6 @@ class GalleryViewModel
     var userClickedToStopSearch = false
 
     private var searchJob: Job = Job()
-
-/*    init {
-        viewModelScope.launch {
-            weather.value = weatherRepository.getCachedForecast()
-        }
-    }*/
 
     override fun onCleared() {
         super.onCleared()
@@ -161,6 +157,9 @@ class GalleryViewModel
                         return@filter daysUntilDue(it) > 0
                     }
                     resultProjects = resultProjects.sortedBy { daysUntilDue(it) } // show projects due earlier first
+                }
+                else -> {
+                    // Do nothing
                 }
             }
             displayedProjectViews.value = resultProjects

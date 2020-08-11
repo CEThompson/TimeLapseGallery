@@ -45,7 +45,7 @@ import com.vwoom.timelapsegallery.weather.WeatherResult
 import javax.inject.Inject
 
 
-// TODO: set mini fabs, or some way to scroll quickly to the bottom of the gallery
+// TODO (1.3): set mini fabs to scroll quickly to the bottom of the gallery
 // TODO (update 1.3): optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
 class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler, Injectable {
 
@@ -138,7 +138,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
             val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
             galleryAdapter = GalleryAdapter(this, externalFilesDir, schedulesDisplayed, gifsDisplayed)
         } catch (e: KotlinNullPointerException) {
-            // TODO: navigate to failure layout
+            // TODO (1.3): navigate to failure layout
             Toast.makeText(requireContext(), getString(R.string.error_retrieving_files_dir), Toast.LENGTH_LONG).show()
         }
         // Set up the recycler view
@@ -377,7 +377,6 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         // Otherwise request a single shot location
         // and invoke the passed in function (forecast get or update) on success
         else {
-            // TODO figure out how to test weather feature
             galleryViewModel.viewModelScope.launchIdling {
                 SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
                     override fun onNewLocationAvailable(location: Location?) {
