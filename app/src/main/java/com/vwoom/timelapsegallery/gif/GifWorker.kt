@@ -9,6 +9,7 @@ import androidx.work.WorkerParameters
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.utils.InjectorUtils
+import timber.log.Timber
 import java.io.File
 
 class GifWorker(context: Context, params: WorkerParameters)
@@ -17,9 +18,9 @@ class GifWorker(context: Context, params: WorkerParameters)
     private lateinit var projectRepository: ProjectRepository
 
     override fun doWork(): Result {
-        Log.d(TAG, "Gif Worker Tracker: Executing work")
+        Timber.d("Gif Worker Tracker: Executing work")
 
-        // Only update gifs if preference is enabled
+        // Only update GIFs if preference is enabled
         val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val gifConvertEnabled = prefs.getBoolean(applicationContext.getString(R.string.key_gif_auto_convert), true)
         if (!gifConvertEnabled) {
@@ -31,7 +32,7 @@ class GifWorker(context: Context, params: WorkerParameters)
         try {
             externalFilesDir = applicationContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
         } catch (e: Exception) {
-            Log.d(TAG, "Gif Worker Tracker: Unable to get external files dir. Reason: ${e.message}")
+            Timber.d("Gif Worker Tracker: Unable to get external files dir. Reason: ${e.message}")
             return Result.failure()
         }
 
@@ -41,15 +42,11 @@ class GifWorker(context: Context, params: WorkerParameters)
         for (project in projects) {
             val gif = GifUtils.getGifForProject(externalFilesDir, project)
             if (gif != null) {
-                // TODO: in the future figure out how to detect if a gif is already updated to the picture set
+                // TODO (1.3): make GIF conversion more efficient. Figure out how to detect if a gif is already updated to the picture set
                 GifUtils.updateGif(externalFilesDir, project)
             }
         }
 
         return Result.success()
-    }
-
-    companion object {
-        const val TAG = "gif_worker"
     }
 }
