@@ -5,10 +5,10 @@ import android.hardware.camera2.*
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback
 import android.hardware.camera2.params.MeteringRectangle
 import android.os.Handler
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
+import timber.log.Timber
 import kotlin.math.max
 
 // TODO (update 1.3): investigate improving focus on close ups
@@ -20,6 +20,7 @@ class CameraFocusOnTouchHandler(
 ) : OnTouchListener {
     private var mManualFocusEngaged = false
 
+    // TODO: handle clickable view accessibility
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         // Override in your touch-enabled view (this can be different than the view you use for displaying the cam preview)
@@ -28,7 +29,7 @@ class CameraFocusOnTouchHandler(
             return false
         }
         if (mManualFocusEngaged) {
-            Log.d(TAG, "Manual focus already engaged")
+            Timber.d("Manual focus already engaged")
             return true
         }
         val sensorArraySize = mCameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE)
@@ -60,7 +61,7 @@ class CameraFocusOnTouchHandler(
 
             override fun onCaptureFailed(session: CameraCaptureSession, request: CaptureRequest, failure: CaptureFailure) {
                 super.onCaptureFailed(session, request, failure)
-                Log.e(TAG, "Manual AF failure: $failure")
+                Timber.e("Manual AF failure: $failure")
                 mManualFocusEngaged = false
             }
         }
@@ -105,8 +106,4 @@ class CameraFocusOnTouchHandler(
                 false
             }
         }
-
-    companion object {
-        private const val TAG = "FocusOnTouchHandler"
-    }
 }
