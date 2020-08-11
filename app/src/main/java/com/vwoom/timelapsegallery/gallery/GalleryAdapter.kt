@@ -211,14 +211,14 @@ class GalleryAdapter(
                     .setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_schedule_indicator_pending_24dp, 0, 0, 0)
         }
     }
-}
 
-class ProjectViewDiffCallback : DiffUtil.ItemCallback<ProjectView>() {
-    override fun areContentsTheSame(oldItem: ProjectView, newItem: ProjectView): Boolean {
-        return oldItem.project_id == newItem.project_id
-    }
+    class ProjectViewDiffCallback : DiffUtil.ItemCallback<ProjectView>() {
+        override fun areContentsTheSame(oldItem: ProjectView, newItem: ProjectView): Boolean {
+            return oldItem.project_id == newItem.project_id
+        }
 
-    override fun areItemsTheSame(oldItem: ProjectView, newItem: ProjectView): Boolean {
-        return oldItem == newItem
+        override fun areItemsTheSame(oldItem: ProjectView, newItem: ProjectView): Boolean {
+            return oldItem == newItem
+        }
     }
 }
