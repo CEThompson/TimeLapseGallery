@@ -10,8 +10,6 @@ const val INTERMEDIATE_MOON = 3
 // TODO (deferred): handle northern vs southern hemisphere representations, localization for moon phases
 
 object MoonPhaseCalculator {
-    private val TAG = MoonPhaseCalculator::class.simpleName
-
     // Calendar value for a synodic month which is 29.530587981 days
     // Calculated using 29.53
     private const val synodicMonthDays = 29 //29.53 days
