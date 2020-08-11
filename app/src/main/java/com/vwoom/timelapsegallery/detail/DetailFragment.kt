@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.transition.Transition
 import android.transition.TransitionInflater
-import android.util.Log
 import android.view.*
 import android.view.View.*
 import android.view.animation.AlphaAnimation
@@ -63,6 +62,7 @@ import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -136,8 +136,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         try {
             externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
         } catch (exc: KotlinNullPointerException) {
-            // TODO (update 1.2): Investigate potential failures with external files.
-            Log.e(TAG, "Couldn't get external files directory.")
+            // TODO (update 1.3): Investigate potential failures with external files.
+            Timber.e("Couldn't get external files directory.")
             Toast.makeText(requireContext(), "Fatal Error: Could not load external files!", Toast.LENGTH_LONG).show()
         }
 
@@ -233,6 +233,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                 requireContext(),
                 onRightSwipe,
                 onLeftSwipe)
+
+        // TODO: handle clickable view accessibility
         @Suppress("ClickableViewAccessibility")
         binding?.detailCurrentImage?.setOnTouchListener(swipeListener)
 
@@ -311,7 +313,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                         action = Intent.ACTION_SEND
                         type = "image/jpeg"
                         val photoFile = File(photoUrl)
-                        Log.d(TAG, photoFile.absolutePath)
+                        Timber.d(photoFile.absolutePath)
                         val photoURI: Uri = FileProvider.getUriForFile(requireContext(),
                                 requireContext().applicationContext.packageName.toString() + ".fileprovider",
                                 photoFile)
@@ -449,8 +451,8 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
             // Get info for the current photo
             val timestamp = photoEntry.timestamp
             val photosInProject: Int = photos.size
-            Log.d(TAG, "photoNumber is $photoNumber")
-            Log.d(TAG, "photosInProject is $photosInProject")
+            Timber.d("photoNumber is $photoNumber")
+            Timber.d("photosInProject is $photosInProject")
             // Get formatted strings
             val photoNumberString = getString(R.string.details_photo_number_out_of, photoNumber, photosInProject)
             val date = TimeUtils.getDateFromTimestamp(timestamp)
@@ -656,7 +658,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
 
     // Sets a coroutine to load the next photo every 50 ms, or whatever has been chosen from the shared preferences
     private fun scheduleNextPhoto(position: Int) {
-        Log.d("DetailsFragment", "schedule loading position $position")
+        Timber.d("schedule loading position $position")
         if (position < 0 || position >= photos.size) {
             stopPlaying()
             return
@@ -679,7 +681,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
 
     // Sets a coroutine to load the previous photo every 50 ms, or whatever has been chosen from the shared preferences
     private fun scheduleRewindPhoto(position: Int) {
-        Log.d("DetailsFragment", "schedule loading position $position")
+        Timber.d("schedule loading position $position")
         if (position < 0 || position >= photos.size) {
             stopPlaying()
             return
@@ -821,7 +823,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
 
             detailViewModel.photoIndex = newMaxIndex
 
-            // TODO: convert these to appropriate boolean mutable live data fields to observe
+            // TODO (1.3): convert these to boolean mutable live data fields to observe when photos are added or deleted
             // If added set to the last photo
             if (added) {
                 // Update gif if exists and preference is set to auto-update
@@ -855,7 +857,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                             getProjectEntryFromProjectView(currentProjectView),
                             photo.timestamp)
                     if (photoUrl == null) {
-                        Log.d(TAG, "error loading timestamp ${photo.timestamp}")
+                        Timber.d("error loading timestamp ${photo.timestamp}")
                         continue
                     }
                     list.add(photoUrl)
@@ -992,9 +994,5 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
                     findNavController().popBackStack()
                 }
                 .setNegativeButton(android.R.string.no, null).show()
-    }
-
-    companion object {
-        private val TAG = DetailFragment::class.java.simpleName
     }
 }
