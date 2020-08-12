@@ -32,8 +32,11 @@
 
 
 # This block would strip timber log statements
-#-assumenosideeffects class timber.log.Timber* {
-#    public static *** v(...);
-#    public static *** d(...);
-#    public static *** i(...);
-#}
+-assumenosideeffects class timber.log.Timber* {
+    public static *** v(...);
+    public static *** d(...);
+    public static *** i(...);
+}
+
+
+
