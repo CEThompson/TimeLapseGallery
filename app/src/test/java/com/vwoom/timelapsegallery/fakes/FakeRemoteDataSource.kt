@@ -3,8 +3,7 @@ package com.vwoom.timelapsegallery.fakes
 import android.location.Location
 import com.vwoom.timelapsegallery.data.source.IWeatherRemoteDataSource
 import com.vwoom.timelapsegallery.testing.TestForecastResponse
-import com.vwoom.timelapsegallery.weather.ForecastResponse
-import com.vwoom.timelapsegallery.weather.WeatherApi
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 
 class FakeRemoteDataSource(var updateSuccess: Boolean = true): IWeatherRemoteDataSource {

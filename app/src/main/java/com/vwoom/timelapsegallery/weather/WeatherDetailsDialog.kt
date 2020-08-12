@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.gallery.GalleryViewModel
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 
 class WeatherDetailsDialog(context: Context, galleryViewModel: GalleryViewModel): Dialog(context) {
 

@@ -4,7 +4,7 @@ import android.location.Location
 import com.vwoom.timelapsegallery.data.repository.IWeatherRepository
 import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
 import com.vwoom.timelapsegallery.data.source.IWeatherRemoteDataSource
-import com.vwoom.timelapsegallery.weather.ForecastResponse
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 
 class FakeWeatherRepository(private val localDataSource: IWeatherLocalDataSource = FakeLocalDataSource(),

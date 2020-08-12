@@ -1,7 +1,7 @@
 package com.vwoom.timelapsegallery.data.source
 
 import android.location.Location
-import com.vwoom.timelapsegallery.weather.ForecastResponse
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 
 interface IWeatherRemoteDataSource {

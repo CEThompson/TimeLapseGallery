@@ -3,7 +3,7 @@ package com.vwoom.timelapsegallery.data.source
 import android.text.format.DateUtils
 import com.vwoom.timelapsegallery.data.dao.WeatherDao
 import com.vwoom.timelapsegallery.data.entry.WeatherEntry
-import com.vwoom.timelapsegallery.weather.ForecastResponse
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherApi.moshi
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.Dispatchers

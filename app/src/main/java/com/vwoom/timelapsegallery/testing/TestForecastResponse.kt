@@ -1,7 +1,7 @@
 package com.vwoom.timelapsegallery.testing
 
 import androidx.annotation.VisibleForTesting
-import com.vwoom.timelapsegallery.weather.ForecastResponse
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherApi
 import java.lang.Exception
 

@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.weather
+package com.vwoom.timelapsegallery.weather.data
 
 import androidx.annotation.Keep
 import com.squareup.moshi.Json
@@ -7,17 +7,18 @@ import com.squareup.moshi.JsonClass
 @Keep
 @JsonClass(generateAdapter = true)
 data class ForecastResponse(
-    @Json(name="@context")
+        @Json(name="@context")
     val context: List<Any>,
-    val geometry: Geometry,
-    val properties: Properties,
-    val type: String
+        val geometry: Geometry,
+        val properties: Properties,
+        val type: String
 ) {
+    @Keep
     data class Geometry(
             val coordinates: List<List<List<Double>>>,
             val type: String
     )
-
+    @Keep
     data class Properties(
             val elevation: Elevation,
             val forecastGenerator: String,
@@ -28,12 +29,12 @@ data class ForecastResponse(
             val updated: String,
             val validTimes: String
     )
-
+    @Keep
     data class Elevation(
             val unitCode: String,
             val value: Double
     )
-
+    @Keep
     data class Period(
             val detailedForecast: String,
             val endTime: String,

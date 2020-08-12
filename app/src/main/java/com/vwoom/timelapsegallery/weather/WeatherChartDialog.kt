@@ -23,6 +23,7 @@ import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.weather.WeatherUtils.getTimestampForDayFromPeriod
 import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherType
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 import java.text.DecimalFormat
 import java.util.*
 

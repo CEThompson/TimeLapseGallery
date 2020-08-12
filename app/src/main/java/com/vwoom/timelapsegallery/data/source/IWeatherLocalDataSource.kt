@@ -1,6 +1,6 @@
 package com.vwoom.timelapsegallery.data.source
 
-import com.vwoom.timelapsegallery.weather.ForecastResponse
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 
 interface IWeatherLocalDataSource {

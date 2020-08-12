@@ -12,7 +12,7 @@ import com.vwoom.timelapsegallery.data.repository.ITagRepository
 import com.vwoom.timelapsegallery.data.repository.IWeatherRepository
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
-import com.vwoom.timelapsegallery.weather.ForecastResponse
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

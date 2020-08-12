@@ -2,8 +2,7 @@ package com.vwoom.timelapsegallery.fakes
 
 import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
 import com.vwoom.timelapsegallery.testing.TestForecastResponse
-import com.vwoom.timelapsegallery.weather.ForecastResponse
-import com.vwoom.timelapsegallery.weather.WeatherApi
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
 
 class FakeLocalDataSource(

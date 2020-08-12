@@ -8,6 +8,7 @@ import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.DialogWeatherRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.weather.WeatherUtils.getTimestampForDayFromPeriod
 import com.vwoom.timelapsegallery.weather.WeatherUtils.getWeatherType
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 
 
 class WeatherAdapter : RecyclerView.Adapter<WeatherAdapter.WeatherAdapterViewHolder>() {
