@@ -4,7 +4,6 @@
 <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_2.gif" width="200">
 <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_3.gif" width="200"><br/>
 
-![Time Lapse Example](blue_flame_1.gif)![Time Lapse Example](blue_flame_2.gif)![Time Lapse Example](blue_flame_3.gif)<br/>
 [![Get it on Google Play](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.vwoom.timelapsegallery&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1)
 
 ### Time Lapse Gallery
