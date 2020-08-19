@@ -35,7 +35,7 @@ Clone this repository and import into **Android Studio**:
 `https://github.com/CEThompson/TimeLapseGallery.git`
 
 ### License
-    Copyright 2020 Christopher Thompson
+    Copyright 2020 Christopher Erik Thompson
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
