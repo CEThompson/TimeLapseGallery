@@ -1,11 +1,18 @@
 ![Time Lapse Gallery Branding](branding_small.png)<br/>
 ![Time Lapse Gallery Preview](preview.png)<br/>
-![Time Lapse Example](mgeo.gif)![Time Lapse Example](crest.gif)![Time Lapse Example](columnar.gif)<br/>
+![Time Lapse Example](mgeo.gif)![Time Lapse Example](crest.gif)<br/>
+[![Get it on Google Play](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.vwoom.timelapsegallery&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1)
 
 ### Time Lapse Gallery
 A tool for creating time-lapse photo sequences.
-#### 1.1
 
+#### 1.2
+* Implemented feature to convert photo-sequences to a GIF
+* Created a feature to display weather data from the National Weather Service API
+* Expanded test coverage, testing coroutines, repositories, datasources, etc.
+
+
+#### 1.1
 * Now handling camera directly with Camera2
 * Implemented project tagging and improved scheduling by refactoring database schema
 * Implemented gallery search
@@ -21,9 +28,7 @@ Initial release allows for:
 * Widget links to scheduled projects
 
 ### Installation 
-[![Get it on Google Play](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.vwoom.timelapsegallery&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1)
-
-Or clone this repository and import into **Android Studio**:
+Clone this repository and import into **Android Studio**:
 `https://github.com/CEThompson/TimeLapseGallery.git`
 
 ### License
