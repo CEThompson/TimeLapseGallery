@@ -289,33 +289,33 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
      */
     private fun setupViewModel() {
         // Observe the entire list projects in the database
-        galleryViewModel.projects.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.projects.observe(viewLifecycleOwner, {
             // Update the displayed projects by filtering all projects
             // Note: default filter is none and currentProjects will simply display
             galleryViewModel.filterProjects()
         })
 
         // Observe the projects to be displayed after filtration
-        galleryViewModel.displayedProjectViews.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.displayedProjectViews.observe(viewLifecycleOwner, {
             galleryAdapter?.submitList(it)
         })
 
         // Observe the search state
         // This will hide and display the search cancel fab if search filter options are not default (no tags, no search string, no due dates)
-        galleryViewModel.search.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.search.observe(viewLifecycleOwner, {
             if (it) searchCancelFAB?.show() else searchCancelFAB?.hide()
         })
 
         // Observe the weather response saved in the database
         // This may be WeatherResponse.NoData, WeatherResponse.Loading, WeatherResponse.Cached, WeatherResponse.TodaysForecast
-        galleryViewModel.weather.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.weather.observe(viewLifecycleOwner, {
             // Display the data from the response in the dialogs
             weatherChartDialog?.handleWeatherChart(it)
             weatherDetailsDialog?.handleWeatherResult(it)
         })
 
         // Watch the tags to update the search dialog
-        galleryViewModel.tags.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.tags.observe(viewLifecycleOwner, {
             searchDialog?.updateSearchDialog()
         })
     }
