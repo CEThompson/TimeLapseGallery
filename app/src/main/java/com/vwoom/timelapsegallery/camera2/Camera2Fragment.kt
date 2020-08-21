@@ -217,7 +217,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
         }
         // Set live data for phone orientation
         relativeOrientation = OrientationLiveData(requireContext(), characteristics).apply {
-            observe(viewLifecycleOwner, Observer { orientation ->
+            observe(viewLifecycleOwner, { orientation ->
                 Timber.d("Orientation changed to $orientation")
             })
         }
