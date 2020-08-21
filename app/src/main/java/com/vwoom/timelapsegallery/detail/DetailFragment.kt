@@ -868,7 +868,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
 
         // Observes the currently selected photo
         // This loads the image and timestamp information based on the current photo
-        detailViewModel.currentPhoto.observe(viewLifecycleOwner, Observer { currentPhoto: PhotoEntry? ->
+        detailViewModel.currentPhoto.observe(viewLifecycleOwner, { currentPhoto: PhotoEntry? ->
             if (currentPhoto != null) {
                 this.currentPhoto = currentPhoto
                 loadUi(currentPhoto)
@@ -878,7 +878,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         // Observe the tags for the project
         // This updates the tags in the dialog, sets the tags in the project info card layout,
         // Lastly this writes the sorted tags to the tags text file in the meta directory
-        detailViewModel.projectTags.observe(viewLifecycleOwner, Observer { projectTagEntries: List<ProjectTagEntry> ->
+        detailViewModel.projectTags.observe(viewLifecycleOwner, { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 // 1. Get the Tag Entries from the Project Tag Entries sorted
                 projectTags = detailViewModel.getTags(projectTagEntries)
@@ -907,7 +907,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         // Observe all the tags in the database
         // This is used to set up the list of all the tags in the project tag dialog
         // So that the user may simply click on a tag to add them to a project
-        detailViewModel.tags.observe(viewLifecycleOwner, Observer { tagEntries: List<TagEntry> ->
+        detailViewModel.tags.observe(viewLifecycleOwner, { tagEntries: List<TagEntry> ->
             allTags = tagEntries.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
             tagDialog?.setProjectTagDialog(allTags, projectTags)
         })
