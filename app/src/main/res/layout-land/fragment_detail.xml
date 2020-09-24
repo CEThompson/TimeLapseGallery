@@ -33,7 +33,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/fab_margin"
                 android:contentDescription="@string/play_as_video_fab_content_description"
-                android:transitionName="details_play_fab"
                 android:src="@drawable/ic_baseline_fast_rewind_white_24"
                 app:borderWidth="0dp"
                 app:backgroundTint="@color/colorSubtleAccent"

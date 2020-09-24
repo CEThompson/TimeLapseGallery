@@ -68,6 +68,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
+// TODO: (update 1.3) investigate minor error in layouting on shared element return from fullscreen fragment
 // TODO: (update 1.3) implement pinch zoom on fullscreen image
 class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, Injectable {
 
