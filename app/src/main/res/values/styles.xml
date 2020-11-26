@@ -36,6 +36,12 @@
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
+    <style name="SensorOutput" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+
     <style name="ScheduleStyle">
         <item name="android:padding">4dp</item>
         <item name="android:layout_margin">4dp</item>

@@ -3,11 +3,16 @@ package com.vwoom.timelapsegallery.camera2
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Context.SENSOR_SERVICE
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.RectF
 import android.graphics.SurfaceTexture
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.hardware.camera2.*
 import android.os.Bundle
 import android.os.Environment
@@ -17,6 +22,7 @@ import android.util.Size
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -46,7 +52,16 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
+// TODO: bind all available sensor data to camera and save sensor data (as exif?)
+// TODO: add GPS data to photos as setting
+// TODO: measure & display ambient light
+// TODO: measure & display ambient pressure
+// TODO: measure & display ambient temperature (and device temperature)
+// TODO: measure & display relative humidity
+// TODO: calc dew point if possible
+
+
+class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injectable {
     private val args: Camera2FragmentArgs by navArgs()
 
     // Camera Fields
@@ -70,6 +85,11 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
     private var baseWidth: Int = 0
     private var baseHeight: Int = 0
 
+    // TODO troubleshoot camera capture size issue
+
+    private lateinit var sensorManager: SensorManager
+    private var light: Sensor? = null
+
     // ViewModel
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -80,6 +100,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
     // Take picture functionality
     private var takePictureJob: Job? = null
     private var takePictureFab: FloatingActionButton? = null
+
+    private var cameraBinding: FragmentCamera2Binding? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentCamera2Binding
@@ -168,6 +190,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                 it.post { it.isEnabled = true }
             }
         }
+        cameraBinding = binding
         return binding.root
     }
 
@@ -218,6 +241,12 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                 Timber.d("Orientation changed to $orientation")
             })
         }
+
+        // Set up sensors
+        Timber.d("setting up sensor manager")
+        sensorManager = requireContext().getSystemService(SENSOR_SERVICE) as SensorManager
+        light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+
     }
 
     private fun initializeCamera() = lifecycleScope.launchIdling {
@@ -293,6 +322,16 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                 cont.resumeWithException(exc)
             }
         }, handler)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sensorManager.registerListener(this, light, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(this)
     }
 
     override fun onStop() {
@@ -378,5 +417,15 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        Timber.d("onSensorChanged ${event?.toString()}")
+        event?:return
+        cameraBinding?.ambientLightOutput?.text = event.values[0].toString()
+    }
+
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+        // TODO handle accuracy change
     }
 }

@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- TODO: display magnetic field (compass)! -->
+<!-- TODO: display alignment targets -->
+<!-- TODO animate action buttons to slide in and out -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -24,29 +26,106 @@
         android:contentDescription="@string/cd_camera_previous_photo"
         android:visibility="invisible" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/take_picture_fab"
+    <!-- TODO align both action buttons to the center -->
+    <LinearLayout
+        android:id="@+id/camera_action_buttons_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="30dp"
-        android:contentDescription="@string/content_description_take_picture_fab"
-        android:src="@drawable/ic_add_a_photo_white_24dp"
-        android:transitionName="@string/key_add_transition"
-        app:fabCustomSize="@dimen/fab_jumbo"
+        app:layout_constraintHorizontal_bias=".5"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:maxImageSize="@dimen/fab_max_image_size" />
+        app:layout_constraintStart_toStartOf="parent">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/quick_compare_fab"
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/quick_compare_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="bottom"
+            android:contentDescription="@string/content_description_quick_compare_fab"
+            android:src="@drawable/ic_compare_white_24dp"
+            app:backgroundTint="@color/colorSubtleRedAccent"
+            app:fabCustomSize="@dimen/fab_large"
+            app:maxImageSize="@dimen/fab_max_image_size" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/take_picture_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:layout_marginStart="20dp"
+            android:contentDescription="@string/content_description_take_picture_fab"
+            android:src="@drawable/ic_add_a_photo_white_24dp"
+            android:transitionName="@string/key_add_transition"
+            app:fabCustomSize="@dimen/fab_jumbo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:maxImageSize="@dimen/fab_max_image_size" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/gps_output"
+        style="@style/SensorOutput"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:contentDescription="@string/content_description_quick_compare_fab"
-        android:src="@drawable/ic_compare_white_24dp"
-        app:fabCustomSize="@dimen/fab_large"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/take_picture_fab"
-        app:maxImageSize="@dimen/fab_max_image_size" />
+        android:layout_marginTop="@dimen/small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="latitude: 5.23112, longitude: 1.08421" />
+
+    <TextView
+        android:id="@+id/ambient_light_output"
+        style="@style/SensorOutput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gps_output"
+        tools:text="x lux" />
+
+    <TextView
+        android:id="@+id/ambient_pressure_output"
+        style="@style/SensorOutput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ambient_light_output"
+        tools:text="hPa or mbar" />
+
+    <TextView
+        android:id="@+id/ambient_temperature_output"
+        style="@style/SensorOutput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ambient_pressure_output"
+        tools:text="ambient: \u2103" />
+
+    <TextView
+        android:id="@+id/device_temperature_output"
+        style="@style/SensorOutput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ambient_temperature_output"
+        tools:text="device: \u2103" />
+
+    <TextView
+        android:id="@+id/relative_humidity_output"
+        style="@style/SensorOutput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/device_temperature_output"
+        tools:text="relative humidity: %" />
+
+    <TextView
+        android:id="@+id/dew_point_output"
+        style="@style/WhiteText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/relative_humidity_output"
+        tools:text="dew point" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
