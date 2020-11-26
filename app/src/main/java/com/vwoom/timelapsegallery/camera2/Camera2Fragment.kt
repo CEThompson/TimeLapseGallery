@@ -132,7 +132,8 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
 
                     // Rotates and scales the bitmap based on the device rotation
                     val matrix = getTransformMatrix(baseWidth, baseHeight)
-                    val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap, 0, 0, viewFinder.bitmap.width, viewFinder.bitmap.height, matrix, true)
+                    // TODO remove !! operators
+                    val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap!!, 0, 0, viewFinder.bitmap!!.width, viewFinder.bitmap!!.height, matrix, true)
                     adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
 
                     // Write exif data for image
@@ -179,7 +180,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
 
         // Set up a texture listener which initializes the camera
         viewFinder.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-            override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
+            override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
                 Timber.d("onSurfaceTextureAvailable called with to width $width and height $height")
                 previewSize = getPreviewOutputSize(
                         viewFinder.display,
@@ -202,16 +203,16 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                 baseWidth = width
             }
 
-            override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+            override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
                 return false
             }
 
-            override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
+            override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
                 baseHeight = height
                 baseWidth = width
             }
 
-            override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
+            override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
             }
         }
         // Set live data for phone orientation
@@ -233,7 +234,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
 
         // Set the surface of the texture view as a target
         val surfaceTexture = viewFinder.surfaceTexture
-        surfaceTexture.setDefaultBufferSize(previewSize!!.width, previewSize!!.height)
+        surfaceTexture?.setDefaultBufferSize(previewSize!!.width, previewSize!!.height)
         val previewSurface = Surface(surfaceTexture)
         val targets = listOf(previewSurface)
         session = createCaptureSession(camera, targets, cameraHandler)
