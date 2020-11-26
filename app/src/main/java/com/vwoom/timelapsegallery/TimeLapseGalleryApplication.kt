@@ -29,6 +29,11 @@ import javax.inject.Inject
 // TODO: calc dew point if possible
 // TODO: investigate night light mode? How do stargazing apps do it?
 
+
+// TODO add quick project add input mode
+// TODO convert NWS Api to OpenWeather?
+
+
 class TimeLapseGalleryApplication : Application(), HasAndroidInjector {
 
     @Inject
