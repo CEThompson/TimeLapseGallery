@@ -157,6 +157,7 @@ class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injecta
 
                     // Write exif data for image
                     val exif = ExifInterface(file.absolutePath)
+                    // TODO consider kotlinx datetime usage here
                     val timestamp = System.currentTimeMillis()
                     val timeString = TimeUtils.getExifDateTimeFromTimestamp(timestamp)
                     exif.setAttribute(ExifInterface.TAG_DATETIME_ORIGINAL, timeString)
@@ -166,6 +167,7 @@ class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injecta
                     val isNewProject = (args.projectView == null)
 
                     // For new projects navigate to project detail after insertion
+                    // TODO insert quick entry mode logic here if new project
                     if (isNewProject) {
                         val newProjectView = camera2ViewModel.addNewProject(file, externalFilesDir, timestamp)
                         val action = Camera2FragmentDirections.actionCamera2FragmentToDetailsFragment(newProjectView)
@@ -174,6 +176,7 @@ class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injecta
                     // For existing projects pop back to the project detail after adding the picture
                     else {
                         camera2ViewModel.addPhotoToProject(file, externalFilesDir, timestamp)
+                        // TODO insert quick entry mode logic here for taking multiple timelapse pictures for a project
                         findNavController().popBackStack()
                     }
                 } catch (e: Exception) {
@@ -206,6 +209,7 @@ class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injecta
                         viewFinder.display,
                         characteristics,
                         SurfaceHolder::class.java)
+                // TODO troubleshoot problems with preview image and saving
                 Timber.d("previewSize is width ${previewSize!!.width} and height ${previewSize!!.height}")
                 viewFinder.setAspectRatio(previewSize!!.width, previewSize!!.height)
 
@@ -348,6 +352,7 @@ class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injecta
         cameraThread.quitSafely()
     }
 
+    // TODO clean up image transform logic
     // Transforms the viewfinder to the device orientation
     private fun transformImage(viewWidth: Int, viewHeight: Int) {
         if (previewSize == null || !::viewFinder.isInitialized) return
