@@ -12,7 +12,7 @@ import javax.inject.Inject
 // TODO: change to SERENDIPITY
 // TODO: create mermaid splash - investigate bombs and bees - animate water
 // TODO: add a map, bottom NAV, sidenav?
-// TODO: convert all databinding to viewbinding
+
 // TODO: convert moshi to kotlinx serialization
 // TODO: convert all usage of java time to kotlinx datetime
 // TODO: modularize app? - camera - gallery

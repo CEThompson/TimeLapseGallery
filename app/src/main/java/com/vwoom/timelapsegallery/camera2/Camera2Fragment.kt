@@ -84,9 +84,6 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentCamera2Binding
                 .inflate(inflater, container, false)
-                .apply {
-                    lifecycleOwner = viewLifecycleOwner
-                }
         viewFinder = binding.cameraPreview
         takePictureFab = binding.takePictureFab
 

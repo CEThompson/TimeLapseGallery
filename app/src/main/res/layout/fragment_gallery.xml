@@ -1,67 +1,65 @@
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.vwoom.timelapsegallery.gallery.GalleryFragment">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/main_layout"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/gallery_fragment_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/AppToolbar" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Recycler View to display time lapse photo projects -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/gallery_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.vwoom.timelapsegallery.gallery.GalleryFragment">
-
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/gallery_fragment_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="?attr/actionBarSize"
-                android:theme="@style/AppToolbar" />
-
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <!-- Recycler View to display time lapse photo projects -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/gallery_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/projects_recycler_view_content_description"
-            android:paddingTop="?attr/actionBarSize"
-            app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-            app:spanCount="3"
-            tools:listitem="@layout/gallery_recyclerview_item" />
+        android:contentDescription="@string/projects_recycler_view_content_description"
+        android:paddingTop="?attr/actionBarSize"
+        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+        app:spanCount="3"
+        tools:listitem="@layout/gallery_recyclerview_item" />
 
 
-        <!-- indicator for active search -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/search_active_indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="@dimen/fab_size_plus_padding"
-            android:layout_marginBottom="@dimen/medium"
-            android:backgroundTint="@color/white"
-            android:contentDescription="@string/content_description_search_active_fab"
-            android:src="@drawable/ic_search_cancel_24dp"
-            android:visibility="invisible"
-            app:fabSize="normal"
-            tools:visibility="visible" />
+    <!-- indicator for active search -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/search_active_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/fab_size_plus_padding"
+        android:layout_marginBottom="@dimen/medium"
+        android:backgroundTint="@color/white"
+        android:contentDescription="@string/content_description_search_active_fab"
+        android:src="@drawable/ic_search_cancel_24dp"
+        android:visibility="invisible"
+        app:fabSize="normal"
+        tools:visibility="visible" />
 
-        <!-- FAB to create a new project -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/add_project_FAB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
-            android:contentDescription="@string/add_project_FAB_content_description"
-            android:src="@drawable/ic_add_white_24dp"
-            android:transitionName="gallery_add_fab"
-            app:fabSize="normal" />
+    <!-- FAB to create a new project -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_project_FAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:contentDescription="@string/add_project_FAB_content_description"
+        android:src="@drawable/ic_add_white_24dp"
+        android:transitionName="gallery_add_fab"
+        app:fabSize="normal" />
 
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-</layout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

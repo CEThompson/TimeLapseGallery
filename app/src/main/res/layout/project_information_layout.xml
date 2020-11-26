@@ -1,87 +1,84 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Layout containing project information -->
-<layout>
-    <androidx.cardview.widget.CardView android:id="@+id/project_information_cardview"
+<?xml version="1.0" encoding="utf-8"?><!-- Layout containing project information -->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/project_information_cardview"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/project_information_constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
+        android:layout_gravity="start"
+        android:padding="@dimen/small">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/project_information_constraint_layout"
-            android:padding="@dimen/small"
-            android:layout_gravity="start"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/project_information_flexbox"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/project_information_layout_info_icon"
-                app:layout_constraintBottom_toTopOf="@id/details_project_tags_textview"
-                app:layout_constraintHorizontal_bias="0"
-                app:alignContent="stretch"
-                app:alignItems="stretch"
-                app:flexWrap="wrap"
-                >
-                <TextView
-                    android:id="@+id/details_project_id"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/small"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:textSize="14sp"
-                    tools:text="100"/>
-
-                <TextView
-                    android:id="@+id/details_project_name_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:layout_margin="@dimen/small"
-                    app:layout_constraintStart_toEndOf="@id/details_project_id"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="project name"/>
-
-                <TextView
-                    android:id="@+id/details_project_timespan_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/small"
-                    app:layout_constraintStart_toEndOf="@id/details_project_name_text_view"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="7/7/19 - 8/8/20" />
-            </com.google.android.flexbox.FlexboxLayout>
-
-            <ImageView
-                android:id="@+id/project_information_layout_info_icon"
-                android:contentDescription="@string/cd_info_dialog_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_info_outline_grey_24dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/project_information_flexbox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:alignContent="stretch"
+            app:alignItems="stretch"
+            app:flexWrap="wrap"
+            app:layout_constraintBottom_toTopOf="@id/details_project_tags_textview"
+            app:layout_constraintEnd_toStartOf="@id/project_information_layout_info_icon"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/details_project_tags_textview"
-                android:layout_width="0dp"
+                android:id="@+id/details_project_id"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorTag"
+                android:layout_margin="@dimen/small"
+                android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/project_information_flexbox"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/project_information_layout_info_icon"
-                app:layout_constraintHorizontal_bias="0"
-                tools:text="#tags #tags #tags"
-                android:scrollHorizontally="true"
-                android:ellipsize="end"
-                android:maxLines="1"/>
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="100" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
-</layout>
+            <TextView
+                android:id="@+id/details_project_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@id/details_project_id"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="project name" />
+
+            <TextView
+                android:id="@+id/details_project_timespan_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small"
+                app:layout_constraintStart_toEndOf="@id/details_project_name_text_view"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="7/7/19 - 8/8/20" />
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <ImageView
+            android:id="@+id/project_information_layout_info_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/cd_info_dialog_icon"
+            android:src="@drawable/ic_info_outline_grey_24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/details_project_tags_textview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:scrollHorizontally="true"
+            android:textColor="@color/colorTag"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/project_information_layout_info_icon"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/project_information_flexbox"
+            tools:text="#tags #tags #tags" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

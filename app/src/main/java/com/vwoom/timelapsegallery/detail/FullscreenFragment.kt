@@ -64,9 +64,7 @@ class FullscreenFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentFullscreenBinding.inflate(inflater, container, false).apply {
-            lifecycleOwner = viewLifecycleOwner
-        }
+        binding = FragmentFullscreenBinding.inflate(inflater, container, false)
         return binding?.root
     }
 
