@@ -28,6 +28,7 @@ import javax.inject.Inject
 // TODO add quick project add input mode
 // TODO convert NWS Api to OpenWeather?
 
+// TODO add mini fab to scroll down to bottom in the gallery
 
 class TimeLapseGalleryApplication : Application(), HasAndroidInjector {
 
