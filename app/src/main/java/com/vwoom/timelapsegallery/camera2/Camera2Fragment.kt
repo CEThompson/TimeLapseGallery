@@ -22,7 +22,6 @@ import android.util.Size
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -32,6 +31,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
 import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
@@ -41,25 +41,22 @@ import com.vwoom.timelapsegallery.di.ViewModelFactory
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils
+import com.vwoom.timelapsegallery.weather.WeatherAdapter.Companion.CELSIUS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
+import java.text.DecimalFormat
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-// TODO: bind all available sensor data to camera and save sensor data (as exif?)
-// TODO: add GPS data to photos as setting
-// TODO: measure & display ambient light
-// TODO: measure & display ambient pressure
-// TODO: measure & display ambient temperature (and device temperature)
-// TODO: measure & display relative humidity
+// TODO: bind all available sensor data to saved image (perhaps as exif data?)
+// TODO: add GPS data to photos as setting?
 // TODO: calc dew point if possible
-
 
 class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injectable {
     private val args: Camera2FragmentArgs by navArgs()
@@ -87,9 +84,13 @@ class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injecta
 
     // TODO troubleshoot camera capture size issue
 
+    // Sensor variables
     private lateinit var sensorManager: SensorManager
-    private var light: Sensor? = null
-
+    private var lightSensor: Sensor? = null
+    private var pressureSensor: Sensor? = null
+    private var ambientTempSensor: Sensor? = null
+    private var humiditySensor: Sensor? = null
+    
     // ViewModel
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -209,7 +210,7 @@ class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injecta
                         viewFinder.display,
                         characteristics,
                         SurfaceHolder::class.java)
-                // TODO troubleshoot problems with preview image and saving
+                // TODO troubleshoot problems with preview image and saving here
                 Timber.d("previewSize is width ${previewSize!!.width} and height ${previewSize!!.height}")
                 viewFinder.setAspectRatio(previewSize!!.width, previewSize!!.height)
 
@@ -247,10 +248,12 @@ class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injecta
         }
 
         // Set up sensors
-        Timber.d("setting up sensor manager")
+        //Timber.d("setting up sensor manager")
         sensorManager = requireContext().getSystemService(SENSOR_SERVICE) as SensorManager
-        light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
-
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+        pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
+        ambientTempSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)
+        humiditySensor = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY)
     }
 
     private fun initializeCamera() = lifecycleScope.launchIdling {
@@ -330,7 +333,10 @@ class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injecta
 
     override fun onResume() {
         super.onResume()
-        sensorManager.registerListener(this, light, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, pressureSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, ambientTempSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, humiditySensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
     override fun onPause() {
@@ -425,12 +431,29 @@ class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injecta
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        Timber.d("onSensorChanged ${event?.toString()}")
         event?:return
-        cameraBinding?.ambientLightOutput?.text = event.values[0].toString()
+        if (event.values.isEmpty()) return
+        when(event.sensor.type){
+            Sensor.TYPE_AMBIENT_TEMPERATURE -> {
+                val measurement = "%.1f".format(event.values[0])
+                cameraBinding?.ambientTemperatureOutput?.text = getString(R.string.ambient, measurement, CELSIUS)
+            }
+            Sensor.TYPE_PRESSURE -> {
+                // TODO format string
+                val measurement = "%.2f".format(event.values[0])
+                cameraBinding?.ambientPressureOutput?.text = getString(R.string.pressure, measurement)
+            }
+            Sensor.TYPE_LIGHT -> {
+                val measurement = "%.1f".format(event.values[0])
+                cameraBinding?.ambientLightOutput?.text = getString(R.string.light, event.values[0].toString())
+            }
+            Sensor.TYPE_RELATIVE_HUMIDITY -> {
+                val measurement = "%.1f".format(event.values[0])
+                cameraBinding?.relativeHumidityOutput?.text = getString(R.string.humidity, event.values[0].toString())
+            }
+        }
     }
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
-        // TODO handle accuracy change
     }
 }
