@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.gallery
 
 import android.Manifest
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.location.Location
@@ -23,7 +24,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -56,6 +56,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         viewModelFactory
     }
 
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
     // Recyclerview
     private var galleryRecyclerView: RecyclerView? = null
     private var galleryAdapter: GalleryAdapter? = null
@@ -68,13 +71,13 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
     private var searchCancelFAB: FloatingActionButton? = null
     // TODO: add scroll up / down fabs here
 
+    /* Dialogs */
     // Searching
     private var searchDialog: SearchDialog? = null
-
     // Weather
     private var weatherChartDialog: WeatherChartDialog? = null
     private var weatherDetailsDialog: WeatherDetailsDialog? = null
-    private var location: Location? = null
+    private var weatherLocation: Location? = null
 
     private var numberOfColumns = PORTRAIT_COLUMN_COUNT
 
@@ -114,14 +117,14 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
 
         // Increase columns for horizontal orientation
-        when (resources.configuration.orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> numberOfColumns = LANDSCAPE_COLUMN_COUNT
-            Configuration.ORIENTATION_PORTRAIT -> numberOfColumns = PORTRAIT_COLUMN_COUNT
+        numberOfColumns = when (resources.configuration.orientation) {
+            Configuration.ORIENTATION_LANDSCAPE -> LANDSCAPE_COLUMN_COUNT
+            Configuration.ORIENTATION_PORTRAIT -> PORTRAIT_COLUMN_COUNT
+            else -> PORTRAIT_COLUMN_COUNT
         }
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val schedulesDisplayed = preferences.getBoolean(getString(R.string.key_schedule_display), true)
-        val gifsDisplayed = preferences.getBoolean(getString(R.string.key_gif_display), true)
+        val schedulesDisplayed = sharedPreferences.getBoolean(getString(R.string.key_schedule_display), true)
+        val gifsDisplayed = sharedPreferences.getBoolean(getString(R.string.key_gif_display), true)
 
         // Set up the adapter for the recycler view
         try {
@@ -228,7 +231,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         if (galleryViewModel.weather.value is WeatherResult.TodaysForecast
                 || galleryViewModel.weather.value is WeatherResult.Loading) return
         getLocationAndExecute {
-            galleryViewModel.getForecast(location)
+            galleryViewModel.getForecast(weatherLocation)
         }
     }
 
@@ -320,7 +323,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         weatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
             getLocationAndExecute {
                 try {
-                    galleryViewModel.updateForecast(location!!)
+                    galleryViewModel.updateForecast(weatherLocation!!)
                 } catch (e: KotlinNullPointerException) {
                     galleryViewModel.getForecast(null)
                     Toast.makeText(requireContext(), getString(R.string.no_location_error), Toast.LENGTH_SHORT).show()
@@ -339,7 +342,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
 
         // Get / update the forecast
         getLocationAndExecute {
-            galleryViewModel.getForecast(location)
+            galleryViewModel.getForecast(weatherLocation)
         }
 
     }
@@ -370,7 +373,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
             galleryViewModel.viewModelScope.launchIdling {
                 SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
                     override fun onNewLocationAvailable(location: Location?) {
-                        this@GalleryFragment.location = location
+                        this@GalleryFragment.weatherLocation = location
                         toExecute.invoke()
                     }
                 })
