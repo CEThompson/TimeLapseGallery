@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.di
+package com.vwoom.timelapsegallery.di.app
 
 import android.app.Activity
 import android.app.Application
@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.vwoom.timelapsegallery.TimeLapseGalleryApplication
+import com.vwoom.timelapsegallery.di.Injectable
 import dagger.android.AndroidInjection
 import dagger.android.HasAndroidInjector
 import dagger.android.support.AndroidSupportInjection

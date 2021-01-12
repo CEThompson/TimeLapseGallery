@@ -1,6 +1,8 @@
-package com.vwoom.timelapsegallery.di
+package com.vwoom.timelapsegallery.di.app
 
 import android.app.Application
+import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.dao.*
 import com.vwoom.timelapsegallery.data.repository.*
@@ -8,6 +10,7 @@ import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
 import com.vwoom.timelapsegallery.data.source.IWeatherRemoteDataSource
 import com.vwoom.timelapsegallery.data.source.WeatherLocalDataSource
 import com.vwoom.timelapsegallery.data.source.WeatherRemoteDataSource
+import com.vwoom.timelapsegallery.di.ViewModelModule
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -16,43 +19,43 @@ import javax.inject.Singleton
 object AppModule {
 
     // TODO: inject shared preferences
-    /*@Provides
+    @Provides
     fun provideSharedPreferences(
             app: Application
-    ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)*/
+    ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
 
     @Provides
-    @Singleton
+    @AppScope
     fun provideDb(app: Application): TimeLapseDatabase {
         return TimeLapseDatabase.getInstance(app)
     }
 
     @Provides
-    @Singleton
+    @AppScope
     fun provideTagRepository(tagRepository: TagRepository): ITagRepository {
         return tagRepository
     }
 
     @Provides
-    @Singleton
+    @AppScope
     fun provideWeatherRepository(weatherRepository: WeatherRepository): IWeatherRepository {
         return weatherRepository
     }
 
     @Provides
-    @Singleton
+    @AppScope
     fun provideProjectRepository(projectRepository: ProjectRepository): IProjectRepository {
         return projectRepository
     }
 
     @Provides
-    @Singleton
+    @AppScope
     fun provideRemoteDataSource(): IWeatherRemoteDataSource {
         return WeatherRemoteDataSource()
     }
 
     @Provides
-    @Singleton
+    @AppScope
     fun provideLocalDataSource(weatherLocalDataSource: WeatherLocalDataSource): IWeatherLocalDataSource {
         return weatherLocalDataSource
     }

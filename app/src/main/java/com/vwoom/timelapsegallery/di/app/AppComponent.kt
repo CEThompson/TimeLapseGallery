@@ -1,14 +1,15 @@
-package com.vwoom.timelapsegallery.di
+package com.vwoom.timelapsegallery.di.app
 
 import android.app.Application
 import com.vwoom.timelapsegallery.TimeLapseGalleryApplication
+import com.vwoom.timelapsegallery.di.TimeLapseGalleryActivityModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
 
-@Singleton
+@AppScope
 @Component(
         modules = [
             AndroidInjectionModule::class,

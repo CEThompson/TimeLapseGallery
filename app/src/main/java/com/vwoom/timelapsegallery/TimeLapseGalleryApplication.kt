@@ -1,7 +1,7 @@
 package com.vwoom.timelapsegallery
 
 import android.app.Application
-import com.vwoom.timelapsegallery.di.AppInjector
+import com.vwoom.timelapsegallery.di.app.AppInjector
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
