@@ -66,6 +66,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
     private var toolbar: Toolbar? = null
     private var addProjectFAB: FloatingActionButton? = null
     private var searchCancelFAB: FloatingActionButton? = null
+    // TODO: add scroll up / down fabs here
 
     // Searching
     private var searchDialog: SearchDialog? = null
@@ -81,23 +82,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
     private lateinit var galleryExitTransition: Transition
     private lateinit var galleryReenterTransition: Transition
     private val reenterListener = object : Transition.TransitionListener {
-        override fun onTransitionEnd(transition: Transition?) {
-        }
-
-        override fun onTransitionCancel(transition: Transition?) {
-        }
-
+        override fun onTransitionEnd(transition: Transition?) {}
+        override fun onTransitionCancel(transition: Transition?) {}
         override fun onTransitionStart(transition: Transition?) {
             val fadeInAnimation = AlphaAnimation(0f, 1f)
             fadeInAnimation.duration = 375
             binding?.galleryRecyclerView?.startAnimation(fadeInAnimation)
         }
-
-        override fun onTransitionPause(transition: Transition?) {
-        }
-
-        override fun onTransitionResume(transition: Transition?) {
-        }
+        override fun onTransitionPause(transition: Transition?) {}
+        override fun onTransitionResume(transition: Transition?) {}
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
