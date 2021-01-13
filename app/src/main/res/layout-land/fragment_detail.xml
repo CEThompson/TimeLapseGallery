@@ -36,6 +36,7 @@
             app:backgroundTint="@color/colorSubtleAccent"
             app:borderWidth="0dp"
             app:fabSize="mini"
+            android:transitionName="details_play_backwards_fab"
             app:layout_constraintBottom_toBottomOf="@id/details_card_container"
             app:layout_constraintEnd_toStartOf="@id/details_card_container" />
 

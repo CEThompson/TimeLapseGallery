@@ -39,32 +39,47 @@
             app:layout_constraintTop_toTopOf="parent"
             app:pressedTranslationZ="0dp" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fullscreen_exit_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/fullscreen_play_fab"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="@dimen/medium"
+            android:contentDescription="@string/fullscreen_back_fab_content_description"
+            android:src="@drawable/ic_fullscreen_exit_white_24dp"
+            android:transitionName="fs_exit_fab"
+            app:backgroundTint="@android:color/transparent"
+            app:elevation="0dp"
+            app:fabSize="mini"
+            app:pressedTranslationZ="0dp" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fullscreen_play_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="@dimen/medium"
+            android:contentDescription="@string/play_as_video_fab_content_description"
+            android:src="@drawable/ic_play_arrow_white_24dp"
+            android:transitionName="fs_play_fab" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fullscreen_rewind_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/colorSubtleAccent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/fullscreen_play_fab"
+            app:fabSize="mini"
+            android:layout_margin="@dimen/medium"
+            android:contentDescription="@string/play_as_video_fab_content_description"
+            android:src="@drawable/ic_baseline_fast_rewind_white_24"
+            android:transitionName="fs_rewind_fab" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fullscreen_exit_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="@dimen/fab_size_plus_padding"
-        android:layout_marginBottom="@dimen/medium"
-        android:contentDescription="@string/fullscreen_back_fab_content_description"
-        android:src="@drawable/ic_fullscreen_exit_white_24dp"
-        android:transitionName="fs_exit_fab"
-        app:backgroundTint="@android:color/transparent"
-        app:elevation="0dp"
-        app:fabSize="mini"
-        app:pressedTranslationZ="0dp" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fullscreen_play_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/medium"
-        android:contentDescription="@string/play_as_video_fab_content_description"
-        android:src="@drawable/ic_play_arrow_white_24dp"
-        android:transitionName="fs_play_fab" />
 
     <TextView
         android:id="@+id/fullscreen_position_textview"

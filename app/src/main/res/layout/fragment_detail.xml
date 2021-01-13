@@ -248,6 +248,7 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_detail_rewind_bottom"
         android:contentDescription="@string/play_as_video_fab_content_description"
+        android:transitionName="details_play_backwards_fab"
         android:src="@drawable/ic_baseline_fast_rewind_white_24"
         app:backgroundTint="@color/colorSubtleAccent"
         app:borderWidth="0dp"

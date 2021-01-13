@@ -221,6 +221,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
             exitTransition = TransitionInflater.from(context).inflateTransition(R.transition.details_to_fullscreen_transition)
             val action = DetailFragmentDirections.actionDetailsFragmentToFullscreenFragment(detailViewModel.photoIndex, photoUrls)
             val extras = FragmentNavigatorExtras(
+                    binding!!.playBackwardsFab as View to "fs_rewind_fab",
                     binding!!.fullscreenFab as View to "fs_exit_fab",
                     binding!!.playAsVideoFab as View to "fs_play_fab")
             findNavController().navigate(action, extras)

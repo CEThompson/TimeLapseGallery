@@ -80,6 +80,7 @@ class FullscreenFragment : BaseFragment() {
         binding?.fullscreenPlayFab?.rippleColor = ContextCompat.getColor(requireContext(), R.color.colorGreen)
         // Display the dialog on clicking the image
         binding?.fullscreenPlayFab?.setOnClickListener { playSetOfImages() }
+        binding?.fullscreenRewindFab?.setOnClickListener { rewindSetOfImages() }
         binding?.fullscreenBackFab?.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -147,6 +148,34 @@ class FullscreenFragment : BaseFragment() {
                 .into(topImage)
     }
 
+    private fun rewindSetOfImages() {
+        // If already playing then stop
+        if (playing) {
+            stopPlaying()
+            return
+        }
+
+        // If not enough photos give user feedback
+        if (photos.size <= 1) {
+            Snackbar.make(binding!!.fullscreenImageBottom, R.string.add_more_photos,
+                    Snackbar.LENGTH_LONG)
+                    .show()
+            return
+        }
+
+        // Handle play state
+        playing = true
+        // Handle UI
+        setFabStatePlaying()
+        // Override the play position to end
+        if (position < photos.size - 1) {
+            position = photos.size -1
+        }
+
+        // Schedule the recursive sequence
+        scheduleLoadPhoto(forward = false) // Recursively loads the rest of set from beginning
+    }
+
     private fun playSetOfImages() {
         // If already playing then stop
         if (playing) {
@@ -172,10 +201,10 @@ class FullscreenFragment : BaseFragment() {
         }
 
         // Schedule the recursive sequence
-        scheduleLoadPhoto() // Recursively loads the rest of set from beginning
+        scheduleLoadPhoto(forward = true) // Recursively loads the rest of set from beginning
     }
 
-    private fun scheduleLoadPhoto() {
+    private fun scheduleLoadPhoto(forward: Boolean) {
         if (position < 0 || position >= photos.size) {
             position = photos.size - 1
             stopPlaying()
@@ -187,12 +216,15 @@ class FullscreenFragment : BaseFragment() {
             // If image is loaded load the next photo
             if (imageIsLoaded) {
                 loadImagePair()
-                position++
-                scheduleLoadPhoto()
+
+                if (forward) position++
+                else position--
+
+                scheduleLoadPhoto(forward)
             }
             // Otherwise check again after the interval
             else {
-                scheduleLoadPhoto()
+                scheduleLoadPhoto(forward)
             }
         }
     }
