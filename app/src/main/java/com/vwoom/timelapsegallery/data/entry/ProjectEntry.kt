@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
-// TODO: add field to mark that GIF needs to be recreated by workmanager
 @Entity(tableName = "project")
 data class ProjectEntry(
         var project_name: String?,
