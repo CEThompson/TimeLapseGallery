@@ -1,9 +1,10 @@
-package com.vwoom.timelapsegallery.di
+package com.vwoom.timelapsegallery.di.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.vwoom.timelapsegallery.camera2.Camera2ViewModel
 import com.vwoom.timelapsegallery.detail.DetailViewModel
+import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
 import com.vwoom.timelapsegallery.gallery.GalleryViewModel
 import com.vwoom.timelapsegallery.settings.SettingsViewModel
 import dagger.Binds

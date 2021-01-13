@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.gallery
 
 import android.Manifest
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.location.Location
@@ -17,14 +18,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -34,8 +32,8 @@ import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
-import com.vwoom.timelapsegallery.di.Injectable
-import com.vwoom.timelapsegallery.di.ViewModelFactory
+import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
+import com.vwoom.timelapsegallery.di.base.BaseFragment
 import com.vwoom.timelapsegallery.location.SingleShotLocationProvider
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.PhotoUtils
@@ -47,7 +45,7 @@ import javax.inject.Inject
 
 // TODO (1.3): set mini fabs to scroll quickly to the bottom of the gallery
 // TODO (update 1.3): optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
-class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler, Injectable {
+class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
 
@@ -56,6 +54,9 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
     private val galleryViewModel: GalleryViewModel by viewModels {
         viewModelFactory
     }
+
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
 
     // Recyclerview
     private var galleryRecyclerView: RecyclerView? = null
@@ -67,14 +68,15 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
     private var toolbar: Toolbar? = null
     private var addProjectFAB: FloatingActionButton? = null
     private var searchCancelFAB: FloatingActionButton? = null
+    // TODO: add scroll up / down fabs here
 
+    /* Dialogs */
     // Searching
     private var searchDialog: SearchDialog? = null
-
     // Weather
     private var weatherChartDialog: WeatherChartDialog? = null
     private var weatherDetailsDialog: WeatherDetailsDialog? = null
-    private var location: Location? = null
+    private var weatherLocation: Location? = null
 
     private var numberOfColumns = PORTRAIT_COLUMN_COUNT
 
@@ -82,26 +84,19 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
     private lateinit var galleryExitTransition: Transition
     private lateinit var galleryReenterTransition: Transition
     private val reenterListener = object : Transition.TransitionListener {
-        override fun onTransitionEnd(transition: Transition?) {
-        }
-
-        override fun onTransitionCancel(transition: Transition?) {
-        }
-
+        override fun onTransitionEnd(transition: Transition?) {}
+        override fun onTransitionCancel(transition: Transition?) {}
         override fun onTransitionStart(transition: Transition?) {
             val fadeInAnimation = AlphaAnimation(0f, 1f)
             fadeInAnimation.duration = 375
             binding?.galleryRecyclerView?.startAnimation(fadeInAnimation)
         }
-
-        override fun onTransitionPause(transition: Transition?) {
-        }
-
-        override fun onTransitionResume(transition: Transition?) {
-        }
+        override fun onTransitionPause(transition: Transition?) {}
+        override fun onTransitionResume(transition: Transition?) {}
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        injector.inject(this)
         super.onCreate(savedInstanceState)
         galleryReenterTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
         galleryReenterTransition.addListener(reenterListener)
@@ -112,9 +107,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = FragmentGalleryBinding.inflate(inflater, container, false).apply {
-            lifecycleOwner = viewLifecycleOwner
-        }
+        binding = FragmentGalleryBinding.inflate(inflater, container, false)
 
         // Set up options menu
         setHasOptionsMenu(true)
@@ -124,14 +117,14 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         (activity as TimeLapseGalleryActivity).supportActionBar?.setIcon(R.drawable.actionbar_space_between_icon_and_title)
 
         // Increase columns for horizontal orientation
-        when (resources.configuration.orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> numberOfColumns = LANDSCAPE_COLUMN_COUNT
-            Configuration.ORIENTATION_PORTRAIT -> numberOfColumns = PORTRAIT_COLUMN_COUNT
+        numberOfColumns = when (resources.configuration.orientation) {
+            Configuration.ORIENTATION_LANDSCAPE -> LANDSCAPE_COLUMN_COUNT
+            Configuration.ORIENTATION_PORTRAIT -> PORTRAIT_COLUMN_COUNT
+            else -> PORTRAIT_COLUMN_COUNT
         }
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val schedulesDisplayed = preferences.getBoolean(getString(R.string.key_schedule_display), true)
-        val gifsDisplayed = preferences.getBoolean(getString(R.string.key_gif_display), true)
+        val schedulesDisplayed = sharedPreferences.getBoolean(getString(R.string.key_schedule_display), true)
+        val gifsDisplayed = sharedPreferences.getBoolean(getString(R.string.key_gif_display), true)
 
         // Set up the adapter for the recycler view
         try {
@@ -238,7 +231,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         if (galleryViewModel.weather.value is WeatherResult.TodaysForecast
                 || galleryViewModel.weather.value is WeatherResult.Loading) return
         getLocationAndExecute {
-            galleryViewModel.getForecast(location)
+            galleryViewModel.getForecast(weatherLocation)
         }
     }
 
@@ -289,33 +282,33 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
      */
     private fun setupViewModel() {
         // Observe the entire list projects in the database
-        galleryViewModel.projects.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.projects.observe(viewLifecycleOwner, {
             // Update the displayed projects by filtering all projects
             // Note: default filter is none and currentProjects will simply display
             galleryViewModel.filterProjects()
         })
 
         // Observe the projects to be displayed after filtration
-        galleryViewModel.displayedProjectViews.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.displayedProjectViews.observe(viewLifecycleOwner, {
             galleryAdapter?.submitList(it)
         })
 
         // Observe the search state
         // This will hide and display the search cancel fab if search filter options are not default (no tags, no search string, no due dates)
-        galleryViewModel.search.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.search.observe(viewLifecycleOwner, {
             if (it) searchCancelFAB?.show() else searchCancelFAB?.hide()
         })
 
         // Observe the weather response saved in the database
         // This may be WeatherResponse.NoData, WeatherResponse.Loading, WeatherResponse.Cached, WeatherResponse.TodaysForecast
-        galleryViewModel.weather.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.weather.observe(viewLifecycleOwner, {
             // Display the data from the response in the dialogs
             weatherChartDialog?.handleWeatherChart(it)
             weatherDetailsDialog?.handleWeatherResult(it)
         })
 
         // Watch the tags to update the search dialog
-        galleryViewModel.tags.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.tags.observe(viewLifecycleOwner, {
             searchDialog?.updateSearchDialog()
         })
     }
@@ -330,7 +323,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
         weatherChartDialog?.findViewById<FloatingActionButton>(R.id.sync_weather_data_fab)?.setOnClickListener {
             getLocationAndExecute {
                 try {
-                    galleryViewModel.updateForecast(location!!)
+                    galleryViewModel.updateForecast(weatherLocation!!)
                 } catch (e: KotlinNullPointerException) {
                     galleryViewModel.getForecast(null)
                     Toast.makeText(requireContext(), getString(R.string.no_location_error), Toast.LENGTH_SHORT).show()
@@ -349,7 +342,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
 
         // Get / update the forecast
         getLocationAndExecute {
-            galleryViewModel.getForecast(location)
+            galleryViewModel.getForecast(weatherLocation)
         }
 
     }
@@ -380,7 +373,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
             galleryViewModel.viewModelScope.launchIdling {
                 SingleShotLocationProvider.requestSingleUpdate(requireContext(), object : SingleShotLocationProvider.LocationCallback {
                     override fun onNewLocationAvailable(location: Location?) {
-                        this@GalleryFragment.location = location
+                        this@GalleryFragment.weatherLocation = location
                         toExecute.invoke()
                     }
                 })

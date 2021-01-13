@@ -1,28 +1,11 @@
 package com.vwoom.timelapsegallery.gallery
 
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentFactory
-import androidx.fragment.app.testing.FragmentScenario
-import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
-import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.filters.MediumTest
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.TimeLapseGalleryApplication
-import com.vwoom.timelapsegallery.di.ViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 
 // TODO convert all test with coroutines to use run blocking test
 @ExperimentalCoroutinesApi

@@ -1,68 +1,63 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<?xml version="1.0" encoding="utf-8"?><!-- TODO: consider removing use of card view but somehow retaining material styling -->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/project_card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/cardview_padding"
+    android:minWidth="@dimen/touch_target_min"
+    android:minHeight="@dimen/touch_target_min">
 
-    <!-- TODO: consider removing use of card view but somehow retaining material styling -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/project_card_view"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/project_recyclerview_constraint_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/cardview_padding"
-        android:minWidth="@dimen/touch_target_min"
-        android:minHeight="@dimen/touch_target_min">
+        android:layout_height="wrap_content">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/project_recyclerview_constraint_layout"
+        <!-- Image for project -->
+        <ImageView
+            android:id="@+id/project_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/darkImagePlaceHolder"
+            android:contentDescription="@string/project_image_content_description"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/gallery_schedule_layout"
+            layout="@layout/schedule_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/project_image"
+            app:layout_constraintEnd_toEndOf="@id/project_image"
+            app:layout_constraintStart_toStartOf="@id/project_image"
+            app:layout_constraintTop_toTopOf="@id/project_image" />
+
+        <!-- Bottom gradient -->
+        <FrameLayout
+            android:id="@+id/gallery_item_check_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <!-- Image for project -->
             <ImageView
-                android:id="@+id/project_image"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="@color/darkImagePlaceHolder"
-                android:contentDescription="@string/project_image_content_description"
-                app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-            <include
-                android:id="@+id/gallery_schedule_layout"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="@id/project_image"
-                app:layout_constraintEnd_toEndOf="@id/project_image"
-                app:layout_constraintTop_toTopOf="@id/project_image"
-                app:layout_constraintBottom_toBottomOf="@id/project_image"
-                layout="@layout/schedule_layout" />
-
-            <!-- Bottom gradient -->
-            <FrameLayout
-                android:id="@+id/gallery_item_check_layout"
+                android:id="@+id/gallery_bottom_gradient"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent">
-                <ImageView
-                    android:id="@+id/gallery_bottom_gradient"
-                    android:contentDescription="@string/cd_gallery_item_bottom_gradient"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:src="@drawable/gradient_overlay_bottom_up"
-                    />
+                android:layout_height="60dp"
+                android:contentDescription="@string/cd_gallery_item_bottom_gradient"
+                android:src="@drawable/gradient_overlay_bottom_up" />
 
-                <!-- check mark to indicate if photo has been taken today -->
-                <ImageView
-                    android:id="@+id/schedule_indicator_check"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|start"
-                    android:contentDescription="@string/schedule_indicator_check_content_description"
-                    android:src="@drawable/ic_check_schedule_green_40dp"
-                    />
-            </FrameLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
-</layout>
+            <!-- check mark to indicate if photo has been taken today -->
+            <ImageView
+                android:id="@+id/schedule_indicator_check"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|start"
+                android:contentDescription="@string/schedule_indicator_check_content_description"
+                android:src="@drawable/ic_check_schedule_green_40dp" />
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

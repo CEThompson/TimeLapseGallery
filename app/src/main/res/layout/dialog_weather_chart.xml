@@ -1,124 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/weather_chart_constraint_layout"
+        android:layout_width="@dimen/weather_chart_size_placeholder"
+        android:layout_height="wrap_content">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/weather_chart_constraint_layout"
-            android:layout_width="@dimen/weather_chart_size_placeholder"
-            android:layout_height="wrap_content">
+        <!-- Sync Forecast Fab -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/sync_weather_data_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/small"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/ic_sync_black_24dp"
+            app:fabSize="mini"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Sync Forecast Fab -->
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/sync_weather_data_fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/small"
-                android:backgroundTint="@color/white"
-                android:src="@drawable/ic_sync_black_24dp"
-                app:fabSize="mini"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+        <!-- Loading Progress -->
+        <ProgressBar
+            android:id="@+id/weather_chart_progress"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_margin="@dimen/small"
+            android:layout_marginTop="@dimen/medium"
+            android:layout_marginEnd="@dimen/medium"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@id/update_time_tv"
+            app:layout_constraintStart_toEndOf="@id/sync_weather_data_fab"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
 
-            <!-- Loading Progress -->
-            <ProgressBar
-                android:id="@+id/weather_chart_progress"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_margin="@dimen/small"
-                android:layout_marginTop="@dimen/medium"
-                android:layout_marginEnd="@dimen/medium"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="@id/update_time_tv"
-                app:layout_constraintStart_toEndOf="@id/sync_weather_data_fab"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible" />
+        <!-- Confirmation check or x for updating the forecast -->
+        <ImageView
+            android:id="@+id/update_confirmation_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/medium"
+            android:src="@drawable/ic_check_green_24dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/update_time_tv"
+            app:layout_constraintEnd_toEndOf="@id/weather_chart_progress"
+            app:layout_constraintStart_toStartOf="@id/weather_chart_progress"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_clear_red_24dp"
+            tools:visibility="visible" />
 
-            <!-- Confirmation check or x for updating the forecast -->
-            <ImageView
-                android:id="@+id/update_confirmation_image_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_check_green_24dp"
-                android:layout_margin="@dimen/medium"
-                app:layout_constraintStart_toStartOf="@id/weather_chart_progress"
-                app:layout_constraintEnd_toEndOf="@id/weather_chart_progress"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="@id/update_time_tv"
-                tools:visibility="visible"
-                tools:src="@drawable/ic_clear_red_24dp"
-                android:visibility="gone"/>
+        <!-- Update time -->
+        <TextView
+            android:id="@+id/update_time_tv"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/medium"
+            app:layout_constraintBottom_toTopOf="@id/error_message_tv"
+            app:layout_constraintEnd_toStartOf="@id/weather_chart_dialog_exit_fab"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/update_confirmation_image_view"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0"
+            tools:text="Updated: 5/18/20 2:17 PM" />
 
-            <!-- Update time -->
-            <TextView
-                android:id="@+id/update_time_tv"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_margin="@dimen/medium"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintVertical_bias="0"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/error_message_tv"
-                app:layout_constraintStart_toEndOf="@id/update_confirmation_image_view"
-                app:layout_constraintEnd_toStartOf="@id/weather_chart_dialog_exit_fab"
-                tools:text="Updated: 5/18/20 2:17 PM" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/weather_chart_dialog_exit_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/small"
+            android:src="@drawable/ic_clear_white_24dp"
+            app:backgroundTint="@color/colorSubtleRedAccent"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/weather_chart_dialog_exit_fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/small"
-                android:src="@drawable/ic_clear_white_24dp"
-                app:backgroundTint="@color/colorSubtleRedAccent"
-                app:fabSize="mini"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+        <!-- Error message -->
+        <TextView
+            android:id="@+id/error_message_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/medium"
+            android:gravity="center_horizontal"
+            android:textColor="@color/colorRedAccent"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sync_weather_data_fab"
+            tools:text="Sync failed: timeout"
+            tools:visibility="visible" />
 
-            <!-- Error message -->
-            <TextView
-                android:id="@+id/error_message_tv"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/medium"
-                android:textColor="@color/colorRedAccent"
-                android:visibility="gone"
-                tools:visibility="visible"
-                android:gravity="center_horizontal"
-                app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/sync_weather_data_fab"
-                tools:text="Sync failed: timeout" />
+        <!-- Weather Chart -->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/weather_chart"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/medium"
+            android:visibility="invisible"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/error_message_tv"
+            tools:visibility="visible" />
 
-            <!-- Weather Chart -->
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/weather_chart"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintDimensionRatio="1:1"
-                android:layout_margin="@dimen/medium"
-                android:visibility="invisible"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintTop_toBottomOf="@id/error_message_tv"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:visibility="visible" />
+        <!-- Show details -->
+        <TextView
+            android:id="@+id/show_weather_details_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/medium"
+            android:text="@string/show_details"
+            android:textColor="@color/colorTag"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/weather_chart" />
 
-            <!-- Show details -->
-            <TextView
-                android:id="@+id/show_weather_details_tv"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/medium"
-                android:textColor="@color/colorTag"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/weather_chart"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:text="@string/show_details" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
-</layout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

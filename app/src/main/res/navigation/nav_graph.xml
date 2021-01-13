@@ -5,6 +5,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/galleryFragment">
 
+    <!-- Gallery Fragment : Displays a gallery of time-lapse photo projects -->
     <fragment
         android:id="@+id/galleryFragment"
         android:name="com.vwoom.timelapsegallery.gallery.GalleryFragment"
@@ -25,6 +26,7 @@
             android:defaultValue="false" />
     </fragment>
 
+    <!-- Details Fragment: Displays details for a selected time-lapse photo project -->
     <fragment
         android:id="@+id/detailsFragment"
         android:name="com.vwoom.timelapsegallery.detail.DetailFragment"
@@ -41,12 +43,14 @@
             app:destination="@id/fullscreenFragment" />
     </fragment>
 
+    <!-- Settings Fragment: Displays shared preferences for application -->
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.vwoom.timelapsegallery.settings.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
 
+    <!-- Camera 2 Fragment: Handles camera for adding photos to a project or creating a new project -->
     <fragment
         android:id="@+id/camera2Fragment"
         android:name="com.vwoom.timelapsegallery.camera2.Camera2Fragment"
@@ -67,6 +71,8 @@
             app:destination="@id/detailsFragment"
             app:popUpTo="@id/galleryFragment"/>
     </fragment>
+
+    <!-- Fullscreen Fragment: Displays fullscreen photos for the currently selected project  -->
     <fragment
         android:id="@+id/fullscreenFragment"
         android:name="com.vwoom.timelapsegallery.detail.FullscreenFragment"

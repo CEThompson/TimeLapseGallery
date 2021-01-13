@@ -20,7 +20,6 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -48,8 +47,8 @@ import com.vwoom.timelapsegallery.detail.dialog.ConversionDialog
 import com.vwoom.timelapsegallery.detail.dialog.InfoDialog
 import com.vwoom.timelapsegallery.detail.dialog.ScheduleDialog
 import com.vwoom.timelapsegallery.detail.dialog.TagDialog
-import com.vwoom.timelapsegallery.di.Injectable
-import com.vwoom.timelapsegallery.di.ViewModelFactory
+import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
+import com.vwoom.timelapsegallery.di.base.BaseFragment
 import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
@@ -68,8 +67,9 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
+// TODO: (update 1.3) investigate minor error in layouting on shared element return from fullscreen fragment
 // TODO: (update 1.3) implement pinch zoom on fullscreen image
-class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, Injectable {
+class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private val args: DetailFragmentArgs by navArgs()
 
@@ -129,6 +129,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        injector.inject(this)
         super.onCreate(savedInstanceState)
         currentProjectView = args.clickedProjectView
         playbackInterval = getString(R.string.playback_interval_default).toLong()
@@ -171,9 +172,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentDetailBinding.inflate(inflater, container, false).apply {
-            lifecycleOwner = viewLifecycleOwner
-        }
+        binding = FragmentDetailBinding.inflate(inflater, container, false)
 
         // Initialize the playback interval from the shared preferences
         val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -868,7 +867,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
 
         // Observes the currently selected photo
         // This loads the image and timestamp information based on the current photo
-        detailViewModel.currentPhoto.observe(viewLifecycleOwner, Observer { currentPhoto: PhotoEntry? ->
+        detailViewModel.currentPhoto.observe(viewLifecycleOwner, { currentPhoto: PhotoEntry? ->
             if (currentPhoto != null) {
                 this.currentPhoto = currentPhoto
                 loadUi(currentPhoto)
@@ -878,7 +877,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         // Observe the tags for the project
         // This updates the tags in the dialog, sets the tags in the project info card layout,
         // Lastly this writes the sorted tags to the tags text file in the meta directory
-        detailViewModel.projectTags.observe(viewLifecycleOwner, Observer { projectTagEntries: List<ProjectTagEntry> ->
+        detailViewModel.projectTags.observe(viewLifecycleOwner, { projectTagEntries: List<ProjectTagEntry> ->
             tagJob = detailViewModel.viewModelScope.launch {
                 // 1. Get the Tag Entries from the Project Tag Entries sorted
                 projectTags = detailViewModel.getTags(projectTagEntries)
@@ -907,7 +906,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
         // Observe all the tags in the database
         // This is used to set up the list of all the tags in the project tag dialog
         // So that the user may simply click on a tag to add them to a project
-        detailViewModel.tags.observe(viewLifecycleOwner, Observer { tagEntries: List<TagEntry> ->
+        detailViewModel.tags.observe(viewLifecycleOwner, { tagEntries: List<TagEntry> ->
             allTags = tagEntries.sortedBy { it.text.toLowerCase(Locale.getDefault()) }
             tagDialog?.setProjectTagDialog(allTags, projectTags)
         })

@@ -309,4 +309,11 @@
     <string name="error_no_remote_response">No response from remote</string>
     <string name="fetching_forecast">Fetching forecast</string>
 
+    <!-- Sensors -->
+    <string name="ambient">%1$s %2$s</string>
+    <string name="pressure">%1$s mbar</string>
+    <string name="light">%1$s lx</string>
+    <string name="humidity">%1$s %%</string>
+
+
 </resources>

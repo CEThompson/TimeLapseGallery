@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToLong
 
+// TODO convert to kotlinx datetime
 const val DAY_IN_MILLISECONDS: Long = (1000 * 60 * 60 * 24).toLong()
 
 object TimeUtils {

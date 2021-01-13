@@ -3,11 +3,16 @@ package com.vwoom.timelapsegallery.camera2
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Context.SENSOR_SERVICE
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.RectF
 import android.graphics.SurfaceTexture
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.hardware.camera2.*
 import android.os.Bundle
 import android.os.Environment
@@ -18,24 +23,24 @@ import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
 import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
 import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
-import com.vwoom.timelapsegallery.di.Injectable
-import com.vwoom.timelapsegallery.di.ViewModelFactory
+import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
+import com.vwoom.timelapsegallery.di.base.BaseFragment
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils
+import com.vwoom.timelapsegallery.weather.WeatherAdapter.Companion.CELSIUS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -47,7 +52,11 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
+// TODO: bind all available sensor data to saved image (perhaps as exif data?)
+// TODO: add GPS data to photos as setting?
+// TODO: calc dew point if possible
+
+class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
     private val args: Camera2FragmentArgs by navArgs()
 
     // Camera Fields
@@ -71,6 +80,15 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
     private var baseWidth: Int = 0
     private var baseHeight: Int = 0
 
+    // TODO troubleshoot camera capture size issue
+
+    // Sensor variables
+    private lateinit var sensorManager: SensorManager
+    private var lightSensor: Sensor? = null
+    private var pressureSensor: Sensor? = null
+    private var ambientTempSensor: Sensor? = null
+    private var humiditySensor: Sensor? = null
+    
     // ViewModel
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -82,12 +100,16 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
     private var takePictureJob: Job? = null
     private var takePictureFab: FloatingActionButton? = null
 
+    private var cameraBinding: FragmentCamera2Binding? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        injector.inject(this)
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentCamera2Binding
                 .inflate(inflater, container, false)
-                .apply {
-                    lifecycleOwner = viewLifecycleOwner
-                }
         viewFinder = binding.cameraPreview
         takePictureFab = binding.takePictureFab
 
@@ -133,11 +155,13 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
 
                     // Rotates and scales the bitmap based on the device rotation
                     val matrix = getTransformMatrix(baseWidth, baseHeight)
-                    val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap, 0, 0, viewFinder.bitmap.width, viewFinder.bitmap.height, matrix, true)
+                    // TODO remove !! operators
+                    val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap!!, 0, 0, viewFinder.bitmap!!.width, viewFinder.bitmap!!.height, matrix, true)
                     adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
 
                     // Write exif data for image
                     val exif = ExifInterface(file.absolutePath)
+                    // TODO consider kotlinx datetime usage here
                     val timestamp = System.currentTimeMillis()
                     val timeString = TimeUtils.getExifDateTimeFromTimestamp(timestamp)
                     exif.setAttribute(ExifInterface.TAG_DATETIME_ORIGINAL, timeString)
@@ -147,6 +171,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                     val isNewProject = (args.projectView == null)
 
                     // For new projects navigate to project detail after insertion
+                    // TODO insert quick entry mode logic here if new project
                     if (isNewProject) {
                         val newProjectView = camera2ViewModel.addNewProject(file, externalFilesDir, timestamp)
                         val action = Camera2FragmentDirections.actionCamera2FragmentToDetailsFragment(newProjectView)
@@ -155,6 +180,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                     // For existing projects pop back to the project detail after adding the picture
                     else {
                         camera2ViewModel.addPhotoToProject(file, externalFilesDir, timestamp)
+                        // TODO insert quick entry mode logic here for taking multiple timelapse pictures for a project
                         findNavController().popBackStack()
                     }
                 } catch (e: Exception) {
@@ -171,6 +197,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                 it.post { it.isEnabled = true }
             }
         }
+        cameraBinding = binding
         return binding.root
     }
 
@@ -180,12 +207,13 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
 
         // Set up a texture listener which initializes the camera
         viewFinder.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-            override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
+            override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
                 Timber.d("onSurfaceTextureAvailable called with to width $width and height $height")
                 previewSize = getPreviewOutputSize(
                         viewFinder.display,
                         characteristics,
                         SurfaceHolder::class.java)
+                // TODO troubleshoot problems with preview image and saving here
                 Timber.d("previewSize is width ${previewSize!!.width} and height ${previewSize!!.height}")
                 viewFinder.setAspectRatio(previewSize!!.width, previewSize!!.height)
 
@@ -203,24 +231,32 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
                 baseWidth = width
             }
 
-            override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+            override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
                 return false
             }
 
-            override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
+            override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
                 baseHeight = height
                 baseWidth = width
             }
 
-            override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
+            override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
             }
         }
         // Set live data for phone orientation
         relativeOrientation = OrientationLiveData(requireContext(), characteristics).apply {
-            observe(viewLifecycleOwner, Observer { orientation ->
+            observe(viewLifecycleOwner, { orientation ->
                 Timber.d("Orientation changed to $orientation")
             })
         }
+
+        // Set up sensors
+        //Timber.d("setting up sensor manager")
+        sensorManager = requireContext().getSystemService(SENSOR_SERVICE) as SensorManager
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+        pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
+        ambientTempSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)
+        humiditySensor = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY)
     }
 
     private fun initializeCamera() = lifecycleScope.launchIdling {
@@ -234,7 +270,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
 
         // Set the surface of the texture view as a target
         val surfaceTexture = viewFinder.surfaceTexture
-        surfaceTexture.setDefaultBufferSize(previewSize!!.width, previewSize!!.height)
+        surfaceTexture?.setDefaultBufferSize(previewSize!!.width, previewSize!!.height)
         val previewSurface = Surface(surfaceTexture)
         val targets = listOf(previewSurface)
         session = createCaptureSession(camera, targets, cameraHandler)
@@ -298,6 +334,19 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
         }, handler)
     }
 
+    override fun onResume() {
+        super.onResume()
+        sensorManager.registerListener(this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, pressureSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, ambientTempSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, humiditySensor, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(this)
+    }
+
     override fun onStop() {
         super.onStop()
         try {
@@ -312,6 +361,7 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
         cameraThread.quitSafely()
     }
 
+    // TODO clean up image transform logic
     // Transforms the viewfinder to the device orientation
     private fun transformImage(viewWidth: Int, viewHeight: Int) {
         if (previewSize == null || !::viewFinder.isInitialized) return
@@ -381,5 +431,32 @@ class Camera2Fragment : Fragment(), LifecycleOwner, Injectable {
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        event?:return
+        if (event.values.isEmpty()) return
+        when(event.sensor.type){
+            Sensor.TYPE_AMBIENT_TEMPERATURE -> {
+                val measurement = "%.1f".format(event.values[0])
+                cameraBinding?.ambientTemperatureOutput?.text = getString(R.string.ambient, measurement, CELSIUS)
+            }
+            Sensor.TYPE_PRESSURE -> {
+                // TODO format string
+                val measurement = "%.2f".format(event.values[0])
+                cameraBinding?.ambientPressureOutput?.text = getString(R.string.pressure, measurement)
+            }
+            Sensor.TYPE_LIGHT -> {
+                val measurement = "%.1f".format(event.values[0])
+                cameraBinding?.ambientLightOutput?.text = getString(R.string.light, event.values[0].toString())
+            }
+            Sensor.TYPE_RELATIVE_HUMIDITY -> {
+                val measurement = "%.1f".format(event.values[0])
+                cameraBinding?.relativeHumidityOutput?.text = getString(R.string.humidity, event.values[0].toString())
+            }
+        }
+    }
+
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
     }
 }

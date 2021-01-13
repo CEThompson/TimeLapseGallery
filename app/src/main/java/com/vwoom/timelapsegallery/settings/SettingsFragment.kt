@@ -17,12 +17,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.di.Injectable
-import com.vwoom.timelapsegallery.di.ViewModelFactory
+import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
+import com.vwoom.timelapsegallery.di.base.BasePreferenceFragment
 import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.ImportUtils
@@ -33,7 +32,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 // TODO (1.3): consider allowing for adjustment of gallery columns
-class SettingsFragment : PreferenceFragmentCompat(), Injectable {
+class SettingsFragment : BasePreferenceFragment() {
     private var prefs: SharedPreferences? = null
     private var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
@@ -60,6 +59,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Injectable {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        injector.inject(this)
         super.onCreate(savedInstanceState)
         // Set up dialogs
         createSyncDialog()
