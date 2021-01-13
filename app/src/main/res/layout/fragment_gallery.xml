@@ -33,33 +33,71 @@
         app:spanCount="3"
         tools:listitem="@layout/gallery_recyclerview_item" />
 
-
-    <!-- indicator for active search -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/search_active_indicator"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="@dimen/fab_size_plus_padding"
-        android:layout_marginBottom="@dimen/medium"
-        android:backgroundTint="@color/white"
-        android:contentDescription="@string/content_description_search_active_fab"
-        android:src="@drawable/ic_search_cancel_24dp"
-        android:visibility="invisible"
-        app:fabSize="normal"
-        tools:visibility="visible" />
+        android:layout_gravity="end|bottom">
+        <!-- indicator for active search -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/search_active_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/add_project_FAB"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="@dimen/medium"
+            android:backgroundTint="@color/white"
+            android:contentDescription="@string/content_description_search_active_fab"
+            android:src="@drawable/ic_search_cancel_24dp"
+            android:visibility="invisible"
+            app:fabSize="normal"
+            tools:visibility="visible" />
 
-    <!-- FAB to create a new project -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_project_FAB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:contentDescription="@string/add_project_FAB_content_description"
-        android:src="@drawable/ic_add_white_24dp"
-        android:transitionName="gallery_add_fab"
-        app:fabSize="normal" />
+        <!-- FAB to create a new project -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_project_FAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="@dimen/fab_margin"
+            android:contentDescription="@string/add_project_FAB_content_description"
+            android:src="@drawable/ic_add_white_24dp"
+            android:transitionName="gallery_add_fab"
+            app:fabSize="normal" />
+
+        <!-- Mini FAB to scroll up -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/scroll_up_FAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/scroll_down_FAB"
+            android:backgroundTint="@color/white"
+            android:layout_margin="@dimen/fab_margin"
+            android:contentDescription="@string/add_project_FAB_content_description"
+            android:src="@drawable/ic_baseline_keyboard_arrow_up_24"
+            app:fabSize="mini"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            />
+
+        <!-- Mini FAB to scroll down -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/scroll_down_FAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/add_project_FAB"
+            android:layout_margin="@dimen/fab_margin"
+            android:contentDescription="@string/add_project_FAB_content_description"
+            android:src="@drawable/ic_baseline_keyboard_arrow_down_24"
+            app:fabSize="mini"
+            android:visibility="invisible"
+            tools:visibility="visible"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

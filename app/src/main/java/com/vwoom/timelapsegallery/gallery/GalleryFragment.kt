@@ -68,7 +68,8 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
     private var toolbar: Toolbar? = null
     private var addProjectFAB: FloatingActionButton? = null
     private var searchCancelFAB: FloatingActionButton? = null
-    // TODO: add scroll up / down fabs here
+    private var scrollUpFAB: FloatingActionButton? = null
+    private var scrollDownFAB: FloatingActionButton? = null
 
     /* Dialogs */
     // Searching
@@ -79,6 +80,7 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
     private var weatherLocation: Location? = null
 
     private var numberOfColumns = PORTRAIT_COLUMN_COUNT
+    private var recyclerLastPosition: Int = 0
 
     // Transitions
     private lateinit var galleryExitTransition: Transition
@@ -123,13 +125,15 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
             else -> PORTRAIT_COLUMN_COUNT
         }
 
-        val schedulesDisplayed = sharedPreferences.getBoolean(getString(R.string.key_schedule_display), true)
-        val gifsDisplayed = sharedPreferences.getBoolean(getString(R.string.key_gif_display), true)
-
         // Set up the adapter for the recycler view
         try {
             val externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-            galleryAdapter = GalleryAdapter(this, externalFilesDir, schedulesDisplayed, gifsDisplayed)
+            galleryAdapter = GalleryAdapter(
+                    this,
+                    externalFilesDir,
+                    sharedPreferences.getBoolean(getString(R.string.key_schedule_display), true),
+                    sharedPreferences.getBoolean(getString(R.string.key_gif_display), true)
+            )
         } catch (e: KotlinNullPointerException) {
             // TODO (1.3): navigate to failure layout
             Toast.makeText(requireContext(), getString(R.string.error_retrieving_files_dir), Toast.LENGTH_LONG).show()
@@ -174,6 +178,20 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
             searchDialog?.updateSearchDialog()
         }
 
+        scrollUpFAB = binding?.scrollUpFAB
+        scrollUpFAB?.setOnClickListener {
+            // TODO show position of gallery?
+            // TODO show minifabs only when gallery is large enough to warrant it?
+            // TODO write tests
+            galleryRecyclerView?.scrollToPosition(0)
+        }
+
+        scrollDownFAB = binding?.scrollDownFAB
+        scrollDownFAB?.setOnClickListener {
+            galleryRecyclerView?.scrollToPosition(recyclerLastPosition)
+        }
+
+        // Set observers
         setupViewModel()
 
         // Launch with search filter if set from the notification
@@ -291,6 +309,9 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
         // Observe the projects to be displayed after filtration
         galleryViewModel.displayedProjectViews.observe(viewLifecycleOwner, {
             galleryAdapter?.submitList(it)
+            recyclerLastPosition = it.size-1
+            if (it.size > SHOW_SCROLLING_FABS_AMOUNT) showScrollingFabs()
+            else hideScrollingFabs()
         })
 
         // Observe the search state
@@ -311,6 +332,16 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
         galleryViewModel.tags.observe(viewLifecycleOwner, {
             searchDialog?.updateSearchDialog()
         })
+    }
+
+    private fun hideScrollingFabs() {
+        scrollDownFAB?.hide()
+        scrollUpFAB?.hide()
+    }
+
+    private fun showScrollingFabs() {
+        scrollDownFAB?.show()
+        scrollUpFAB?.show()
     }
 
     /**
@@ -449,6 +480,7 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
     }
 
     companion object {
+        private const val SHOW_SCROLLING_FABS_AMOUNT = 10
         private const val LANDSCAPE_COLUMN_COUNT = 6
         private const val PORTRAIT_COLUMN_COUNT = 3
         private const val BUNDLE_RECYCLER_LAYOUT = "recycler_layout_key"
