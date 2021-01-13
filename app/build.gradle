@@ -39,7 +39,6 @@ android {
 
     buildTypes {
         release {
-            // TODO: figure out how to re-activate minification and shrinking resources with retrofit and moshi
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
