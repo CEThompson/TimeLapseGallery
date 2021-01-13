@@ -2,13 +2,12 @@ package com.vwoom.timelapsegallery.gif
 
 import android.content.Context
 import android.os.Environment
-import android.util.Log
 import androidx.preference.PreferenceManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
-import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.di.InjectorUtils
 import timber.log.Timber
 import java.io.File
 
