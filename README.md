@@ -1,21 +1,21 @@
-<p align = "center">
+<p align = "start">
+    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/branding_small.png" width="400">    
+</p>
+
+<p align = "start">
     <a href="https://play.google.com/store/apps/details?id=com.vwoom.timelapsegallery&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"> 
         <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Google Play Store" width="300"> 
     </a>
 </p>
 
-<p align = "center">
-    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/branding_small.png" width="300">    
+<p align = "start">
+    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_1.gif" width="150">
+    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_2.gif" width="150">
+    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_3.gif" width="150">
 </p>
 
-<p align = "center">
-    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_1.gif" width="100">
-    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_2.gif" width="100">
-    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_3.gif" width="100">
-</p>
-
-<p align = "center">
-    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/preview.png" width="300">    
+<p align = "start">
+    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/preview.png" width="500">    
 </p>
 
 
