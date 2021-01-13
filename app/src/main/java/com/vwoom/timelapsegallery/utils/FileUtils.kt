@@ -14,6 +14,7 @@ object FileUtils {
 
     // Directory definitions
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
+    // TODO restructure using "projects" subdirectory
     const val META_FILE_SUBDIRECTORY = "Meta"
     const val GIF_FILE_SUBDIRECTORY = "Gif"
 
