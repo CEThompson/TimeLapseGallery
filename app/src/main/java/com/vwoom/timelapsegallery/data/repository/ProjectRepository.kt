@@ -124,9 +124,13 @@ class ProjectRepository
         val photoEntry = PhotoEntry(projectView.project_id, timestamp)
         val photoId = photoDao.insertPhoto(photoEntry)
 
-        // Insert the cover photo
+        // Insert / Update the cover photo
         val coverPhotoEntry = CoverPhotoEntry(projectView.project_id, photoId)
         coverPhotoDao.insertPhoto(coverPhotoEntry)
+
+        // Mark the project to record that a photo has been added
+        // Note: this is so that the work manager can determine whether or not to recreate the GIF
+        markProjectChanged(projectEntry)
 
         // Create the final file
         // TODO: handle blocking method in non blocking context
@@ -135,6 +139,19 @@ class ProjectRepository
             FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
         }
     }
+
+    override suspend fun markProjectUnchanged(projectEntry: ProjectEntry) {
+        // Note: 0 indicates that the project has had nothing added to it
+        projectEntry.project_updated = 0
+        projectDao.updateProject(projectEntry)
+    }
+
+    override suspend fun markProjectChanged(projectEntry: ProjectEntry) {
+        // Note: 1 indicates that something has been added to the project
+        projectEntry.project_updated = 1
+        projectDao.updateProject(projectEntry)
+    }
+
 
     override suspend fun deleteProjectPhoto(externalFilesDir: File, photoEntry: PhotoEntry) {
         val projectEntry = projectDao.getProjectById(photoEntry.project_id) ?: return

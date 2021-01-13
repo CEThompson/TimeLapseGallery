@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.data.repository
 
 import androidx.lifecycle.LiveData
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import java.io.File
@@ -17,6 +18,8 @@ interface IProjectRepository {
     suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int = 0): ProjectView
     suspend fun updateProjectName(externalFilesDir: File, sourceProjectView: ProjectView, name: String)
     suspend fun deleteProject(externalFilesDir: File, projectId: Long)
+    suspend fun markProjectChanged(projectEntry: ProjectEntry)
+    suspend fun markProjectUnchanged(projectEntry: ProjectEntry)
 
     // For managing project cover photo and schedules
     suspend fun setProjectSchedule(

@@ -1,5 +1,7 @@
 package com.vwoom.timelapsegallery.data.source
 
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import com.vwoom.timelapsegallery.fakes.FakeWeatherDao
 import com.vwoom.timelapsegallery.testing.TestForecastResponse
@@ -18,7 +20,9 @@ class WeatherLocalDataSourceTest {
     @Before
     fun setup() {
         fakeWeatherDao = FakeWeatherDao()
-        localDataSource = WeatherLocalDataSource(fakeWeatherDao)
+        // TODO restore test by injecting with
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        localDataSource = WeatherLocalDataSource(fakeWeatherDao, MoshiHelper.instance)
     }
 
     @Test

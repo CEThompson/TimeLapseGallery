@@ -6,7 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
-import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.di.InjectorUtils
 import com.vwoom.timelapsegallery.widget.WidgetProvider.Companion.updateWidgets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

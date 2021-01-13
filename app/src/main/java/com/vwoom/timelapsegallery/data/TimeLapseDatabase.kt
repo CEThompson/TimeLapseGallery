@@ -21,7 +21,7 @@ import com.vwoom.timelapsegallery.data.view.ProjectView
     CoverPhotoEntry::class,
     WeatherEntry::class],
         views = [ProjectView::class],
-        version = 3,
+        version = 4,
         exportSchema = true)
 abstract class TimeLapseDatabase : RoomDatabase() {
     abstract fun projectDao(): ProjectDao
@@ -47,6 +47,7 @@ abstract class TimeLapseDatabase : RoomDatabase() {
             return Room.databaseBuilder(context, TimeLapseDatabase::class.java, DATABASE_NAME)
                     .addMigrations(MIGRATION_1_2)
                     .addMigrations(MIGRATION_2_3)
+                    .addMigrations(MIGRATION_3_4)
                     .build()
         }
 
@@ -161,5 +162,13 @@ abstract class TimeLapseDatabase : RoomDatabase() {
                         ")")
             }
         }
+
+        val MIGRATION_3_4: Migration = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE project " +
+                        "ADD project_updated INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+
     }
 }

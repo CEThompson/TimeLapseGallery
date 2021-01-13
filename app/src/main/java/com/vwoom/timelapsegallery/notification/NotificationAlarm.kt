@@ -11,7 +11,7 @@ import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 import com.vwoom.timelapsegallery.notification.NotificationUtils.clearPreviousNotifications
 import com.vwoom.timelapsegallery.notification.NotificationUtils.convertDayOfYearToNotificationTime
 import com.vwoom.timelapsegallery.notification.NotificationUtils.notifyUserOfScheduledProjects
-import com.vwoom.timelapsegallery.utils.InjectorUtils
+import com.vwoom.timelapsegallery.di.InjectorUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
