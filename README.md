@@ -1,10 +1,23 @@
-![Time Lapse Gallery Branding](branding_small.png)<br/>
-![Time Lapse Gallery Preview](preview.png)<br/>
-<img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_1.gif" width="200">
-<img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_2.gif" width="200">
-<img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_3.gif" width="200"><br/>
+<p align = "center">
+    <a href="https://play.google.com/store/apps/details?id=com.vwoom.timelapsegallery&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"> 
+        <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Google Play Store" width="300"> 
+    </a>
+</p>
 
-[![Get it on Google Play](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.vwoom.timelapsegallery&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1)
+<p align = "center">
+    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/branding_small.png" width="300">    
+</p>
+
+<p align = "center">
+    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_1.gif" width="100">
+    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_2.gif" width="100">
+    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/blue_flame_3.gif" width="100">
+</p>
+
+<p align = "center">
+    <img src="https://github.com/CEThompson/TimeLapseGallery/blob/master/preview.png" width="300">    
+</p>
+
 
 ### Time Lapse Gallery
 A tool for creating time-lapse photo sequences.
