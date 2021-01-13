@@ -1,16 +1,22 @@
 package com.vwoom.timelapsegallery.testing
 
 import androidx.annotation.VisibleForTesting
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.vwoom.timelapsegallery.weather.data.ForecastResponse
-import com.vwoom.timelapsegallery.weather.WeatherApi
 import java.lang.Exception
 
 @VisibleForTesting
 object TestForecastResponse {
+    // TODO figure out how to use dagger for injecting into tests
+    val moshi: Moshi by lazy {
+        Moshi.Builder()
+                .add(KotlinJsonAdapterFactory()).build()
+    }
 
     fun getForecastResponse(jsonString: String?): ForecastResponse? {
         return try {
-            WeatherApi.moshi.adapter(ForecastResponse::class.java).fromJson(jsonString!!)
+            moshi.adapter(ForecastResponse::class.java).fromJson(jsonString!!)
         } catch (e: Exception) {
             null
         }
@@ -18,7 +24,7 @@ object TestForecastResponse {
 
     fun makeForecastResponse(forecastResponse: ForecastResponse): String? {
         return try {
-            WeatherApi.moshi.adapter(ForecastResponse::class.java).toJson(forecastResponse)
+            moshi.adapter(ForecastResponse::class.java).toJson(forecastResponse)
         } catch (e: Exception){
             null
         }

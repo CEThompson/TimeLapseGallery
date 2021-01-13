@@ -1,10 +1,10 @@
 package com.vwoom.timelapsegallery.data.source
 
 import android.text.format.DateUtils
+import com.squareup.moshi.Moshi
 import com.vwoom.timelapsegallery.data.dao.WeatherDao
 import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import com.vwoom.timelapsegallery.weather.data.ForecastResponse
-import com.vwoom.timelapsegallery.weather.WeatherApi.moshi
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,7 +14,7 @@ import kotlin.coroutines.CoroutineContext
 // TODO (1.3): figure out how to properly handle blocking calls in coroutines
 @Suppress("BlockingMethodInNonBlockingContext")
 class WeatherLocalDataSource
-@Inject constructor(private val weatherDao: WeatherDao) : IWeatherLocalDataSource {
+@Inject constructor(private val weatherDao: WeatherDao, private val moshi: Moshi) : IWeatherLocalDataSource {
 
     var coroutineContext: CoroutineContext = Dispatchers.IO
 
