@@ -7,4 +7,20 @@
             <target android:targetId="@id/gallery_recycler_view"/>
         </targets>
     </fade>
+
+    <slide
+        android:slideEdge="bottom">
+        <targets>
+            <target android:targetId="@id/search_active_indicator"/>
+        </targets>
+    </slide>
+
+    <slide
+        android:slideEdge="right">
+        <targets>
+            <target android:targetId="@id/scroll_up_FAB"/>
+            <target android:targetId="@id/scroll_down_FAB"/>
+        </targets>
+    </slide>
+
 </transitionSet>
