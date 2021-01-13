@@ -5,6 +5,8 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.MediumTest
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +38,8 @@ class WeatherLocalDataSourceIntegrationTest {
         )
                 .allowMainThreadQueries()
                 .build()
-        dataSource = WeatherLocalDataSource(db.weatherDao()) // TODO inject dispatcher
+        // TODO restore test by injecting dependencies
+        dataSource = WeatherLocalDataSource(db.weatherDao(), MoshiHelper.instance) // TODO inject dispatcher
         dataSource.coroutineContext = Dispatchers.Main
     }
 
