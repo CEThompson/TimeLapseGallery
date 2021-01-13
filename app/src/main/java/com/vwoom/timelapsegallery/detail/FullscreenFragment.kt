@@ -168,7 +168,7 @@ class FullscreenFragment : BaseFragment() {
         // Handle UI
         setFabStatePlaying()
         // Override the play position to end
-        if (position < photos.size - 1) {
+        if (position <= 0) {
             position = photos.size -1
         }
 
@@ -206,7 +206,7 @@ class FullscreenFragment : BaseFragment() {
 
     private fun scheduleLoadPhoto(forward: Boolean) {
         if (position < 0 || position >= photos.size) {
-            position = photos.size - 1
+            position = if (forward) photos.size - 1 else 0
             stopPlaying()
             return
         }
