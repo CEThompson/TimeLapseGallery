@@ -18,7 +18,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -33,8 +32,8 @@ import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
-import com.vwoom.timelapsegallery.di.Injectable
-import com.vwoom.timelapsegallery.di.ViewModelFactory
+import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
+import com.vwoom.timelapsegallery.di.fragment.BaseFragment
 import com.vwoom.timelapsegallery.location.SingleShotLocationProvider
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.PhotoUtils
@@ -46,7 +45,7 @@ import javax.inject.Inject
 
 // TODO (1.3): set mini fabs to scroll quickly to the bottom of the gallery
 // TODO (update 1.3): optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
-class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler, Injectable {
+class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
 
@@ -97,6 +96,7 @@ class GalleryFragment : Fragment(), GalleryAdapter.GalleryAdapterOnClickHandler,
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        injector.inject(this)
         super.onCreate(savedInstanceState)
         galleryReenterTransition = TransitionInflater.from(context).inflateTransition(R.transition.gallery_exit_transition)
         galleryReenterTransition.addListener(reenterListener)

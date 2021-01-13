@@ -23,7 +23,6 @@ import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -36,8 +35,8 @@ import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
 import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
 import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
-import com.vwoom.timelapsegallery.di.Injectable
-import com.vwoom.timelapsegallery.di.ViewModelFactory
+import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
+import com.vwoom.timelapsegallery.di.fragment.BaseFragment
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils
@@ -48,7 +47,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
-import java.text.DecimalFormat
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -58,7 +56,7 @@ import kotlin.coroutines.suspendCoroutine
 // TODO: add GPS data to photos as setting?
 // TODO: calc dew point if possible
 
-class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injectable {
+class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
     private val args: Camera2FragmentArgs by navArgs()
 
     // Camera Fields
@@ -103,6 +101,11 @@ class Camera2Fragment : Fragment(), SensorEventListener, LifecycleOwner, Injecta
     private var takePictureFab: FloatingActionButton? = null
 
     private var cameraBinding: FragmentCamera2Binding? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        injector.inject(this)
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentCamera2Binding

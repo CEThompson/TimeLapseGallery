@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.di
+package com.vwoom.timelapsegallery.di.presentation
 
 import androidx.lifecycle.ViewModel
 import dagger.MapKey

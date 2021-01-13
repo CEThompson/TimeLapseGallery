@@ -20,7 +20,6 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -48,8 +47,8 @@ import com.vwoom.timelapsegallery.detail.dialog.ConversionDialog
 import com.vwoom.timelapsegallery.detail.dialog.InfoDialog
 import com.vwoom.timelapsegallery.detail.dialog.ScheduleDialog
 import com.vwoom.timelapsegallery.detail.dialog.TagDialog
-import com.vwoom.timelapsegallery.di.Injectable
-import com.vwoom.timelapsegallery.di.ViewModelFactory
+import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
+import com.vwoom.timelapsegallery.di.fragment.BaseFragment
 import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
@@ -70,7 +69,7 @@ import kotlin.properties.Delegates
 
 // TODO: (update 1.3) investigate minor error in layouting on shared element return from fullscreen fragment
 // TODO: (update 1.3) implement pinch zoom on fullscreen image
-class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, Injectable {
+class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private val args: DetailFragmentArgs by navArgs()
 
@@ -130,6 +129,7 @@ class DetailFragment : Fragment(), DetailAdapter.DetailAdapterOnClickHandler, In
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        injector.inject(this)
         super.onCreate(savedInstanceState)
         currentProjectView = args.clickedProjectView
         playbackInterval = getString(R.string.playback_interval_default).toLong()

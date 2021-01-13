@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -22,13 +21,14 @@ import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.Snackbar
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.FragmentFullscreenBinding
+import com.vwoom.timelapsegallery.di.fragment.BaseFragment
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.properties.Delegates
 
-class FullscreenFragment : Fragment() {
+class FullscreenFragment : BaseFragment() {
 
     private val args: FullscreenFragmentArgs by navArgs()
     private var position by Delegates.notNull<Int>()
@@ -102,7 +102,7 @@ class FullscreenFragment : Fragment() {
         val topImage = binding!!.fullscreenImageTop
         imageIsLoaded = false
 
-        binding?.fullscreenPositionTextview?.text = getString(R.string.details_photo_number_out_of, position+1,photos.size)
+        binding?.fullscreenPositionTextview?.text = getString(R.string.details_photo_number_out_of, position + 1, photos.size)
 
         // 1. The first glide call: First load the image into the next image view on top of the current
         Glide.with(this)

@@ -1,12 +1,10 @@
 package com.vwoom.timelapsegallery
 
 import android.app.Application
-import com.vwoom.timelapsegallery.di.app.AppInjector
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
+import com.vwoom.timelapsegallery.di.app.AppComponent
+import com.vwoom.timelapsegallery.di.app.AppModule
+import com.vwoom.timelapsegallery.di.app.DaggerAppComponent
 import timber.log.Timber
-import javax.inject.Inject
 
 // TODO: TLG 1.4
 // TODO: use app bundling for 1.4 release
@@ -30,16 +28,15 @@ import javax.inject.Inject
 
 // TODO add mini fab to scroll down to bottom in the gallery
 
-class TimeLapseGalleryApplication : Application(), HasAndroidInjector {
+class TimeLapseGalleryApplication : Application() {
 
-    @Inject
-    lateinit var androidInjector: DispatchingAndroidInjector<Any>
-
-    override fun androidInjector(): AndroidInjector<Any> = androidInjector
-
+    val appComponent: AppComponent by lazy {
+        DaggerAppComponent.builder()
+                .appModule(AppModule(this))
+                .build()
+    }
     override fun onCreate() {
         super.onCreate()
-        AppInjector.init(this)
         if (BuildConfig.DEBUG)
             Timber.plant(Timber.DebugTree())
     }

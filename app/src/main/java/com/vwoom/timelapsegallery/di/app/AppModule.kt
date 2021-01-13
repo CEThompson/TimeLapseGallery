@@ -10,16 +10,18 @@ import com.vwoom.timelapsegallery.data.source.IWeatherLocalDataSource
 import com.vwoom.timelapsegallery.data.source.IWeatherRemoteDataSource
 import com.vwoom.timelapsegallery.data.source.WeatherLocalDataSource
 import com.vwoom.timelapsegallery.data.source.WeatherRemoteDataSource
-import com.vwoom.timelapsegallery.di.ViewModelModule
+import com.vwoom.timelapsegallery.di.presentation.ViewModelModule
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
 
-@Module(includes = [ViewModelModule::class])
-object AppModule {
+@Module//(includes = [ViewModelModule::class])
+class AppModule(val application: Application) {
 
-    // TODO: inject shared preferences
     @Provides
+    fun application() = application
+
+    @Provides
+    @AppScope
     fun provideSharedPreferences(
             app: Application
     ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)

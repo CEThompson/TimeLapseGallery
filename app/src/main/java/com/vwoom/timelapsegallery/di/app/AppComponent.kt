@@ -1,30 +1,18 @@
 package com.vwoom.timelapsegallery.di.app
 
-import android.app.Application
-import com.vwoom.timelapsegallery.TimeLapseGalleryApplication
-import com.vwoom.timelapsegallery.di.TimeLapseGalleryActivityModule
-import dagger.BindsInstance
+import com.example.diap.common.dependencyinjection.service.ServiceComponent
+import com.example.diap.common.dependencyinjection.service.ServiceModule
+import com.vwoom.timelapsegallery.di.activity.ActivityComponent
+import com.vwoom.timelapsegallery.di.activity.ActivityModule
 import dagger.Component
-import dagger.android.AndroidInjectionModule
-import dagger.android.support.AndroidSupportInjectionModule
-import javax.inject.Singleton
 
 @AppScope
 @Component(
         modules = [
-            AndroidInjectionModule::class,
-            AndroidSupportInjectionModule::class,
-            AppModule::class,
-            TimeLapseGalleryActivityModule::class
+            AppModule::class
         ]
 )
 interface AppComponent {
-    @Component.Builder
-    interface Builder {
-        @BindsInstance
-        fun application(application: Application): Builder
-        fun build(): AppComponent
-    }
-
-    fun inject(app: TimeLapseGalleryApplication)
+    fun newActivityComponentBuilder(): ActivityComponent.Builder
+    fun newServiceComponent(serviceModule: ServiceModule): ServiceComponent
 }
