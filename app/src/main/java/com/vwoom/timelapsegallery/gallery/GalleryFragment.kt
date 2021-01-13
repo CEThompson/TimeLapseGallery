@@ -33,7 +33,7 @@ import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
 import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
-import com.vwoom.timelapsegallery.di.fragment.BaseFragment
+import com.vwoom.timelapsegallery.di.base.BaseFragment
 import com.vwoom.timelapsegallery.location.SingleShotLocationProvider
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.PhotoUtils

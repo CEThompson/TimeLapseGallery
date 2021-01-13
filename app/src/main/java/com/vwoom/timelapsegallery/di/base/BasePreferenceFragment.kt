@@ -1,8 +1,8 @@
-package com.vwoom.timelapsegallery.di.fragment
+package com.vwoom.timelapsegallery.di.base
 
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
-import com.vwoom.timelapsegallery.di.activity.BaseActivity
+import com.vwoom.timelapsegallery.di.base.BaseActivity
 import com.vwoom.timelapsegallery.di.presentation.PresentationModule
 
 open class BasePreferenceFragment: PreferenceFragmentCompat() {

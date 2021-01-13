@@ -36,7 +36,7 @@ import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
 import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
 import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
-import com.vwoom.timelapsegallery.di.fragment.BaseFragment
+import com.vwoom.timelapsegallery.di.base.BaseFragment
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils

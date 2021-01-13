@@ -21,7 +21,7 @@ import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.Snackbar
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.databinding.FragmentFullscreenBinding
-import com.vwoom.timelapsegallery.di.fragment.BaseFragment
+import com.vwoom.timelapsegallery.di.base.BaseFragment
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

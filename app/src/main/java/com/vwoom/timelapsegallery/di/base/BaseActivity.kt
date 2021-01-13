@@ -1,4 +1,4 @@
-package com.vwoom.timelapsegallery.di.activity
+package com.vwoom.timelapsegallery.di.base
 
 import androidx.appcompat.app.AppCompatActivity
 import com.vwoom.timelapsegallery.TimeLapseGalleryApplication

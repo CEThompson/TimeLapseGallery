@@ -2,7 +2,7 @@ package com.vwoom.timelapsegallery
 
 import android.os.Bundle
 import android.os.Environment
-import com.vwoom.timelapsegallery.di.activity.BaseActivity
+import com.vwoom.timelapsegallery.di.base.BaseActivity
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService

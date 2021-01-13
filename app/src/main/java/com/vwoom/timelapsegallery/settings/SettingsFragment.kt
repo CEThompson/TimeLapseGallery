@@ -21,7 +21,7 @@ import androidx.preference.PreferenceManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
-import com.vwoom.timelapsegallery.di.fragment.BasePreferenceFragment
+import com.vwoom.timelapsegallery.di.base.BasePreferenceFragment
 import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.ImportUtils

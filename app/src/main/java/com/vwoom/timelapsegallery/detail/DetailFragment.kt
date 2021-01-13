@@ -48,7 +48,7 @@ import com.vwoom.timelapsegallery.detail.dialog.InfoDialog
 import com.vwoom.timelapsegallery.detail.dialog.ScheduleDialog
 import com.vwoom.timelapsegallery.detail.dialog.TagDialog
 import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
-import com.vwoom.timelapsegallery.di.fragment.BaseFragment
+import com.vwoom.timelapsegallery.di.base.BaseFragment
 import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
