@@ -32,8 +32,8 @@ import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentGalleryBinding
 import com.vwoom.timelapsegallery.databinding.GalleryRecyclerviewItemBinding
-import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
 import com.vwoom.timelapsegallery.di.base.BaseFragment
+import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
 import com.vwoom.timelapsegallery.location.SingleShotLocationProvider
 import com.vwoom.timelapsegallery.testing.launchIdling
 import com.vwoom.timelapsegallery.utils.PhotoUtils
@@ -42,8 +42,6 @@ import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import javax.inject.Inject
 
-
-// TODO (1.3): set mini fabs to scroll quickly to the bottom of the gallery
 // TODO (update 1.3): optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
 class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
@@ -74,6 +72,7 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
     /* Dialogs */
     // Searching
     private var searchDialog: SearchDialog? = null
+
     // Weather
     private var weatherChartDialog: WeatherChartDialog? = null
     private var weatherDetailsDialog: WeatherDetailsDialog? = null
@@ -93,6 +92,7 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
             fadeInAnimation.duration = 375
             binding?.galleryRecyclerView?.startAnimation(fadeInAnimation)
         }
+
         override fun onTransitionPause(transition: Transition?) {}
         override fun onTransitionResume(transition: Transition?) {}
     }
@@ -309,7 +309,7 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
         // Observe the projects to be displayed after filtration
         galleryViewModel.displayedProjectViews.observe(viewLifecycleOwner, {
             galleryAdapter?.submitList(it)
-            recyclerLastPosition = it.size-1
+            recyclerLastPosition = it.size - 1
             if (it.size > SHOW_SCROLLING_FABS_AMOUNT) showScrollingFabs()
             else hideScrollingFabs()
         })
