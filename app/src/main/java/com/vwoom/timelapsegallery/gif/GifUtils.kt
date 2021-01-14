@@ -23,8 +23,8 @@ object GifUtils {
     }
 
 
-    // TODO (update 1.3): create control for framerate
-    // TODO (update 1.3): create control for scale
+    // TODO: (deferred) create control for framerate
+    // TODO: (deferred) create control for scale
     // Creates a .gif from the set of photos for a project
     fun makeGif(externalFilesDir: File, project: ProjectEntry, fps: Int = 14, scale: Int = 400) {
         // Write the list of paths for the files to a text file for use by ffmpeg

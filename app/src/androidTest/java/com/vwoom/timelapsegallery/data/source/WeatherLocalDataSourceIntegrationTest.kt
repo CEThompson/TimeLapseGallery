@@ -38,7 +38,7 @@ class WeatherLocalDataSourceIntegrationTest {
         )
                 .allowMainThreadQueries()
                 .build()
-        // TODO restore test by injecting dependencies
+        // TODO: figure out how to inject moshi with dagger
         dataSource = WeatherLocalDataSource(db.weatherDao(), MoshiHelper.instance) // TODO inject dispatcher
         dataSource.coroutineContext = Dispatchers.Main
     }

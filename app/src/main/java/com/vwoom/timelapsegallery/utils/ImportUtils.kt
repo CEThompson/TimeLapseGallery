@@ -9,7 +9,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
-// TODO (1.3): handle blocking in coroutines
+// TODO (deferred): handle blocking in coroutines
 object ImportUtils {
 
     // Used to bundle a project with the number of photos in it
@@ -23,7 +23,7 @@ object ImportUtils {
         // Final output list
         val resultList = arrayListOf<ProjectDataBundle>()
 
-        // TODO investigate validating Gif, Meta, Projects structure here
+        // TODO: consider validating Gif, Meta, Projects structure here in root
         //val rootDirectories = externalFilesDir.listFiles()
 
         val projects = FileUtils.getProjectsSubdirectory(externalFilesDir).listFiles()

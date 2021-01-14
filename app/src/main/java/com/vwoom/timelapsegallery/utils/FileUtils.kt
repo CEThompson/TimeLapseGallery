@@ -160,7 +160,6 @@ object FileUtils {
         }
     }
 
-    // TODO (1.3): write test for temp list
     // Creates a temporary text file list of the photo urls for a project
     // In the format:
     // file '/path/to/file1'

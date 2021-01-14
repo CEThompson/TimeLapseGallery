@@ -141,7 +141,7 @@ dependencies {
     androidTestImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7'
 
-    androidTestImplementation 'androidx.fragment:fragment-testing:1.2.5'  // TODO figure out if this can go to android test implementation
+    androidTestImplementation 'androidx.fragment:fragment-testing:1.2.5'
 
     androidTestImplementation 'androidx.test:core:1.3.0'
     // For mocking

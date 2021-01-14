@@ -17,6 +17,6 @@ open class BasePreferenceFragment: PreferenceFragmentCompat() {
     protected val injector get() = presentationComponent
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        // TODO: Implement in subclass?
+        // TODO: reconsider base preference fragment class hierarchy implementation
     }
 }

@@ -67,8 +67,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
-// TODO: (update 1.3) investigate minor error in layouting on shared element return from fullscreen fragment
-// TODO: (update 1.3) implement pinch zoom on fullscreen image
+// TODO: (deferred) implement pinch zoom on fullscreen image
 class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
     private val args: DetailFragmentArgs by navArgs()
@@ -137,7 +136,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
         try {
             externalFilesDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
         } catch (exc: KotlinNullPointerException) {
-            // TODO (update 1.3): Investigate potential failures with external files.
+            // TODO: (deferred) Investigate potential failures with external files.
             Timber.e("Couldn't get external files directory.")
             Toast.makeText(requireContext(), "Fatal Error: Could not load external files!", Toast.LENGTH_LONG).show()
         }
@@ -179,7 +178,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
         val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
         playbackInterval = playbackIntervalSharedPref?.toLong() ?: 50
 
-        // TODO (update 1.3): refactor toolbar to navigation drawer
+        // TODO: (deferred) refactor toolbar to navigation drawer
         // Set up toolbar
         setHasOptionsMenu(true)
         toolbar = binding?.detailsFragmentToolbar
@@ -823,7 +822,8 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
 
             detailViewModel.photoIndex = newMaxIndex
 
-            // TODO (1.3): convert these to boolean mutable live data fields to observe when photos are added or deleted
+            // TODO: (deferred) convert these to boolean mutable live data fields to observe when photos are added or deleted
+            // TODO: (deferred) clean up detail fragment god activity (including observable logic)
             // If added set to the last photo
             if (added) {
                 // Update gif if exists and preference is set to auto-update

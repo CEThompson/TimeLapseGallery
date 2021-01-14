@@ -22,6 +22,12 @@ class FileUtilsTest {
     }
 
     @Test
+    fun createTempListPhotoFiles(){
+        // todo: implement test for createTempListPhotoFiles function
+        //FileUtils.createTempListPhotoFiles(externalFilesTestDir, projectEntry)
+    }
+
+    @Test
     fun createTemporaryImageFile_givenTempFolder_tempFileExists() {
         // Given the project directory
         val tempFolder = File(externalFilesTestDir, FileUtils.TEMP_FILE_SUBDIRECTORY)

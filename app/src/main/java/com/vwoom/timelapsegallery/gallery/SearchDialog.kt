@@ -16,6 +16,7 @@ import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import java.util.*
 
+// TODO: consider implementing search tag filters as chips instead of checkboxes
 class SearchDialog(context: Context, private val galleryViewModel: GalleryViewModel) : Dialog(context) {
 
     init {

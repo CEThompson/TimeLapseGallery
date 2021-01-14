@@ -31,7 +31,7 @@ import kotlinx.coroutines.async
 import timber.log.Timber
 import javax.inject.Inject
 
-// TODO (1.3): consider allowing for adjustment of gallery columns
+// TODO (deferred): consider allowing for adjustment of gallery columns
 class SettingsFragment : BasePreferenceFragment() {
     private var prefs: SharedPreferences? = null
     private var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null

@@ -42,7 +42,7 @@ import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import javax.inject.Inject
 
-// TODO (update 1.3): optimize getting the device location for forecasts (location table, get once per day or on forecast sync)
+// TODO: (deferred) consider optimizing device location for forecasts (location table, get once per day or on forecast sync)
 class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
     private val args: GalleryFragmentArgs by navArgs()
@@ -135,7 +135,7 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
                     sharedPreferences.getBoolean(getString(R.string.key_gif_display), true)
             )
         } catch (e: KotlinNullPointerException) {
-            // TODO (1.3): navigate to failure layout
+            // TODO: (deferred) navigate to layout as failure point for getting external files dir
             Toast.makeText(requireContext(), getString(R.string.error_retrieving_files_dir), Toast.LENGTH_LONG).show()
         }
         // Set up the recycler view
@@ -180,9 +180,8 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
 
         scrollUpFAB = binding?.scrollUpFAB
         scrollUpFAB?.setOnClickListener {
-            // TODO show position of gallery?
-            // TODO show minifabs only when gallery is large enough to warrant it?
-            // TODO write tests
+            // TODO: (deferred) show position of gallery in a scroll bar like display
+            // TODO: (deferred) listen to scroll position and hide up and down scroll fabs as necessary
             galleryRecyclerView?.scrollToPosition(0)
         }
 

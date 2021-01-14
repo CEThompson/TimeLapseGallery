@@ -25,12 +25,10 @@ class FakeProjectRepository : IProjectRepository {
             PhotoEntry(id = 3, project_id = 3, timestamp = 123456789)
     )
 
+    // TODO: consider testing marking a project updated / unchanged
     override suspend fun markProjectChanged(projectEntry: ProjectEntry) {
-        // TODO test this
     }
-
     override suspend fun markProjectUnchanged(projectEntry: ProjectEntry) {
-        // TODO test this
     }
 
     // Getters

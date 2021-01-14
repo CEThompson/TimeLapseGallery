@@ -133,7 +133,7 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
         this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.INVISIBLE
     }
 
-    // TODO (update 1.3): calculate and show projects due per day
+    // TODO: (deferred) calculate and show projects due per day
     private fun setWeatherChart(forecast: ForecastResponse) {
         val periods: List<ForecastResponse.Period>? = forecast.properties.periods
         if (periods != null) {

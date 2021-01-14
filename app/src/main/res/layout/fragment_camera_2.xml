@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?><!-- TODO: display magnetic field (compass)! -->
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TODO: display magnetic field (compass) -->
 <!-- TODO: display alignment targets -->
-<!-- TODO animate action buttons to slide in and out -->
+<!-- TODO: consider animating action buttons to slide in and out -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"

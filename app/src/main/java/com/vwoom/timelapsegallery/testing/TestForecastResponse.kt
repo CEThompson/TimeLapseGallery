@@ -8,7 +8,7 @@ import java.lang.Exception
 
 @VisibleForTesting
 object TestForecastResponse {
-    // TODO figure out how to use dagger for injecting into tests
+    // TODO: (deferred) figure out how to use dagger for injecting into tests
     val moshi: Moshi by lazy {
         Moshi.Builder()
                 .add(KotlinJsonAdapterFactory()).build()

@@ -6,8 +6,8 @@ const val NEW_MOON = 1
 const val FULL_MOON = 2
 const val INTERMEDIATE_MOON = 3
 
-// TODO (update 1.3): handle phases of the moon in a moon phase dialog
-// TODO (deferred): handle northern vs southern hemisphere representations, localization for moon phases
+// TODO: (deferred) handle phases of the moon in a moon phase dialog
+// TODO: (deferred) handle northern vs southern hemisphere representations, localization for moon phases
 
 object MoonPhaseCalculator {
     // Calendar value for a synodic month which is 29.530587981 days

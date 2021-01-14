@@ -50,7 +50,6 @@ object ProjectUtils {
         return photos
     }
 
-    // TODO test rename
     // Copies a Project from one folder to another: For use in renaming a project
     fun renameProject(externalFilesDir: File, sourceProjectEntry: ProjectEntry, destinationProjectEntry: ProjectEntry): Boolean { // Create a file for the source project
         val sourceProject: File = getProjectFolder(externalFilesDir, sourceProjectEntry)

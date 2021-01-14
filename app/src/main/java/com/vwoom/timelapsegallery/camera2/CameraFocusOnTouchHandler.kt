@@ -11,7 +11,7 @@ import android.view.View.OnTouchListener
 import timber.log.Timber
 import kotlin.math.max
 
-// TODO (update 1.3): investigate improving focus on close ups
+// TODO: (deferred) investigate improving focus on close ups
 class CameraFocusOnTouchHandler(
         private val mCameraCharacteristics: CameraCharacteristics,
         private val mCaptureRequestBuilder: CaptureRequest.Builder,

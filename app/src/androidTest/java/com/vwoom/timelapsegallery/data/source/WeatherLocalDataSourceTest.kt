@@ -20,7 +20,7 @@ class WeatherLocalDataSourceTest {
     @Before
     fun setup() {
         fakeWeatherDao = FakeWeatherDao()
-        // TODO restore test by injecting with
+        // TODO: figure out how to test with dagger (injecting moshi)
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         localDataSource = WeatherLocalDataSource(fakeWeatherDao, MoshiHelper.instance)
     }

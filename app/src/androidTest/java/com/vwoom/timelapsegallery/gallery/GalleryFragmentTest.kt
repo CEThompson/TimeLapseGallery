@@ -43,24 +43,20 @@ class GalleryFragmentTest {
         )*/
     }
 
+    // TODO: consider testing scrolling
     @Test
     fun clickScrollUp_scrollsGalleryToTop() {
-        // TODO test scrolling
     }
-
     @Test
     fun clickScrollDown_scrollsGalleryToBottom() {
-        // TODO test scrolling
     }
 
+    // TODO: consider testing scroll state / corresponding fab display
     @Test
     fun whenLessThanXProjects_scrollFabsGone(){
-        // TODO test scroll state
     }
-
     @Test
     fun whenMoreThanXProjects_scrollFabsVisible(){
-        // TODO test scroll state
     }
 
     // TODO figure out how to launch fragment scenario with dagger
