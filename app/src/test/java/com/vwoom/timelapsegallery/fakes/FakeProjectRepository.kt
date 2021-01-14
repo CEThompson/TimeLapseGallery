@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.fakes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.repository.IProjectRepository
 import com.vwoom.timelapsegallery.data.view.ProjectView
@@ -24,6 +25,13 @@ class FakeProjectRepository : IProjectRepository {
             PhotoEntry(id = 3, project_id = 3, timestamp = 123456789)
     )
 
+    override suspend fun markProjectChanged(projectEntry: ProjectEntry) {
+        // TODO test this
+    }
+
+    override suspend fun markProjectUnchanged(projectEntry: ProjectEntry) {
+        // TODO test this
+    }
 
     // Getters
     override fun getProjectPhotosLiveData(projectId: Long): LiveData<List<PhotoEntry>> {

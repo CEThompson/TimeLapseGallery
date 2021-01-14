@@ -36,8 +36,10 @@ class ProjectUtilsTest {
         val projectName = "test project"
         val projectEntry = ProjectEntry(1, projectName)
         // a project directory
-        val projectFolder = File(externalFilesTestDir, "1_$projectName")
-        projectFolder.mkdir()
+        val projectFolder = ProjectUtils.getProjectFolder(externalFilesTestDir, projectEntry)
+        projectFolder.mkdirs()
+        println(projectFolder.absolutePath)
+        println(projectFolder.exists())
         // and files in the directory
         File(projectFolder, "99999999.jpg").createNewFile()
         File(projectFolder, "11111111.jpg").createNewFile()
@@ -63,8 +65,8 @@ class ProjectUtilsTest {
         val id: Long = 2
         val projectEntry = ProjectEntry(id, projectName)
         // a project directory
-        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
-        projectFolder.mkdir()
+        val projectFolder = ProjectUtils.getProjectFolder(externalFilesTestDir, projectEntry)
+        projectFolder.mkdirs()
         // files in the directory
         val children = listOf("99999999.jpg", "11111111.jpg")
         for (child in children) File(projectFolder, child).createNewFile()
@@ -79,7 +81,7 @@ class ProjectUtilsTest {
         // Then we expect the previous folder to be gone
         assertTrue(!projectFolder.exists())
         // and the renamed folder to exist
-        val renamedProject = File(externalFilesTestDir, "${id}_$projectRenameString")
+        val renamedProject = ProjectUtils.getProjectFolder(externalFilesTestDir, projectEntryToRename)
         assertTrue(renamedProject.exists())
         // with the same children
         for (child in children) assertTrue(File(renamedProject, child).exists())
@@ -93,8 +95,8 @@ class ProjectUtilsTest {
         val id: Long = 3
         val projectEntry = ProjectEntry(id, projectName)
         // a project directory
-        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
-        projectFolder.mkdir()
+        val projectFolder = ProjectUtils.getProjectFolder(externalFilesTestDir, projectEntry)
+        projectFolder.mkdirs()
         // files in the directory
         val first = File(projectFolder, "99999999.jpg")
         first.createNewFile()
@@ -117,11 +119,13 @@ class ProjectUtilsTest {
         val id: Long = 4
         val projectEntry = ProjectEntry(id, projectName)
         // a project directory
-        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
-        projectFolder.mkdir()
+        val projectFolder = ProjectUtils.getProjectFolder(externalFilesTestDir, projectEntry)
+        projectFolder.mkdirs()
         // two photos in the directory
         val firstPhotoTimestamp: Long = 999999999
         val first = File(projectFolder, "${firstPhotoTimestamp}.jpg")
+        println(projectFolder.absolutePath)
+        println(first.absolutePath)
         first.createNewFile()
         val second = File(projectFolder, "11111111.jpg")
         second.createNewFile()
@@ -142,16 +146,18 @@ class ProjectUtilsTest {
         // Given a project to test
         val projectName = "get photo url test project"
         val id: Long = 5
+        val projectEntry = ProjectEntry(id, projectName)
+
         // a project directory
-        val projectFolder = File(externalFilesTestDir, "${id}_$projectName")
-        projectFolder.mkdir()
+        val projectFolder = ProjectUtils.getProjectFolder(externalFilesTestDir, projectEntry)
+        projectFolder.mkdirs()
+
         // a photo in the directory
         val timestamp: Long = 999999999
         val first = File(projectFolder, "${timestamp}.jpg")
         first.createNewFile()
         // and entries derived for photo and project
         val photoEntry = PhotoEntry(id, id, timestamp)
-        val projectEntry = ProjectEntry(id, projectName)
 
         // When the utility gets the entry
         val photoUrl = ProjectUtils.getProjectPhotoUrl(externalFilesTestDir, projectEntry, photoEntry.timestamp)

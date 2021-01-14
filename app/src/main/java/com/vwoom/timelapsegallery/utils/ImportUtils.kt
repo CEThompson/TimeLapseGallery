@@ -23,14 +23,17 @@ object ImportUtils {
         // Final output list
         val resultList = arrayListOf<ProjectDataBundle>()
 
-        val files = externalFilesDir.listFiles()
-        if (files == null || files.isEmpty())
+        // TODO investigate validating Gif, Meta, Projects structure here
+        //val rootDirectories = externalFilesDir.listFiles()
+
+        val projects = FileUtils.getProjectsSubdirectory(externalFilesDir).listFiles()
+        if (projects == null || projects.isEmpty())
             return ValidationResult.Error.NoFilesError(null, externalFilesDir.absolutePath)
 
         val projectIds = HashSet<Long>()
 
         // Get project directories
-        for (child in files) {
+        for (child in projects) {
             // Get the filename of the project
             val url = child.absolutePath
             val projectFilename = url.substring(url.lastIndexOf(File.separatorChar) + 1)

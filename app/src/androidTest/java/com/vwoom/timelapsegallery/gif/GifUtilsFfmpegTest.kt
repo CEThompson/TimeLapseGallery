@@ -36,7 +36,7 @@ class GifUtilsFfmpegTest {
         // Given - a project with a set of images
         val project = ProjectEntry(1, null)
         val projectFolder = ProjectUtils.getProjectFolder(externalFilesTestDir, project)
-        if (!projectFolder.exists()) projectFolder.mkdir()
+        if (!projectFolder.exists()) projectFolder.mkdirs()
 
         // Create a few empty bitmaps written to jpeg files
         val bm = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)

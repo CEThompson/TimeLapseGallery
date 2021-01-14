@@ -9,8 +9,9 @@ import java.util.*
 object ProjectUtils {
 
     fun getProjectFolder(externalFilesDir: File, projectEntry: ProjectEntry): File {
+        val projectsSubDir = FileUtils.getProjectsSubdirectory(externalFilesDir)
         val projectPath = getProjectDirectoryPath(projectEntry)
-        return File(externalFilesDir, projectPath)
+        return File(projectsSubDir, projectPath)
     }
 
     fun getProjectEntryFromProjectView(projectView: ProjectView): ProjectEntry = ProjectEntry(projectView.project_id, projectView.project_name)
@@ -49,23 +50,18 @@ object ProjectUtils {
         return photos
     }
 
-
+    // TODO test rename
     // Copies a Project from one folder to another: For use in renaming a project
     fun renameProject(externalFilesDir: File, sourceProjectEntry: ProjectEntry, destinationProjectEntry: ProjectEntry): Boolean { // Create a file for the source project
-        val sourceProjectPath = getProjectDirectoryPath(sourceProjectEntry)
-        val sourceProject = File(externalFilesDir, sourceProjectPath)
-        // Create a file for the destination project
-        val destinationProjectPath = getProjectDirectoryPath(destinationProjectEntry)
-        val destinationProject = File(externalFilesDir, destinationProjectPath)
-
+        val sourceProject: File = getProjectFolder(externalFilesDir, sourceProjectEntry)
+        val destinationProject: File = getProjectFolder(externalFilesDir, destinationProjectEntry)
         // Rename the folder: returns true if successful and false if not
         return sourceProject.renameTo(destinationProject)
     }
 
     // Delete project directory and files within project directory
     fun deleteProject(externalFilesDir: File, projectEntry: ProjectEntry) {
-        val projectDirectoryPath = getProjectDirectoryPath(projectEntry)
-        val projectDirectory = File(externalFilesDir, projectDirectoryPath)
+        val projectDirectory = getProjectFolder(externalFilesDir, projectEntry)
         val metaProjectDirectory = getMetaDirectoryForProject(externalFilesDir, projectEntry.id)
         // Delete the project photo files
         FileUtils.deleteRecursive(projectDirectory)

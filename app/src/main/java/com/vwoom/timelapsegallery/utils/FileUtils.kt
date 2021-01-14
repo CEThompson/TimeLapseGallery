@@ -14,7 +14,7 @@ object FileUtils {
 
     // Directory definitions
     const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
-    // TODO restructure using "projects" subdirectory
+    const val PROJECTS_FILE_SUBDIRECTORY = "Projects"
     const val META_FILE_SUBDIRECTORY = "Meta"
     const val GIF_FILE_SUBDIRECTORY = "Gif"
 
@@ -23,10 +23,14 @@ object FileUtils {
     const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
     private const val LIST_PHOTOS_TEXT_FILE = "photos_list.txt"
 
+    fun getProjectsSubdirectory(externalFilesDir: File): File{
+        return File(externalFilesDir, PROJECTS_FILE_SUBDIRECTORY)
+    }
+
     // Creates an image file for a project in the projects folder by project view
-    private fun createImageFileForProject(storageDirectory: File, projectEntry: ProjectEntry, timestamp: Long): File {
+    private fun createImageFileForProject(externalFilesDir: File, projectEntry: ProjectEntry, timestamp: Long): File {
         val imageFileName = "$timestamp.jpg"
-        val projectDir = getProjectFolder(storageDirectory, projectEntry)
+        val projectDir = getProjectFolder(externalFilesDir, projectEntry)
         if (!projectDir.exists()) projectDir.mkdirs()
         return File(projectDir, imageFileName)
     }

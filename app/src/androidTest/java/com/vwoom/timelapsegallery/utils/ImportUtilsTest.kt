@@ -29,6 +29,7 @@ class ImportUtilsTest {
     val testFolder = TemporaryFolder()
 
     private lateinit var externalFilesTestDir: File
+    private lateinit var projectSubDir: File
     private lateinit var db: TimeLapseDatabase
 
     @Before
@@ -36,6 +37,7 @@ class ImportUtilsTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(context, TimeLapseDatabase::class.java).build()
         externalFilesTestDir = testFolder.newFolder("pictures")
+        projectSubDir = FileUtils.getProjectsSubdirectory(externalFilesTestDir)
     }
 
     @After
@@ -67,7 +69,7 @@ class ImportUtilsTest {
         }
 
         // Create files for actual project one
-        val projectOneDir = File(externalFilesTestDir, "1_test")
+        val projectOneDir = File(projectSubDir, "1_test")
         projectOneDir.mkdirs()
         val projectOnePhoto = File(projectOneDir, "300")
         projectOnePhoto.createNewFile()
@@ -83,7 +85,8 @@ class ImportUtilsTest {
                 ProjectScheduleEntry(1,1))
 
         // Create files for actual project 2
-        val projectTwoDir = File(externalFilesTestDir, "3_test two")
+        // Note: now project two has an id of 3
+        val projectTwoDir = File(projectSubDir, "3_test two")
         projectTwoDir.mkdirs()
         val projectTwoPhoto = File(projectTwoDir, "400")
         projectTwoPhoto.createNewFile()
@@ -120,6 +123,7 @@ class ImportUtilsTest {
 
             // Assert state of project 2 files matches state of database
             projectEntry = db.projectDao().getProjectById(3)
+            println("$projectEntry")
             assertTrue(projectEntry?.project_name =="test two")
             photoEntry = db.photoDao().getLastPhoto(3)
             assertTrue(photoEntry?.timestamp == 400.toLong())
@@ -169,7 +173,7 @@ class ImportUtilsTest {
     fun validateFileStructure_invalidFolder_returnsInvalidFolderError() {
         // Given
         externalFilesTestDir.deleteRecursively()
-        val projectFile = File(externalFilesTestDir, "project with no ID")
+        val projectFile = File(projectSubDir, "project with no ID")
         projectFile.mkdirs()
 
         // When
@@ -184,7 +188,7 @@ class ImportUtilsTest {
     fun validateFileStructure_fileNotTimestamp_returnsInvalidPhotoFileError() {
         // Given
         externalFilesTestDir.deleteRecursively()
-        val projectFile = File(externalFilesTestDir, "1_test project")
+        val projectFile = File(projectSubDir, "1_test project")
         projectFile.mkdirs()
         val photoFile = File(projectFile, "1234nottimestamp.jpeg")
         photoFile.createNewFile()
@@ -202,12 +206,12 @@ class ImportUtilsTest {
         externalFilesTestDir.deleteRecursively()
 
         // Project 1
-        val projectFile = File(externalFilesTestDir, "1_test project")
+        val projectFile = File(projectSubDir, "1_test project")
         projectFile.mkdirs()
         File(projectFile, "123456789.jpeg").createNewFile()
 
         // Project 2
-        val projectFileTwo = File(externalFilesTestDir, "1_test project2")
+        val projectFileTwo = File(projectSubDir, "1_test project2")
         projectFileTwo.mkdirs()
         File(projectFileTwo, "123456789.jpeg").createNewFile()
 
@@ -236,7 +240,7 @@ class ImportUtilsTest {
                     || character == '\''
                     || character == '/') continue
             externalFilesTestDir.deleteRecursively()
-            val projectFile = File(externalFilesTestDir, "1_test project $character")
+            val projectFile = File(projectSubDir, "1_test project $character")
             projectFile.mkdirs()
             println(projectFile.absolutePath)
             File(projectFile, "123456789.jpeg").createNewFile()
@@ -256,10 +260,10 @@ class ImportUtilsTest {
         //val context = InstrumentationRegistry.getInstrumentation().context
         externalFilesTestDir.deleteRecursively()
 
-        val projectFolder = File(externalFilesTestDir, "1_test project")
+        val projectFolder = File(projectSubDir, "1_test project")
         projectFolder.mkdirs()
         File(projectFolder, "1234567.jpeg").createNewFile()
-        val projectFolderTwo = File(externalFilesTestDir, "2_test project")
+        val projectFolderTwo = File(projectSubDir, "2_test project")
         projectFolderTwo.mkdirs()
         File(projectFolderTwo, "2345671.jpeg").createNewFile()
 
