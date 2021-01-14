@@ -166,7 +166,13 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
         })
         sharedElementEnterTransition = sharedElemTransition
         sharedElementReturnTransition = sharedElemTransition
-        enterTransition = TransitionInflater.from(context).inflateTransition(R.transition.details_enter_transition)
+
+        // Change the animation for the play backwards fab in landscape orientation
+        enterTransition = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+            TransitionInflater.from(context).inflateTransition(R.transition.details_enter_transition_landscape)
+        else
+            TransitionInflater.from(context).inflateTransition(R.transition.details_enter_transition)
+
         postponeEnterTransition()
     }
 

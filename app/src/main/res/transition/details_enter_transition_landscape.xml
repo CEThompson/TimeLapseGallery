@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+    android:transitionOrdering="together">
+    <slide
+        android:slideEdge="right">
+        <targets>
+            <target android:targetId="@id/play_as_video_fab"/>
+
+        </targets>
+    </slide>
+
+    <slide
+        android:slideEdge="bottom">
+        <targets>
+            <target android:targetId="@id/details_recyclerview"/>
+            <target android:targetId="@id/image_loading_progress"/>
+        </targets>
+    </slide>
+
+    <fade
+        android:duration="150">
+        <targets>
+            <target android:targetId="@id/play_backwards_fab"/>
+            <target android:targetId="@id/project_information_layout"/>
+            <target android:targetId="@id/project_schedule_fab"/>
+            <target android:targetId="@id/project_tag_fab"/>
+        </targets>
+    </fade>
+
+</transitionSet>
