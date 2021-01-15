@@ -280,10 +280,13 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
         weatherDetailsDialog?.dismiss()
     }
 
+    // TODO: find better way to handle binding
     override fun onDestroyView() {
         super.onDestroyView()
         galleryRecyclerView = null
         addProjectFAB = null
+        scrollDownFAB = null
+        scrollUpFAB = null
         searchCancelFAB = null
         gridLayoutManager = null
         galleryAdapter = null
