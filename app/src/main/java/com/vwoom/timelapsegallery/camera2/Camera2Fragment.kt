@@ -107,7 +107,7 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentCamera2Binding
                 .inflate(inflater, container, false)
         viewFinder = binding.cameraPreview
