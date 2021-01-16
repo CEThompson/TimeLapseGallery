@@ -20,10 +20,10 @@ class FakeProjectRepository : IProjectRepository {
     )
 
     val fakePhotos: ArrayList<PhotoEntry> = arrayListOf(
-            PhotoEntry(id = 0, project_id = 0, timestamp = 123456789),
-            PhotoEntry(id = 1, project_id = 1, timestamp = 123456789),
-            PhotoEntry(id = 2, project_id = 2, timestamp = 123456789),
-            PhotoEntry(id = 3, project_id = 3, timestamp = 123456789)
+            PhotoEntry(id = 0, project_id = 0, timestamp = 123456789, null, null, null, null),
+            PhotoEntry(id = 1, project_id = 1, timestamp = 123456789, null, null, null, null),
+            PhotoEntry(id = 2, project_id = 2, timestamp = 123456789, null, null, null, null),
+            PhotoEntry(id = 3, project_id = 3, timestamp = 123456789, null, null, null, null)
     )
 
     // TODO: consider testing marking a project updated / unchanged
@@ -71,7 +71,7 @@ class FakeProjectRepository : IProjectRepository {
     override suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int, sensorData: SensorData): ProjectView {
         val projectId = getNextProjectId()
         val photoId = getNextPhotoId()
-        val photoToAdd = PhotoEntry(id = photoId, project_id = projectId, timestamp = timestamp)
+        val photoToAdd = PhotoEntry(id = photoId, project_id = projectId, timestamp = timestamp, null, null, null, null)
         val projectToAdd = ProjectView(
                 project_id = getNextProjectId(),
                 project_name = "newProject",
@@ -149,7 +149,7 @@ class FakeProjectRepository : IProjectRepository {
         val photoToAdd = PhotoEntry(
                 id = getNextPhotoId(),
                 project_id = projectView.project_id,
-                timestamp = timestamp
+                timestamp = timestamp, null, null, null, null
         )
         fakePhotos.add(photoToAdd)
     }

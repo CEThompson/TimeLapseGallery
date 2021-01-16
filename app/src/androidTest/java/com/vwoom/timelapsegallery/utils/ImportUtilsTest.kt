@@ -46,6 +46,7 @@ class ImportUtilsTest {
         db.close()
     }
 
+    // TODO split up import projects into subtests
     @Test
     fun importProjects() {
         // Given: projects in database that do not match file structure
@@ -53,7 +54,13 @@ class ImportUtilsTest {
         runBlocking {
             // Test project one
             db.projectDao().insertProject(ProjectEntry(1, null))
-            db.photoDao().insertPhoto(PhotoEntry(1,1, 100))
+            db.photoDao().insertPhoto(PhotoEntry(1,
+                    1,
+                    100,
+                    null,
+                    null,
+                    null,
+                    null))
             db.coverPhotoDao().insertPhoto(CoverPhotoEntry(1,1))
             db.projectScheduleDao().insertProjectSchedule(ProjectScheduleEntry(1,0))
             db.tagDao().insertTag(TagEntry(1,"a"))
@@ -61,7 +68,11 @@ class ImportUtilsTest {
 
             // Test project two
             db.projectDao().insertProject(ProjectEntry(2, null))
-            db.photoDao().insertPhoto(PhotoEntry(2,2, 200))
+            db.photoDao().insertPhoto(PhotoEntry(2,2, 200,
+                    null,
+                    null,
+                    null,
+                    null))
             db.coverPhotoDao().insertPhoto(CoverPhotoEntry(2,2))
             db.projectScheduleDao().insertProjectSchedule(ProjectScheduleEntry(2,1))
             db.tagDao().insertTag(TagEntry(2,"b"))
@@ -83,6 +94,11 @@ class ImportUtilsTest {
         FileUtils.writeProjectScheduleFile(externalFilesTestDir,
                 projectOneDefinition.project_id,
                 ProjectScheduleEntry(1,1))
+        // TODO test sensor data
+        FileUtils.writeSensorData(externalFilesTestDir,
+                PhotoEntry(1,1,300,"1","2","3","4"),
+                projectOneDefinition.project_id,
+        )
 
         // Create files for actual project 2
         // Note: now project two has an id of 3
@@ -100,6 +116,8 @@ class ImportUtilsTest {
         FileUtils.writeProjectScheduleFile(externalFilesTestDir,
                 projectTwoDefinition.project_id,
                 ProjectScheduleEntry(3,3))
+        // Note: No sensor data for project two
+
 
         // When: Projects are imported
         val result = validateFileStructure(externalFilesTestDir)
@@ -114,6 +132,13 @@ class ImportUtilsTest {
             assertTrue(projectEntry?.project_name == "test")
             var photoEntry = db.photoDao().getLastPhoto(1)
             assertTrue(photoEntry?.timestamp == 300.toLong())
+
+            // Check on sensor entries
+            assertTrue(photoEntry?.light == "1")
+            assertTrue(photoEntry?.pressure == "2")
+            assertTrue(photoEntry?.temp == "3")
+            assertTrue(photoEntry?.humidity == "4")
+
             var tags = db.projectTagDao().getProjectTagsByProjectId(1)
             assertTrue(tags.size==1)
             var tag = db.tagDao().getTagById(tags[0].tag_id)
@@ -127,6 +152,13 @@ class ImportUtilsTest {
             assertTrue(projectEntry?.project_name =="test two")
             photoEntry = db.photoDao().getLastPhoto(3)
             assertTrue(photoEntry?.timestamp == 400.toLong())
+
+            // Ensure no sensor entries
+            assertTrue(photoEntry?.light == null)
+            assertTrue(photoEntry?.pressure == null)
+            assertTrue(photoEntry?.temp == null)
+            assertTrue(photoEntry?.humidity == null)
+
             tags = db.projectTagDao().getProjectTagsByProjectId(3)
             assertTrue(tags.size==1)
             tag = db.tagDao().getTagById(tags[0].tag_id)
