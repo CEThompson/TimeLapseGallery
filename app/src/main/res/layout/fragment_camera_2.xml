@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- TODO: display magnetic field (compass) -->
+<?xml version="1.0" encoding="utf-8"?><!-- TODO: display magnetic field (compass) -->
 <!-- TODO: display alignment targets -->
 <!-- TODO: consider animating action buttons to slide in and out -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -63,14 +62,16 @@
             app:maxImageSize="@dimen/fab_max_image_size" />
     </LinearLayout>
 
+
     <LinearLayout
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:id="@+id/sensors_layout"
-        android:orientation="vertical"
-        android:gravity="end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:gravity="end"
+        android:orientation="vertical"
+        tools:showIn="@layout/fragment_camera_2">
 
         <TextView
             android:id="@+id/gps_output"

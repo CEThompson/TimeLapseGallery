@@ -57,6 +57,7 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectEntryFromProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
+import com.vwoom.timelapsegallery.weather.WeatherAdapter.Companion.CELSIUS
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -414,6 +415,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
         binding!!.detailScheduleLayout.scheduleDaysUntilDueTv.animate().alpha(1f)
         binding!!.photoInformationLayout.animate().alpha(1f)
         binding!!.fullscreenFab.show()
+        binding!!.sensorInformationLayout.animate().alpha(1f)
     }
 
     // Animates the information for the current photo to fade out
@@ -424,6 +426,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
         binding!!.detailScheduleLayout.scheduleDaysUntilDueTv.animate().alpha(0f)
         binding!!.photoInformationLayout.animate().alpha(0f)
         binding!!.fullscreenFab.hide()
+        binding!!.sensorInformationLayout.animate().alpha(0f)
     }
 
     // Updates the ui to a particular photo entry
@@ -468,6 +471,12 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
             binding?.detailsPhotoDateTv?.text = date
             binding?.detailsPhotoDayTv?.text = day
             binding?.detailsPhotoTimeTv?.text = time
+
+            // Set the sensor info
+            binding?.photoLight?.text = getString(R.string.light, photoEntry.light)
+            binding?.photoPressure?.text = getString(R.string.pressure, photoEntry.pressure)
+            binding?.photoTemp?.text = getString(R.string.ambientTemperature, photoEntry.temp, CELSIUS)
+            binding?.photoHumidity?.text = getString(R.string.humidity, photoEntry.humidity)
         }
     }
 

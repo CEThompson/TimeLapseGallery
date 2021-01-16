@@ -1,10 +1,15 @@
 package com.vwoom.timelapsegallery.utils
 
+import com.vwoom.timelapsegallery.camera2.SensorData
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
+import timber.log.Timber
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStream
 import java.util.*
+import kotlin.collections.HashMap
 
 object ProjectUtils {
 
@@ -29,6 +34,11 @@ object ProjectUtils {
                                           projectEntry: ProjectEntry): List<PhotoEntry> {
         val photos: MutableList<PhotoEntry> = ArrayList()
         val projectFolder = getProjectFolder(externalFilesDir, projectEntry)
+
+        // For use in restoring sensor data from text file
+        val map: Map<Long, SensorData> = getMapFromSensorData(externalFilesDir, projectEntry)
+        Timber.d("for project ${projectEntry.id} map is $map")
+
         val files = projectFolder.listFiles()
         if (files != null) {
             for (child in files) {
@@ -41,14 +51,56 @@ object ProjectUtils {
                 val filenameParts = filename.split(".").toTypedArray()
                 val timestamp = filenameParts[0].toLong()
 
+                val sensorData: SensorData? = map[timestamp]
                 // Create a photo entry for the timestamp
-                val photoEntry = PhotoEntry(projectEntry.id, timestamp)
+                val photoEntry = PhotoEntry(projectEntry.id, timestamp,
+                        light = sensorData?.light,
+                        pressure = sensorData?.pressure,
+                        temp = sensorData?.temp,
+                        humidity = sensorData?.humidity)
                 photos.add(photoEntry)
             }
         }
         // Sort the photo entries by timestamp
         photos.sortBy { it.timestamp }
         return photos
+    }
+
+    // TODO figure out how to handle units
+    private fun getMapFromSensorData(externalFilesDir: File, projectEntry: ProjectEntry): Map<Long, SensorData> {
+        val metaDir = getMetaDirectoryForProject(externalFilesDir, projectEntry.id)
+        val sensorTextFile = File(metaDir, FileUtils.SENSOR_DEFINITION_TEXT_FILE)
+
+        val map: MutableMap<Long, SensorData> = HashMap()
+
+        if (!sensorTextFile.exists()) return map.toMap()
+
+        Timber.d("at project ${projectEntry.id}")
+
+        try {
+            val inputStream: InputStream = sensorTextFile.inputStream()
+
+            inputStream.bufferedReader().forEachLine {
+                // Note: follows the following format
+                // timestamp light temp pressure humidity
+                val line: String = it
+                if (line.isNotEmpty()) {
+                    val sub: List<String> = line.split(" ")
+                    val timestamp: Long = sub[0].toLong()
+                    val light = sub[1]
+                    val temp = sub[2]
+                    val pressure = sub[3]
+                    val humidity = sub[4]
+
+                    Timber.d("reading line $line")
+                    val sensorData = SensorData(light = light, temp = temp, pressure = pressure, humidity = humidity)
+                    map[timestamp] = sensorData
+                }
+            }
+        } catch (e: Exception){
+            Timber.e("exception getting map from sensor data: ${e.localizedMessage}")
+        }
+        return map.toMap()
     }
 
     // Copies a Project from one folder to another: For use in renaming a project

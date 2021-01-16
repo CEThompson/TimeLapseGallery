@@ -135,6 +135,46 @@
                     app:layout_constraintBottom_toBottomOf="@+id/detail_current_image"
                     app:layout_constraintEnd_toEndOf="@id/detail_current_image"
                     app:layout_constraintStart_toStartOf="@id/detail_current_image" />
+
+                <LinearLayout
+                    android:id="@+id/sensor_information_layout"
+                    android:orientation="vertical"
+                    android:layout_marginTop="@dimen/large"
+                    android:gravity="end"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <!-- Displays -->
+                    <TextView
+                        android:id="@+id/photo_light"
+                        style="@style/WhiteText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="\n100 lx" />
+                    <!-- Displays -->
+                    <TextView
+                        android:id="@+id/photo_temp"
+                        style="@style/WhiteText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="20 c" />
+                    <!-- Displays -->
+                    <TextView
+                        android:id="@+id/photo_pressure"
+                        style="@style/WhiteText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="1000.00 mbar" />
+                    <!-- Displays -->
+                    <TextView
+                        android:id="@+id/photo_humidity"
+                        style="@style/WhiteText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="2 % humidity" />
+                </LinearLayout>
+
                 <!-- Layout displaying the photo information -->
                 <LinearLayout
                     android:id="@+id/photo_information_layout"

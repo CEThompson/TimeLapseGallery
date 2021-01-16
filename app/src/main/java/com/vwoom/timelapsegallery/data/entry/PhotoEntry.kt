@@ -22,7 +22,20 @@ data class PhotoEntry(
 
     /* For inserting with auto-generated ID */
     @Ignore
-    constructor(id: Long, project_id: Long, timestamp: Long) : this(project_id, timestamp) {
+    constructor(id: Long,
+                project_id: Long,
+                timestamp: Long,
+                light: String?,
+                pressure: String?,
+                temp: String?,
+                humidity: String?)
+            : this(
+            project_id,
+            timestamp,
+            light,
+            pressure,
+            temp,
+            humidity) {
         this.id = id
     }
 

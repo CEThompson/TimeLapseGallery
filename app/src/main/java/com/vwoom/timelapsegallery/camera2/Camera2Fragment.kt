@@ -447,7 +447,7 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
             Sensor.TYPE_AMBIENT_TEMPERATURE -> {
                 val measurement = "%.1f".format(event.values[0])
                 currentAmbientTemp = measurement
-                cameraBinding?.ambientTemperatureOutput?.text = getString(R.string.ambient, measurement, CELSIUS)
+                cameraBinding?.ambientTemperatureOutput?.text = getString(R.string.ambientTemperature, measurement, CELSIUS)
             }
             Sensor.TYPE_PRESSURE -> {
                 val measurement = "%.2f".format(event.values[0])
