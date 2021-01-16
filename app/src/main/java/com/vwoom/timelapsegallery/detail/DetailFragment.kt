@@ -473,10 +473,25 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
             binding?.detailsPhotoTimeTv?.text = time
 
             // Set the sensor info
-            binding?.photoLight?.text = getString(R.string.light, photoEntry.light)
-            binding?.photoPressure?.text = getString(R.string.pressure, photoEntry.pressure)
-            binding?.photoTemp?.text = getString(R.string.ambientTemperature, photoEntry.temp, CELSIUS)
-            binding?.photoHumidity?.text = getString(R.string.humidity, photoEntry.humidity)
+            val nullReplacement = "-"
+            val lightText =
+                    if (photoEntry.light == null) getString(R.string.light, nullReplacement)
+                else getString(R.string.light, photoEntry.light)
+            val pressureText =
+                    if (photoEntry.pressure == null)getString(R.string.pressure, nullReplacement)
+                    else getString(R.string.pressure, photoEntry.pressure)
+            val tempText =
+                    if (photoEntry.temp == null) getString(R.string.ambientTemperature, nullReplacement, CELSIUS)
+                    else getString(R.string.ambientTemperature, photoEntry.temp, CELSIUS)
+            val humidityText =
+                    if (photoEntry.humidity == null) getString(R.string.humidity, nullReplacement)
+                    else getString(R.string.humidity, photoEntry.humidity)
+
+            binding?.photoLight?.text = lightText
+            binding?.photoPressure?.text = pressureText
+            binding?.photoTemp?.text = tempText
+            binding?.photoHumidity?.text = humidityText
+
         }
     }
 

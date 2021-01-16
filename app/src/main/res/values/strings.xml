@@ -313,7 +313,7 @@
     <string name="ambientTemperature">%1$s %2$s</string>
     <string name="pressure">%1$s mbar</string>
     <string name="light">%1$s lx</string>
-    <string name="humidity">%1$s %%</string>
+    <string name="humidity">%1$s %% humidity</string>
 
 
 </resources>
