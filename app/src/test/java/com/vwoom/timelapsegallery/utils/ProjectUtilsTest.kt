@@ -157,7 +157,7 @@ class ProjectUtilsTest {
         val first = File(projectFolder, "${timestamp}.jpg")
         first.createNewFile()
         // and entries derived for photo and project
-        val photoEntry = PhotoEntry(id, id, timestamp)
+        val photoEntry = PhotoEntry(id, id, timestamp, null, null, null, null)
 
         // When the utility gets the entry
         val photoUrl = ProjectUtils.getProjectPhotoUrl(externalFilesTestDir, projectEntry, photoEntry.timestamp)
