@@ -136,40 +136,43 @@
                     app:layout_constraintEnd_toEndOf="@id/detail_current_image"
                     app:layout_constraintStart_toStartOf="@id/detail_current_image" />
 
+                <!-- Layout displaying sensor information -->
                 <LinearLayout
                     android:id="@+id/sensor_information_layout"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginEnd="@dimen/medium"
                     android:orientation="vertical"
-                    android:layout_marginTop="@dimen/large"
                     android:gravity="end"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
+
                     <!-- Displays -->
                     <TextView
                         android:id="@+id/photo_light"
-                        style="@style/WhiteText"
+                        style="@style/SensorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:text="\n100 lx" />
+                        tools:text="100 lx" />
                     <!-- Displays -->
                     <TextView
                         android:id="@+id/photo_temp"
-                        style="@style/WhiteText"
+                        style="@style/SensorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="20 c" />
                     <!-- Displays -->
                     <TextView
                         android:id="@+id/photo_pressure"
-                        style="@style/WhiteText"
+                        style="@style/SensorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="1000.00 mbar" />
                     <!-- Displays -->
                     <TextView
                         android:id="@+id/photo_humidity"
-                        style="@style/WhiteText"
+                        style="@style/SensorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="2 % humidity" />
@@ -183,12 +186,13 @@
                     android:layout_margin="@dimen/detail_margin"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="@id/detail_current_image"
-                    app:layout_constraintEnd_toStartOf="@id/fullscreen_fab"
+                    app:layout_constraintEnd_toStartOf="@id/sensor_information_layout"
                     app:layout_constraintStart_toStartOf="@id/detail_current_image">
+
                     <!-- Displays the photo number as a fraction of the set -->
                     <TextView
                         android:id="@+id/details_photo_number_tv"
-                        style="@style/WhiteText"
+                        style="@style/SensorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
@@ -196,14 +200,14 @@
                     <!-- Displays the time the photo was taken -->
                     <TextView
                         android:id="@+id/details_photo_time_tv"
-                        style="@style/WhiteText"
+                        style="@style/SensorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="photo time" />
                     <!-- Displays the day the photo was taken -->
                     <TextView
                         android:id="@+id/details_photo_day_tv"
-                        style="@style/WhiteText"
+                        style="@style/SensorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textStyle="italic"
@@ -211,7 +215,7 @@
                     <!-- Displays the date the photo was taken -->
                     <TextView
                         android:id="@+id/details_photo_date_tv"
-                        style="@style/WhiteText"
+                        style="@style/SensorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="photo date" />
@@ -225,8 +229,9 @@
                     android:contentDescription="@string/cd_rotation_indicator"
                     android:src="@drawable/ic_screen_rotation_white_24dp"
                     android:visibility="invisible"
+                    tools:visibility="visible"
                     app:layout_constraintBottom_toTopOf="@id/fullscreen_fab"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="@id/fullscreen_fab" />
 
                 <!-- Fullscreen fab -->
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -248,11 +253,10 @@
                     android:id="@+id/detail_schedule_layout"
                     layout="@layout/schedule_layout"
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintBottom_toBottomOf="@id/detail_current_image"
-                    app:layout_constraintEnd_toEndOf="@id/detail_current_image"
-                    app:layout_constraintStart_toStartOf="@id/detail_current_image"
-                    app:layout_constraintTop_toTopOf="@id/detail_current_image" />
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>

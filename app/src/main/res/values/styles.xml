@@ -36,6 +36,14 @@
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
+    <style name="SensorText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:shadowColor">#000000</item>
+        <item name="android:shadowDx">2</item>
+        <item name="android:shadowDy">2</item>
+        <item name="android:shadowRadius">2</item>
+    </style>
+
     <style name="SensorOutput" parent="TextAppearance.AppCompat">
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:layout_marginEnd">8dp</item>

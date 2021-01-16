@@ -473,24 +473,34 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
             binding?.detailsPhotoTimeTv?.text = time
 
             // Set the sensor info
-            val nullReplacement = "-"
-            val lightText =
-                    if (photoEntry.light == null) getString(R.string.light, nullReplacement)
-                else getString(R.string.light, photoEntry.light)
-            val pressureText =
-                    if (photoEntry.pressure == null)getString(R.string.pressure, nullReplacement)
-                    else getString(R.string.pressure, photoEntry.pressure)
-            val tempText =
-                    if (photoEntry.temp == null) getString(R.string.ambientTemperature, nullReplacement, CELSIUS)
-                    else getString(R.string.ambientTemperature, photoEntry.temp, CELSIUS)
-            val humidityText =
-                    if (photoEntry.humidity == null) getString(R.string.humidity, nullReplacement)
-                    else getString(R.string.humidity, photoEntry.humidity)
+            val lightText = getString(R.string.light, photoEntry.light)
+            val pressureText = getString(R.string.pressure, photoEntry.pressure)
+            val tempText = getString(R.string.ambientTemperature, photoEntry.temp, CELSIUS)
+            val humidityText = getString(R.string.humidity, photoEntry.humidity)
 
-            binding?.photoLight?.text = lightText
-            binding?.photoPressure?.text = pressureText
-            binding?.photoTemp?.text = tempText
-            binding?.photoHumidity?.text = humidityText
+            // Hide any sensor fields that are missing
+            if (photoEntry.light == null) binding?.photoLight?.visibility = GONE
+            else {
+                binding?.photoLight?.text = lightText
+                binding?.photoLight?.visibility = VISIBLE
+            }
+            if (photoEntry.pressure == null) binding?.photoPressure?.visibility = GONE
+            else {
+                binding?.photoPressure?.text = pressureText
+                binding?.photoPressure?.visibility = VISIBLE
+            }
+            if (photoEntry.temp == null) binding?.photoTemp?.visibility = GONE
+            else {
+                binding?.photoTemp?.text = tempText
+                binding?.photoTemp?.visibility = VISIBLE
+            }
+            if (photoEntry.humidity == null) binding?.photoHumidity?.visibility = GONE
+            else {
+                binding?.photoHumidity?.text = humidityText
+                binding?.photoHumidity?.visibility = VISIBLE
+            }
+
+            // TODO: bind today's forecast temperature range to to current photo
 
         }
     }
