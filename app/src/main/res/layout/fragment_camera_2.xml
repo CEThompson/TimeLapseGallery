@@ -67,61 +67,57 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:id="@+id/sensors_layout"
+        android:layout_margin="@dimen/medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="end"
         android:orientation="vertical"
         tools:showIn="@layout/fragment_camera_2">
 
-        <TextView
+        <!-- TODO reassess gps usage -->
+        <!--<TextView
             android:id="@+id/gps_output"
             style="@style/SensorOutput"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/small"
-            tools:text="latitude: 5.23112, longitude: 1.08421" />
+            tools:text="latitude: 5.23112, longitude: 1.08421" />-->
 
         <TextView
             android:id="@+id/ambient_light_output"
-            style="@style/SensorOutput"
+            style="@style/SensorText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="x lux" />
 
         <TextView
             android:id="@+id/ambient_pressure_output"
-            style="@style/SensorOutput"
+            style="@style/SensorText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="hPa or mbar" />
 
         <TextView
             android:id="@+id/ambient_temperature_output"
-            style="@style/SensorOutput"
+            style="@style/SensorText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="ambient: \u2103" />
 
         <TextView
-            android:id="@+id/device_temperature_output"
-            style="@style/SensorOutput"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="device: \u2103" />
-
-        <TextView
             android:id="@+id/relative_humidity_output"
-            style="@style/SensorOutput"
+            style="@style/SensorText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="relative humidity: %" />
 
-        <TextView
+        <!-- TODO reassess dew point usage -->
+        <!--<TextView
             android:id="@+id/dew_point_output"
             style="@style/WhiteText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="dew point" />
+            tools:text="dew point" />-->
 
     </LinearLayout>
 
