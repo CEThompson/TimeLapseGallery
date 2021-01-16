@@ -55,8 +55,10 @@ import kotlin.coroutines.suspendCoroutine
 // TODO: bind all available sensor data to saved image (perhaps as exif data?)
 // TODO: add GPS data to photos as setting?
 // TODO: calc dew point if possible
+// TODO troubleshoot camera capture size issue
 
 class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
+
     private val args: Camera2FragmentArgs by navArgs()
 
     // Camera Fields
@@ -80,15 +82,19 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
     private var baseWidth: Int = 0
     private var baseHeight: Int = 0
 
-    // TODO troubleshoot camera capture size issue
-
     // Sensor variables
     private lateinit var sensorManager: SensorManager
     private var lightSensor: Sensor? = null
     private var pressureSensor: Sensor? = null
     private var ambientTempSensor: Sensor? = null
     private var humiditySensor: Sensor? = null
-    
+
+    // For writing sensor data with new image
+    private var currentAmbientTemp: String? = null
+    private var currentPressure: String? = null
+    private var currentLight: String? = null
+    private var currentRelativeHumidity: String? = null
+
     // ViewModel
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -172,14 +178,15 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
 
                     // For new projects navigate to project detail after insertion
                     // TODO insert quick entry mode logic here if new project
+                    val sensorData = SensorData(light = currentLight, pressure = currentPressure, temp = currentAmbientTemp, humidity = currentRelativeHumidity)
                     if (isNewProject) {
-                        val newProjectView = camera2ViewModel.addNewProject(file, externalFilesDir, timestamp)
+                        val newProjectView = camera2ViewModel.addNewProject(file, externalFilesDir, timestamp, sensorData)
                         val action = Camera2FragmentDirections.actionCamera2FragmentToDetailsFragment(newProjectView)
                         findNavController().navigate(action)
                     }
                     // For existing projects pop back to the project detail after adding the picture
                     else {
-                        camera2ViewModel.addPhotoToProject(file, externalFilesDir, timestamp)
+                        camera2ViewModel.addPhotoToProject(file, externalFilesDir, timestamp, sensorData)
                         // TODO insert quick entry mode logic here for taking multiple timelapse pictures for a project
                         findNavController().popBackStack()
                     }
@@ -439,19 +446,22 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
         when(event.sensor.type){
             Sensor.TYPE_AMBIENT_TEMPERATURE -> {
                 val measurement = "%.1f".format(event.values[0])
+                currentAmbientTemp = measurement
                 cameraBinding?.ambientTemperatureOutput?.text = getString(R.string.ambient, measurement, CELSIUS)
             }
             Sensor.TYPE_PRESSURE -> {
-                // TODO format string
                 val measurement = "%.2f".format(event.values[0])
+                currentPressure = measurement
                 cameraBinding?.ambientPressureOutput?.text = getString(R.string.pressure, measurement)
             }
             Sensor.TYPE_LIGHT -> {
                 val measurement = "%.1f".format(event.values[0])
+                currentLight = measurement
                 cameraBinding?.ambientLightOutput?.text = getString(R.string.light, event.values[0].toString())
             }
             Sensor.TYPE_RELATIVE_HUMIDITY -> {
                 val measurement = "%.1f".format(event.values[0])
+                currentRelativeHumidity = measurement
                 cameraBinding?.relativeHumidityOutput?.text = getString(R.string.humidity, event.values[0].toString())
             }
         }
@@ -459,4 +469,5 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
     }
+
 }

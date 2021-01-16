@@ -11,7 +11,11 @@ import androidx.room.*
 data class PhotoEntry(
         @ColumnInfo(index = true)
         var project_id: Long,
-        var timestamp: Long) {
+        var timestamp: Long,
+        var light: String? = null,
+        var pressure: String? = null,
+        var temp: String? = null,
+        var humidity: String? = null) {
 
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0

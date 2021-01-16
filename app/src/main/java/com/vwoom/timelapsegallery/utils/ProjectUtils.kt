@@ -23,6 +23,7 @@ object ProjectUtils {
         return projectSubfolder
     }
 
+    // todo retrieve stored sensor data here
     // Creates a list of photo entries in a project folder sorted by timestamp
     fun getPhotoEntriesInProjectDirectory(externalFilesDir: File,
                                           projectEntry: ProjectEntry): List<PhotoEntry> {

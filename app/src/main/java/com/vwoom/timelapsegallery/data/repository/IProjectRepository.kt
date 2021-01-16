@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.data.repository
 
 import androidx.lifecycle.LiveData
+import com.vwoom.timelapsegallery.camera2.SensorData
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
@@ -15,7 +16,7 @@ interface IProjectRepository {
     fun getProjectPhotosLiveData(projectId: Long): LiveData<List<PhotoEntry>>
 
     // For project creation and management
-    suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int = 0): ProjectView
+    suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int = 0, sensorData: SensorData): ProjectView
     suspend fun updateProjectName(externalFilesDir: File, sourceProjectView: ProjectView, name: String)
     suspend fun deleteProject(externalFilesDir: File, projectId: Long)
     suspend fun markProjectChanged(projectEntry: ProjectEntry)
@@ -31,6 +32,9 @@ interface IProjectRepository {
     // For managing project photos
     suspend fun addPhotoToProject(file: File,
                                   externalFilesDir: File,
-                                  projectView: ProjectView, timestamp: Long)
+                                  projectView: ProjectView,
+                                  timestamp: Long,
+                                  sensorData: SensorData)
+
     suspend fun deleteProjectPhoto(externalFilesDir: File, photoEntry: PhotoEntry)
 }

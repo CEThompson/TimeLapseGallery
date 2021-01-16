@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.utils
 
+import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
@@ -21,6 +22,7 @@ object FileUtils {
     // Text files for metadata
     const val SCHEDULE_TEXT_FILE = "schedule.txt"
     const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
+    const val SENSOR_DEFINITION_TEXT_FILE = "sensorData.txt"
     private const val LIST_PHOTOS_TEXT_FILE = "photos_list.txt"
 
     fun getProjectsSubdirectory(externalFilesDir: File): File{
@@ -200,6 +202,20 @@ object FileUtils {
             return null
         }
         return listFiles
+    }
+
+    // todo test writing sensor data
+    fun writeSensorData(externalFilesDir: File, photoEntry: PhotoEntry, projectId: Long) {
+        val metaDir = getMetaDirectoryForProject(externalFilesDir, projectId)
+        val sensorDataFile = File(metaDir, SENSOR_DEFINITION_TEXT_FILE)
+
+        val entryText = "${photoEntry.timestamp} ${photoEntry.light} ${photoEntry.temp} ${photoEntry.pressure} ${photoEntry.humidity}\n"
+
+        try {
+            sensorDataFile.appendText(entryText)
+        } catch (exception: IOException){
+            Timber.e("error writing sensor data to text file: ${exception.message}")
+        }
     }
 
 }

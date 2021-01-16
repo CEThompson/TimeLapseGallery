@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.fakes
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.vwoom.timelapsegallery.camera2.SensorData
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
@@ -67,7 +68,7 @@ class FakeProjectRepository : IProjectRepository {
         }
     }
 
-    override suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int): ProjectView {
+    override suspend fun newProject(file: File, externalFilesDir: File, timestamp: Long, scheduleInterval: Int, sensorData: SensorData): ProjectView {
         val projectId = getNextProjectId()
         val photoId = getNextPhotoId()
         val photoToAdd = PhotoEntry(id = photoId, project_id = projectId, timestamp = timestamp)
@@ -144,7 +145,7 @@ class FakeProjectRepository : IProjectRepository {
     }
 
     // Photo management
-    override suspend fun addPhotoToProject(file: File, externalFilesDir: File, projectView: ProjectView, timestamp: Long) {
+    override suspend fun addPhotoToProject(file: File, externalFilesDir: File, projectView: ProjectView, timestamp: Long, sensorData: SensorData) {
         val photoToAdd = PhotoEntry(
                 id = getNextPhotoId(),
                 project_id = projectView.project_id,

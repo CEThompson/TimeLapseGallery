@@ -19,14 +19,14 @@ class Camera2ViewModel @Inject constructor(
     }
 
     // Returns a project view for navigation
-    suspend fun addNewProject(file: File, externalFilesDir: File, timestamp: Long): ProjectView {
-        return projectRepository.newProject(file, externalFilesDir, timestamp, 0)
+    suspend fun addNewProject(file: File, externalFilesDir: File, timestamp: Long, sensorData: SensorData): ProjectView {
+        return projectRepository.newProject(file, externalFilesDir, timestamp, 0, sensorData)
     }
 
     // Adds the photo to the current project
-    suspend fun addPhotoToProject(file: File, externalFilesDir: File, timestamp: Long) {
+    suspend fun addPhotoToProject(file: File, externalFilesDir: File, timestamp: Long, sensorData: SensorData) {
         projectView?.let {
-            projectRepository.addPhotoToProject(file, externalFilesDir, it, timestamp)
+            projectRepository.addPhotoToProject(file, externalFilesDir, it, timestamp, sensorData)
         }
     }
 

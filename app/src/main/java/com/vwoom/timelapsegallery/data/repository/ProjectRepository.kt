@@ -1,13 +1,11 @@
 package com.vwoom.timelapsegallery.data.repository
 
+import com.vwoom.timelapsegallery.camera2.SensorData
 import com.vwoom.timelapsegallery.data.dao.CoverPhotoDao
 import com.vwoom.timelapsegallery.data.dao.PhotoDao
 import com.vwoom.timelapsegallery.data.dao.ProjectDao
 import com.vwoom.timelapsegallery.data.dao.ProjectScheduleDao
-import com.vwoom.timelapsegallery.data.entry.CoverPhotoEntry
-import com.vwoom.timelapsegallery.data.entry.PhotoEntry
-import com.vwoom.timelapsegallery.data.entry.ProjectEntry
-import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
+import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.ProjectUtils
@@ -23,7 +21,7 @@ class ProjectRepository
                     private val coverPhotoDao: CoverPhotoDao,
                     private val projectScheduleDao: ProjectScheduleDao) : IProjectRepository {
 
-    var coroutineContext: CoroutineContext = Dispatchers.IO
+    private var coroutineContext: CoroutineContext = Dispatchers.IO
 
     /**
      * Project observables
@@ -39,16 +37,25 @@ class ProjectRepository
     override suspend fun newProject(file: File,
                                     externalFilesDir: File,
                                     timestamp: Long,
-                                    scheduleInterval: Int): ProjectView {
+                                    scheduleInterval: Int,
+                                    sensorData: SensorData): ProjectView {
         // Create and insert the project
         val projectEntry = ProjectEntry(null)
         val projectId = projectDao.insertProject(projectEntry)
         projectEntry.id = projectId
 
         // Create and insert the photo
-        val photoEntry = PhotoEntry(projectId, timestamp)
+        // TODO: add sensor data for photo timestamp
+        val photoEntry = PhotoEntry(
+                projectId,
+                timestamp,
+                light = sensorData.light,
+                pressure = sensorData.pressure,
+                temp = sensorData.temp,
+                humidity = sensorData.humidity)
         val photoId = photoDao.insertPhoto(photoEntry)
         photoEntry.id = photoId
+
 
         // Create cover photo and schedule then insert
         val coverPhotoEntry = CoverPhotoEntry(projectId, photoId)
@@ -60,6 +67,8 @@ class ProjectRepository
         @Suppress("BlockingMethodInNonBlockingContext")
         withContext(coroutineContext) {
             FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
+            // TODO: write sensor data to file
+            FileUtils.writeSensorData(externalFilesDir, photoEntry, projectEntry.id)
         }
 
         return ProjectView(projectEntry.id, projectEntry.project_name, scheduleInterval, coverPhotoId, timestamp)
@@ -116,13 +125,25 @@ class ProjectRepository
 
     override suspend fun addPhotoToProject(file: File,
                                            externalFilesDir: File,
-                                           projectView: ProjectView, timestamp: Long) {
+                                           projectView: ProjectView,
+                                           timestamp: Long,
+                                           sensorData: SensorData) {
         // Do not add photo if project cannot be found
         val projectEntry = projectDao.getProjectById(projectView.project_id) ?: return
 
-        // Insert the photo
-        val photoEntry = PhotoEntry(projectView.project_id, timestamp)
+        // Insert the photo with sensor data
+        // TODO: Insert sensor data
+        val photoEntry = PhotoEntry(
+                projectView.project_id,
+                timestamp,
+                light = sensorData.light,
+                pressure = sensorData.pressure,
+                temp = sensorData.temp,
+                humidity = sensorData.humidity
+        )
         val photoId = photoDao.insertPhoto(photoEntry)
+
+
 
         // Insert / Update the cover photo
         val coverPhotoEntry = CoverPhotoEntry(projectView.project_id, photoId)
@@ -137,6 +158,8 @@ class ProjectRepository
         @Suppress("BlockingMethodInNonBlockingContext")
         withContext(coroutineContext) {
             FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
+            // TODO: write sensor data to file
+            FileUtils.writeSensorData(externalFilesDir, photoEntry, projectEntry.id)
         }
     }
 

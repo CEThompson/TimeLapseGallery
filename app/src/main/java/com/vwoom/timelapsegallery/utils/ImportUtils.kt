@@ -9,6 +9,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
+// Todo: figure out how to import sensor data
 // TODO (deferred): handle blocking in coroutines
 object ImportUtils {
 
