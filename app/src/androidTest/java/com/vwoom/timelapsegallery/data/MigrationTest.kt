@@ -6,6 +6,10 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.vwoom.timelapsegallery.data.Migrations.MIGRATION_1_2
+import com.vwoom.timelapsegallery.data.Migrations.MIGRATION_2_3
+import com.vwoom.timelapsegallery.data.Migrations.MIGRATION_3_4
+import com.vwoom.timelapsegallery.data.Migrations.MIGRATION_4_5
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.WeatherEntry
 import kotlinx.coroutines.runBlocking
@@ -53,7 +57,7 @@ class MigrationTest {
         }
 
         // When we run the migrations and validate
-        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 2, true, TimeLapseDatabase.MIGRATION_1_2)
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 2, true, Migrations.MIGRATION_1_2)
 
         // Then the resulting database should have the same data
         val resultDb = getMigratedRoomDatabase()
@@ -85,23 +89,23 @@ class MigrationTest {
     fun migrationFrom2To3_containsCorrectData() {
         // Given an old version of the database
         // With 2 photos entered for a project
-        val db = testHelper.createDatabase(TEST_DB_NAME, 1)
+        val db = testHelper.createDatabase(TEST_DB_NAME, 2)
         db.apply {
             // Insert a project into the database
-            execSQL("INSERT INTO project (id, name, thumbnail_url, schedule, schedule_next_submission, timestamp) " +
-                    "VALUES (1, 'test name one', 'thumbnail_url_1', 1, 1, 1)")
+            execSQL("INSERT INTO project (id, project_name) " +
+                    "VALUES (1, 'test name one')")
             // Insert two photos for project 1
-            execSQL("INSERT INTO photo (id, project_id, url, timestamp) " +
-                    "VALUES (1, 1, 'photo_1_url', 111)")
-            execSQL("INSERT INTO photo (id, project_id, url, timestamp) " +
-                    "VALUES (2, 1, 'photo_2_url', 222)")
+            execSQL("INSERT INTO photo (id, project_id, timestamp) " +
+                    "VALUES (1, 1, 111)")
+            execSQL("INSERT INTO photo (id, project_id, timestamp) " +
+                    "VALUES (2, 1, 222)")
             // Close old db
             close()
         }
 
         // When we run the migrations and validate
-        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 2, true, TimeLapseDatabase.MIGRATION_1_2)
-        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 3, true, TimeLapseDatabase.MIGRATION_2_3)
+        //testHelper.runMigrationsAndValidate(TEST_DB_NAME, 2, true, MIGRATION_1_2)
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 3, true, MIGRATION_2_3)
         val resultDb = getMigratedRoomDatabase()
 
         // Assert that resulting database persists the projects on migration
@@ -111,7 +115,6 @@ class MigrationTest {
         assertTrue(photos.size == 2)
         assertTrue(projects[0].id == 1.toLong())
         assertTrue(projects[0].project_name == "test name one")
-
 
         // Assert that weather table now useful
         var weather = runBlocking { resultDb.weatherDao().getWeather() }
@@ -144,29 +147,26 @@ class MigrationTest {
     fun migrationFrom3To4_containsCorrectData() {
         // Given an old version of the database
         // With 2 photos entered for a project
-        val db = testHelper.createDatabase(TEST_DB_NAME, 1)
+        val db = testHelper.createDatabase(TEST_DB_NAME, 3)
         db.apply {
-            execSQL("INSERT INTO project (id, name, thumbnail_url, schedule, schedule_next_submission, timestamp) " +
-                    "VALUES (1, 'test name one', 'thumbnail_url_1', 1, 1, 1)")
-            execSQL("INSERT INTO photo (id, project_id, url, timestamp) " +
-                    "VALUES (1, 1, 'photo_1_url', 111)")
-            execSQL("INSERT INTO photo (id, project_id, url, timestamp) " +
-                    "VALUES (2, 1, 'photo_2_url', 222)")
-            // Close db version 2
+            // Insert a project into the database
+            execSQL("INSERT INTO project (id, project_name) " +
+                    "VALUES (1, 'test name one')")
+            // Insert two photos for project 1
+            execSQL("INSERT INTO photo (id, project_id, timestamp) " +
+                    "VALUES (1, 1, 111)")
             close()
         }
 
         // When we run the migrations and validate
-        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 2, true, TimeLapseDatabase.MIGRATION_1_2)
-        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 3, true, TimeLapseDatabase.MIGRATION_2_3)
-        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 4, true, TimeLapseDatabase.MIGRATION_3_4)
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 4, true, MIGRATION_3_4)
         val resultDb = getMigratedRoomDatabase()
 
         // Assert that resulting database persists the projects on migration
         val projects = resultDb.projectDao().getProjects()
         val photos = resultDb.photoDao().getPhotos()
         assertTrue(projects.size == 1)
-        assertTrue(photos.size == 2)
+        assertTrue(photos.size == 1)
         assertTrue(projects[0].id == 1.toLong())
         assertTrue(projects[0].project_name == "test name one")
 
@@ -183,12 +183,45 @@ class MigrationTest {
         resultDb.close()
     }
 
+    @Test
+    @Throws(IOException::class)
+    fun migrationFrom4To5_containsCorrectData() {
+        // Given an old version of the database
+        // With 2 photos entered for a project
+        val db = testHelper.createDatabase(TEST_DB_NAME, 4)
+        db.apply {
+            // Insert two photos for project 1
+            execSQL("INSERT INTO photo (id, project_id, timestamp) " +
+                    "VALUES (1, 1, 111)")
+            execSQL("INSERT INTO photo (id, project_id, timestamp) " +
+                    "VALUES (2, 1, 222)")// Close db version 2
+            close()
+        }
+
+        // When we run the migrations and validate
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 5, true, MIGRATION_4_5)
+        val resultDb = getMigratedRoomDatabase()
+
+        // Assert sensor fields have been added
+        val photos = resultDb.photoDao().getPhotos()
+
+        assertTrue(photos[0].light == null)
+        assertTrue(photos[0].pressure == null)
+        assertTrue(photos[0].temp == null)
+        assertTrue(photos[0].humidity == null)
+
+        // Clean up
+        resultDb.close()
+    }
+
+
     private fun getMigratedRoomDatabase(): TimeLapseDatabase {
         val database: TimeLapseDatabase = Room.databaseBuilder(ApplicationProvider.getApplicationContext(),
                 TimeLapseDatabase::class.java, TEST_DB_NAME)
-                .addMigrations(TimeLapseDatabase.MIGRATION_1_2)
-                .addMigrations(TimeLapseDatabase.MIGRATION_2_3)
-                .addMigrations(TimeLapseDatabase.MIGRATION_3_4)
+                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_2_3)
+                .addMigrations(MIGRATION_3_4)
+                .addMigrations(MIGRATION_4_5)
                 .build()
         // close the database and release any stream resources when the test finishes
         testHelper.closeWhenFinished(database)
