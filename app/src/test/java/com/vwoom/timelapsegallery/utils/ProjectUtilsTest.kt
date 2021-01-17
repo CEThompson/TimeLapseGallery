@@ -110,6 +110,11 @@ class ProjectUtilsTest {
         assertTrue(!first.exists())
         assertTrue(!second.exists())
         assertTrue(!projectFolder.exists())
+
+        // Also its meta dir should not exist
+        val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
+        assertTrue(!metaDir.exists())
+
     }
 
     @Test
