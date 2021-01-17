@@ -112,8 +112,10 @@ class ProjectUtilsTest {
         assertTrue(!projectFolder.exists())
 
         // Also its meta dir should not exist
-        val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
-        assertTrue(!metaDir.exists())
+
+        val metaDir = File(externalFilesTestDir, FileUtils.META_FILE_SUBDIRECTORY)
+        val projectMetaSubfolder = File(metaDir, projectEntry.id.toString())
+        assertTrue(!projectMetaSubfolder.exists())
 
     }
 
