@@ -1,5 +1,6 @@
 package com.vwoom.timelapsegallery.utils
 
+import androidx.room.util.FileUtil
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -7,6 +8,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.File
+import java.io.InputStream
 
 class FileUtilsTest {
 
@@ -23,10 +25,51 @@ class FileUtilsTest {
 
     @Test
     fun createTempListPhotoFiles(){
-        // todo: implement test for createTempListPhotoFiles function
-        //FileUtils.createTempListPhotoFiles(externalFilesTestDir, projectEntry)
+        // Given a project with photos
+        val projectEntry = ProjectEntry(1, "name")
+        val projectFolder = ProjectUtils.getProjectFolder(externalFilesTestDir, projectEntry)
+        projectFolder.mkdirs()
+        val photoFile1  = File(projectFolder, "1231.jpeg")
+        photoFile1.createNewFile()
+        val photoFile2 = File(projectFolder, "12342.jpeg")
+        photoFile2.createNewFile()
+
+        val textFileList = FileUtils.createTempListPhotoFiles(externalFilesTestDir, projectEntry)
+
+        assertTrue(textFileList != null)
+        assertTrue(textFileList!!.exists())
+
+        val inputStream: InputStream = textFileList.inputStream()
+
+        val resList: MutableList<String> = ArrayList()
+
+        inputStream.bufferedReader().forEachLine {
+            if (it.isNotEmpty()) resList.add(it)
+        }
+
+        assert(resList.size == 2)
+
+        assert(resList[0] == "file '${photoFile1.absolutePath}'")
+        assert(resList[1] == "file '${photoFile2.absolutePath}'")
     }
 
+    /*@Test
+    fun writeProjectTagsFile(){
+        FileUtils.writeProjectTagsFile(externalFilesTestDir, projectId, tags)
+
+    }
+
+    @Test
+    fun writeProjectScheduleFile(){
+        FileUtils.writeProjectScheduleFile(externalFilesTestDir, projectId, projectScheduleEntry)
+    }
+
+    @Test
+    fun writeSensorData(){
+        // Given a project with a photo
+        FileUtils.writeSensorData(externalFilesTestDir, photoEntry, projectId)
+    }
+*/
     @Test
     fun createTemporaryImageFile_givenTempFolder_tempFileExists() {
         // Given the project directory
