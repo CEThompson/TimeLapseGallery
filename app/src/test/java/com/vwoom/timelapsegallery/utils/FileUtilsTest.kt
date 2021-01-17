@@ -3,6 +3,7 @@ package com.vwoom.timelapsegallery.utils
 import androidx.room.util.FileUtil
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -103,17 +104,54 @@ class FileUtilsTest {
     }
 
     // TODO consider writing test for writing project schedule
-    /*
+
     @Test
     fun writeProjectScheduleFile(){
-        FileUtils.writeProjectScheduleFile(externalFilesTestDir, projectId, projectScheduleEntry)
-    }*/
+        // Given a project with a schedule
+        val projectEntry = ProjectEntry(1, "name")
+        val projectScheduleEntry = ProjectScheduleEntry(projectEntry.id, 1)
+
+        // First the schedule file should not yet exist
+        val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
+        val scheduleFile = File(metaDir, FileUtils.SCHEDULE_TEXT_FILE)
+        assertTrue(!scheduleFile.exists())
+
+        // When we write the file
+        FileUtils.writeProjectScheduleFile(externalFilesTestDir, projectEntry.id, projectScheduleEntry)
+
+        // It should exist with the value 1
+        assertTrue(scheduleFile.exists())
+
+        // When we read the file
+        var inputStream: InputStream = scheduleFile.inputStream()
+        val res: MutableList<String> = ArrayList()
+        inputStream.bufferedReader().forEachLine {
+            if (it.isNotEmpty()) res.add(it)
+        }
+
+        // there should only be 1 entry
+        assertTrue(res.size == 1)
+        assertTrue(res[0] == "1")
+
+        // When we write a new schedule it should be updated
+        projectScheduleEntry.interval_days = 7
+        FileUtils.writeProjectScheduleFile(externalFilesTestDir, projectEntry.id, projectScheduleEntry)
+
+        inputStream = scheduleFile.inputStream()
+        res.clear()
+        inputStream.bufferedReader().forEachLine {
+            if (it.isNotEmpty()) res.add(it)
+        }
+
+        assertTrue(res.size == 1)
+        assertTrue(res[0] == "7")
+    }
 
     @Test
     fun writeSensorData(){
         // Given photo entries with sensor data yet to exist
-        val photoEntry = PhotoEntry(1,1, 1, "100", "1000", "27.1", "5",)
-        val photoEntry2 = PhotoEntry(2,1, 2, "1001", "1001", "28.1", "6",)
+        val photoEntry = PhotoEntry(1,1, 1, "100", "1000", "27.1", "5")
+        val photoEntry2 = PhotoEntry(2,1, 2, "1001", "1001", "28.1", "6")
 
         val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesTestDir, 1)
         val sensorFile = File(metaDir, FileUtils.SENSOR_DEFINITION_TEXT_FILE)
