@@ -2,6 +2,7 @@ package com.vwoom.timelapsegallery.utils
 
 import androidx.room.util.FileUtil
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
+import com.vwoom.timelapsegallery.data.entry.TagEntry
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -34,8 +35,10 @@ class FileUtilsTest {
         val photoFile2 = File(projectFolder, "12342.jpeg")
         photoFile2.createNewFile()
 
+        // When we use the function
         val textFileList = FileUtils.createTempListPhotoFiles(externalFilesTestDir, projectEntry)
 
+        // A file is returned in the expected format for FFMPEG conversion
         assertTrue(textFileList != null)
         assertTrue(textFileList!!.exists())
 
@@ -53,12 +56,52 @@ class FileUtilsTest {
         assert(resList[1] == "file '${photoFile2.absolutePath}'")
     }
 
-    /*@Test
+    @Test
     fun writeProjectTagsFile(){
-        FileUtils.writeProjectTagsFile(externalFilesTestDir, projectId, tags)
 
+        // Given a project and a list of tags
+        val projectEntry = ProjectEntry(1, "name")
+        var listTags = arrayListOf(TagEntry(1, "a"), TagEntry(1, "b"))
+
+        // Before we write any tags file should not exist
+        val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
+        val tagsFile = File(metaDir, FileUtils.TAGS_DEFINITION_TEXT_FILE)
+        assertTrue(!tagsFile.exists())
+
+        // When we use the function
+        FileUtils.writeProjectTagsFile(externalFilesTestDir, projectEntry.id, listTags)
+
+        // Tags should exist
+        assertTrue(tagsFile.exists())
+
+        var inputStream: InputStream = tagsFile.inputStream()
+        val tagsRes: MutableList<String> = ArrayList()
+        inputStream.bufferedReader().forEachLine {
+            if (it.isNotEmpty()) tagsRes.add(it)
+        }
+
+        // Tags should represent the input list
+        assertTrue(tagsRes.size == 2)
+        assertTrue(tagsRes[0] == "a")
+        assertTrue(tagsRes[1] == "b")
+
+        // When we use the function again, the format should be updated accordingly
+        listTags = arrayListOf(TagEntry(1, "c"), TagEntry(1, "d"))
+        FileUtils.writeProjectTagsFile(externalFilesTestDir, projectEntry.id, listTags)
+
+        tagsRes.clear()
+        inputStream = tagsFile.inputStream()
+        inputStream.bufferedReader().forEachLine {
+            if (it.isNotEmpty()) tagsRes.add(it)
+        }
+
+        // Should now be c and d
+        assertTrue(tagsRes.size == 2)
+        assertTrue(tagsRes[0] == "c")
+        assertTrue(tagsRes[1] == "d")
     }
 
+    /*
     @Test
     fun writeProjectScheduleFile(){
         FileUtils.writeProjectScheduleFile(externalFilesTestDir, projectId, projectScheduleEntry)
