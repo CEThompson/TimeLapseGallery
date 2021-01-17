@@ -1,6 +1,7 @@
 package com.vwoom.timelapsegallery.utils
 
 import androidx.room.util.FileUtil
+import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.TagEntry
 import org.junit.Assert.assertTrue
@@ -101,18 +102,67 @@ class FileUtilsTest {
         assertTrue(tagsRes[1] == "d")
     }
 
+    // TODO consider writing test for writing project schedule
     /*
     @Test
     fun writeProjectScheduleFile(){
         FileUtils.writeProjectScheduleFile(externalFilesTestDir, projectId, projectScheduleEntry)
-    }
+    }*/
 
     @Test
     fun writeSensorData(){
-        // Given a project with a photo
-        FileUtils.writeSensorData(externalFilesTestDir, photoEntry, projectId)
+        // Given photo entries with sensor data yet to exist
+        val photoEntry = PhotoEntry(1,1, 1, "100", "1000", "27.1", "5",)
+        val photoEntry2 = PhotoEntry(2,1, 2, "1001", "1001", "28.1", "6",)
+
+        val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesTestDir, 1)
+        val sensorFile = File(metaDir, FileUtils.SENSOR_DEFINITION_TEXT_FILE)
+
+        // Sensor data should not yet exist
+        assertTrue(!sensorFile.exists())
+
+        // When we write the data
+        FileUtils.writeSensorData(externalFilesTestDir, photoEntry, 1)
+
+        // File should now exist
+        assertTrue(sensorFile.exists())
+
+        // When we read the file
+        var inputStream: InputStream = sensorFile.inputStream()
+        val sensorRes: MutableList<String> = ArrayList()
+        inputStream.bufferedReader().forEachLine {
+            if (it.isNotEmpty()) sensorRes.add(it)
+        }
+
+        // We should have 1 entry with the appropriate parts
+        assertTrue(sensorRes.size == 1)
+        var parts = sensorRes[0].split(" ")
+        assertTrue(parts[0] == "1") // timestamp
+        assertTrue(parts[1] == "100") // light
+        assertTrue(parts[2] == "27.1") // temp
+        assertTrue(parts[3] == "1000") // pressure
+        assertTrue(parts[4] == "5") // humidity
+
+        // When we write another entry
+        FileUtils.writeSensorData(externalFilesTestDir, photoEntry2, 1)
+
+        // Then it should be appended to the end
+        inputStream = sensorFile.inputStream()
+        sensorRes.clear()
+        inputStream.bufferedReader().forEachLine {
+            if (it.isNotEmpty()) sensorRes.add(it)
+        }
+
+        // We should have 2 entries now
+        assertTrue(sensorRes.size == 2)
+        parts = sensorRes[1].split(" ")
+        assertTrue(parts[0] == "2") // timestamp
+        assertTrue(parts[1] == "1001") // light
+        assertTrue(parts[2] == "28.1") // temp
+        assertTrue(parts[3] == "1001") // pressure
+        assertTrue(parts[4] == "6") // humidity
     }
-*/
+
     @Test
     fun createTemporaryImageFile_givenTempFolder_tempFileExists() {
         // Given the project directory
