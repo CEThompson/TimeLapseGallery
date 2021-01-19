@@ -35,7 +35,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.TimeLapseGalleryActivity
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
@@ -47,8 +46,8 @@ import com.vwoom.timelapsegallery.detail.dialog.ConversionDialog
 import com.vwoom.timelapsegallery.detail.dialog.InfoDialog
 import com.vwoom.timelapsegallery.detail.dialog.ScheduleDialog
 import com.vwoom.timelapsegallery.detail.dialog.TagDialog
-import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
 import com.vwoom.timelapsegallery.di.base.BaseFragment
+import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
 import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
@@ -111,9 +110,6 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
     // For fullscreen fragment
     private var photoUrls: Array<String> = arrayOf()
 
-    // Analytics
-    private var firebaseAnalytics: FirebaseAnalytics? = null
-
     // Animations for orientation indicator
     private val blinkAnimation: Animation by lazy {
         val animation: Animation = AlphaAnimation(0f, 1f) //to change visibility from visible to invisible
@@ -142,7 +138,6 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
             Toast.makeText(requireContext(), "Fatal Error: Could not load external files!", Toast.LENGTH_LONG).show()
         }
 
-        firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
         val sharedElemTransition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
         sharedElemTransition.addListener(object : Transition.TransitionListener {
             override fun onTransitionEnd(transition: Transition?) {
@@ -598,7 +593,6 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
         // If already playing then stop
         if (playing) {
             stopPlaying()
-            firebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
             return
         }
         // If not enough photos give user feedback
@@ -625,8 +619,6 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
         binding?.imageLoadingProgress?.progress = currentPlayPosition
         scheduleNextPhoto(currentPlayPosition) // Recursively loads the rest of set from beginning
 
-        // Track play button interaction
-        firebaseAnalytics!!.logEvent(getString(R.string.analytics_play_time_lapse), null)
     }
 
     // Loads the set of images backwards
@@ -634,7 +626,6 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
         // If already playing then stop
         if (playing) {
             stopPlaying()
-            firebaseAnalytics!!.logEvent(getString(R.string.analytics_stop_time_lapse), null)
             return
         }
         // If not enough photos give user feedback
@@ -984,7 +975,6 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _: Int ->
                     detailViewModel.deleteCurrentPhoto(externalFilesDir)
-                    firebaseAnalytics?.logEvent(getString(R.string.analytics_delete_photo), null)
                 }
                 .setNegativeButton(android.R.string.no, null).show()
     }
@@ -1027,10 +1017,6 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
                         UpdateWidgetService.startActionUpdateWidgets(requireContext())
                     }
                     sharedElementReturnTransition = null
-
-                    // Log project deletion to analytics
-                    firebaseAnalytics?.logEvent(getString(R.string.analytics_delete_project), null)
-
                     findNavController().popBackStack()
                 }
                 .setNegativeButton(android.R.string.no, null).show()
