@@ -10,19 +10,16 @@ import timber.log.Timber
 // TODO: (TLG rebrand) create mermaid splash - investigate bombs and bees - animate water
 // TODO: (TLG rebrand) add a map, bottom NAV, sidenav?
 
-// TODO: (1.3) use app bundling for release
-// TODO: (1.3) fix proguard minification and obfuscation
-// TODO: (1.3) add quick project add input mode
-
 // TODO: (1.4) convert NWS Api to OpenWeather?
+// TODO: (1.4) implement CI/CD
+
 // TODO: (when scaling an issue) implement left handed and right handed modes
 // TODO: (when scaling an issue) implement content grouping where appropriate for accessibility
 // TODO: (when scaling an issue) consider any content descriptions that need dynamic content descriptions with live regions
 
-
-// TODO: (1.4) modularize app? - camera - gallery
-// TODO: (1.4) implement CI/CD
-// TODO: (1.4) investigate night light mode? How do stargazing apps do it?
+// TODO: (deferred) consider adding quick input mode
+// TODO: (deferred) consider modularizing app  [camera - gallery]
+// TODO: (deferred) investigate night light mode? How do stargazing apps do it?
 
 // TODO: (when stable) convert to data store
 // TODO: (when stable) convert moshi to kotlinx serialization
@@ -36,6 +33,7 @@ class TimeLapseGalleryApplication : Application() {
                 .appModule(AppModule(this))
                 .build()
     }
+
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG)
