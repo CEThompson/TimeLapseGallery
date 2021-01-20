@@ -4,7 +4,8 @@ import android.content.Context
 import com.vwoom.timelapsegallery.data.TimeLapseDatabase
 import com.vwoom.timelapsegallery.data.repository.ProjectRepository
 
-// NOTE: this util is retained due to simplicity compared to dagger injection for work manager
+// NOTE: this util is retained due to simplicity for injecting into work manager
+// (dagger injection looks complex in comparison)
 // Used for injecting into services, broadcast receivers, and workers
 object InjectorUtils {
     fun getProjectRepository(context: Context): ProjectRepository {
