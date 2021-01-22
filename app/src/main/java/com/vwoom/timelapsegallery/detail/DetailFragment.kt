@@ -974,10 +974,10 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
                 .setTitle(R.string.delete_photo)
                 .setMessage(R.string.verify_delete_photo)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { _, _: Int ->
+                .setPositiveButton(android.R.string.ok) { _, _: Int ->
                     detailViewModel.deleteCurrentPhoto(externalFilesDir)
                 }
-                .setNegativeButton(android.R.string.no, null).show()
+                .setNegativeButton(android.R.string.cancel, null).show()
     }
 
     // If the photo is the last in the project, directs the user to deleting the project instead
@@ -986,10 +986,10 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
                 .setTitle(R.string.delete_photo)
                 .setMessage(R.string.verify_delete_last_photo)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { _, _: Int ->
+                .setPositiveButton(android.R.string.ok) { _, _: Int ->
                     verifyProjectDeletion()
                 }
-                .setNegativeButton(android.R.string.no, null).show()
+                .setNegativeButton(android.R.string.cancel, null).show()
     }
 
     // Deletes the current project after user verification
@@ -998,10 +998,10 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
                 .setTitle(R.string.delete_project)
                 .setMessage(R.string.verify_delete_project)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { _, _: Int ->
+                .setPositiveButton(android.R.string.ok) { _, _: Int ->
                     doubleVerifyProjectDeletion()
                 }
-                .setNegativeButton(android.R.string.no, null).show()
+                .setNegativeButton(android.R.string.cancel, null).show()
     }
 
     // Provides an additional layer of verification for project deletion
@@ -1010,7 +1010,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
                 .setTitle(R.string.delete_project)
                 .setMessage(R.string.double_verify_project_deletion)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { _, _: Int ->
+                .setPositiveButton(android.R.string.ok) { _, _: Int ->
                     detailViewModel.deleteCurrentProject(externalFilesDir, currentProjectView)
                     // If current project had a schedule remove the notification and update widgets
                     if (currentProjectView.interval_days != 0) {
@@ -1020,6 +1020,6 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
                     sharedElementReturnTransition = null
                     findNavController().popBackStack()
                 }
-                .setNegativeButton(android.R.string.no, null).show()
+                .setNegativeButton(android.R.string.cancel, null).show()
     }
 }
