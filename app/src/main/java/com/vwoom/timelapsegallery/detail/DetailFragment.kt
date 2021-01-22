@@ -67,6 +67,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
+// TODO: implement a way to resolve a project as successful (established a plant in ground) or as unsuccessful (plant died)
 // TODO: (deferred) implement pinch zoom on fullscreen image
 class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
