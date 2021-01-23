@@ -67,7 +67,7 @@ class GalleryViewModel
     private fun userIsSearching(): Boolean {
         return searchTags.isNotEmpty()
                 || searchType != SearchType.None
-                || !searchName.isBlank()
+                || searchName.isNotBlank()
     }
 
     // Returns whether or not a tag was selected by the user
