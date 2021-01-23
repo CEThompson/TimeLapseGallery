@@ -59,16 +59,18 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
         // Show the time of the forecast
         val date = TimeUtils.getDateFromTimestamp(result.timestamp)
         val time = TimeUtils.getTimeFromTimestamp(result.timestamp)
-        this.findViewById<TextView>(R.id.update_time_tv)?.text = context.getString(R.string.cache_time, date, time)
-        this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
+        val updateTimeTv = this.findViewById<TextView>(R.id.update_time_tv)
+        updateTimeTv?.text = context.getString(R.string.cache_time, date, time)
+        updateTimeTv?.visibility = View.VISIBLE
 
         // Show reason for showing forecast that hasn't been updated today
         val exceptionMessage = if (result.exception != null && result.exception!!.localizedMessage != null)
             result.exception!!.localizedMessage!!
         else context.getString(R.string.unknown)
 
-        this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString(R.string.forecast_error, exceptionMessage)
-        this.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
+        val errorMessageTv = this.findViewById<TextView>(R.id.error_message_tv)
+        errorMessageTv?.text = context.getString(R.string.forecast_error, exceptionMessage)
+        errorMessageTv?.visibility = View.VISIBLE
 
         // Hide the progress
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
@@ -87,8 +89,9 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
         // Set and show the time the forecast was updated
         val date = TimeUtils.getDateFromTimestamp(result.timestamp)
         val time = TimeUtils.getTimeFromTimestamp(result.timestamp)
-        this.findViewById<TextView>(R.id.update_time_tv)?.text = context.getString(R.string.update_time, date, time)
-        this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.VISIBLE
+        val updateTimeTv = this.findViewById<TextView>(R.id.update_time_tv)
+        updateTimeTv?.text = context.getString(R.string.update_time, date, time)
+        updateTimeTv?.visibility = View.VISIBLE
 
         // No error message shown
         this.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.INVISIBLE
@@ -106,15 +109,17 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.INVISIBLE
         this.findViewById<TextView>(R.id.show_weather_details_tv)?.visibility = View.INVISIBLE
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-        this.findViewById<TextView>(R.id.error_message_tv)?.text = context.getString(R.string.fetching_forecast)
-        this.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
+        val errorMessageTv = this.findViewById<TextView>(R.id.error_message_tv)
+        errorMessageTv?.text = context.getString(R.string.fetching_forecast)
+        errorMessageTv?.visibility = View.VISIBLE
     }
 
     private fun showWeatherNoData(message: String?) {
+        val errorMessageTv = this.findViewById<TextView>(R.id.error_message_tv)
         this.findViewById<TextView>(R.id.update_time_tv)?.visibility = View.INVISIBLE
         
         if (message == null)
-            this.findViewById<TextView>(R.id.error_message_tv)?.text =
+            errorMessageTv?.text =
                     context.getString(R.string.forecast_error, context.getString(R.string.no_forecast_available))
         else {
             val localizedMessage = when (message) {
@@ -123,10 +128,10 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
                 else -> message
             }
 
-            this.findViewById<TextView>(R.id.error_message_tv)?.text =
+            errorMessageTv?.text =
                     context.getString(R.string.forecast_error, localizedMessage)
         }
-        this.findViewById<TextView>(R.id.error_message_tv)?.visibility = View.VISIBLE
+        errorMessageTv?.visibility = View.VISIBLE
         this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
         this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
         this.findViewById<ImageView>(R.id.update_confirmation_image_view)?.visibility = View.GONE
@@ -135,118 +140,116 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
 
     // TODO: (deferred) calculate and show projects due per day
     private fun setWeatherChart(forecast: ForecastResponse) {
-        val periods: List<ForecastResponse.Period>? = forecast.properties.periods
-        if (periods != null) {
+        val periods: List<ForecastResponse.Period> = forecast.properties.periods
 
-            val chart = this.findViewById<LineChart>(R.id.weather_chart) ?: return
+        val chart = this.findViewById<LineChart>(R.id.weather_chart) ?: return
 
-            // Set the entries for the chart
-            val weatherEntries: ArrayList<Entry> = arrayListOf()
-            val averages: ArrayList<Entry> = arrayListOf()
-            val iconEntries: ArrayList<Entry> = arrayListOf()
-            val axisLabels: ArrayList<String> = arrayListOf()
+        // Set the entries for the chart
+        val weatherEntries: ArrayList<Entry> = arrayListOf()
+        val averages: ArrayList<Entry> = arrayListOf()
+        val iconEntries: ArrayList<Entry> = arrayListOf()
+        val axisLabels: ArrayList<String> = arrayListOf()
 
-            // Set the weather and icons
-            for (i in periods.indices) {
-                weatherEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()))
-                // Handle icon per period
-                val weatherType = getWeatherType(periods[i].shortForecast)
-                val icon = WeatherUtils.getWeatherIconResource(context,
-                        periods[i].isDaytime,
-                        weatherType,
-                        getTimestampForDayFromPeriod(periods[i].startTime))
-                iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat() + 5f, icon))
-            }
-
-            // Handle averages
-            val start = if (periods[0].isDaytime) 0 else 1
-            for (i in start until periods.size - 1 step 2) {
-                //if ( (i+1) !in periods.indices) break
-                val avg = (periods[i].temperature.toFloat() + periods[i + 1].temperature.toFloat()) / 2f
-                averages.add(Entry((i.toFloat() + (i + 1).toFloat()) / 2f, avg))
-            }
-            if (start == 1) {
-                val first = (periods[0].temperature.toFloat() + periods[1].temperature.toFloat()) / 2f
-                val entry = Entry(0.5f, first)
-                averages.add(0, entry)
-
-                val last = (periods[periods.size - 1].temperature.toFloat() + periods[periods.size - 2].temperature.toFloat()) / 2f
-                val lastEntry = Entry(((periods.size - 1 + periods.size - 2).toFloat() / 2f), last)
-                averages.add(lastEntry)
-            }
-
-            // Get the day from the period and add it as the label
-            for (i in 0 until periods.size - 1 step 1) {
-                val timestamp: Long? = getTimestampForDayFromPeriod(periods[i].startTime)
-                if (timestamp == null) {
-                    axisLabels.add(((i / 2) + 1).toString()) // Fallback day number
-                } else {
-                    val day = TimeUtils.getDayFromTimestamp(timestamp)
-                    axisLabels.add(day.substring(0, 3).toUpperCase(Locale.getDefault()))
-                }
-            }
-
-            // Set axis info
-            val valueFormatter = object : ValueFormatter() {
-                override fun getAxisLabel(value: Float, axis: AxisBase?): String {
-                    return if (value.toInt() < axisLabels.size)
-                        axisLabels[value.toInt()]
-                    else ""
-                }
-            }
-
-            // Set the chart characteristics
-            chart.setTouchEnabled(false)
-            chart.xAxis?.granularity = 1f
-            chart.xAxis?.valueFormatter = valueFormatter
-
-            // Hide axis lines
-            chart.xAxis?.setDrawGridLines(false)
-            chart.xAxis?.setDrawAxisLine(false)
-            chart.axisRight?.isEnabled = false
-            chart.axisLeft?.isEnabled = false
-            chart.description?.isEnabled = false
-
-
-            // Set the dataSet
-            val tempType = if (periods[0].temperatureUnit == "F") WeatherAdapter.FAHRENHEIT else WeatherAdapter.CELSIUS
-            val weatherDataSet = LineDataSet(weatherEntries, tempType)
-            val iconDataSet = LineDataSet(iconEntries, "Weather Type")
-            val avgDataSet = LineDataSet(averages, "Average Temp")
-            avgDataSet.setDrawCircles(false)
-            avgDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
-            avgDataSet.setDrawValues(false)
-
-            iconDataSet.setDrawIcons(true)
-            iconDataSet.setDrawCircles(false)
-            iconDataSet.setDrawValues(false)
-            iconDataSet.enableDashedLine(0f, 1f, 0f)
-            iconDataSet.color = ContextCompat.getColor(this.context, R.color.black)
-
-            // Style the dataSet
-            //weatherDataSet.enableDashedLine(0f,1f,0f)
-            weatherDataSet.setDrawCircles(false)
-            weatherDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-            weatherDataSet.cubicIntensity = .2f
-            weatherDataSet.color = ContextCompat.getColor(this.context, R.color.colorWeatherChartLight)
-
-            val tempFormatter = object : ValueFormatter() {
-                private val format = DecimalFormat("###,##0")
-                override fun getPointLabel(entry: Entry?): String {
-                    return format.format(entry?.y)
-                }
-            }
-            weatherDataSet.valueFormatter = tempFormatter
-            weatherDataSet.valueTextSize = 14f
-
-            // Assign the data to the chart
-            val lineData = LineData(weatherDataSet, iconDataSet, avgDataSet)
-            chart.data = lineData
-            chart.invalidate()
-
-            this.findViewById<LineChart>(R.id.weather_chart)?.visibility = View.VISIBLE
-            this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
+        // Set the weather and icons
+        for (i in periods.indices) {
+            weatherEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat()))
+            // Handle icon per period
+            val weatherType = getWeatherType(periods[i].shortForecast)
+            val icon = WeatherUtils.getWeatherIconResource(context,
+                    periods[i].isDaytime,
+                    weatherType,
+                    getTimestampForDayFromPeriod(periods[i].startTime))
+            iconEntries.add(Entry(i.toFloat(), periods[i].temperature.toFloat() + 5f, icon))
         }
+
+        // Handle averages
+        val start = if (periods[0].isDaytime) 0 else 1
+        for (i in start until periods.size - 1 step 2) {
+            //if ( (i+1) !in periods.indices) break
+            val avg = (periods[i].temperature.toFloat() + periods[i + 1].temperature.toFloat()) / 2f
+            averages.add(Entry((i.toFloat() + (i + 1).toFloat()) / 2f, avg))
+        }
+        if (start == 1) {
+            val first = (periods[0].temperature.toFloat() + periods[1].temperature.toFloat()) / 2f
+            val entry = Entry(0.5f, first)
+            averages.add(0, entry)
+
+            val last = (periods[periods.size - 1].temperature.toFloat() + periods[periods.size - 2].temperature.toFloat()) / 2f
+            val lastEntry = Entry(((periods.size - 1 + periods.size - 2).toFloat() / 2f), last)
+            averages.add(lastEntry)
+        }
+
+        // Get the day from the period and add it as the label
+        for (i in 0 until periods.size - 1 step 1) {
+            val timestamp: Long? = getTimestampForDayFromPeriod(periods[i].startTime)
+            if (timestamp == null) {
+                axisLabels.add(((i / 2) + 1).toString()) // Fallback day number
+            } else {
+                val day = TimeUtils.getDayFromTimestamp(timestamp)
+                axisLabels.add(day.substring(0, 3).toUpperCase(Locale.getDefault()))
+            }
+        }
+
+        // Set axis info
+        val valueFormatter = object : ValueFormatter() {
+            override fun getAxisLabel(value: Float, axis: AxisBase?): String {
+                return if (value.toInt() < axisLabels.size)
+                    axisLabels[value.toInt()]
+                else ""
+            }
+        }
+
+        // Set the chart characteristics
+        chart.setTouchEnabled(false)
+        chart.xAxis?.granularity = 1f
+        chart.xAxis?.valueFormatter = valueFormatter
+
+        // Hide axis lines
+        chart.xAxis?.setDrawGridLines(false)
+        chart.xAxis?.setDrawAxisLine(false)
+        chart.axisRight?.isEnabled = false
+        chart.axisLeft?.isEnabled = false
+        chart.description?.isEnabled = false
+
+
+        // Set the dataSet
+        val tempType = if (periods[0].temperatureUnit == "F") WeatherAdapter.FAHRENHEIT else WeatherAdapter.CELSIUS
+        val weatherDataSet = LineDataSet(weatherEntries, tempType)
+        val iconDataSet = LineDataSet(iconEntries, "Weather Type")
+        val avgDataSet = LineDataSet(averages, "Average Temp")
+        avgDataSet.setDrawCircles(false)
+        avgDataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
+        avgDataSet.setDrawValues(false)
+
+        iconDataSet.setDrawIcons(true)
+        iconDataSet.setDrawCircles(false)
+        iconDataSet.setDrawValues(false)
+        iconDataSet.enableDashedLine(0f, 1f, 0f)
+        iconDataSet.color = ContextCompat.getColor(this.context, R.color.black)
+
+        // Style the dataSet
+        //weatherDataSet.enableDashedLine(0f,1f,0f)
+        weatherDataSet.setDrawCircles(false)
+        weatherDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+        weatherDataSet.cubicIntensity = .2f
+        weatherDataSet.color = ContextCompat.getColor(this.context, R.color.colorWeatherChartLight)
+
+        val tempFormatter = object : ValueFormatter() {
+            private val format = DecimalFormat("###,##0")
+            override fun getPointLabel(entry: Entry?): String {
+                return format.format(entry?.y)
+            }
+        }
+        weatherDataSet.valueFormatter = tempFormatter
+        weatherDataSet.valueTextSize = 14f
+
+        // Assign the data to the chart
+        val lineData = LineData(weatherDataSet, iconDataSet, avgDataSet)
+        chart.data = lineData
+        chart.invalidate()
+
+        chart.visibility = View.VISIBLE
+        this.findViewById<ProgressBar>(R.id.weather_chart_progress)?.visibility = View.INVISIBLE
     }
 
     fun handleWeatherChart(result: WeatherResult<ForecastResponse>) {
@@ -263,7 +266,6 @@ class WeatherChartDialog(context: Context, galleryViewModel: GalleryViewModel) :
                 this.setWeatherChart(result.data)
                 this.showCachedForecast(result)
             }
-
         }
     }
 }
