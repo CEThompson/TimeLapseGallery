@@ -52,8 +52,9 @@ class ConversionDialog(context: Context,
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             val newWidth = (width * 0.7).toInt()
             val newHeight = (height * 0.7).toInt()
-            this.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout).layoutParams.height = newHeight
-            this.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout).layoutParams.width = newWidth
+            val conversionDialogLayout = this.findViewById<ConstraintLayout>(R.id.conversion_dialog_layout)
+            conversionDialogLayout.layoutParams.height = newHeight
+            conversionDialogLayout.layoutParams.width = newWidth
         }
         // If landscape just set by height (width auto adjusts for different layout)
         else {
@@ -138,7 +139,7 @@ class ConversionDialog(context: Context,
                 //.apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
                 .listener(object : RequestListener<GifDrawable> {
                     override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<GifDrawable>?, isFirstResource: Boolean): Boolean {
-                        Timber.d("${e?.message}")
+                        Timber.d(e)
                         return false
                     }
 
