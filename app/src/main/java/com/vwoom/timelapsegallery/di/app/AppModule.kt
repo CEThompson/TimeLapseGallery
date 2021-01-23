@@ -12,12 +12,10 @@ class AppModule(val application: Application) {
     @Provides
     fun application() = application
 
-
     @Provides
     @AppScope
     fun provideSharedPreferences(
             app: Application
     ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
-
 
 }
