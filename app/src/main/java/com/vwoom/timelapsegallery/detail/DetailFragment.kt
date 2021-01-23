@@ -67,7 +67,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
-// TODO: implement a way to resolve a project as successful (established a plant in ground) or as unsuccessful (plant died)
+// TODO: (1.4) implement a way to measure the business value of the application (resolve a project as successful (established a plant in ground) or as unsuccessful)
 // TODO: (deferred) implement pinch zoom on fullscreen image
 class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler {
 
@@ -181,7 +181,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
         val playbackIntervalSharedPref = pref.getString(getString(R.string.key_playback_interval), getString(R.string.playback_interval_default))
         playbackInterval = playbackIntervalSharedPref?.toLong() ?: 50
 
-        // TODO: (deferred) refactor toolbar to navigation drawer
+        // TODO: (deferred) refactor toolbar to navigation drawer?
         // Set up toolbar
         setHasOptionsMenu(true)
         toolbar = binding?.detailsFragmentToolbar
@@ -496,7 +496,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
                 binding?.photoHumidity?.visibility = VISIBLE
             }
 
-            // TODO: bind today's forecast temperature range to to current photo
+            // TODO: display today's forecast temperature range to to current photo (if available)
 
         }
     }

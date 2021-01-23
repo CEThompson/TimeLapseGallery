@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package com.vwoom.timelapsegallery.data
 
 import android.content.Context
@@ -13,8 +15,6 @@ import com.vwoom.timelapsegallery.data.Migrations.MIGRATION_4_5
 import com.vwoom.timelapsegallery.data.dao.*
 import com.vwoom.timelapsegallery.data.entry.*
 import com.vwoom.timelapsegallery.data.view.ProjectView
-
-// TODO: (deferred) consider removing table cover photo and instead just use last in photo set
 
 @Database(entities = [
     ProjectEntry::class,
