@@ -4,6 +4,7 @@ import android.app.Service
 import com.example.diap.common.dependencyinjection.service.ServiceModule
 import com.vwoom.timelapsegallery.TimeLapseGalleryApplication
 
+// Note: currently base service unused
 abstract class BaseService : Service() {
 
     private val appComponent get() = (application as TimeLapseGalleryApplication).appComponent
