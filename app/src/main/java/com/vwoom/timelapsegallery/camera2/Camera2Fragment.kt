@@ -52,10 +52,10 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-// TODO: bind all available sensor data to saved image (perhaps as exif data?)
-// TODO: add GPS data to photos as setting?
-// TODO: calc dew point if possible
-// TODO troubleshoot camera capture size issue
+// TODO: (deferred) re-evaluate GPS data with photos
+// TODO: (deferred) calculate and display dew point where possible
+// TODO: (deferred) show temperature range (high and low) from weather API if possible for the day
+// TODO: (deferred) troubleshoot camera capture size issue
 
 class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
 
@@ -161,13 +161,22 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
 
                     // Rotates and scales the bitmap based on the device rotation
                     val matrix = getTransformMatrix(baseWidth, baseHeight)
-                    // TODO remove !! operators
-                    val adjustedBitmap = Bitmap.createBitmap(viewFinder.bitmap!!, 0, 0, viewFinder.bitmap!!.width, viewFinder.bitmap!!.height, matrix, true)
+                    // TODO: (deferred) remove usage of !! operators
+                    val adjustedBitmap = Bitmap.createBitmap(
+                            viewFinder.bitmap!!,
+                            0,
+                            0,
+                            viewFinder.bitmap!!.width,
+                            viewFinder.bitmap!!.height, matrix,
+                            true)
                     adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputPhoto)
 
                     // Write exif data for image
                     val exif = ExifInterface(file.absolutePath)
-                    // TODO consider kotlinx datetime usage here
+
+                    // TODO: (deferred) consider kotlinx datetime usage here
+                    // TODO: (deferred) re-evaluate usage of time in seconds instead of milliseconds
+                    // Note: By using milliseconds the max time (long max value) appears to be Saturday August 16, 292,278,994
                     val timestamp = System.currentTimeMillis()
                     val timeString = TimeUtils.getExifDateTimeFromTimestamp(timestamp)
                     exif.setAttribute(ExifInterface.TAG_DATETIME_ORIGINAL, timeString)
@@ -177,7 +186,7 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
                     val isNewProject = (args.projectView == null)
 
                     // For new projects navigate to project detail after insertion
-                    // TODO insert quick entry mode logic here if new project
+                    // TODO: (deferred) insert quick entry mode logic here for new projects
                     val sensorData = SensorData(light = currentLight, pressure = currentPressure, temp = currentAmbientTemp, humidity = currentRelativeHumidity)
                     if (isNewProject) {
                         val newProjectView = camera2ViewModel.addNewProject(file, externalFilesDir, timestamp, sensorData)
@@ -187,7 +196,7 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
                     // For existing projects pop back to the project detail after adding the picture
                     else {
                         camera2ViewModel.addPhotoToProject(file, externalFilesDir, timestamp, sensorData)
-                        // TODO insert quick entry mode logic here for taking multiple timelapse pictures for a project
+                        // TODO: (deferred) insert quick entry mode logic here for taking multiple timelapse pictures for a project
                         findNavController().popBackStack()
                     }
                 } catch (e: Exception) {
@@ -220,7 +229,7 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
                         viewFinder.display,
                         characteristics,
                         SurfaceHolder::class.java)
-                // TODO troubleshoot problems with preview image and saving here
+                // TODO: (1.4) troubleshoot problems with preview image and saving here
                 Timber.d("previewSize is width ${previewSize!!.width} and height ${previewSize!!.height}")
                 viewFinder.setAspectRatio(previewSize!!.width, previewSize!!.height)
 
@@ -329,6 +338,7 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
         }, handler)
     }
 
+    // TODO: (1.4) replace deprecated capture session usage
     private suspend fun createCaptureSession(device: CameraDevice, targets: List<Surface>, handler: Handler? = null
     ): CameraCaptureSession = suspendCoroutine { cont ->
         device.createCaptureSession(targets, object : CameraCaptureSession.StateCallback() {
@@ -368,11 +378,12 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
         cameraThread.quitSafely()
     }
 
-    // TODO clean up image transform logic
+    // TODO: (1.4) clean up image transform logic
     // Transforms the viewfinder to the device orientation
     private fun transformImage(viewWidth: Int, viewHeight: Int) {
         if (previewSize == null || !::viewFinder.isInitialized) return
         val matrix = Matrix()
+        // TODO: (1.4) remove usage of deprecated defaultDisplay
         val rotation = requireActivity().windowManager.defaultDisplay.rotation
         val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
         val bufferRect = RectF(0f, 0f, previewSize!!.height.toFloat(), previewSize!!.width.toFloat())
@@ -396,6 +407,7 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
     // Returns a transform matrix for rotating the bitmap from the viewfinder on capture
     private fun getTransformMatrix(viewWidth: Int, viewHeight: Int): Matrix {
         val matrix = Matrix()
+        // TODO: (1.4) remove usage of deprecated defaultDisplay
         val rotation = requireActivity().windowManager.defaultDisplay.rotation
         val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
         val bufferRect = RectF(0f, 0f, viewFinder.height.toFloat(), viewFinder.width.toFloat())
