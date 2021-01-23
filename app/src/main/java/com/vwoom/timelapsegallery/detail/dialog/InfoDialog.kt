@@ -55,11 +55,11 @@ class InfoDialog(context: Context,
         AlertDialog.Builder(context)
                 .setTitle(context.getString(R.string.edit_name))
                 .setView(input)
-                .setPositiveButton(android.R.string.yes) { _, _: Int ->
+                .setPositiveButton(android.R.string.ok) { _, _: Int ->
                     val nameText = input.text.toString().trim()
                     detailViewModel.updateProjectName(externalFilesDir, nameText, project)
                 }
-                .setNegativeButton(android.R.string.no, null).show()
+                .setNegativeButton(android.R.string.cancel, null).show()
     }
 
     // This updates the rest of the info in the project info dialog
