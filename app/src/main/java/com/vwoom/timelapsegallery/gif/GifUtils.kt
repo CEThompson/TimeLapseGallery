@@ -2,7 +2,6 @@ package com.vwoom.timelapsegallery.gif
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
@@ -21,7 +20,6 @@ object GifUtils {
         if (!gifDir.exists()) gifDir.mkdir()
         return gifDir
     }
-
 
     // TODO: (deferred) create control for framerate
     // TODO: (deferred) create control for scale

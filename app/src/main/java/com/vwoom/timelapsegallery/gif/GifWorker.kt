@@ -64,7 +64,7 @@ class GifWorker(context: Context, params: WorkerParameters)
     }
 
     companion object {
-        val TAG = GifWorker::class.java.simpleName
+        val TAG: String = GifWorker::class.java.simpleName
     }
 
 }
