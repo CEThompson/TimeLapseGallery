@@ -1,4 +1,4 @@
-package com.example.diap.common.dependencyinjection.service
+package com.vwoom.timelapsegallery.di.service
 
 import dagger.Subcomponent
 
