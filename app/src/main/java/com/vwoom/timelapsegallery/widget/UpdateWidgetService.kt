@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
+// TODO: (deferred) update deprecated usage of intent service
 class UpdateWidgetService
     : IntentService("UpdateWidgetService"), CoroutineScope {
 
