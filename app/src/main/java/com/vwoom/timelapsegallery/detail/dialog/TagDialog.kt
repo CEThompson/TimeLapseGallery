@@ -106,11 +106,11 @@ class TagDialog(context: Context, private val detailViewModel: DetailViewModel, 
                 .setTitle(context.getString(R.string.delete_tag, tagEntry.text))
                 .setMessage(context.getString(R.string.verify_delete_tag, tagEntry.text))
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { _, _: Int ->
+                .setPositiveButton(android.R.string.ok) { _, _: Int ->
                     // If this photo is the last photo then set the new thumbnail to its previous
                     detailViewModel.deleteTagFromDatabase(tagEntry)
                 }
-                .setNegativeButton(android.R.string.no, null).show()
+                .setNegativeButton(android.R.string.cancel, null).show()
     }
 
 }
