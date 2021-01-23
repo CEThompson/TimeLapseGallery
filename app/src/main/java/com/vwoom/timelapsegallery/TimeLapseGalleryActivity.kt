@@ -7,9 +7,7 @@ import com.vwoom.timelapsegallery.notification.NotificationUtils
 import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.widget.UpdateWidgetService
 
-
 class TimeLapseGalleryActivity : BaseActivity() {
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         injector.inject(this)
