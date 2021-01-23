@@ -2,10 +2,9 @@ package com.vwoom.timelapsegallery.di.base
 
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
-import com.vwoom.timelapsegallery.di.base.BaseActivity
 import com.vwoom.timelapsegallery.di.presentation.PresentationModule
 
-open class BasePreferenceFragment: PreferenceFragmentCompat() {
+open class BasePreferenceFragment : PreferenceFragmentCompat() {
 
     private val presentationComponent by lazy {
         (requireActivity() as BaseActivity).activityComponent
@@ -16,7 +15,7 @@ open class BasePreferenceFragment: PreferenceFragmentCompat() {
 
     protected val injector get() = presentationComponent
 
+    // TODO: reconsider this implementation
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        // TODO: reconsider base preference fragment class hierarchy implementation
     }
 }
