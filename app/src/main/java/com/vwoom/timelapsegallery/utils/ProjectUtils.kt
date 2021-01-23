@@ -28,7 +28,6 @@ object ProjectUtils {
         return projectSubfolder
     }
 
-    // todo retrieve stored sensor data here
     // Creates a list of photo entries in a project folder sorted by timestamp
     fun getPhotoEntriesInProjectDirectory(externalFilesDir: File,
                                           projectEntry: ProjectEntry): List<PhotoEntry> {
@@ -66,7 +65,7 @@ object ProjectUtils {
         return photos
     }
 
-    // TODO figure out how to handle units
+    // TODO: (deferred) re-evaluate units for sensor data
     private fun getMapFromSensorData(externalFilesDir: File, projectEntry: ProjectEntry): Map<Long, SensorData> {
         val metaDir = getMetaDirectoryForProject(externalFilesDir, projectEntry.id)
         val sensorTextFile = File(metaDir, FileUtils.SENSOR_DEFINITION_TEXT_FILE)
