@@ -39,7 +39,7 @@ class WeatherDetailsDialog(context: Context, galleryViewModel: GalleryViewModel)
         val width = dm.widthPixels
         val height = dm.heightPixels
         val minSize = (width.coerceAtMost(height) * 0.7).toInt()
-        this.findViewById<RecyclerView>(R.id.weather_recycler_view)?.layoutParams?.width = minSize
+        weatherRecyclerView?.layoutParams?.width = minSize
 
         // Set the data
         if (galleryViewModel.weather.value != null) handleWeatherResult(galleryViewModel.weather.value!!)
