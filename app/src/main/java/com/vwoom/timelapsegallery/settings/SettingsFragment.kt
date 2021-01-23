@@ -285,6 +285,10 @@ class SettingsFragment : BasePreferenceFragment() {
                 imageFeedback.setImageResource(R.drawable.ic_check_green_40dp)
                 responseView.text = getString(R.string.executing_sync_complete)
             }
+            is ValidationResult.InProgress -> {
+                // Do nothing
+                // Note: progress updates handled by observables in setupViewModel()
+            }
         }
         // Show the updated views
         overallProgress.visibility = GONE
@@ -323,7 +327,7 @@ class SettingsFragment : BasePreferenceFragment() {
 
     private fun setupViewModel() {
         // Updates the progress of importing projects
-        settingsViewModel.projectProgress.observe(viewLifecycleOwner, Observer {
+        settingsViewModel.projectProgress.observe(viewLifecycleOwner, {
             val progress = syncDialog?.findViewById<ProgressBar>(R.id.project_sync_progress)
             progress?.progress = it + 1
             val tv = syncDialog?.findViewById<TextView>(R.id.project_sync_tv)
@@ -332,12 +336,12 @@ class SettingsFragment : BasePreferenceFragment() {
                     SyncProgressCounter.projectMax.value!! + 1)
         })
         // Updates the max number of projects to import
-        settingsViewModel.projectMax.observe(viewLifecycleOwner, Observer {
+        settingsViewModel.projectMax.observe(viewLifecycleOwner, {
             val progress = syncDialog?.findViewById<ProgressBar>(R.id.project_sync_progress)
             progress?.max = it + 1
         })
         // Updates the progress of photos imported for a project
-        settingsViewModel.photoProgress.observe(viewLifecycleOwner, Observer {
+        settingsViewModel.photoProgress.observe(viewLifecycleOwner, {
             val progress = syncDialog?.findViewById<ProgressBar>(R.id.photo_sync_progress)
             progress?.progress = it + 1
             val tv = syncDialog?.findViewById<TextView>(R.id.photo_sync_tv)
@@ -347,7 +351,7 @@ class SettingsFragment : BasePreferenceFragment() {
                     SyncProgressCounter.projectMax.value!! + 1)
         })
         // Updates the photo maximum import for a project
-        settingsViewModel.photoMax.observe(viewLifecycleOwner, Observer {
+        settingsViewModel.photoMax.observe(viewLifecycleOwner, {
             val progress = syncDialog?.findViewById<ProgressBar>(R.id.photo_sync_progress)
             progress?.max = it + 1
         })
