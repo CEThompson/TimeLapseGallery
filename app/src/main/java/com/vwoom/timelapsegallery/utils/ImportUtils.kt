@@ -9,7 +9,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
-// Todo: figure out how to import sensor data
 // TODO (deferred): handle blocking in coroutines
 object ImportUtils {
 
@@ -25,7 +24,7 @@ object ImportUtils {
         val resultList = arrayListOf<ProjectDataBundle>()
 
         // TODO: consider validating Gif, Meta, Projects structure here in root
-        //val rootDirectories = externalFilesDir.listFiles()
+        // val rootDirectories = externalFilesDir.listFiles()
 
         val projects = FileUtils.getProjectsSubdirectory(externalFilesDir).listFiles()
         if (projects == null || projects.isEmpty())
@@ -167,6 +166,7 @@ object ImportUtils {
         }
     }
 
+    // TODO: (deferred) appropriately handle blocking calls here
     private suspend fun importProjectMetaData(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry) {
         val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesDir, currentProject.id)
         val tagsFile = File(metaDir, FileUtils.TAGS_DEFINITION_TEXT_FILE)
@@ -174,11 +174,10 @@ object ImportUtils {
 
         // Import tags
         if (tagsFile.exists()) {
-            //Log.d(TAG, "importing project tags for $currentProject")
+
             val inputAsString = FileInputStream(tagsFile).bufferedReader().use { it.readText() }
             val tags: List<String> = inputAsString.split('\n')
 
-            //Log.d(TAG, "handling $tags")
             // Convert text to tag entries and enter into database
             for (text in tags) {
                 if (text.isEmpty()) continue
