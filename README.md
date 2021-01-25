@@ -22,11 +22,15 @@
 ### Time Lapse Gallery
 An open-source android application for creating time-lapse photo sequences.
 
+#### 1.3
+* Now binding sensor data to pictures when available (light level, pressure, temperature, humidity)
+* Expanded usage of Dagger 2
+* Increased test coverage and general code quality
+
 #### 1.2
 * Implemented feature to convert photo-sequences to a GIF
 * Created a feature to display weather data from the National Weather Service API
 * Expanded test coverage, testing coroutines, repositories, datasources, etc.
-
 
 #### 1.1
 * Now handling camera directly with Camera2
