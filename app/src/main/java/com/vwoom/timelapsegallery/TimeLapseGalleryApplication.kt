@@ -6,6 +6,8 @@ import com.vwoom.timelapsegallery.di.app.AppModule
 import com.vwoom.timelapsegallery.di.app.DaggerAppComponent
 import timber.log.Timber
 
+// TODO: (1.4) Gather feedback for 1.4 update
+
 // TODO: (TLG rebrand) change to SERENDIPITY
 // TODO: (TLG rebrand) create mermaid splash - investigate bombs and bees - animate water
 // TODO: (TLG rebrand) add a map, bottom NAV, sidenav?
