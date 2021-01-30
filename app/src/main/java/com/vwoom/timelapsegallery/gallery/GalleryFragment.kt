@@ -42,6 +42,7 @@ import com.vwoom.timelapsegallery.weather.WeatherDetailsDialog
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import javax.inject.Inject
 
+// TODO: clean up dialog implementations
 // TODO: (deferred) consider optimizing device location for forecasts (location table, get once per day or on forecast sync)
 class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHandler {
 
