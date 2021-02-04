@@ -67,6 +67,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
+// TODO: (1.4) consider conversion to Finite State Machine
 // TODO: (1.4) implement a way to measure the business value of the application (resolve a project as successful (established a plant in ground) or as unsuccessful)
 // TODO: (deferred) implement pinch zoom on fullscreen image
 class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler {
