@@ -738,6 +738,8 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
     /**
      * UI binding
      */
+    // TODO: (1.4) clean up detail fragment god activity (including observable logic)
+    // TODO clean up observables
     // Bind the ui to observables
     private fun setupViewModel() {
         // Observe the project for name and schedule changes
@@ -748,6 +750,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
             // This updates the project information card, project info dialog,
             // schedule layout over the image and the schedule dialog
 
+            // TODO encapsulate setting project info cardview
             // Set the ui for the project information layout cardview
             // 1. Set the ID
             binding?.projectInformationLayout?.detailsProjectId?.text = currentProjectView.project_id.toString()
@@ -778,6 +781,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
                         ?.setTypeface(binding!!.projectInformationLayout.detailsProjectNameTextView.typeface, Typeface.BOLD)
             }
 
+            // TODO encapsulate setting schedule info?
             // 3. Set the schedule information
             // If there isn't a schedule set the color of the fab to white and hide the layout
             if (currentProjectView.interval_days == 0) {
@@ -814,6 +818,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
                 // Show the layout
                 binding?.detailScheduleLayout?.scheduleLayout?.visibility = VISIBLE
             }
+
             // Also update the fields in the info dialog
             infoDialog?.setInfoDialog(projectView)
             // And update the fields in the schedule dialog
@@ -856,7 +861,6 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
             detailViewModel.photoIndex = newMaxIndex
 
             // TODO: (deferred) convert these to boolean mutable live data fields to observe when photos are added or deleted
-            // TODO: (deferred) clean up detail fragment god activity (including observable logic)
             // If added set to the last photo
             if (added) {
                 // Update gif if exists and preference is set to auto-update
