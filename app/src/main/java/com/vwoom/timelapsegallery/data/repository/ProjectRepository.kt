@@ -66,7 +66,7 @@ class ProjectRepository
         // TODO: handle blocking method in non blocking context
         @Suppress("BlockingMethodInNonBlockingContext")
         withContext(coroutineContext) {
-            FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
+            FileUtils.createProjectPhotoFileFromTemporaryPhoto(externalFilesDir, file.absolutePath, projectEntry, timestamp)
             // TODO: write sensor data to file
             FileUtils.writeSensorData(externalFilesDir, photoEntry, projectEntry.id)
         }
@@ -157,7 +157,7 @@ class ProjectRepository
         // TODO: handle blocking method in non blocking context
         @Suppress("BlockingMethodInNonBlockingContext")
         withContext(coroutineContext) {
-            FileUtils.createFinalFileFromTemp(externalFilesDir, file.absolutePath, projectEntry, timestamp)
+            FileUtils.createProjectPhotoFileFromTemporaryPhoto(externalFilesDir, file.absolutePath, projectEntry, timestamp)
             // TODO: write sensor data to file
             FileUtils.writeSensorData(externalFilesDir, photoEntry, projectEntry.id)
         }

@@ -29,7 +29,7 @@ object FileUtils {
         return File(externalFilesDir, PROJECTS_FILE_SUBDIRECTORY)
     }
 
-    // Creates an image file for a project in the projects folder by project view
+    // Creates an empty image file for a project in the projects folder to be copied to
     private fun createImageFileForProject(externalFilesDir: File, projectEntry: ProjectEntry, timestamp: Long): File {
         val imageFileName = "$timestamp.jpg"
         val projectDir = getProjectFolder(externalFilesDir, projectEntry)
@@ -37,44 +37,45 @@ object FileUtils {
         return File(projectDir, imageFileName)
     }
 
-    // Creates a file in the temporary directory
+    // Creates an empty image file in the temporary directory to be written to by the camera
     @JvmStatic
     @Throws(IOException::class)
-    fun createTemporaryImageFile(externalFilesDir: File?): File { // Create an image file name
-        val imageFileName = "TEMP_"
-        val tempFolder = File(externalFilesDir, TEMP_FILE_SUBDIRECTORY)
-        if (!tempFolder.exists()) tempFolder.mkdirs()
+    fun createImageFileInTemporaryFolder(externalFilesDir: File?): File {
+        val imageFilePrefix = "TEMP_"
+        val suffixExtension = ".jpg"
+        val temporaryFolder = File(externalFilesDir, TEMP_FILE_SUBDIRECTORY)
+        if (!temporaryFolder.exists()) temporaryFolder.mkdirs()
         return File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",  /* suffix */
-                tempFolder /* directory */
+                imageFilePrefix,  // prefix
+                suffixExtension,  // suffix
+                temporaryFolder // directory
         )
     }
 
-    // Creates a file for a project from a temporary file
+    // Copies from temporary photo file to the final photo for a project
     @Throws(IOException::class)
-    fun createFinalFileFromTemp(
+    fun createProjectPhotoFileFromTemporaryPhoto(
             externalFilesDir: File,
             tempPath: String,
             projectEntry: ProjectEntry,
             timestamp: Long): File {
-        // Create the permanent file for the photo
+        // 1. First create the permanent file for the photo
         val finalFile = createImageFileForProject(externalFilesDir, projectEntry, timestamp)
-        // Create temporary file from previous path
+        // 2. Get reference to the temp file
         val tempFile = File(tempPath)
-        // Copy file to new destination
+        // 3. Copy from temp to the final destination
         copyFile(tempFile, finalFile)
-        // Remove temporary file
+        // 4. Clean up / remove the temporary file
         tempFile.delete()
         return finalFile
     }
 
-    // Used to copy temp photo file to final photo file
+    // Used internal to class to copy from one file to another (should be from the temp photo to final photo)
     @Throws(IOException::class)
-    private fun copyFile(src: File, dst: File) {
+    private fun copyFile(src: File, destination: File) {
         val input: InputStream = FileInputStream(src)
         input.use {
-            val out: OutputStream = FileOutputStream(dst)
+            val out: OutputStream = FileOutputStream(destination)
             out.use {
                 val buf = ByteArray(1024)
                 var len: Int
@@ -85,7 +86,7 @@ object FileUtils {
         }
     }
 
-    // Deletes the temporary directory and files within
+    // Deletes the temporary directory and its contents
     fun deleteTempFiles(externalFilesDir: File?) {
         if (externalFilesDir == null) return
         val tempDir = File(externalFilesDir, TEMP_FILE_SUBDIRECTORY)
@@ -112,16 +113,18 @@ object FileUtils {
         return false
     }
 
-    // Support .jpg, .png, .jpeg creation from timestamp
+    // Supports .jpg, .png, .jpeg creation from timestamp
     fun getPhotoFileExtensions(timestamp: Long): Array<String> {
         return arrayOf("$timestamp.jpg", "$timestamp.png", "$timestamp.jpeg")
     }
 
-    // Write the tags for a project in a text file in the projects meta directory
-    // For use in loading data on and off devices
+    // This function Writes the tags for a project in a text file in the meta directory for the project
+    // Ex. a project of ID 1 will have a path of ...meta/1/tags.txt
+    // In general this is used to decouple tag data from the room data (for use in loading data on and off devices)
     fun writeProjectTagsFile(
             externalFilesDir: File,
             projectId: Long,
+            // TODO (1.4) : look into preserving tag order so that lineage can be preserved for plants (mother x father designation). Currently tags are sorted alphabetically somewhere
             tags: List<TagEntry>) {
         val metaDir = getMetaDirectoryForProject(externalFilesDir, projectId)
         val tagsFile = File(metaDir, TAGS_DEFINITION_TEXT_FILE)
@@ -141,8 +144,9 @@ object FileUtils {
         }
     }
 
-    // Writes the schedule for a project in the projects meta directory
-    // For use in loading data on and off devices
+    // Writes the schedule for a project in the projects meta directory similarly to the tag writing function
+    // This text file should contain a simple integer indicating the interval between scheduled photos in days
+    // (For use in loading data on and off devices)
     fun writeProjectScheduleFile(
             externalFilesDir: File,
             projectId: Long,
@@ -162,49 +166,49 @@ object FileUtils {
         }
     }
 
-    // Creates a temporary text file list of the photo urls for a project
-    // In the format:
+    // Creates a temporary text file which contains a list of the photo urls for a project
+    // This text file is used to control ffmpeg in order to create a GIF from the set of photos
+    // The format required by ffmpeg is as follows:
     // file '/path/to/file1'
     // file '/path/to/file2'
     // etc.
     fun createTempListPhotoFiles(
             externalFilesDir: File,
-            project: ProjectEntry): File? {
-
-        // First clean the temp files
+            projectEntry: ProjectEntry): File? {
+        // 1. First clean the temp files
         deleteTempFiles(externalFilesDir)
 
-        // Get the list of photos to convert
-        val photosToConvert = ProjectUtils.getPhotoEntriesInProjectDirectory(externalFilesDir, project)
+        // 2. Get the list of photos to convert
+        val listOfPhotos = ProjectUtils.getPhotoEntriesInProjectDirectory(externalFilesDir, projectEntry)
 
-        // Create the temporary folder and define the text file
+        // 3. Create the temporary folder and define the text file
         val tempFolder = File(externalFilesDir, TEMP_FILE_SUBDIRECTORY)
         tempFolder.mkdir()
         val listFiles = File(tempFolder, LIST_PHOTOS_TEXT_FILE)
 
-        // Writ the file paths to the text file
+        // Write the file paths to the text file
         try {
             val output = FileOutputStream(listFiles)
             val outputStreamWriter = OutputStreamWriter(output)
-            // For each photo write the path
-            for (photo in photosToConvert) {
-                val photoUrlString = ProjectUtils.getProjectPhotoUrl(externalFilesDir, project, photo.timestamp)
-                val fileDefString = "file '$photoUrlString'\n"
+            // For each photo in the list write its path
+            for (photo in listOfPhotos) {
+                val photoUrlString = ProjectUtils.getProjectPhotoUrl(externalFilesDir, projectEntry, photo.timestamp)
+                val fileDefString = "file '$photoUrlString'\n" // file '/path/to/file1'
                 outputStreamWriter.write(fileDefString)
             }
-            // Clean up
             outputStreamWriter.flush()
             output.fd.sync()
             outputStreamWriter.close()
         }
-        // If exception caught return null
         catch (exception: IOException) {
             return null
         }
         return listFiles
     }
 
-    // todo test writing sensor data
+    // Writes sensor data (if available) for each photo to a text file
+    // Should be a list of strings in the following format:
+    // timestamp(long) light(lx) temperature(celsius) pressure(mbar) humidity(%)
     fun writeSensorData(externalFilesDir: File, photoEntry: PhotoEntry, projectId: Long) {
         val metaDir = getMetaDirectoryForProject(externalFilesDir, projectId)
         val sensorDataFile = File(metaDir, SENSOR_DEFINITION_TEXT_FILE)

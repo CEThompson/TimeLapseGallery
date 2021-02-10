@@ -1,6 +1,5 @@
 package com.vwoom.timelapsegallery.utils
 
-import androidx.room.util.FileUtil
 import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectScheduleEntry
@@ -208,7 +207,7 @@ class FileUtilsTest {
         tempFolder.mkdir()
 
         // When
-        FileUtils.createTemporaryImageFile(tempFolder)
+        FileUtils.createImageFileInTemporaryFolder(tempFolder)
 
         // Then the temp directory should not be empty
         assertTrue(tempFolder.listFiles()?.size != 0)
@@ -221,13 +220,13 @@ class FileUtilsTest {
         val tempFolder = File(externalFilesTestDir, FileUtils.TEMP_FILE_SUBDIRECTORY)
         tempFolder.mkdir()
         // a temporary image file
-        val tempFile = FileUtils.createTemporaryImageFile(tempFolder)
+        val tempFile = FileUtils.createImageFileInTemporaryFolder(tempFolder)
         val timestamp = System.currentTimeMillis()
         // and a project
         val projectEntry = ProjectEntry("test project")
 
         // When we create the folder for the project
-        val finalFile = FileUtils.createFinalFileFromTemp(
+        val finalFile = FileUtils.createProjectPhotoFileFromTemporaryPhoto(
                 externalFilesTestDir,
                 tempFile.absolutePath,
                 projectEntry,

@@ -156,7 +156,7 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
                 var outputPhoto: FileOutputStream? = null
                 try {
                     val externalFilesDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-                    val file = FileUtils.createTemporaryImageFile(externalFilesDir)
+                    val file = FileUtils.createImageFileInTemporaryFolder(externalFilesDir)
                     outputPhoto = FileOutputStream(file)
 
                     // Rotates and scales the bitmap based on the device rotation
