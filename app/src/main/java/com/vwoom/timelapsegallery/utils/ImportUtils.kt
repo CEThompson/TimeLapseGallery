@@ -27,64 +27,64 @@ object ImportUtils {
         // val rootDirectories = externalFilesDir.listFiles()
 
         val projects = FileUtils.getProjectsSubdirectory(externalFilesDir).listFiles()
-        if (projects == null || projects.isEmpty())
-            return ValidationResult.Error.NoFilesError(null, externalFilesDir.absolutePath)
 
         val projectIds = HashSet<Long>()
 
         // Get project directories
-        for (child in projects) {
-            // Get the filename of the project
-            val url = child.absolutePath
-            val projectFilename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
+        if (projects!=null) {
+            for (child in projects) {
+                // Get the filename of the project
+                val url = child.absolutePath
+                val projectFilename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
 
-            // Determine ID of project
-            val idString: String =
-                    if (projectFilename.lastIndexOf("_") == -1) projectFilename
-                    else projectFilename.substring(0, projectFilename.lastIndexOf("_"))
+                // Determine ID of project
+                val idString: String =
+                        if (projectFilename.lastIndexOf("_") == -1) projectFilename
+                        else projectFilename.substring(0, projectFilename.lastIndexOf("_"))
 
-            // Ensure ids are unique
-            var currentId: Long?
-            try {
-                currentId = idString.toLong()
-                if (projectIds.contains(currentId))
-                    return ValidationResult.Error.DuplicateIdError(null, projectFilename)
-                projectIds.add(currentId)
-            } catch (e: NumberFormatException) {
-                return ValidationResult.Error.InvalidFolder(e, projectFilename)
-            }
+                // Ensure ids are unique
+                var currentId: Long?
+                try {
+                    currentId = idString.toLong()
+                    if (projectIds.contains(currentId))
+                        return ValidationResult.Error.DuplicateIdError(null, projectFilename)
+                    projectIds.add(currentId)
+                } catch (e: NumberFormatException) {
+                    return ValidationResult.Error.InvalidFolder(e, projectFilename)
+                }
 
-            // Determine name of project
-            var projectName: String? = null
-            val indexOfIdNameSeparator = projectFilename.lastIndexOf("_")
-            if (indexOfIdNameSeparator > 0)
-                projectName = projectFilename.substring(indexOfIdNameSeparator + 1)
+                // Determine name of project
+                var projectName: String? = null
+                val indexOfIdNameSeparator = projectFilename.lastIndexOf("_")
+                if (indexOfIdNameSeparator > 0)
+                    projectName = projectFilename.substring(indexOfIdNameSeparator + 1)
 
-            /* Ensure names do not contain reserved characters */
-            if (projectName != null && FileUtils.pathContainsReservedCharacter(projectName))
-                return ValidationResult.Error.InvalidCharacterError(null, projectName)
+                /* Ensure names do not contain reserved characters */
+                if (projectName != null && FileUtils.pathContainsReservedCharacter(projectName))
+                    return ValidationResult.Error.InvalidCharacterError(null, projectName)
 
-            // Get the files within the directory
-            val projectFiles = child.listFiles()
+                // Get the files within the directory
+                val projectFiles = child.listFiles()
 
-            // Check for valid timestamps
-            var photoCounter = 0
-            if (projectFiles != null) {
-                for (file in projectFiles) {
-                    if (file.isDirectory) continue  // skips the meta subfolder
-                    val photoUrl = file.absolutePath
-                    val photoFilename = photoUrl.substring(photoUrl.lastIndexOf(File.separatorChar) + 1)
-                    try {
-                        java.lang.Long.valueOf(photoFilename.replaceFirst("[.][^.]+$".toRegex(), ""))
-                        photoCounter++
-                    } catch (e: Exception) {
-                        return ValidationResult.Error.InvalidPhotoFileError(e, photoUrl, projectName)
+                // Check for valid timestamps
+                var photoCounter = 0
+                if (projectFiles != null) {
+                    for (file in projectFiles) {
+                        if (file.isDirectory) continue  // skips the meta subfolder
+                        val photoUrl = file.absolutePath
+                        val photoFilename = photoUrl.substring(photoUrl.lastIndexOf(File.separatorChar) + 1)
+                        try {
+                            java.lang.Long.valueOf(photoFilename.replaceFirst("[.][^.]+$".toRegex(), ""))
+                            photoCounter++
+                        } catch (e: Exception) {
+                            return ValidationResult.Error.InvalidPhotoFileError(e, photoUrl, projectName)
+                        }
                     }
                 }
+                val currentProject = ProjectEntry(currentId, projectName)
+                val currentDataBundle = ProjectDataBundle(currentProject, photoCounter)
+                resultList.add(currentDataBundle)
             }
-            val currentProject = ProjectEntry(currentId, projectName)
-            val currentDataBundle = ProjectDataBundle(currentProject, photoCounter)
-            resultList.add(currentDataBundle)
         }
         Timber.d("return validation result, list of size ${resultList.size}")
         return ValidationResult.Success(resultList.toList())
