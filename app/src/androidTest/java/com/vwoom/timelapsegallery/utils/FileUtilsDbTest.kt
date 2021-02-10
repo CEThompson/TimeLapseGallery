@@ -70,7 +70,6 @@ class FilesUtilsDbTest {
                 ProjectTagEntry(project_id = projectEntry.id, tag_id = 2)
         )
 
-
         // When we add the project tags to the db
         db.tagDao().bulkInsert(tags)
         db.projectTagDao().bulkInsert(projectTags)
@@ -89,8 +88,7 @@ class FilesUtilsDbTest {
             assertTrue(tags.contains(currentTag)) // make the assertions
         }
         // And a tag file should exist in the projects meta directory
-        val meta = getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
-        val tagsFile = File(meta, FileUtils.TAGS_DEFINITION_TEXT_FILE)
+        val tagsFile = ProjectUtils.getProjectTagsFile(externalFilesTestDir, projectEntry.id)
         assertTrue(tagsFile.exists()) // make the assertion
         // And the text file should contain both of the tags
         val inputAsString = FileInputStream(tagsFile).bufferedReader().use { it.readText() }
@@ -126,9 +124,8 @@ class FilesUtilsDbTest {
         val projectTagEntries = db.projectTagDao().getProjectTagsByProjectId(projectEntry.id)
         assertTrue(projectTagEntries.isEmpty())
 
-        // Agnd an empty tag file should exist in the projects meta directory
-        val meta = getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
-        val tagsFile = File(meta, FileUtils.TAGS_DEFINITION_TEXT_FILE)
+        // And an empty tag file should exist in the projects meta directory
+        val tagsFile = ProjectUtils.getProjectTagsFile(externalFilesTestDir, projectEntry.id)
         assertTrue(tagsFile.exists()) // make the assertion
         val inputAsString = FileInputStream(tagsFile).bufferedReader().use { it.readText() }
         assertTrue(inputAsString.isEmpty())
@@ -158,10 +155,11 @@ class FilesUtilsDbTest {
         assertTrue(retrievedSchedule?.interval_days == 7)
 
         // And the text file exists and represents the interval
-        val meta = getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
-        val scheduleFile = File(meta, FileUtils.SCHEDULE_TEXT_FILE)
+        val scheduleFile = ProjectUtils.getProjectScheduleFile(externalFilesTestDir, projectEntry.id)
         assertTrue(scheduleFile.exists())
         val inputAsString = FileInputStream(scheduleFile).bufferedReader().use { it.readText() }
         assertTrue(inputAsString.toInt() == 7)
     }
+
+    // TODO test sensor data matches in db and as file?
 }

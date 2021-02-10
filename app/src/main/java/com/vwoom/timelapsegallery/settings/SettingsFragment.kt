@@ -24,8 +24,8 @@ import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
 import com.vwoom.timelapsegallery.di.base.BasePreferenceFragment
 import com.vwoom.timelapsegallery.gif.GifUtils
 import com.vwoom.timelapsegallery.notification.NotificationUtils
+import com.vwoom.timelapsegallery.utils.FileUtils
 import com.vwoom.timelapsegallery.utils.ImportUtils
-import com.vwoom.timelapsegallery.utils.RESERVED_CHARACTERS
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import timber.log.Timber
@@ -265,7 +265,7 @@ class SettingsFragment : BasePreferenceFragment() {
                 responseView.text = requireContext()
                         .getString(R.string.invalid_character_error,
                                 result.projectName,
-                                RESERVED_CHARACTERS)
+                                FileUtils.getReservedCharacters())
             }
             is ValidationResult.Error.DuplicateIdError -> {
                 responseView.text = requireContext().getString(R.string.duplicate_id_error, result.projectName)

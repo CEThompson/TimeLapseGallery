@@ -79,22 +79,38 @@ class ImportUtilsTest {
             db.projectTagDao().insertProjectTag(ProjectTagEntry(2,2))
         }
 
+        // Define a project
+        val projectOneId: Long = 1
+        val projectOneName = "test"
+        val projectOneInterval = 0
+        val projectOneCoverPhotoId: Long = 1
+        val projectOneCoverPhotoTimestamp: Long = 300
+
         // Create files for actual project one
-        val projectOneDir = File(projectSubDir, "1_test")
+        val projectOneDir = File(projectSubDir, "${projectOneId}_${projectOneName}")
         projectOneDir.mkdirs()
-        val projectOnePhoto = File(projectOneDir, "300")
+        val projectOnePhoto = File(projectOneDir, "$projectOneCoverPhotoTimestamp")
         projectOnePhoto.createNewFile()
-        val projectOneMetaDir = File(projectOneDir, FileUtils.META_FILE_SUBDIRECTORY)
+        val projectOneMetaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesTestDir, 1)
         projectOneMetaDir.mkdirs()
-        val projectOneDefinition = ProjectView(1,"test",0,1,300)
+
+        val projectOneDefinition =
+                ProjectView(
+                        projectOneId,
+                        projectOneName,
+                        projectOneInterval,
+                        projectOneCoverPhotoId,
+                        projectOneCoverPhotoTimestamp)
+
         FileUtils.writeProjectTagsFile(
                 externalFilesTestDir,
                 projectOneDefinition.project_id,
                 listOf(TagEntry(1, "c")))
+
         FileUtils.writeProjectScheduleFile(externalFilesTestDir,
                 projectOneDefinition.project_id,
                 ProjectScheduleEntry(1,1))
-        // TODO test sensor data
+
         FileUtils.writeSensorData(externalFilesTestDir,
                 PhotoEntry(1,1,300,"1","2","3","4"),
                 projectOneDefinition.project_id,
@@ -106,7 +122,9 @@ class ImportUtilsTest {
         projectTwoDir.mkdirs()
         val projectTwoPhoto = File(projectTwoDir, "400")
         projectTwoPhoto.createNewFile()
-        val projectTwoMetaDir = File(projectTwoDir, FileUtils.META_FILE_SUBDIRECTORY)
+        val projectTwoMetaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesTestDir, 3)
+
+        //val projectOneMetaDir = File(projectOneDir, FileUtils.META_FILE_SUBDIRECTORY)
         projectTwoMetaDir.mkdirs()
         val projectTwoDefinition = ProjectView(3,"test two",0,2,400)
         FileUtils.writeProjectTagsFile(
@@ -258,7 +276,7 @@ class ImportUtilsTest {
     fun validateFileStructure_projectsWithNameContainingInvalidCharacters_returnsInvalidCharacterError() {
         // Given
         //val context = InstrumentationRegistry.getInstrumentation().context
-        for (character in RESERVED_CHARACTERS) {
+        for (character in FileUtils.getReservedCharacters()) {
             println(character)
             if (character == '|'
                     || character == '\\'

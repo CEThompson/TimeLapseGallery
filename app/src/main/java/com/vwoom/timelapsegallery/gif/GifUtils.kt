@@ -16,7 +16,7 @@ object GifUtils {
     private val TAG = GifUtils::class.java.simpleName
 
     private fun getGifDirectory(externalFilesDir: File): File {
-        val gifDir = File(externalFilesDir, FileUtils.GIF_FILE_SUBDIRECTORY)
+        val gifDir = FileUtils.getGifSubdirectory(externalFilesDir)
         if (!gifDir.exists()) gifDir.mkdir()
         return gifDir
     }

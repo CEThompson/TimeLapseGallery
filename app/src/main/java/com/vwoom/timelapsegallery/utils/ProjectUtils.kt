@@ -13,19 +13,49 @@ import kotlin.collections.HashMap
 
 object ProjectUtils {
 
+    // Returns the folder for a project containing its photos
     fun getProjectFolder(externalFilesDir: File, projectEntry: ProjectEntry): File {
         val projectsSubDir = FileUtils.getProjectsSubdirectory(externalFilesDir)
         val projectPath = getProjectDirectoryPath(projectEntry)
         return File(projectsSubDir, projectPath)
     }
 
-    fun getProjectEntryFromProjectView(projectView: ProjectView): ProjectEntry = ProjectEntry(projectView.project_id, projectView.project_name)
+    // Internal helper returning the pattern for a projects path
+    // In the following format: {project_id}_{project_name}
+    // Examples: 1_My Project, 2_Cactus, 3_Flower, etc.
+    private fun getProjectDirectoryPath(projectEntry: ProjectEntry): String {
+        val name = projectEntry.project_name
+        return if (name.isNullOrEmpty()) projectEntry.id.toString()
+        else projectEntry.id.toString() + "_" + projectEntry.project_name
+    }
 
+    // Converts a project view to a project entry
+    fun getProjectEntryFromProjectView(projectView: ProjectView): ProjectEntry =
+            ProjectEntry(projectView.project_id, projectView.project_name)
+
+    // Returns the meta directory for a project
     fun getMetaDirectoryForProject(externalFilesDir: File, projectId: Long): File {
-        val metaDir = File(externalFilesDir, FileUtils.META_FILE_SUBDIRECTORY)
+        val metaDir = FileUtils.getMetaSubdirectory(externalFilesDir)
         val projectSubfolder = File(metaDir, projectId.toString())
         if (!projectSubfolder.exists()) projectSubfolder.mkdirs()
         return projectSubfolder
+    }
+
+    // Returns the tags file for a project
+    fun getProjectTagsFile(externalFilesDir: File, id: Long): File {
+        val metaDir = getMetaDirectoryForProject(externalFilesDir, id);
+        return FileUtils.getTagsFile(metaDir)
+        //File(metaDir, FileUtils.TAGS_DEFINITION_TEXT_FILE)
+    }
+
+    fun getProjectScheduleFile(externalFilesDir: File, id: Long): File {
+        val metaDir = getMetaDirectoryForProject(externalFilesDir, id)
+        return FileUtils.getScheduleFile(metaDir)
+    }
+
+    fun getSensorDataFile(externalFilesDir: File, id: Long): File {
+        val metaDir = getMetaDirectoryForProject(externalFilesDir, id)
+        return FileUtils.getSensorFile(metaDir)
     }
 
     // Creates a list of photo entries in a project folder sorted by timestamp
@@ -68,7 +98,7 @@ object ProjectUtils {
     // TODO: (deferred) re-evaluate units for sensor data
     private fun getMapFromSensorData(externalFilesDir: File, projectEntry: ProjectEntry): Map<Long, SensorData> {
         val metaDir = getMetaDirectoryForProject(externalFilesDir, projectEntry.id)
-        val sensorTextFile = File(metaDir, FileUtils.SENSOR_DEFINITION_TEXT_FILE)
+        val sensorTextFile = FileUtils.getSensorFile(metaDir)
 
         val map: MutableMap<Long, SensorData> = HashMap()
 
@@ -129,13 +159,6 @@ object ProjectUtils {
         FileUtils.deleteRecursive(photoFile)
     }
 
-    // Returns the pattern for a projects path : project path = {project_id}_{project_name}
-    // Examples: 1_My Project, 2_Cactus, 3_Flower, etc.
-    private fun getProjectDirectoryPath(projectEntry: ProjectEntry): String {
-        val name = projectEntry.project_name
-        return if (name.isNullOrEmpty()) projectEntry.id.toString()
-        else projectEntry.id.toString() + "_" + projectEntry.project_name
-    }
 
     fun getProjectPhotoUrl(externalFilesDir: File, projectEntry: ProjectEntry, timestamp: Long): String? {
         val imageFileNames = FileUtils.getPhotoFileExtensions(timestamp)
@@ -163,5 +186,6 @@ object ProjectUtils {
         val daysUntilDue = projectView.interval_days - daysSinceLastPhoto
         return daysUntilDue == 1.toLong()
     }
+
 }
 

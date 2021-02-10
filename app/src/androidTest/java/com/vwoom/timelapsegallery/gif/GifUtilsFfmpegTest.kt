@@ -58,7 +58,7 @@ class GifUtilsFfmpegTest {
     fun updateGif() {
         // Given a gif for a project
         val project = ProjectEntry(1000, null)
-        val gifDir = File(externalFilesTestDir, FileUtils.GIF_FILE_SUBDIRECTORY)
+        val gifDir = FileUtils.getGifSubdirectory(externalFilesTestDir)
         if (!gifDir.exists()) gifDir.mkdir()
         val makeGif = File(gifDir, "${project.id}.gif")
         makeGif.mkdir()

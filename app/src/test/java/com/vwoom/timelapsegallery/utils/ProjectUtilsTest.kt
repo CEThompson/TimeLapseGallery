@@ -113,7 +113,7 @@ class ProjectUtilsTest {
 
         // Also its meta dir should not exist
 
-        val metaDir = File(externalFilesTestDir, FileUtils.META_FILE_SUBDIRECTORY)
+        val metaDir = FileUtils.getMetaSubdirectory(externalFilesTestDir)
         val projectMetaSubfolder = File(metaDir, projectEntry.id.toString())
         assertTrue(!projectMetaSubfolder.exists())
 

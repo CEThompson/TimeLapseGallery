@@ -65,8 +65,7 @@ class FileUtilsTest {
         var listTags = arrayListOf(TagEntry(1, "a"), TagEntry(1, "b"))
 
         // Before we write any tags file should not exist
-        val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
-        val tagsFile = File(metaDir, FileUtils.TAGS_DEFINITION_TEXT_FILE)
+        val tagsFile = ProjectUtils.getProjectTagsFile(externalFilesTestDir, projectEntry.id)
         assertTrue(!tagsFile.exists())
 
         // When we use the function
@@ -111,8 +110,7 @@ class FileUtilsTest {
         val projectScheduleEntry = ProjectScheduleEntry(projectEntry.id, 1)
 
         // First the schedule file should not yet exist
-        val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesTestDir, projectEntry.id)
-        val scheduleFile = File(metaDir, FileUtils.SCHEDULE_TEXT_FILE)
+        val scheduleFile = ProjectUtils.getProjectScheduleFile(externalFilesTestDir, projectEntry.id)
         assertTrue(!scheduleFile.exists())
 
         // When we write the file
@@ -152,8 +150,7 @@ class FileUtilsTest {
         val photoEntry = PhotoEntry(1,1, 1, "100", "1000", "27.1", "5")
         val photoEntry2 = PhotoEntry(2,1, 2, "1001", "1001", "28.1", "6")
 
-        val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesTestDir, 1)
-        val sensorFile = File(metaDir, FileUtils.SENSOR_DEFINITION_TEXT_FILE)
+        val sensorFile = ProjectUtils.getSensorDataFile(externalFilesTestDir, 1)
 
         // Sensor data should not yet exist
         assertTrue(!sensorFile.exists())
@@ -203,7 +200,7 @@ class FileUtilsTest {
     @Test
     fun createTemporaryImageFile_givenTempFolder_tempFileExists() {
         // Given the project directory
-        val tempFolder = File(externalFilesTestDir, FileUtils.TEMP_FILE_SUBDIRECTORY)
+        val tempFolder = FileUtils.getTempFolder(externalFilesTestDir)
         tempFolder.mkdir()
 
         // When
@@ -217,7 +214,7 @@ class FileUtilsTest {
     fun createFinalFileFromTemp() {
         // Given
         // a pictures directory and temporary_images directory
-        val tempFolder = File(externalFilesTestDir, FileUtils.TEMP_FILE_SUBDIRECTORY)
+        val tempFolder = FileUtils.getTempFolder(externalFilesTestDir)
         tempFolder.mkdir()
         // a temporary image file
         val tempFile = FileUtils.createImageFileInTemporaryFolder(tempFolder)
@@ -241,7 +238,7 @@ class FileUtilsTest {
     @Test
     fun deleteTempFiles() {
         // Given a directory of temp files
-        val tempFolder = File(externalFilesTestDir, FileUtils.TEMP_FILE_SUBDIRECTORY)
+        val tempFolder = FileUtils.getTempFolder(externalFilesTestDir)
         tempFolder.mkdir()
         // and a picture in the directory
         val child = File(tempFolder, "11.jpg")

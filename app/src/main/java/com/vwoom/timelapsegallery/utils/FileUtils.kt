@@ -9,24 +9,51 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectFolder
 import timber.log.Timber
 import java.io.*
 
-const val RESERVED_CHARACTERS = "|\\?*<\":>+[]/'"
-
 object FileUtils {
 
+    private const val RESERVED_CHARACTERS = "|\\?*<\":>+[]/'"
+
     // Directory definitions
-    const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
-    const val PROJECTS_FILE_SUBDIRECTORY = "Projects"
-    const val META_FILE_SUBDIRECTORY = "Meta"
-    const val GIF_FILE_SUBDIRECTORY = "Gif"
+    private const val TEMP_FILE_SUBDIRECTORY = "temporary_images"
+    private const val PROJECTS_FILE_SUBDIRECTORY = "Projects"
+    private const val META_FILE_SUBDIRECTORY = "Meta"
+    private const val GIF_FILE_SUBDIRECTORY = "Gif"
 
     // Text files for metadata
-    const val SCHEDULE_TEXT_FILE = "schedule.txt"
-    const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
-    const val SENSOR_DEFINITION_TEXT_FILE = "sensorData.txt"
-    private const val LIST_PHOTOS_TEXT_FILE = "photos_list.txt"
+    private const val SCHEDULE_DEFINITION_TEXT_FILE = "schedule.txt"
+    private const val TAGS_DEFINITION_TEXT_FILE = "tags.txt"
+    private const val SENSOR_DEFINITION_TEXT_FILE = "sensorData.txt"
+    private const val LIST_PHOTOS_TEXT_FILE = "photosList.txt"
 
-    fun getProjectsSubdirectory(externalFilesDir: File): File{
+    fun getReservedCharacters() = RESERVED_CHARACTERS
+
+    fun getProjectsSubdirectory(externalFilesDir: File): File {
         return File(externalFilesDir, PROJECTS_FILE_SUBDIRECTORY)
+    }
+
+    fun getMetaSubdirectory(externalFilesDir: File): File {
+        return File(externalFilesDir, META_FILE_SUBDIRECTORY)
+    }
+
+    fun getGifSubdirectory(externalFilesDir: File): File {
+        return File(externalFilesDir, GIF_FILE_SUBDIRECTORY)
+    }
+
+    fun getTempFolder(externalFilesTestDir: File): File {
+        return File(externalFilesTestDir, TEMP_FILE_SUBDIRECTORY)
+    }
+
+
+    fun getTagsFile(projectMetaDir: File): File {
+        return File(projectMetaDir, TAGS_DEFINITION_TEXT_FILE)
+    }
+
+    fun getScheduleFile(projectMetaDir: File): File{
+        return File(projectMetaDir, SCHEDULE_DEFINITION_TEXT_FILE)
+    }
+
+    fun getSensorFile(projectMetaDir: File): File {
+        return File(projectMetaDir, SENSOR_DEFINITION_TEXT_FILE)
     }
 
     // Creates an empty image file for a project in the projects folder to be copied to
@@ -152,7 +179,7 @@ object FileUtils {
             projectId: Long,
             projectScheduleEntry: ProjectScheduleEntry) {
         val metaDir = getMetaDirectoryForProject(externalFilesDir, projectId)
-        val scheduleFile = File(metaDir, SCHEDULE_TEXT_FILE)
+        val scheduleFile = File(metaDir, SCHEDULE_DEFINITION_TEXT_FILE)
 
         try {
             val output = FileOutputStream(scheduleFile)

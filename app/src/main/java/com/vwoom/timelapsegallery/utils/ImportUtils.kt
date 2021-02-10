@@ -38,17 +38,12 @@ object ImportUtils {
             val url = child.absolutePath
             val projectFilename = url.substring(url.lastIndexOf(File.separatorChar) + 1)
 
-            // Skip Temporary Images, Meta Directory, and GIF directory
-            if (projectFilename == FileUtils.TEMP_FILE_SUBDIRECTORY
-                    || projectFilename == FileUtils.META_FILE_SUBDIRECTORY
-                    || projectFilename == FileUtils.GIF_FILE_SUBDIRECTORY) continue
-
             // Determine ID of project
             val idString: String =
                     if (projectFilename.lastIndexOf("_") == -1) projectFilename
                     else projectFilename.substring(0, projectFilename.lastIndexOf("_"))
 
-            /* Ensure ids are unique */
+            // Ensure ids are unique
             var currentId: Long?
             try {
                 currentId = idString.toLong()
@@ -168,9 +163,11 @@ object ImportUtils {
 
     // TODO: (deferred) appropriately handle blocking calls here
     private suspend fun importProjectMetaData(externalFilesDir: File, db: TimeLapseDatabase, currentProject: ProjectEntry) {
-        val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesDir, currentProject.id)
-        val tagsFile = File(metaDir, FileUtils.TAGS_DEFINITION_TEXT_FILE)
-        val scheduleFile = File(metaDir, FileUtils.SCHEDULE_TEXT_FILE)
+        //val metaDir = ProjectUtils.getMetaDirectoryForProject(externalFilesDir, currentProject.id)
+        val tagsFile = ProjectUtils.getProjectTagsFile(externalFilesDir, currentProject.id)
+        //val tagsFile = File(metaDir, FileUtils.TAGS_DEFINITION_TEXT_FILE)
+        val scheduleFile = ProjectUtils.getProjectScheduleFile(externalFilesDir, currentProject.id)
+        //val scheduleFile = File(metaDir, FileUtils.SCHEDULE_TEXT_FILE)
 
         // Import tags
         if (tagsFile.exists()) {
