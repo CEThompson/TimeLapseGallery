@@ -73,7 +73,7 @@ object TimeUtils {
             // When the today's year is before the photo
             // Note: this error case should not be used since this case is checked for on entry to function
             else -> {
-                return -1;
+                return -1
             }
         }
     }
