@@ -203,7 +203,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
 
         // 2. Set the click listeners
         binding?.addPhotoFab?.setOnClickListener {
-            val cameraId = PhotoUtils.findCamera(requireContext())
+            val cameraId = PhotoUtils.findBackFacingCamera(requireContext())
             if (cameraId == null) {
                 Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
             } else {
@@ -511,7 +511,7 @@ class DetailFragment : BaseFragment(), DetailAdapter.DetailAdapterOnClickHandler
         }
 
         // Otherwise Detect configuration
-        val imageIsLandscape = PhotoUtils.isLandscape(imagePath)
+        val imageIsLandscape = PhotoUtils.isImageLandscape(imagePath)
         val deviceIsLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
         // If landscape device and image (true == true) or portrait device and image (false == false)

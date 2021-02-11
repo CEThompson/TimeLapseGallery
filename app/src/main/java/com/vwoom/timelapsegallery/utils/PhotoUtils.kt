@@ -7,9 +7,11 @@ import android.hardware.camera2.CameraManager
 import androidx.exifinterface.media.ExifInterface
 import java.io.IOException
 
+// TODO: reassess usage of this class
 object PhotoUtils {
 
-    fun findCamera(context: Context): String? {
+    // Returns a back facing camera that is available to the phone
+    fun findBackFacingCamera(context: Context): String? {
         val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         for (id in cameraManager.cameraIdList) {
             val currentCameraCharacteristics = cameraManager.getCameraCharacteristics(id)
@@ -21,7 +23,7 @@ object PhotoUtils {
         return null
     }
 
-    /* Returns the aspect ratio from the photo path */
+    // Returns the aspect ratio from the photo path
     fun getAspectRatioFromImagePath(path: String): String {
         val bmOptions = BitmapFactory.Options()
         bmOptions.inJustDecodeBounds = true
@@ -42,7 +44,7 @@ object PhotoUtils {
         return aspectRatio
     }
 
-    /* Gets exif orientation from bitmap */
+    // Gets exif orientation from bitmap
     @JvmStatic
     @Throws(IOException::class)
     fun getOrientationFromImagePath(path: String): Int {
@@ -50,7 +52,8 @@ object PhotoUtils {
         return exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
     }
 
-    fun isLandscape(imagePath: String): Boolean {
+    // Determines if photo is wider than it is tall, used as shorthand for landscape
+    fun isImageLandscape(imagePath: String): Boolean {
         val aspectRatio = getAspectRatioFromImagePath(imagePath)
         val res = aspectRatio.split(":").toTypedArray()
         val width = res[0].toInt()

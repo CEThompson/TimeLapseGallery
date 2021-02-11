@@ -163,7 +163,7 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
             exitTransition = null
             reenterTransition = null
             // Send the camera ID to the camera fragment or notify the user if no camera available
-            val cameraId = PhotoUtils.findCamera(requireContext())
+            val cameraId = PhotoUtils.findBackFacingCamera(requireContext())
             if (cameraId == null) {
                 Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
             } else {
