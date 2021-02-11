@@ -5,7 +5,6 @@ import com.vwoom.timelapsegallery.data.entry.PhotoEntry
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import timber.log.Timber
-import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
 import java.util.*
@@ -22,7 +21,8 @@ object ProjectUtils {
 
     // Internal helper returning the pattern for a projects path
     // In the following format: {project_id}_{project_name}
-    // Examples: 1_My Project, 2_Cactus, 3_Flower, etc.
+    // If there is no project name then the format is simply: {project_id}
+    // Examples: 1_My Project, 2_Cactus, 3_Flower, 4, 143, 154_my plant, etc.
     private fun getProjectDirectoryPath(projectEntry: ProjectEntry): String {
         val name = projectEntry.project_name
         return if (name.isNullOrEmpty()) projectEntry.id.toString()
@@ -34,6 +34,8 @@ object ProjectUtils {
             ProjectEntry(projectView.project_id, projectView.project_name)
 
     // Returns the meta directory for a project
+    // Example: if a project is Projects/1_my project
+    // This will return the folder: Meta/1
     fun getMetaDirectoryForProject(externalFilesDir: File, projectId: Long): File {
         val metaDir = FileUtils.getMetaSubdirectory(externalFilesDir)
         val projectSubfolder = File(metaDir, projectId.toString())
@@ -43,22 +45,23 @@ object ProjectUtils {
 
     // Returns the tags file for a project
     fun getProjectTagsFile(externalFilesDir: File, id: Long): File {
-        val metaDir = getMetaDirectoryForProject(externalFilesDir, id);
+        val metaDir = getMetaDirectoryForProject(externalFilesDir, id)
         return FileUtils.getTagsFile(metaDir)
-        //File(metaDir, FileUtils.TAGS_DEFINITION_TEXT_FILE)
     }
 
+    // Returns the a projects schedule file
     fun getProjectScheduleFile(externalFilesDir: File, id: Long): File {
         val metaDir = getMetaDirectoryForProject(externalFilesDir, id)
         return FileUtils.getScheduleFile(metaDir)
     }
 
+    // Returns the sensor data for a project
     fun getSensorDataFile(externalFilesDir: File, id: Long): File {
         val metaDir = getMetaDirectoryForProject(externalFilesDir, id)
         return FileUtils.getSensorFile(metaDir)
     }
 
-    // Creates a list of photo entries in a project folder sorted by timestamp
+    // Returns a list of photo entries in a project folder sorted by timestamp
     fun getPhotoEntriesInProjectDirectory(externalFilesDir: File,
                                           projectEntry: ProjectEntry): List<PhotoEntry> {
         val photos: MutableList<PhotoEntry> = ArrayList()
@@ -95,17 +98,17 @@ object ProjectUtils {
         return photos
     }
 
-    // TODO: (deferred) re-evaluate units for sensor data
+    // Returns a map of timestamps in long format (representing photos)
+    // to the accompanying sensor data in the projects sensor data text file
     private fun getMapFromSensorData(externalFilesDir: File, projectEntry: ProjectEntry): Map<Long, SensorData> {
         val metaDir = getMetaDirectoryForProject(externalFilesDir, projectEntry.id)
         val sensorTextFile = FileUtils.getSensorFile(metaDir)
 
         val map: MutableMap<Long, SensorData> = HashMap()
 
-        if (!sensorTextFile.exists()) return map.toMap()
+        if (!sensorTextFile.exists()) return map.toMap() // If no sensor file return an empty map
 
-        Timber.d("at project ${projectEntry.id}")
-
+        // Otherwise create the map
         try {
             val inputStream: InputStream = sensorTextFile.inputStream()
 
@@ -113,6 +116,7 @@ object ProjectUtils {
                 // Note: follows the following format
                 // timestamp light temp pressure humidity
                 val line: String = it
+                // TODO: (deferred) re-evaluate units for sensor data
                 if (line.isNotEmpty()) {
                     val sub: List<String> = line.split(" ")
                     val timestamp: Long = sub[0].toLong()
@@ -132,7 +136,8 @@ object ProjectUtils {
         return map.toMap()
     }
 
-    // Copies a Project from one folder to another: For use in renaming a project
+    // Copies a project from one folder to another
+    // Used for renaming a project
     fun renameProject(externalFilesDir: File, sourceProjectEntry: ProjectEntry, destinationProjectEntry: ProjectEntry): Boolean { // Create a file for the source project
         val sourceProject: File = getProjectFolder(externalFilesDir, sourceProjectEntry)
         val destinationProject: File = getProjectFolder(externalFilesDir, destinationProjectEntry)
@@ -141,6 +146,10 @@ object ProjectUtils {
     }
 
     // Delete project directory and files within project directory
+    // Note: this deletes the Projects/{Id}_{Name} folder and
+    // the accompanying Meta/{Id} folder
+    // However this leaves any created Gifs from the project behind (In the Gif folder at Gif/{Id}.gif)
+    // TODO: consider splitting this into two functions, retiring a successful time-lapse project and deleting a failed project (which would remove the accompanying GIF?)
     fun deleteProject(externalFilesDir: File, projectEntry: ProjectEntry) {
         val projectDirectory = getProjectFolder(externalFilesDir, projectEntry)
         val metaProjectDirectory = getMetaDirectoryForProject(externalFilesDir, projectEntry.id)
@@ -150,36 +159,43 @@ object ProjectUtils {
         FileUtils.deleteRecursive(metaProjectDirectory)
     }
 
-    // Deletes file referred to in photo entry by project view
+    // Deletes file referred to in photo entry
     fun deleteProjectPhoto(externalFilesDir: File, projectEntry: ProjectEntry, photoEntry: PhotoEntry) {
-        // photo file does not exist already return
+        // Get the url of the photo
         val photoUrl = getProjectPhotoUrl(externalFilesDir, projectEntry, photoEntry.timestamp)
-                ?: return
+
+        // If the photo file does not exist already return
+        photoUrl?: return
+
+        // Delete the photo
         val photoFile = File(photoUrl)
         FileUtils.deleteRecursive(photoFile)
     }
 
-
+    // Returns the Url for a project's photo
     fun getProjectPhotoUrl(externalFilesDir: File, projectEntry: ProjectEntry, timestamp: Long): String? {
-        val imageFileNames = FileUtils.getPhotoFileExtensions(timestamp)
+        // get supported filenames from the timestamp
+        // in the format: {timestamp}.jpg, {timestamp}.jpeg, {timestamp}.png
+        val imageFileNames: Array<String> = FileUtils.getPhotoFileExtensions(timestamp)
         val projectDir = getProjectFolder(externalFilesDir, projectEntry)
 
         lateinit var photoFile: File
-        // Try the timestamp to various file formats, i.e. timestamp.jpeg, timestamp.png, timestamp.jpg
         for (fileName in imageFileNames) {
             photoFile = File(projectDir, fileName)
-            if (photoFile.exists()) return photoFile.absolutePath
+            if (photoFile.exists()) return photoFile.absolutePath // If the file with extension is there return its path
         }
         return null
     }
 
+    // Returns whether or not a project is due today
     fun isProjectDueToday(projectView: ProjectView): Boolean {
-        if (projectView.interval_days == 0) return false
+        if (projectView.interval_days == 0) return false    // If the project isn't scheduled it cannot be due
         val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(projectView.cover_photo_timestamp, System.currentTimeMillis())
         val daysUntilDue = projectView.interval_days - daysSinceLastPhoto
-        return daysUntilDue <= 0
+        return daysUntilDue <= 0    // Otherwise project is due if time has elapsed past its interval
     }
 
+    // Returns whether or not a project is due tomorrow
     fun isProjectDueTomorrow(projectView: ProjectView): Boolean {
         if (projectView.interval_days == 0) return false
         val daysSinceLastPhoto = TimeUtils.getDaysSinceTimeStamp(projectView.cover_photo_timestamp, System.currentTimeMillis())
