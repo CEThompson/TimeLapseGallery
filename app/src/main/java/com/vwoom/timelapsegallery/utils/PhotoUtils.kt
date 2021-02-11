@@ -32,8 +32,7 @@ object PhotoUtils {
         val imageWidth = bmOptions.outWidth
         var aspectRatio = "$imageWidth:$imageHeight"
         // If the image is rotated modify the aspect ratio
-        val orientation: Int
-        orientation = try {
+        val orientation: Int = try {
             getOrientationFromImagePath(path)
         } catch (e: IOException) {
             return aspectRatio
