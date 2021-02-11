@@ -102,9 +102,37 @@ class TimeUtilsTest {
         assertTrue(daysSinceTimestamp == 4.toLong())
     }
 
+    // Tests a multi year interval with a leap year (2020)
     @Test
-    fun getDaysSinceTimestamp_manyYearInterval() {
+    fun getDaysSinceTimestamp_leapYearAccountedFor() {
         // Given two timestamps, now is 4 days after the photo but in a new year
+        val calendar = Calendar.getInstance()
+        calendar[Calendar.MONTH] = Calendar.DECEMBER
+        calendar[Calendar.DAY_OF_MONTH] = 30
+        calendar[Calendar.HOUR_OF_DAY] = 20
+        calendar[Calendar.YEAR] = 2019
+        val timestampPhoto = calendar.timeInMillis // 12-30-2019 (monday)
+        calendar[Calendar.MONTH] = Calendar.JANUARY
+        calendar[Calendar.DAY_OF_MONTH] = 3
+        calendar[Calendar.HOUR_OF_DAY] = 0
+        calendar[Calendar.YEAR] = 2021
+        val timestampNow = calendar.timeInMillis // 1-3-2020 (friday)
+
+        // When we call the utility class
+        val daysSinceTimestamp = TimeUtils.getDaysSinceTimeStamp(timestampPhoto, timestampNow)
+
+        // Then the days since the timestamp should be 370
+        // 2020 leap year = 366
+        // days in 2019 = 1
+        // days in 2021 = 3
+        println("days since is $daysSinceTimestamp")
+        assertTrue(daysSinceTimestamp == 370.toLong())
+    }
+
+    // Tests a multiple year interval including both leap year and non-leap year
+    @Test
+    fun getDaysSinceTimestamp_multiYearInterval_withOneLeapYear() {
+        // Given two timestamps one at the end of 2019 and one 3 days into 2022
         val calendar = Calendar.getInstance()
         calendar[Calendar.MONTH] = Calendar.DECEMBER
         calendar[Calendar.DAY_OF_MONTH] = 30
@@ -120,9 +148,44 @@ class TimeUtilsTest {
         // When we call the utility class
         val daysSinceTimestamp = TimeUtils.getDaysSinceTimeStamp(timestampPhoto, timestampNow)
 
-        // Then the days since the timestamp should be four
+        // Then the days since the timestamp should be 735
+        // days in 2019 = 1
+        // leap year 2020 = 366
+        // leap year 2021 = 365
+        // days in 2022 = 3
+        // for a total of 735 days
+
         println("days since is $daysSinceTimestamp")
-        assertTrue(daysSinceTimestamp != 4.toLong())
+        assertTrue(daysSinceTimestamp == 735.toLong())
+    }
+
+    // Tests a multiple year interval without leap years
+    @Test
+    fun getDaysSinceTimestamp_multiYearInterval_withoutLeapYears() {
+        // Given two timestamps one at the end of 2019 and one 3 days into 2022
+        val calendar = Calendar.getInstance()
+        calendar[Calendar.MONTH] = Calendar.DECEMBER
+        calendar[Calendar.DAY_OF_MONTH] = 30
+        calendar[Calendar.YEAR] = 2021
+        calendar[Calendar.HOUR_OF_DAY] = 20
+        val timestampPhoto = calendar.timeInMillis // 12-30-2019 (monday)
+        calendar[Calendar.MONTH] = Calendar.JANUARY
+        calendar[Calendar.DAY_OF_MONTH] = 3
+        calendar[Calendar.YEAR] = 2023
+        calendar[Calendar.HOUR_OF_DAY] = 0
+        val timestampNow = calendar.timeInMillis // 1-3-2020 (friday)
+
+        // When we call the utility class
+        val daysSinceTimestamp = TimeUtils.getDaysSinceTimeStamp(timestampPhoto, timestampNow)
+
+        // Then the days since the timestamp should be 735
+        // days in 2021 = 1
+        // non-leap year 2022 = 365
+        // days in 2023 = 3
+        // for a total of 369 days
+
+        println("days since is $daysSinceTimestamp")
+        assertTrue(daysSinceTimestamp == 369.toLong())
     }
 
     @Test

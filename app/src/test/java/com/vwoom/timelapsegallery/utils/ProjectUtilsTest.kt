@@ -15,6 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import java.io.File
+import java.util.*
 
 class ProjectUtilsTest {
 
@@ -28,7 +29,7 @@ class ProjectUtilsTest {
         externalFilesTestDir = testFolder.newFolder("pictures")
     }
 
-    /* Tests retrieving a list of photo entries from a project folder*/
+    // Tests retrieving a list of photo entries from a project folder
     @Test
     fun getPhotoEntriesInProjectDirectory_directoryWithData_returnsTwoOrderedPhotoEntries() {
         // Given:
@@ -190,13 +191,22 @@ class ProjectUtilsTest {
         assertTrue(relPath == project.id.toString())
     }
 
+    // NOTE: This test will likely fail if run at the very beginning of a new year
     @Test
     fun isProjectDueToday() {
         // Given
-        val timestampTwoDaysAgo = System.currentTimeMillis() - (DAY_IN_MILLISECONDS*2)
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = System.currentTimeMillis()
+        val twoDaysAgo = calendar[Calendar.DAY_OF_YEAR] - 2
+
+        calendar[Calendar.DAY_OF_YEAR] = twoDaysAgo
+
+        val timestampTwoDaysAgo = calendar.timeInMillis
         val project = ProjectView(1, null, 2, 1, timestampTwoDaysAgo)
+
         // When
         val isProjectDueToday = ProjectUtils.isProjectDueToday(project)
+
         // Then
         assertTrue(isProjectDueToday)
     }
