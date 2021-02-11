@@ -3,9 +3,6 @@ package com.vwoom.timelapsegallery.settings
 sealed class ValidationResult<out T : Any> {
     class Success<out T : Any>(val data: T) : ValidationResult<T>()
     sealed class Error(val exception: Exception?) : ValidationResult<Nothing>() {
-        class NoFilesError(exception: Exception? = null,
-                           val directoryUrl: String) : Error(exception)
-
         class InvalidCharacterError(exception: Exception? = null,
                                     val projectName: String?) : Error(exception)
 

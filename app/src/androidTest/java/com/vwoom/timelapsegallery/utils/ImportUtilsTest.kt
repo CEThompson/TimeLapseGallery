@@ -206,19 +206,6 @@ class ImportUtilsTest {
 
     }
 
-
-    @Test
-    fun validateFileStructure_emptyFileStructure_returnsNoFilesInDirectory() {
-        // Given
-        externalFilesTestDir.deleteRecursively()
-
-        // When
-        val response = validateFileStructure(externalFilesTestDir)
-
-        // Then
-        assertTrue(response is ValidationResult.Error.NoFilesError)
-    }
-
     @Test
     fun validateFileStructure_invalidFolder_returnsInvalidFolderError() {
         // Given

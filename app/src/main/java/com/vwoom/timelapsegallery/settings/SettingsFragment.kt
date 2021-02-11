@@ -256,11 +256,6 @@ class SettingsFragment : BasePreferenceFragment() {
 
         imageFeedback.setImageResource(R.drawable.ic_error_red_40dp)
         when (result) {
-            is ValidationResult.Error.NoFilesError -> {
-                responseView.text = requireContext()
-                        .getString(R.string.no_files_in_directory_error,
-                                result.directoryUrl)
-            }
             is ValidationResult.Error.InvalidCharacterError -> {
                 responseView.text = requireContext()
                         .getString(R.string.invalid_character_error,
