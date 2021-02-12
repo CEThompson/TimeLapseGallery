@@ -1,11 +1,10 @@
-package com.vwoom.timelapsegallery.weather
+package com.vwoom.timelapsegallery.weather.moonphase
+
 
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-import java.util.*
-
-class MoonPhaseCalculatorTest {
+class PhaseCalculatorTest {
     // Dec 3, 2040 11:33 PM PST should be new moon
     private val timestampNewMoon = 2238219180000
     // Dec 18, 2040 4:15 AM PST should be full moon
@@ -15,17 +14,17 @@ class MoonPhaseCalculatorTest {
 
     @Test
     fun getMoonPhaseFromTimestamp_shouldBeNewMoon() {
-        val phase = MoonPhaseCalculator.getMoonPhaseFromTimestamp(timestampNewMoon)
+        val phase = PhaseCalculator.getMoonPhaseFromTimestamp(timestampNewMoon)
 
         println(phase)
-        assertTrue(phase == NEW_MOON)
+        assertTrue(phase == PhaseType.NEW_MOON)
     }
 
     @Test
     fun getMoonPhaseFromTimestamp_shouldBeFullMoon() {
-        val phase = MoonPhaseCalculator.getMoonPhaseFromTimestamp(timestampFullMoon)
+        val phase = PhaseCalculator.getMoonPhaseFromTimestamp(timestampFullMoon)
         println(phase)
-        assertTrue(phase == FULL_MOON)
+        assertTrue(phase == PhaseType.FULL_MOON)
     }
 
     @Test
@@ -34,23 +33,23 @@ class MoonPhaseCalculatorTest {
         var timeAfter = timestampNewMoon + millisecondsDay
 
         // Check the day after and day before new moon
-        var phaseBefore = MoonPhaseCalculator.getMoonPhaseFromTimestamp(timeBefore)
-        var phaseAfter = MoonPhaseCalculator.getMoonPhaseFromTimestamp(timeAfter)
+        var phaseBefore = PhaseCalculator.getMoonPhaseFromTimestamp(timeBefore)
+        var phaseAfter = PhaseCalculator.getMoonPhaseFromTimestamp(timeAfter)
         println(phaseBefore)
-        assertTrue(phaseBefore == INTERMEDIATE_MOON)
+        assertTrue(phaseBefore == PhaseType.INTERMEDIATE)
         println(phaseAfter)
-        assertTrue(phaseAfter == INTERMEDIATE_MOON)
+        assertTrue(phaseAfter == PhaseType.INTERMEDIATE)
 
         timeBefore = timestampFullMoon - millisecondsDay
         timeAfter = timestampNewMoon + millisecondsDay
 
-        phaseBefore = MoonPhaseCalculator.getMoonPhaseFromTimestamp(timeBefore)
-        phaseAfter = MoonPhaseCalculator.getMoonPhaseFromTimestamp(timeAfter)
+        phaseBefore = PhaseCalculator.getMoonPhaseFromTimestamp(timeBefore)
+        phaseAfter = PhaseCalculator.getMoonPhaseFromTimestamp(timeAfter)
 
         println(phaseBefore)
-        assertTrue(phaseBefore == INTERMEDIATE_MOON)
+        assertTrue(phaseBefore == PhaseType.INTERMEDIATE)
         println(phaseAfter)
-        assertTrue(phaseAfter == INTERMEDIATE_MOON)
+        assertTrue(phaseAfter == PhaseType.INTERMEDIATE)
     }
 
 }

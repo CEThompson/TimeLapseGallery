@@ -4,7 +4,8 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.vwoom.timelapsegallery.R
-import com.vwoom.timelapsegallery.weather.MoonPhaseCalculator.getMoonPhaseFromTimestamp
+import com.vwoom.timelapsegallery.weather.moonphase.PhaseCalculator.getMoonPhaseFromTimestamp
+import com.vwoom.timelapsegallery.weather.moonphase.PhaseType
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -15,6 +16,7 @@ object WeatherUtils {
         Snowy, Rainy, Cloudy, Foggy, Stormy, Clear
     }
 
+    // Returns an appropriate icon to represent the weather
     fun getWeatherIconResource(context: Context, isDay: Boolean, weatherType: WeatherType, timestamp: Long?): Drawable? {
         val resource = when (weatherType) {
             WeatherType.Cloudy -> R.drawable.ic_cloud_black_24dp
@@ -28,8 +30,8 @@ object WeatherUtils {
                     timestamp == null -> R.drawable.ic_brightness_2_black_24dp
                     else -> {
                         when (getMoonPhaseFromTimestamp(timestamp)) {
-                            NEW_MOON -> R.drawable.ic_star_black_24dp
-                            FULL_MOON -> R.drawable.ic_brightness_1_black_24dp
+                            PhaseType.NEW_MOON -> R.drawable.ic_star_black_24dp
+                            PhaseType.FULL_MOON -> R.drawable.ic_brightness_1_black_24dp
                             else -> R.drawable.ic_brightness_2_black_24dp
                         }
                     }
@@ -68,8 +70,8 @@ object WeatherUtils {
     }
 
     // Returns a timestamp from a forecast response period start time string
+    // Note: input string should be an iso string
     fun getTimestampForDayFromPeriod(timeString: String): Long? {
-        //if (period == null) return null
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return try {
             val dateString = timeString.split("T")[0]

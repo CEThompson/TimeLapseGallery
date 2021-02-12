@@ -1,15 +1,12 @@
-package com.vwoom.timelapsegallery.weather
+package com.vwoom.timelapsegallery.weather.moonphase
 
 import java.util.*
-
-const val NEW_MOON = 1
-const val FULL_MOON = 2
-const val INTERMEDIATE_MOON = 3
 
 // TODO: (deferred) handle phases of the moon in a moon phase dialog
 // TODO: (deferred) handle northern vs southern hemisphere representations, localization for moon phases
 
-object MoonPhaseCalculator {
+object PhaseCalculator {
+
     // Calendar value for a synodic month which is 29.530587981 days
     // Calculated using 29.53
     private const val synodicMonthDays = 29 //29.53 days
@@ -25,7 +22,7 @@ object MoonPhaseCalculator {
     // May 7, 2020 3:45 AM PST
     private const val fullMoonReference: Long = 1588848300000
 
-    fun getMoonPhaseFromTimestamp(timestamp: Long): Int {
+    fun getMoonPhaseFromTimestamp(timestamp: Long): PhaseType {
         // Calc newMoon prev to timestamp
         val calendar = Calendar.getInstance(Locale.getDefault())
         calendar.timeInMillis = fullMoonReference
@@ -58,9 +55,9 @@ object MoonPhaseCalculator {
 
         // Timestamp is new moon
         return if (newMoonYear == comparisonYear && newMoonDay == comparisonDay) {
-            NEW_MOON
+            PhaseType.NEW_MOON
         } else if (fullMoonYear == comparisonYear && fullMoonDay == comparisonDay) {
-            FULL_MOON
-        } else INTERMEDIATE_MOON
+            PhaseType.FULL_MOON
+        } else PhaseType.INTERMEDIATE
     }
 }
