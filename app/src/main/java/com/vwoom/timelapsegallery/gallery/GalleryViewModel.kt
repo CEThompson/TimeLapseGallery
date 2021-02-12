@@ -75,6 +75,7 @@ class GalleryViewModel
         return searchTags.contains(tag)
     }
 
+    // TODO: simplify and clarify forecast retrieval
     // Retrieves cached forecast and attempts to update it if forecast does not belong to today
     fun getForecast(location: Location?) {
         weather.value = WeatherResult.Loading
