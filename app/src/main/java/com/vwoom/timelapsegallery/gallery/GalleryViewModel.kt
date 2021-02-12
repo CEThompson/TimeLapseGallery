@@ -64,7 +64,7 @@ class GalleryViewModel
         searchJob.cancel()
     }
 
-    private fun userIsSearching(): Boolean {
+    private fun isUserSearching(): Boolean {
         return searchTags.isNotEmpty()
                 || searchType != SearchType.None
                 || searchName.isNotBlank()
@@ -167,7 +167,7 @@ class GalleryViewModel
     }
 
     fun setSearch() {
-        search.value = userIsSearching()
+        search.value = isUserSearching()
     }
 
     fun clearSearch() {
