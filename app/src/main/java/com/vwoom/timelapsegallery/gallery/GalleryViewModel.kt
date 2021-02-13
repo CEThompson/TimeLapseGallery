@@ -12,16 +12,12 @@ import com.vwoom.timelapsegallery.data.repository.ITagRepository
 import com.vwoom.timelapsegallery.data.repository.IWeatherRepository
 import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.utils.TimeUtils.daysUntilDue
-import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 import com.vwoom.timelapsegallery.weather.WeatherResult
+import com.vwoom.timelapsegallery.weather.data.ForecastResponse
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
-
-enum class SearchType {
-    None, DueToday, DueTomorrow, Pending, Scheduled, Unscheduled
-}
 
 class GalleryViewModel
 @Inject constructor(projectRepository: IProjectRepository,
@@ -46,7 +42,7 @@ class GalleryViewModel
     // Inputted search data
     var searchTags: ArrayList<TagEntry> = arrayListOf()
     var searchName: String = ""
-    var searchType = SearchType.None
+    var searchType = GallerySearchType.NONE
 
     // State of showing dialogs
     var searchDialogShowing = false
@@ -66,7 +62,7 @@ class GalleryViewModel
 
     private fun isUserSearching(): Boolean {
         return searchTags.isNotEmpty()
-                || searchType != SearchType.None
+                || searchType != GallerySearchType.NONE
                 || searchName.isNotBlank()
     }
 
@@ -130,29 +126,29 @@ class GalleryViewModel
             }
 
             when (searchType) {
-                SearchType.Scheduled -> {
+                GallerySearchType.SCHEDULED -> {
                     resultProjects = resultProjects.filter {
                         return@filter it.interval_days > 0
                     }
                 }
-                SearchType.Unscheduled -> {
+                GallerySearchType.UNSCHEDULED -> {
                     resultProjects = resultProjects.filter {
                         return@filter it.interval_days == 0
                     }
                 }
-                SearchType.DueToday -> {
+                GallerySearchType.DUE_TODAY -> {
                     resultProjects = resultProjects.filter {
                         if (it.interval_days == 0) return@filter false
                         return@filter daysUntilDue(it) <= 0
                     }
                 }
-                SearchType.DueTomorrow -> {
+                GallerySearchType.DUE_TOMORROW -> {
                     resultProjects = resultProjects.filter {
                         if (it.interval_days == 0) return@filter false
                         return@filter daysUntilDue(it) == 1.toLong()
                     }
                 }
-                SearchType.Pending -> {
+                GallerySearchType.PENDING -> {
                     resultProjects = resultProjects.filter {
                         if (it.interval_days == 0) return@filter false
                         return@filter daysUntilDue(it) > 0
@@ -174,7 +170,7 @@ class GalleryViewModel
     fun clearSearch() {
         searchName = ""
         searchTags.clear()
-        searchType = SearchType.None
+        searchType = GallerySearchType.NONE
         filterProjects()
         setSearch()
     }
