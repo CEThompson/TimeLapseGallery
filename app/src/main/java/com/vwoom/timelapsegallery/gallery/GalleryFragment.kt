@@ -70,11 +70,8 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
     private var scrollUpFAB: FloatingActionButton? = null
     private var scrollDownFAB: FloatingActionButton? = null
 
-    /* Dialogs */
-    // Searching
+    // Dialogs
     private var searchDialog: SearchDialog? = null
-
-    // Weather
     private var weatherChartDialog: WeatherChartDialog? = null
     private var weatherDetailsDialog: WeatherDetailsDialog? = null
     private var weatherLocation: Location? = null
@@ -167,6 +164,7 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
             if (cameraId == null) {
                 Toast.makeText(requireContext(), getString(R.string.no_camera_found), Toast.LENGTH_LONG).show()
             } else {
+                // TODO: consider encapsulating navigation into a navigation helper class
                 val action = GalleryFragmentDirections.actionGalleryFragmentToCamera2Fragment(cameraId, null, null)
                 findNavController().navigate(action)
             }
@@ -224,6 +222,7 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
                 true
             }
             R.id.weather_option -> {
+                // TODO: consider encapsulating permissions into a helper class
                 // Request permissions before handling dialog
                 if (gpsPermissionsGranted()) {
                     showWeatherDialog()
@@ -281,7 +280,7 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
         weatherDetailsDialog?.dismiss()
     }
 
-    // TODO: find better way to handle binding
+    // TODO: find better way to handle bindings
     override fun onDestroyView() {
         super.onDestroyView()
         galleryRecyclerView = null
@@ -350,6 +349,7 @@ class GalleryFragment : BaseFragment(), GalleryAdapter.GalleryAdapterOnClickHand
     /**
      * Search Dialog methods
      */
+    // TODO: reconsider encapsulation of weather chart dialog, can it handle its own click listeners?
     private fun initializeWeatherChartDialog() {
         if (weatherChartDialog != null) return
         weatherChartDialog = WeatherChartDialog(requireContext(), galleryViewModel)
