@@ -14,6 +14,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.hardware.camera2.*
+import android.hardware.camera2.params.OutputConfiguration
+import android.hardware.camera2.params.SessionConfiguration
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -47,6 +49,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
+import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -339,16 +342,30 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
     }
 
     // TODO: (1.4) replace deprecated capture session usage
+    @Suppress("DEPRECATION")
     private suspend fun createCaptureSession(device: CameraDevice, targets: List<Surface>, handler: Handler? = null
     ): CameraCaptureSession = suspendCoroutine { cont ->
-        device.createCaptureSession(targets, object : CameraCaptureSession.StateCallback() {
+
+        val callback = object : CameraCaptureSession.StateCallback() {
             override fun onConfigured(session: CameraCaptureSession) = cont.resume(session)
             override fun onConfigureFailed(session: CameraCaptureSession) {
                 val exc = RuntimeException("Camera ${device.id} session config failed")
                 Timber.e(exc)
                 cont.resumeWithException(exc)
             }
-        }, handler)
+        }
+
+        // Handle new camera 2 api for creating capture session
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+            val outputs: List<OutputConfiguration> = targets.map { it: Surface -> OutputConfiguration(it) }
+            val executor = Executors.newSingleThreadExecutor() // TODO: verify executor shut down on lifecycle events
+            val sessionConfiguration = SessionConfiguration(SessionConfiguration.SESSION_REGULAR, outputs, executor, callback)
+            device.createCaptureSession(sessionConfiguration)
+        }
+        // Handle old version
+        else {
+            device.createCaptureSession(targets, callback, handler)
+        }
     }
 
     override fun onResume() {
