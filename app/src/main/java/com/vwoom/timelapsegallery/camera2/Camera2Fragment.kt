@@ -383,8 +383,10 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
     private fun transformImage(viewWidth: Int, viewHeight: Int) {
         if (previewSize == null || !::viewFinder.isInitialized) return
         val matrix = Matrix()
-        // TODO: (1.4) remove usage of deprecated defaultDisplay
-        val rotation = requireActivity().windowManager.defaultDisplay.rotation
+
+        // TODO: handle null case for rotation
+        val rotation = requireActivity().display?.rotation
+
         val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
         val bufferRect = RectF(0f, 0f, previewSize!!.height.toFloat(), previewSize!!.width.toFloat())
         val centerX = viewRect.centerX()
@@ -407,8 +409,10 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
     // Returns a transform matrix for rotating the bitmap from the viewfinder on capture
     private fun getTransformMatrix(viewWidth: Int, viewHeight: Int): Matrix {
         val matrix = Matrix()
-        // TODO: (1.4) remove usage of deprecated defaultDisplay
-        val rotation = requireActivity().windowManager.defaultDisplay.rotation
+
+        // TODO: handle null case for rotation
+        val rotation = requireActivity().display?.rotation
+
         val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
         val bufferRect = RectF(0f, 0f, viewFinder.height.toFloat(), viewFinder.width.toFloat())
         val centerX = viewRect.centerX()
