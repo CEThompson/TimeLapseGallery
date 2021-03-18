@@ -55,6 +55,8 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+// TODO: write (probably instrumentation) test to verify that saved image has the same dimensions as displayed preview image
+
 // TODO: (deferred) re-evaluate GPS data with photos
 // TODO: (deferred) calculate and display dew point where possible
 // TODO: (deferred) show temperature range (high and low) from weather API if possible for the day
