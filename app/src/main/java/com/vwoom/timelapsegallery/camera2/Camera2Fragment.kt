@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Context.SENSOR_SERVICE
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Matrix
@@ -16,10 +17,7 @@ import android.hardware.SensorManager
 import android.hardware.camera2.*
 import android.hardware.camera2.params.OutputConfiguration
 import android.hardware.camera2.params.SessionConfiguration
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.HandlerThread
+import android.os.*
 import android.util.Size
 import android.view.*
 import android.widget.Toast
@@ -28,6 +26,7 @@ import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -266,9 +265,9 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
         }
         // Set live data for phone orientation
         relativeOrientation = OrientationLiveData(requireContext(), characteristics).apply {
-            observe(viewLifecycleOwner, { orientation ->
+            observe(viewLifecycleOwner) { orientation ->
                 Timber.d("Orientation changed to $orientation")
-            })
+            }
         }
 
         // Set up sensors
@@ -358,7 +357,7 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
         }
 
         // Handle new camera 2 api for creating capture session
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P){
             val outputs: List<OutputConfiguration> = targets.map { it: Surface -> OutputConfiguration(it) }
             val executor = Executors.newSingleThreadExecutor() // TODO: verify executor shut down on lifecycle events
             val sessionConfiguration = SessionConfiguration(SessionConfiguration.SESSION_REGULAR, outputs, executor, callback)
@@ -404,7 +403,11 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
         val matrix = Matrix()
 
         // TODO: handle null case for rotation
-        val rotation = requireActivity().display?.rotation
+        val rotation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            requireActivity().display?.rotation
+        } else {
+            requireActivity().windowManager.defaultDisplay.rotation
+        }
 
         val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
         val bufferRect = RectF(0f, 0f, previewSize!!.height.toFloat(), previewSize!!.width.toFloat())
@@ -430,7 +433,11 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
         val matrix = Matrix()
 
         // TODO: handle null case for rotation
-        val rotation = requireActivity().display?.rotation
+        val rotation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            requireActivity().display?.rotation
+        } else {
+            requireActivity().windowManager.defaultDisplay.rotation
+        }
 
         val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
         val bufferRect = RectF(0f, 0f, viewFinder.height.toFloat(), viewFinder.width.toFloat())
