@@ -199,7 +199,10 @@ dependencies {
     // Note: LTS version required to support API level 16+ rather than API level 24+
     //implementation 'com.arthenica:mobile-ffmpeg-full:4.3.1.LTS'
     //implementation 'com.arthenica:ffmpeg-kit-full:4.5'
-    implementation 'com.arthenica:ffmpeg-kit-full:4.5.LTS'
+
+    // full gpl version needed for lib x264 encoding (for converting images to mp4)
+    implementation 'com.arthenica:ffmpeg-kit-full-gpl:4.5.LTS'
+
     //implementation 'com.arthenica:mobile-ffmpeg-full:4.4.LTS'
 
     // Timber For Logging
