@@ -8,6 +8,7 @@ import com.vwoom.timelapsegallery.utils.ProjectUtils.getMetaDirectoryForProject
 import com.vwoom.timelapsegallery.utils.ProjectUtils.getProjectFolder
 import timber.log.Timber
 import java.io.*
+import kotlin.jvm.Throws
 
 object FileUtils {
 
@@ -143,6 +144,10 @@ object FileUtils {
     // Supports .jpg, .png, .jpeg creation from timestamp
     fun getPhotoFileExtensions(timestamp: Long): Array<String> {
         return arrayOf("$timestamp.jpg", "$timestamp.png", "$timestamp.jpeg")
+
+        // TODO: reassess this block for creating from ai art machine
+        //val timestampString = timestamp.toString().padStart(4, '0')
+        //return arrayOf("$timestampString.jpg", "$timestampString.png", "$timestampString.jpeg")
     }
 
     // This function Writes the tags for a project in a text file in the meta directory for the project
@@ -223,6 +228,16 @@ object FileUtils {
                 val fileDefString = "file '$photoUrlString'\n" // file '/path/to/file1'
                 outputStreamWriter.write(fileDefString)
             }
+
+            // TODO: use this block to create feature to make a rewind gif or mp4
+            // For looping backwards to start
+            /*for (i in listOfPhotos.size-2 downTo 1){
+                val cphoto = listOfPhotos[i]
+                val photoUrlString = ProjectUtils.getProjectPhotoUrl(externalFilesDir, projectEntry, cphoto.timestamp)
+                val fileDefString = "file '$photoUrlString'\n" // file '/path/to/file1'
+                outputStreamWriter.write(fileDefString)
+            }*/
+
             outputStreamWriter.flush()
             output.fd.sync()
             outputStreamWriter.close()
