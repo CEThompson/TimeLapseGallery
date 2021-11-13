@@ -28,7 +28,8 @@
         tools:ignore="AllowBackup">
 
         <!-- Main Activity -->
-        <activity android:name=".TimeLapseGalleryActivity">
+        <activity android:name=".TimeLapseGalleryActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -58,7 +59,8 @@
         </receiver>
 
         <!-- This receiver used to update any active widgets -->
-        <receiver android:name=".widget.WidgetProvider">
+        <receiver android:name=".widget.WidgetProvider"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
