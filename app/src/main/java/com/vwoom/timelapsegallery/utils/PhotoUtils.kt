@@ -6,6 +6,7 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import androidx.exifinterface.media.ExifInterface
 import java.io.IOException
+import kotlin.jvm.Throws
 
 // TODO: reassess usage of this class
 object PhotoUtils {
