@@ -110,7 +110,8 @@ class SettingsFragment : BasePreferenceFragment() {
         val syncPref: Preference? = findPreference(getString(R.string.key_sync))
 
         // Listen for changes to shared preferences and update notification worker on change
-        prefs = PreferenceManager.getDefaultSharedPreferences(activity)
+        prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        //prefs = PreferenceManager.getDefaultSharedPreferences(activity)
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
             Timber.d("Notification listener activating for key = $key")
 

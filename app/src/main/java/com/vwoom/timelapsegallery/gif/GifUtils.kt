@@ -6,11 +6,12 @@ import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.arthenica.mobileffmpeg.FFmpeg
+import com.arthenica.ffmpegkit.FFmpegKit
 import com.vwoom.timelapsegallery.data.entry.ProjectEntry
 import com.vwoom.timelapsegallery.utils.FileUtils
 import timber.log.Timber
 import java.io.File
+
 
 object GifUtils {
     private val TAG = GifUtils::class.java.simpleName
@@ -36,10 +37,10 @@ object GifUtils {
 
         // Create the command for ffmpeg
         val ffmpegCommand = "-r $fps -y -f concat -safe 0 -i $listTextFile -vf scale=$scale:-1 $outputGif"
-        FFmpeg.execute(ffmpegCommand)
+        FFmpegKit.execute(ffmpegCommand)
 
         //Use this block for logging
-        //val rc = FFmpeg.execute(ffmpegCommand)
+        //val session = FFmpegKit.execute(ffmpegCommand)
         //val lastCommandOutput = Config.getLastCommandOutput()
         //Log.d("TLG.GIF:", "Creating list of text files")
         //Log.d("TLG.GIF:", "Output gif path is: $outputGif")
