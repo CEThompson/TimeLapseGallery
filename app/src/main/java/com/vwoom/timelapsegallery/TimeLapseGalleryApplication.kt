@@ -8,6 +8,7 @@ import timber.log.Timber
 
 // TODO: (1.4) Gather feedback for 1.4 update
 
+// TODO: Consider rebranding
 // TODO: (TLG rebrand) change to SERENDIPITY
 // TODO: (TLG rebrand) create mermaid splash - investigate bombs and bees - animate water
 // TODO: (TLG rebrand) add a map, bottom NAV, sidenav?
@@ -15,18 +16,18 @@ import timber.log.Timber
 // TODO: (1.4) convert NWS Api to OpenWeather?
 // TODO: (1.4) implement CI/CD
 
-// TODO: (when scaling an issue) implement left handed and right handed modes
-// TODO: (when scaling an issue) implement content grouping where appropriate for accessibility
-// TODO: (when scaling an issue) consider any content descriptions that need dynamic content descriptions with live regions
+// Consider implementing left handed and right handed modes
+// Consider implement content grouping where appropriate for accessibility
+// Consider consider any content descriptions that need dynamic content descriptions with live regions
 
 // TODO: (deferred) consider adding quick input mode
 // TODO: (deferred) consider modularizing app  [camera - gallery]
 // TODO: (deferred) investigate night light mode? How do stargazing apps do it?
 
-// TODO: (when stable) convert to data store
-// TODO: (when stable) convert moshi to kotlinx serialization
-// TODO: (when stable) convert all usage of java time to kotlinx datetime
-// TODO: (when stable) convert to hilt?
+// TODO: (when stable) consider converting to data store
+// TODO: (when stable) consider converting moshi to kotlinx serialization
+// TODO: (when stable) consider converting all usage of java time to kotlinx datetime
+// TODO: (when stable) consider converting to hilt
 
 class TimeLapseGalleryApplication : Application() {
 
