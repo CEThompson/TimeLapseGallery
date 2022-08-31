@@ -35,6 +35,7 @@ import com.vwoom.timelapsegallery.R
 import com.vwoom.timelapsegallery.camera2.common.AutoFitTextureView
 import com.vwoom.timelapsegallery.camera2.common.OrientationLiveData
 import com.vwoom.timelapsegallery.camera2.common.getPreviewOutputSize
+import com.vwoom.timelapsegallery.data.view.ProjectView
 import com.vwoom.timelapsegallery.databinding.FragmentCamera2Binding
 import com.vwoom.timelapsegallery.di.viewmodel.ViewModelFactory
 import com.vwoom.timelapsegallery.di.base.BaseFragment
@@ -45,6 +46,7 @@ import com.vwoom.timelapsegallery.weather.WeatherAdapter.Companion.CELSIUS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -153,6 +155,10 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
 
         // Set a click listener to take the photo, either adding it to an existing project or creating a new project
         takePictureFab?.setOnClickListener {
+            // Determine if new project
+            val isNewProject = (args.projectView == null)
+            var newProjectView: ProjectView? = null
+
             // Disable the take picture fab
             it.isEnabled = false
             // Launch the picture as an idling resource job
@@ -186,26 +192,19 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
                     exif.setAttribute(ExifInterface.TAG_DATETIME_ORIGINAL, timeString)
                     exif.saveAttributes()
 
-                    // Determine if new project
-                    val isNewProject = (args.projectView == null)
-
                     // For new projects navigate to project detail after insertion
                     // TODO: (deferred) insert quick entry mode logic here for new projects
                     val sensorData = SensorData(light = currentLight, pressure = currentPressure, temp = currentAmbientTemp, humidity = currentRelativeHumidity)
-                    if (isNewProject) {
-                        val newProjectView = camera2ViewModel.addNewProject(file, externalFilesDir, timestamp, sensorData)
-                        val action = Camera2FragmentDirections.actionCamera2FragmentToDetailsFragment(newProjectView)
-                        findNavController().navigate(action)
-                    }
+
+                    // TODO: (deferred) insert quick entry mode logic here for taking multiple timelapse pictures for a project
+                    if (isNewProject)
+                        newProjectView = camera2ViewModel.addNewProject(file, externalFilesDir, timestamp, sensorData)
                     // For existing projects pop back to the project detail after adding the picture
-                    else {
-                        camera2ViewModel.addPhotoToProject(file, externalFilesDir, timestamp, sensorData)
-                        // TODO: (deferred) insert quick entry mode logic here for taking multiple timelapse pictures for a project
-                        findNavController().popBackStack()
-                    }
+                    else camera2ViewModel.addPhotoToProject(file, externalFilesDir, timestamp, sensorData)
+
                 } catch (e: Exception) {
-                    viewFinder.post { Toast.makeText(context, "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
-                    Timber.d("Take picture exception: ${e.message}")
+                    Timber.e("Take picture exception: ${e.message}")
+                    viewFinder.post { Toast.makeText(requireActivity(), "Capture failed: ${e.message}", Toast.LENGTH_LONG).show() }
                 } finally {
                     try {
                         outputPhoto?.close()
@@ -216,6 +215,26 @@ class Camera2Fragment : BaseFragment(), SensorEventListener, LifecycleOwner {
                 // Re-enable the take picture fab
                 it.post { it.isEnabled = true }
             }
+
+            // TODO: temporary fix to navigate back from camera fragment or to project once take picture job complete, re-evaluate this block
+            takePictureJob?.invokeOnCompletion{
+                lifecycleScope.launchIdling {
+                    withContext(Dispatchers.Main) {
+                        if (isNewProject) {
+                            newProjectView?.let { currentProjectView ->
+                                val action =
+                                    Camera2FragmentDirections.actionCamera2FragmentToDetailsFragment(
+                                        currentProjectView
+                                    )
+                                findNavController().navigate(action)
+                            }
+                        } else {
+                            findNavController().popBackStack()
+                        }
+                    }
+                }
+            }
+
         }
         cameraBinding = binding
         return binding.root
