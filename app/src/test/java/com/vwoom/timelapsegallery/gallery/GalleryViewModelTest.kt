@@ -10,6 +10,8 @@ import com.vwoom.timelapsegallery.getOrAwaitValue
 import com.vwoom.timelapsegallery.weather.WeatherResult
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.pauseDispatcher
+import kotlinx.coroutines.test.resumeDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
